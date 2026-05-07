@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Oracle Lexique Francisé SIH - Dictionnaire interactif, exemples PL/SQL, quiz">
+<title>Oracle Lexique Francisé - SIH</title>
+<style>
+:root {
+  --color-bg-deep: #0a0e17;
+  --color-bg-surface: #131a2a;
+  --color-bg-elevated: #1a2340;
+  --color-bg-hover: #243052;
+  --color-border: #1e2d4a;
+  --color-border-active: #3b82f6;
+  --color-blue: #3b82f6;
+  --color-blue-dim: #1e3a6e;
+  --color-red: #ef4444;
+  --color-red-dim: #7f1d1d;
+  --color-green: #22c55e;
+  --color-green-dim: #166534;
+  --color-amber: #f59e0b;
+  --color-amber-dim: #78350f;
+  --color-cyan: #06b6d4;
+  --color-purple: #a855f7;
+  --font-ui: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+  --fs-xs: 0.6875rem;
+  --fs-sm: 0.8125rem;
+  --fs-base: 0.9375rem;
+  --fs-md: 1.0625rem;
+  --fs-lg: 1.25rem;
+  --fs-xl: 1.5rem;
+  --fs-2xl: 2rem;
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-6: 1.5rem;
+  --sp-8: 2rem;
+  --sp-12: 3rem;
+  --nav-width: 260px;
+  --header-height: 56px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --transition-fast: 150ms ease;
+  --transition-normal: 300ms ease;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+body { font-family: var(--font-ui); font-size: var(--fs-base); color: #e2e8f0; background: var(--color-bg-deep); line-height: 1.6; overflow-x: hidden; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input, select, textarea { font-family: inherit; font-size: inherit; }
+pre, code { font-family: var(--font-mono); }
+table { border-collapse: collapse; width: 100%; }
+a { color: var(--color-cyan); text-decoration: none; }
+a:hover { text-decoration: underline; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--color-bg-deep); }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: var(--radius-sm); }
+::-webkit-scrollbar-thumb:hover { background: var(--color-blue); }
+
+.app-layout { display: grid; grid-template-columns: var(--nav-width) 1fr; grid-template-rows: var(--header-height) 1fr; grid-template-areas: "header header" "nav main"; min-height: 100vh; }
+.app-header { grid-area: header; display: flex; align-items: center; justify-content: space-between; padding: 0 var(--sp-6); background: var(--color-bg-surface); border-bottom: 1px solid var(--color-border); z-index: 100; }
+.app-header__brand { display: flex; align-items: center; gap: var(--sp-3); font-family: var(--font-mono); font-size: var(--fs-md); font-weight: 700; letter-spacing: -0.02em; }
+.app-header__brand-icon { width: 28px; height: 28px; background: var(--color-blue); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: var(--fs-sm); font-weight: 900; color: #fff; }
+.app-header__status { display: flex; align-items: center; gap: var(--sp-4); font-size: var(--fs-xs); font-family: var(--font-mono); }
+.status-badge { display: inline-flex; align-items: center; gap: var(--sp-2); padding: var(--sp-1) var(--sp-3); border-radius: var(--radius-sm); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.status-badge--online { background: var(--color-green-dim); color: var(--color-green); }
+.status-badge--hds { background: var(--color-blue-dim); color: var(--color-blue); }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: pulse-dot 2s infinite; }
+@keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.app-nav { grid-area: nav; background: var(--color-bg-surface); border-right: 1px solid var(--color-border); padding: var(--sp-6) 0; overflow-y: auto; }
+.app-nav__section { padding: 0 var(--sp-4); margin-bottom: var(--sp-6); }
+.app-nav__section-title { font-size: var(--fs-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-blue); margin-bottom: var(--sp-3); font-family: var(--font-mono); }
+.app-nav__item { display: flex; align-items: center; gap: var(--sp-3); width: 100%; padding: var(--sp-3) var(--sp-4); border-radius: var(--radius-md); font-size: var(--fs-sm); font-weight: 500; color: #94a3b8; transition: all var(--transition-fast); text-align: left; }
+.app-nav__item:hover { background: var(--color-bg-hover); color: #e2e8f0; }
+.app-nav__item--active { background: var(--color-blue-dim); color: var(--color-blue); font-weight: 600; }
+.app-nav__item-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700; border-radius: var(--radius-sm); background: var(--color-bg-elevated); flex-shrink: 0; }
+.app-nav__item--active .app-nav__item-icon { background: var(--color-blue); color: #fff; }
+.app-nav__rgpd-notice { margin: var(--sp-6) var(--sp-4); padding: var(--sp-3); background: var(--color-blue-dim); border: 1px solid var(--color-blue); border-radius: var(--radius-md); font-size: var(--fs-xs); color: var(--color-blue); font-family: var(--font-mono); line-height: 1.5; }
+
+.app-main { grid-area: main; padding: var(--sp-8); overflow-y: auto; background: var(--color-bg-deep); }
+
+.page-header { margin-bottom: var(--sp-8); padding-bottom: var(--sp-4); border-bottom: 1px solid var(--color-border); }
+.page-header__title { font-size: var(--fs-xl); font-weight: 700; letter-spacing: -0.02em; margin-bottom: var(--sp-2); }
+.page-header__subtitle { font-size: var(--fs-sm); color: #94a3b8; font-family: var(--font-mono); }
+.page-header__subtitle-row { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); }
+.page-header__help-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 1px solid var(--color-border); border-radius: 50%; background: var(--color-bg-elevated); color: #94a3b8; font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700; cursor: pointer; transition: all var(--transition-fast); flex-shrink: 0; }
+.page-header__help-btn:hover { border-color: var(--color-blue); color: var(--color-blue); background: var(--color-blue-dim); }
+
+.card { background: var(--color-bg-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--sp-6); margin-bottom: var(--sp-6); }
+.card__title { font-size: var(--fs-md); font-weight: 700; margin-bottom: var(--sp-4); display: flex; align-items: center; gap: var(--sp-3); font-family: var(--font-mono); }
+.card__title-icon { color: var(--color-blue); }
+
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-6); }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-6); }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-6); }
+@media (max-width: 1200px) { .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+.data-mono { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--color-cyan); background: var(--color-bg-elevated); padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); display: inline-block; }
+.data-label { font-size: var(--fs-xs); color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+
+.stat-block { background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--sp-4); text-align: center; }
+.stat-block__value { font-family: var(--font-mono); font-size: var(--fs-xl); font-weight: 700; margin-bottom: var(--sp-1); }
+.stat-block__label { font-size: var(--fs-xs); color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+.stat-block--blue .stat-block__value { color: var(--color-blue); }
+.stat-block--green .stat-block__value { color: var(--color-green); }
+.stat-block--red .stat-block__value { color: var(--color-red); }
+.stat-block--amber .stat-block__value { color: var(--color-amber); }
+.stat-block--cyan .stat-block__value { color: var(--color-cyan); }
+.stat-block--purple .stat-block__value { color: var(--color-purple); }
+
+.progress-bar { width: 100%; height: 8px; background: var(--color-bg-elevated); border-radius: var(--radius-sm); overflow: hidden; margin: var(--sp-2) 0; }
+.progress-bar__fill { height: 100%; border-radius: var(--radius-sm); transition: width var(--transition-normal); }
+.progress-bar__fill--blue { background: var(--color-blue); }
+.progress-bar__fill--green { background: var(--color-green); }
+.progress-bar__fill--red { background: var(--color-red); }
+.progress-bar__fill--amber { background: var(--color-amber); }
+.progress-bar__fill--cyan { background: var(--color-cyan); }
+
+.tag { display: inline-flex; align-items: center; padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); font-size: var(--fs-xs); font-weight: 600; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.03em; }
+.tag--blue { background: var(--color-blue-dim); color: var(--color-blue); }
+.tag--green { background: var(--color-green-dim); color: var(--color-green); }
+.tag--red { background: var(--color-red-dim); color: var(--color-red); }
+.tag--amber { background: var(--color-amber-dim); color: var(--color-amber); }
+.tag--purple { background: #4c1d95; color: var(--color-purple); }
+.tag--cyan { background: #083344; color: var(--color-cyan); }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2); padding: var(--sp-3) var(--sp-6); border-radius: var(--radius-md); font-size: var(--fs-sm); font-weight: 600; transition: all var(--transition-fast); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.03em; }
+.btn--primary { background: var(--color-blue); color: #fff; }
+.btn--primary:hover { background: #2563eb; }
+.btn--success { background: var(--color-green); color: #fff; }
+.btn--success:hover { background: #16a34a; }
+.btn--danger { background: var(--color-red); color: #fff; }
+.btn--danger:hover { background: #dc2626; }
+.btn--outline { border: 1px solid var(--color-border); color: #e2e8f0; }
+.btn--outline:hover { border-color: var(--color-blue); color: var(--color-blue); }
+.btn--sm { padding: var(--sp-2) var(--sp-4); font-size: var(--fs-xs); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.alert { padding: var(--sp-4); border-radius: var(--radius-md); border-left: 4px solid; margin-bottom: var(--sp-4); font-size: var(--fs-sm); font-family: var(--font-mono); }
+.alert--info { background: var(--color-blue-dim); border-color: var(--color-blue); color: #93c5fd; }
+.alert--success { background: var(--color-green-dim); border-color: var(--color-green); color: #86efac; }
+.alert--warning { background: var(--color-amber-dim); border-color: var(--color-amber); color: #fcd34d; }
+.alert--error { background: var(--color-red-dim); border-color: var(--color-red); color: #fca5a5; }
+
+.log-console { background: #000; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--sp-4); font-family: var(--font-mono); font-size: var(--fs-xs); max-height: 300px; overflow-y: auto; line-height: 1.8; }
+.log-console__entry { color: #94a3b8; }
+.log-console__entry--info { color: var(--color-blue); }
+.log-console__entry--success { color: var(--color-green); }
+.log-console__entry--error { color: var(--color-red); }
+.log-console__entry--warn { color: var(--color-amber); }
+.log-console__timestamp { color: #475569; margin-right: var(--sp-2); }
+
+.data-table { width: 100%; font-size: var(--fs-sm); }
+.data-table th { text-align: left; padding: var(--sp-3) var(--sp-4); background: var(--color-bg-elevated); font-family: var(--font-mono); font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; font-weight: 600; border-bottom: 1px solid var(--color-border); }
+.data-table td { padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--color-border); font-family: var(--font-mono); font-size: var(--fs-xs); }
+.data-table tr:hover td { background: var(--color-bg-hover); }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn var(--transition-normal) ease; }
+.module-section { display: none; }
+.module-section--active { display: block; animation: fadeIn var(--transition-normal) ease; }
+
+.app-footer { margin-top: var(--sp-12); padding-top: var(--sp-6); border-top: 1px solid var(--color-border); font-size: var(--fs-xs); color: #475569; font-family: var(--font-mono); text-align: center; line-height: 1.8; }
+
+.search-bar { position: relative; margin-bottom: var(--sp-4); }
+.search-bar__input { width: 100%; padding: var(--sp-3) var(--sp-4) var(--sp-3) var(--sp-10); background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-md); color: #e2e8f0; font-family: var(--font-mono); font-size: var(--fs-sm); outline: none; transition: border-color var(--transition-fast); }
+.search-bar__input:focus { border-color: var(--color-blue); }
+.search-bar__input::placeholder { color: #475569; }
+.search-bar__icon { position: absolute; left: var(--sp-4); top: 50%; transform: translateY(-50%); font-family: var(--font-mono); font-size: var(--fs-sm); color: #475569; pointer-events: none; }
+
+.filter-pills { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-bottom: var(--sp-4); }
+.filter-pill { display: inline-flex; align-items: center; padding: var(--sp-2) var(--sp-4); border-radius: 20px; font-size: var(--fs-xs); font-weight: 600; font-family: var(--font-mono); border: 1px solid var(--color-border); color: #94a3b8; cursor: pointer; transition: all var(--transition-fast); text-transform: none; letter-spacing: 0; }
+.filter-pill:hover { border-color: var(--color-blue); color: #e2e8f0; }
+.filter-pill--active { background: var(--color-blue); color: #fff; border-color: var(--color-blue); }
+.filter-pill--active:hover { background: #2563eb; }
+
+.lex-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-4); }
+@media (max-width: 1200px) { .lex-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) { .lex-grid { grid-template-columns: 1fr; } }
+
+.lex-card { perspective: 800px; min-height: 240px; cursor: pointer; }
+.lex-card__inner { position: relative; width: 100%; height: 100%; min-height: 240px; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; }
+.lex-card--flipped .lex-card__inner { transform: rotateY(180deg); }
+.lex-card__face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: var(--radius-lg); padding: var(--sp-4); display: flex; flex-direction: column; border: 1px solid var(--color-border); background: var(--color-bg-surface); }
+.lex-card__back { transform: rotateY(180deg); background: var(--color-bg-elevated); border-color: var(--color-blue); }
+.lex-card__category { margin-bottom: var(--sp-3); }
+.lex-card__term-fr { font-weight: 700; font-size: var(--fs-md); margin-bottom: var(--sp-1); }
+.lex-card__term-en { color: var(--color-cyan); font-family: var(--font-mono); font-size: var(--fs-xs); margin-bottom: var(--sp-3); }
+.lex-card__short-def { font-size: var(--fs-sm); color: #94a3b8; flex: 1; line-height: 1.6; }
+.lex-card__full-def { font-size: var(--fs-sm); color: #cbd5e1; flex: 1; line-height: 1.6; margin-bottom: var(--sp-3); }
+.lex-card__context { font-size: var(--fs-xs); color: #64748b; font-family: var(--font-mono); padding: var(--sp-2); background: var(--color-bg-deep); border-radius: var(--radius-sm); margin-bottom: var(--sp-3); }
+.lex-card__btn { align-self: flex-end; }
+
+.lex-count { font-family: var(--font-mono); font-size: var(--fs-xs); color: #64748b; margin-bottom: var(--sp-4); }
+
+.code-editor-wrapper { position: relative; background: #0d1117; border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; }
+.code-editor__header { display: flex; align-items: center; justify-content: space-between; padding: var(--sp-2) var(--sp-4); background: var(--color-bg-elevated); border-bottom: 1px solid var(--color-border); }
+.code-editor__label { font-family: var(--font-mono); font-size: var(--fs-xs); color: #94a3b8; }
+.code-editor__textarea { width: 100%; min-height: 300px; padding: var(--sp-4); background: transparent; color: #e2e8f0; font-family: var(--font-mono); font-size: var(--fs-sm); line-height: 1.7; border: none; outline: none; resize: vertical; tab-size: 2; white-space: pre; overflow: auto; }
+.example-selector select { width: 100%; padding: var(--sp-3) var(--sp-4); background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-md); color: #e2e8f0; font-family: var(--font-mono); font-size: var(--fs-sm); cursor: pointer; }
+.example-selector select option { background: var(--color-bg-surface); }
+
+.state-machine { display: flex; align-items: center; gap: var(--sp-2); padding: var(--sp-3) 0; flex-wrap: wrap; }
+.state-step { display: flex; align-items: center; gap: var(--sp-2); font-family: var(--font-mono); font-size: var(--fs-xs); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #475569; }
+.state-step__dot { width: 10px; height: 10px; border-radius: 50%; background: #475569; transition: all var(--transition-fast); }
+.state-step--active .state-step__dot { background: var(--color-blue); box-shadow: 0 0 8px var(--color-blue); animation: pulse-dot 1s infinite; }
+.state-step--active { color: var(--color-blue); }
+.state-step--done .state-step__dot { background: var(--color-green); }
+.state-step--done { color: var(--color-green); }
+.state-step--error .state-step__dot { background: var(--color-red); box-shadow: 0 0 8px var(--color-red); }
+.state-step--error { color: var(--color-red); }
+.state-arrow { color: #475569; font-size: var(--fs-xs); }
+
+.example-explanation { padding: var(--sp-4); border-left: 4px solid var(--color-blue); background: var(--color-bg-elevated); border-radius: 0 var(--radius-md) var(--radius-md) 0; margin-top: var(--sp-4); font-size: var(--fs-sm); color: #cbd5e1; line-height: 1.7; }
+.example-explanation__title { font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700; color: var(--color-blue); margin-bottom: var(--sp-2); }
+.example-explanation code { font-family: var(--font-mono); font-size: var(--fs-xs); background: var(--color-bg-deep); padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); color: var(--color-cyan); }
+
+.quiz-question { font-size: var(--fs-md); font-weight: 600; margin-bottom: var(--sp-6); line-height: 1.5; }
+.quiz-question code { font-family: var(--font-mono); font-size: var(--fs-sm); background: var(--color-bg-elevated); padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); color: var(--color-cyan); }
+.quiz-options { display: flex; flex-direction: column; gap: var(--sp-3); }
+.quiz-option { display: flex; align-items: center; gap: var(--sp-3); width: 100%; padding: var(--sp-3) var(--sp-4); background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-md); font-size: var(--fs-sm); color: #e2e8f0; cursor: pointer; transition: all var(--transition-fast); text-align: left; font-family: var(--font-mono); }
+.quiz-option:hover:not(:disabled) { border-color: var(--color-blue); background: var(--color-bg-hover); }
+.quiz-option:disabled { cursor: not-allowed; }
+.quiz-option--correct { border-color: var(--color-green); background: var(--color-green-dim); color: var(--color-green); }
+.quiz-option--wrong { border-color: var(--color-red); background: var(--color-red-dim); color: var(--color-red); }
+.quiz-option__letter { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--color-bg-deep); font-weight: 700; font-size: var(--fs-xs); flex-shrink: 0; }
+.quiz-feedback { margin-top: var(--sp-4); }
+.quiz-progress-bar { margin-bottom: var(--sp-4); }
+.quiz-progress-bar__text { font-family: var(--font-mono); font-size: var(--fs-xs); color: #64748b; margin-bottom: var(--sp-1); display: flex; justify-content: space-between; }
+
+.help-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 999; animation: fadeIn 0.2s ease; }
+.help-overlay--active { display: block; }
+.help-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%) translateY(16px); width: 90%; max-width: 720px; max-height: 85vh; background: var(--color-bg-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); z-index: 1000; overflow: hidden; animation: fadeSlideUp 0.3s ease forwards; box-shadow: 0 24px 48px rgba(0,0,0,0.4); }
+.help-modal--active { display: flex; flex-direction: column; }
+@keyframes fadeSlideUp { from { opacity:0; transform: translate(-50%,-50%) translateY(16px); } to { opacity:1; transform: translate(-50%,-50%) translateY(0); } }
+.help-modal__header { display: flex; align-items: center; justify-content: space-between; padding: var(--sp-4) var(--sp-6); border-bottom: 1px solid var(--color-border); background: var(--color-bg-elevated); }
+.help-modal__title { font-family: var(--font-mono); font-size: var(--fs-md); font-weight: 700; color: var(--color-blue); }
+.help-modal__close { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-bg-deep); color: #94a3b8; font-size: var(--fs-md); cursor: pointer; transition: all var(--transition-fast); font-weight: 700; }
+.help-modal__close:hover { border-color: var(--color-red); color: var(--color-red); background: var(--color-red-dim); }
+.help-modal__body { padding: var(--sp-6); overflow-y: auto; flex: 1; }
+.help-modal__section { margin-bottom: var(--sp-6); }
+.help-modal__section:last-child { margin-bottom: 0; }
+.help-modal__section-title { font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: var(--sp-3); padding-bottom: var(--sp-2); border-bottom: 1px solid var(--color-border); }
+.help-modal__section-title--objective { color: var(--color-blue); }
+.help-modal__section-title--controls { color: var(--color-cyan); }
+.help-modal__section-title--indicators { color: var(--color-amber); }
+.help-modal__section-title--hds { color: var(--color-green); }
+.help-modal__text { font-size: var(--fs-sm); color: #cbd5e1; line-height: 1.7; margin-bottom: var(--sp-3); }
+.help-modal__text code { font-family: var(--font-mono); font-size: var(--fs-xs); background: var(--color-bg-elevated); padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); color: var(--color-cyan); }
+.help-modal__list { list-style: none; padding: 0; }
+.help-modal__list li { position: relative; padding: var(--sp-2) 0 var(--sp-2) var(--sp-6); font-size: var(--fs-sm); color: #94a3b8; line-height: 1.6; border-left: 2px solid var(--color-border); }
+.help-modal__list li::before { content: ''; position: absolute; left: -1px; top: 50%; width: 8px; height: 2px; background: var(--color-blue); transform: translateY(-50%); }
+.help-modal__list li:last-child { border-left-color: transparent; }
+.help-modal__footer { padding: var(--sp-4) var(--sp-6); border-top: 1px solid var(--color-border); display: flex; justify-content: flex-end; background: var(--color-bg-elevated); }
+</style>
+</head>
+<body>
+
+<div class="app-layout">
+  <header class="app-header">
+    <div class="app-header__brand">
+      <div class="app-header__brand-icon">L</div>
+      <span>ORACLE<span style="color: var(--color-cyan);">_LEXIQUE</span>::SIH</span>
+    </div>
+    <div class="app-header__status">
+      <span class="status-badge status-badge--online"><span class="status-dot"></span>LEXIQUE ACTIF</span>
+      <span class="status-badge status-badge--hds">HDS / DONNEES FICTIVES</span>
+    </div>
+  </header>
+
+  <nav class="app-nav">
+    <div class="app-nav__section">
+      <div class="app-nav__section-title">Lexique Oracle PUI</div>
+      <button class="app-nav__item app-nav__item--active" data-tab="dictionary"><span class="app-nav__item-icon">D</span>Dictionnaire Interactif</button>
+      <button class="app-nav__item" data-tab="examples"><span class="app-nav__item-icon">E</span>Laboratoire d'Exemples</button>
+      <button class="app-nav__item" data-tab="quiz"><span class="app-nav__item-icon">Q</span>Quiz &amp; Validation</button>
+    </div>
+    <div class="app-nav__section">
+      <div class="app-nav__section-title">Progression</div>
+      <div style="padding: 0 var(--sp-4); font-size: var(--fs-xs); font-family: var(--font-mono); line-height: 2;">
+        <div style="color: #64748b;">TERMES ETUDIES</div>
+        <div id="session-terms-count" style="color: var(--color-cyan);">0 / 50</div>
+        <div style="color: #64748b; margin-top: var(--sp-2);">SCORE QUIZ</div>
+        <div id="session-quiz-score" style="color: var(--color-green);">0%</div>
+      </div>
+    </div>
+    <div class="app-nav__rgpd-notice">
+      100% FICTIF<br>
+      Concu pour DSI HCL<br>
+      Contexte PUI Hospitaliere
+    </div>
+  </nav>
+
+  <main class="app-main" id="app-main">
+    <!-- TAB 1: DICTIONNAIRE -->
+    <section class="module-section module-section--active" id="tab-dictionary">
+      <div class="page-header">
+        <h1 class="page-header__title">Dictionnaire Interactif</h1>
+        <div class="page-header__subtitle-row">
+          <p class="page-header__subtitle">50 termes Oracle francises, filtrables par domaine. Cliquez une carte pour le verso detaille.</p>
+          <button class="page-header__help-btn" data-help="dictionary" aria-label="Aide Dictionnaire">?</button>
+        </div>
+      </div>
+      <div class="search-bar">
+        <span class="search-bar__icon">&#128269;</span>
+        <input type="search" class="search-bar__input" id="lex-search" placeholder="Rechercher un terme, une definition, un mot-cle..." autocomplete="off">
+      </div>
+      <div class="filter-pills" id="filter-pills">
+        <button class="filter-pill filter-pill--active" data-category="all">Tous (50)</button>
+        <button class="filter-pill" data-category="Structure">Structure</button>
+        <button class="filter-pill" data-category="Objets">Objets</button>
+        <button class="filter-pill" data-category="PL/SQL">PL/SQL</button>
+        <button class="filter-pill" data-category="Triggers">Triggers</button>
+        <button class="filter-pill" data-category="Performance">Performance</button>
+        <button class="filter-pill" data-category="Securite">Securite</button>
+      </div>
+      <div class="lex-count" id="lex-filter-count">50 / 50 termes</div>
+      <div class="lex-grid" id="lex-grid"></div>
+    </section>
+
+    <!-- TAB 2: LABORATOIRE -->
+    <section class="module-section" id="tab-examples">
+      <div class="page-header">
+        <h1 class="page-header__title">Laboratoire d'Exemples</h1>
+        <div class="page-header__subtitle-row">
+          <p class="page-header__subtitle">Exemples pedagogiques 100% nouveaux, execution simulee avec erreurs ORA</p>
+          <button class="page-header__help-btn" data-help="examples" aria-label="Aide Exemples">?</button>
+        </div>
+      </div>
+      <div class="card fade-in">
+        <div class="card__title"><span class="card__title-icon">&#9655;</span> Concept a etudier</div>
+        <div class="example-selector">
+          <select id="example-select"><option value="">-- Choisir un exemple --</option></select>
+        </div>
+      </div>
+      <div class="card fade-in">
+        <div class="card__title"><span class="card__title-icon">&gt;_</span> Editeur de Code</div>
+        <div class="code-editor-wrapper">
+          <div class="code-editor__header">
+            <span class="code-editor__label" id="example-filename">exemple.sql</span>
+            <span class="code-editor__label" id="example-lang">SQL</span>
+          </div>
+          <textarea class="code-editor__textarea" id="example-code" readonly spellcheck="false"></textarea>
+        </div>
+        <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
+          <button class="btn btn--success btn--sm" id="btn-execute-example">&#9654; Simuler l'Execution</button>
+          <button class="btn btn--outline btn--sm" id="btn-reset-example">Reinitialiser</button>
+        </div>
+      </div>
+      <div class="card fade-in">
+        <div class="card__title"><span class="card__title-icon">&#9202;</span> Machine d'Etats</div>
+        <div class="state-machine" id="example-state-machine">
+          <div class="state-step state-step--active" id="ex-state-idle"><span class="state-step__dot"></span>IDLE</div>
+          <span class="state-arrow">&rarr;</span>
+          <div class="state-step" id="ex-state-parsing"><span class="state-step__dot"></span>PARSING</div>
+          <span class="state-arrow">&rarr;</span>
+          <div class="state-step" id="ex-state-compiling"><span class="state-step__dot"></span>COMPILING</div>
+          <span class="state-arrow">&rarr;</span>
+          <div class="state-step" id="ex-state-executing"><span class="state-step__dot"></span>EXECUTING</div>
+          <span class="state-arrow">&rarr;</span>
+          <div class="state-step" id="ex-state-completed"><span class="state-step__dot"></span>COMPLETED</div>
+        </div>
+        <div id="ex-state-info" style="margin-top: var(--sp-2); font-size: var(--fs-xs); color: #64748b; font-family: var(--font-mono);"></div>
+      </div>
+      <div class="card fade-in">
+        <div class="card__title"><span class="card__title-icon">&#128203;</span> Console de Sortie</div>
+        <div class="log-console" id="example-console" style="max-height: 250px;">
+          <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Laboratoire initialise. Selectionnez un exemple.</div>
+        </div>
+      </div>
+      <div id="example-explanation-container" style="display: none;">
+        <div class="example-explanation" id="example-explanation">
+          <div class="example-explanation__title" id="explanation-title"></div>
+          <div id="explanation-body"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: QUIZ -->
+    <section class="module-section" id="tab-quiz">
+      <div class="page-header">
+        <h1 class="page-header__title">Quiz &amp; Validation</h1>
+        <div class="page-header__subtitle-row">
+          <p class="page-header__subtitle">Testez votre maitrise des concepts Oracle PUI — 20 questions</p>
+          <button class="page-header__help-btn" data-help="quiz" aria-label="Aide Quiz">?</button>
+        </div>
+      </div>
+      <div class="grid-4" id="quiz-stats">
+        <div class="stat-block stat-block--cyan"><div class="stat-block__value" id="quiz-score">0</div><div class="stat-block__label">Score</div></div>
+        <div class="stat-block stat-block--blue"><div class="stat-block__value" id="quiz-total">0/20</div><div class="stat-block__label">Questions</div></div>
+        <div class="stat-block stat-block--green"><div class="stat-block__value" id="quiz-streak">0</div><div class="stat-block__label">Streak</div></div>
+        <div class="stat-block stat-block--amber"><div class="stat-block__value" id="quiz-pct">0%</div><div class="stat-block__label">Precision</div></div>
+      </div>
+      <div class="card fade-in">
+        <div class="card__title"><span class="card__title-icon">&#10067;</span> Question</div>
+        <div class="quiz-progress-bar">
+          <div class="quiz-progress-bar__text">
+            <span id="quiz-progress-text">Question 1 / 20</span>
+            <span id="quiz-progress-pct">0%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-bar__fill progress-bar__fill--blue" id="quiz-progress-fill" style="width: 0%;"></div></div>
+        </div>
+        <div class="quiz-question" id="quiz-question"></div>
+        <div class="quiz-options" id="quiz-options"></div>
+        <div class="quiz-feedback" id="quiz-feedback" style="display: none;"></div>
+        <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
+          <button class="btn btn--primary btn--sm" id="btn-next-question" style="display: none;">Prochaine Question &rarr;</button>
+          <button class="btn btn--outline btn--sm" id="btn-restart-quiz" style="display: none;">Recommencer</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- HELP MODALS -->
+    <div class="help-overlay" id="help-overlay" aria-hidden="true"></div>
+    <div class="help-modal" id="help-dictionary" role="dialog" aria-modal="true" aria-labelledby="help-dictionary-title" aria-hidden="true">
+      <div class="help-modal__header"><div class="help-modal__title" id="help-dictionary-title">Dictionnaire Interactif</div><button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button></div>
+      <div class="help-modal__body">
+        <div class="help-modal__section"><div class="help-modal__section-title help-modal__section-title--objective">Objectif</div><p class="help-modal__text">50 termes Oracle traduits en francais, classes par domaine. Chaque terme est affiche dans une carte interactive recto/verso.</p>
+        <ul class="help-modal__list"><li><strong>Recherche</strong> : Filtrage en temps reel par terme, definition ou mot-cle (debounce 150ms).</li><li><strong>Filtres categorie</strong> : 6 domaines couleurs : Structure (bleu), Objets (cyan), PL/SQL (vert), Triggers (ambre), Performance (violet), Securite (rouge).</li><li><strong>Flip carte</strong> : Cliquez pour voir la definition complete, le contexte PUI, et le bouton "Voir l'exemple".</li></ul></div>
+        <div class="help-modal__section"><div class="help-modal__section-title help-modal__section-title--controls">Controles</div><ul class="help-modal__list"><li><strong>Barre de recherche</strong> : Tapez un mot-cle pour filtrer.</li><li><strong>Pilules</strong> : Filtrez par domaine.</li><li><strong>Carte (clic)</strong> : Retournez pour le verso.</li><li><strong>Voir l'exemple</strong> : Navigue vers l'onglet Laboratoire avec l'exemple pre-charge.</li></ul></div>
+      </div>
+      <div class="help-modal__footer"><button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button></div>
+    </div>
+    <div class="help-modal" id="help-examples" role="dialog" aria-modal="true" aria-labelledby="help-examples-title" aria-hidden="true">
+      <div class="help-modal__header"><div class="help-modal__title" id="help-examples-title">Laboratoire d'Exemples</div><button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button></div>
+      <div class="help-modal__body">
+        <div class="help-modal__section"><div class="help-modal__section-title help-modal__section-title--objective">Objectif</div><p class="help-modal__text">Exemples de code pedagogiques pour illustrer les concepts Oracle les plus importants en contexte PUI.</p>
+        <ul class="help-modal__list"><li><strong>Erreur ORA-04091</strong> : Table mutante avec code erreur puis solution Compound Trigger.</li><li><strong>BULK COLLECT vs curseur</strong> : Comparison de performance simulee.</li><li><strong>Hints et Explain Plan</strong> : Analyse et optimisation de plans d'execution.</li><li><strong>VPD et Audit</strong> : Politiques de securite par service.</li></ul></div>
+        <div class="help-modal__section"><div class="help-modal__section-title help-modal__section-title--controls">Controles</div><ul class="help-modal__list"><li><strong>Selecteur</strong> : Choisit l'exemple a afficher.</li><li><strong>Editeur</strong> : Code SQL/PLSQL commente en lecture seule.</li><li><strong>Simuler</strong> : Lance la machine d'etats. Certains exemples declenchent une erreur ORA volontaire.</li></ul></div>
+      </div>
+      <div class="help-modal__footer"><button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button></div>
+    </div>
+    <div class="help-modal" id="help-quiz" role="dialog" aria-modal="true" aria-labelledby="help-quiz-title" aria-hidden="true">
+      <div class="help-modal__header"><div class="help-modal__title" id="help-quiz-title">Quiz &amp; Validation</div><button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button></div>
+      <div class="help-modal__body">
+        <div class="help-modal__section"><div class="help-modal__section-title help-modal__section-title--objective">Objectif</div><p class="help-modal__text">20 questions a choix multiples couvrant tous les domaines du lexique Oracle PUI.</p>
+        <ul class="help-modal__list"><li><strong>Questions aleatoires</strong> : Ordre randomise a chaque session.</li><li><strong>Feedback immediat</strong> : Explication detaillee apres chaque reponse.</li><li><strong>Score et streak</strong> : Suivi en temps reel des performances.</li></ul></div>
+        <div class="help-modal__section"><div class="help-modal__section-title help-modal__section-title--controls">Controles</div><ul class="help-modal__list"><li><strong>Proposition A/B/C</strong> : Cliquez pour repondre. Vert = correct, rouge = incorrect.</li><li><strong>Prochaine Question</strong> : Passe a la suivante.</li><li><strong>Recommencer</strong> : Melange et reinitialise.</li></ul></div>
+      </div>
+      <div class="help-modal__footer"><button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button></div>
+    </div>
+
+    <footer class="app-footer">
+      ORACLE_LEXIQUE::SIH — Lexique Francise pour DSI HCL<br>
+      50 termes couvrant SQL, PL/SQL, Triggers, Performance, Securite<br>
+      Zero Dependency — Offline — Conception pedagogique — 100% Fictif
+    </footer>
+  </main>
+</div>
+<script>
+'use strict';
+
+// ============================================================
+// EVENT DISPATCHER
+// ============================================================
+class EventDispatcher {
+  constructor() { this._l = {}; }
+  on(evt, cb) { (this._l[evt] = this._l[evt] || []).push(cb); }
+  off(evt, cb) { this._l[evt] = (this._l[evt] || []).filter(h => h !== cb); }
+  emit(evt, data) { (this._l[evt] || []).forEach(cb => cb(data)); }
+}
+
+// ============================================================
+// STATE MANAGER
+// ============================================================
+class StateManager {
+  constructor(key = 'oracle_lexique_sih_state') {
+    this._key = key;
+    this._data = this._load();
+    this._ev = new EventDispatcher();
+  }
+  _load() { try { return JSON.parse(localStorage.getItem(this._key)) || this._defaults(); } catch { return this._defaults(); } }
+  _defaults() { return { quizScore: 0, quizTotal: 0, termsViewed: [], lastExample: null }; }
+  _save() { try { localStorage.setItem(this._key, JSON.stringify(this._data)); } catch {} this._ev.emit('change', this._data); }
+  on(evt, cb) { this._ev.on(evt, cb); }
+  get termsViewed() { return this._data.termsViewed; }
+  trackTerm(id) { if (!this._data.termsViewed.includes(id)) { this._data.termsViewed.push(id); this._save(); } }
+  get lastExample() { return this._data.lastExample; }
+  set lastExample(v) { this._data.lastExample = v; this._save(); }
+  updateQuiz(score, total) { this._data.quizScore = score; this._data.quizTotal = total; this._save(); }
+  get quizData() { return { score: this._data.quizScore, total: this._data.quizTotal }; }
+}
+// ============================================================
+// LEXIQUE DATA - 50 TERMS
+// ============================================================
+const LEXIQUE_TERMS = [
+  {id:'table',termFr:'Table',termEn:'Table',category:'Structure',shortDef:'Structure fondamentale de stockage relationnel. Organise les donnees en lignes et colonnes avec des types stricts.',fullDef:'Une table Oracle est l unite de base du stockage relationnel. Elle definit des colonnes avec des types (VARCHAR2, NUMBER, DATE) et des contraintes (PK, FK, CHECK, NOT NULL). En PUI, STOCK_MED, LOT_SIMU et SORTIE_STOCK sont les piliers.',context:'PUI: CREATE TABLE stock_med (med_id NUMBER PRIMARY KEY, molecule VARCHAR2(100), qty NUMBER(8));',exampleId:'ex_table'},
+  {id:'vue',termFr:'Vue',termEn:'View',category:'Structure',shortDef:'Table virtuelle issue d un SELECT. Masque la complexite des jointures et restreint l acces aux donnees.',fullDef:'Une vue est un SELECT stocke comme objet BD. Elle ne contient pas de donnees (sauf vue materialisee). Elle simplifie les requetes complexes, masque des colonnes sensibles, et fournit une interface stable.',context:'PUI: CREATE VIEW v_stock_critique AS SELECT med_id, qty FROM stock_med WHERE qty < 50;',exampleId:'ex_vue'},
+  {id:'index',termFr:'Index',termEn:'Index',category:'Structure',shortDef:'Structure d acces rapide aux donnees. Recherches O(log n) au lieu de O(n).',fullDef:'Un index Oracle est une structure B-tree permettant d acceder rapidement aux lignes sans Full Table Scan. Les index composites optimisent les jointures. En PUI, un index sur (med_id, lot_id) accelere les dispensations.',context:'PUI: CREATE INDEX idx_stock_med ON stock_med(med_id, lot_id);',exampleId:'ex_index'},
+  {id:'sequence',termFr:'Sequence',termEn:'Sequence',category:'Structure',shortDef:'Generateur de nombres uniques et incrementaux. Pour les cles primaires auto-incrementees.',fullDef:'Une sequence genere une suite de nombres uniques. NEXTVAL retourne la prochaine valeur, CURRVAL la derniere generee. Essentiel pour les PK sans collision en multi-utilisateurs PUI.',context:'CREATE SEQUENCE seq_lot START WITH 1000 INCREMENT BY 1; INSERT INTO lot VALUES (seq_lot.NEXTVAL);',exampleId:'ex_sequence'},
+  {id:'synonyme',termFr:'Synonyme',termEn:'Synonym',category:'Structure',shortDef:'Alias pour un objet de BD. Simplifie les references croisees entre schemas.',fullDef:'Un synonyme est un alias vers un objet d un autre schema. Les synonymes publics permettent l acces sans prefixer par le schema. Utile en PUI pour les requetes cross-schema.',context:'CREATE PUBLIC SYNONYM stock_med FOR pui_admin.stock_med;',exampleId:''},
+  {id:'tablespace',termFr:'Tablespace',termEn:'Tablespace',category:'Structure',shortDef:'Unite logique de stockage physique. Contient les segments et correspond a des fichiers disque.',fullDef:'Un tablespace est une couche d abstraction entre stockage logique et physique (fichiers .dbf). Il a une taille maximale, peut etre en autoextend, et doit etre monitore. Un tablespace plein bloque tout DML.',context:'CREATE TABLESPACE ts_pui_data DATAFILE \'/u01/pui_data01.dbf\' SIZE 2G AUTOEXTEND ON;',exampleId:'ex_tablespace'},
+  {id:'schema',termFr:'Schema',termEn:'Schema',category:'Structure',shortDef:'Collection d objets appartenant a un utilisateur Oracle. Un utilisateur = un schema.',fullDef:'Un schema est un conteneur logique d objets (tables, vues, packages) appartenant a un utilisateur. En PUI, on peut avoir PUI_ADMIN pour les objets principaux et PUI_READONLY pour les vues.',context:'CREATE USER pui_admin IDENTIFIED BY pwd; Cree automatiquement le schema PUI_ADMIN',exampleId:''},
+  {id:'partition',termFr:'Partitionnement',termEn:'Partitioning',category:'Structure',shortDef:'Decoupage d une table volumineuse en sous-ensembles (partitions) selon une cle.',fullDef:'Le partitionnement divise une grande table en segments independants (range, list, hash). Le pruning permet au CBO de ne scanner que les partitions pertinentes. En PUI, partitionner SORTIE_STOCK par annee accelere les rapports.',context:'PARTITION BY RANGE (date_disp) (PARTITION p_2024 VALUES LESS THAN (TO_DATE(\'2025-01-01\')));',exampleId:'ex_partition'},
+
+  {id:'package',termFr:'Package',termEn:'Package',category:'Objets',shortDef:'Conteneur modulaire regroupant procedures, fonctions, types et variables liees par un domaine metier.',fullDef:'Un package a une specification (interface publique) et un body (implementation). La spec declare les elements visibles, le body contient le code. Permet encapsulation, reutilisation, et variables persistantes par session.',context:'CREATE PACKAGE pkg_pui IS PROCEDURE reapprovisionnement; FUNCTION stock_critique RETURN NUMBER; END;',exampleId:'ex_package'},
+  {id:'fonction',termFr:'Fonction Stockee',termEn:'Stored Function',category:'Objets',shortDef:'Bloc PL/SQL nomme qui retourne une valeur. Utilisable dans les expressions SQL.',fullDef:'Une fonction retourne une valeur via RETURN et peut etre appelee dans un SELECT, WHERE. Ideale pour les calculs metier complexes : disponibilite, verification de peremption, etc.',context:'CREATE FUNCTION fn_dispo(p_med_id NUMBER) RETURN BOOLEAN IS BEGIN ... END;',exampleId:''},
+  {id:'procedure',termFr:'Procedure Stockee',termEn:'Stored Procedure',category:'Objets',shortDef:'Bloc PL/SQL nomme qui execute une action. Ne retourne pas de valeur (utilise OUT params).',fullDef:'Une procedure execute des operations sans retourner de valeur directe. Utilise des parametres OUT ou des ref cursors. Ideale pour les operations de masse : reapprovisionnement batch, purge.',context:'CREATE PROCEDURE sp_purge(p_days NUMBER) IS BEGIN DELETE FROM sortie WHERE date_d < SYSDATE - p_days; END;',exampleId:''},
+  {id:'curseur',termFr:'Curseur',termEn:'Cursor',category:'Objets',shortDef:'Pointeur sur un ensemble de resultats. Permet de parcourir les lignes une par une en PL/SQL.',fullDef:'Un curseur est un pointeur sur un contexte d execution SQL. Les curseurs explicites (DECLARE CURSOR c IS SELECT...) parcourent les resultats ligne par ligne. Les curseurs implicites sont crees pour SELECT INTO.',context:'DECLARE CURSOR c IS SELECT * FROM stock_med WHERE qty < 50; BEGIN FOR r IN c LOOP ... END;',exampleId:''},
+  {id:'type_oracle',termFr:'Type Objet Oracle',termEn:'Object Type',category:'Objets',shortDef:'Definition d un type personnalise avec attributs et methodes. Programmation orientee objet.',fullDef:'Un type objet (CREATE TYPE) definit des structures avec attributs et methodes. Base de l approche OO d Oracle. En PUI, un type MEDICAMENT_TYPE peut encapsuler les infos d un medicament.',context:'CREATE TYPE medicament_type AS OBJECT (id NUMBER, nom VARCHAR2(100), MEMBER FUNCTION est_expire RETURN BOOLEAN);',exampleId:''},
+  {id:'collection',termFr:'Collection PL/SQL',termEn:'PL/SQL Collection',category:'Objets',shortDef:'Structure de donnees en memoire (table indexee, VARRAY, nested table) pour le traitement par lot.',fullDef:'Les collections sont des structures en memoire PGA : tables indexees (INDEX BY), VARRAY (taille fixe), nested tables. Essentielles pour BULK COLLECT et FORALL, elles reduisent les context switches.',context:'TYPE t_med_tab IS TABLE OF stock_med%ROWTYPE INDEX BY PLS_INTEGER;',exampleId:''},
+  {id:'record',termFr:'Record',termEn:'Record',category:'Objets',shortDef:'Structure composite regroupant plusieurs champs. Equivalent d une ligne de table en memoire.',fullDef:'Un record regroupe plusieurs champs de types differents. DECLARE v_med stock_med%ROWTYPE; cree un record avec la structure d une ligne. Facilite la manipulation de lignes completes.',context:'DECLARE v_med stock_med%ROWTYPE; BEGIN SELECT * INTO v_med FROM stock_med WHERE med_id = 1;',exampleId:''},
+  {id:'lob',termFr:'LOB (Large Object)',termEn:'LOB',category:'Objets',shortDef:'Type de colonne pour donnees volumineuses : textes longs, images, documents (CLOB, BLOB, NCLOB).',fullDef:'Les LOB stockent des donnees volumineuses (jusqu a 128 To). CLOB pour le texte, BLOB pour les binaires (images, PDF), NCLOB pour l Unicode. En PUI, un BLOB pourrait stocker les notices de medicaments.',context:'ALTER TABLE stock_med ADD notice_blob BLOB;',exampleId:''},
+
+  {id:'bulk_collect',termFr:'BULK COLLECT',termEn:'BULK COLLECT',category:'PL/SQL',shortDef:'Charge un ensemble de resultats dans une collection en une operation. Reduce les context switches.',fullDef:'BULK COLLECT charge toutes les lignes dans une collection en un seul appel au moteur SQL. Contrairement au FETCH ligne par ligne, il effectue une seule transition PGA/SGA. Gain de 10x a 50x. LIMIT permet de chunker.',context:'SELECT * BULK COLLECT INTO v_reappro FROM lot_simu WHERE qty < seuil;',exampleId:'ex_bulk_collect'},
+  {id:'forall',termFr:'FORALL',termEn:'FORALL',category:'PL/SQL',shortDef:'Execute un DML en batch sur tous les elements d une collection.',fullDef:'FORALL execute un DML pour chaque element d une collection en un seul appel SQL. Combine avec BULK COLLECT, c est le pattern ETL le plus performant. Les context switches passent de N a 1.',context:'FORALL i IN 1..v_reappro.COUNT UPDATE stock_med SET qty = v_reappro(i).qty WHERE id = v_reappro(i).id;',exampleId:''},
+  {id:'exception',termFr:'Gestion d Exceptions',termEn:'Exception Handling',category:'PL/SQL',shortDef:'Gestion d erreurs en PL/SQL via les blocs EXCEPTION et WHEN.',fullDef:'La gestion d exceptions capture et traite les erreurs structurellement. Exceptions predefinies (NO_DATA_FOUND, TOO_MANY_ROWS) levees automatiquement. Exceptions utilisateurs declarees dans DECLARE et levees avec RAISE.',context:'EXCEPTION WHEN NO_DATA_FOUND THEN DBMS_OUTPUT.PUT_LINE(\'Introuvable\'); WHEN OTHERS THEN ROLLBACK;',exampleId:'ex_exception'},
+  {id:'bloc_anonyme',termFr:'Bloc Anonyme',termEn:'Anonymous Block',category:'PL/SQL',shortDef:'Bloc PL/SQL sans nom, execute immediatement. DECLARE ... BEGIN ... EXCEPTION ... END;',fullDef:'Un bloc anonyme est un bloc PL/SQL non stocke, execute immediatement. Structure : DECLARE (variables), BEGIN (code), EXCEPTION (erreurs), END. Utilise pour scripts ad-hoc, tests, migrations.',context:'DECLARE v_count NUMBER; BEGIN SELECT COUNT(*) INTO v_count FROM stock_med; DBMS_OUTPUT.PUT_LINE(v_count); END;',exampleId:''},
+  {id:'pct_type',termFr:'%TYPE / %ROWTYPE',termEn:'%TYPE / %ROWTYPE',category:'PL/SQL',shortDef:'Typage dynamique. %TYPE herite le type d une colonne, %ROWTYPE celui d une ligne.',fullDef:'%TYPE et %ROWTYPE lient le type d une variable a la definition d une table. Si le type de la colonne change, la variable s adapte sans recompilation. Resilience garantie.',context:'DECLARE v_mol stock_med.molecule%TYPE; v_med stock_med%ROWTYPE;',exampleId:'ex_pct_type'},
+  {id:'if_then_else',termFr:'IF/THEN/ELSE',termEn:'Conditional Logic',category:'PL/SQL',shortDef:'Branchement conditionnel PL/SQL : IF ... THEN ... ELSIF ... ELSE ... END IF.',fullDef:'La structure IF/THEN/ELSE permet le branchement conditionnel. Supporte IF simple, IF/ELSE, IF/ELSIF/ELSE, et les imbrications. En PUI, elle evalue les niveaux de stock et les peremptions.',context:'IF v_qty < 50 THEN v_c := \'CRITIQUE\'; ELSIF v_qty < 150 THEN v_c := \'ATTENTION\'; ELSE v_c := \'OK\'; END IF;',exampleId:''},
+  {id:'loop',termFr:'LOOP / WHILE / FOR',termEn:'Loop Constructs',category:'PL/SQL',shortDef:'Trois types de boucles : LOOP...EXIT, WHILE...LOOP, FOR...LOOP (numerique ou curseur).',fullDef:'Oracle offre trois boucles : LOOP avec EXIT WHEN, WHILE LOOP (condition pre-testee), FOR LOOP (iterateur automatique). Le FOR LOOP sur curseur ouvre, itere, et ferme automatiquement.',context:'FOR r IN (SELECT * FROM stock_med WHERE qty < 50) LOOP DBMS_OUTPUT.PUT_LINE(r.molecule); END LOOP;',exampleId:''},
+  {id:'raise',termFr:'RAISE / RAISE_APPLICATION_ERROR',termEn:'RAISE',category:'PL/SQL',shortDef:'Levee d exceptions. RAISE pour les declarees, RAISE_APPLICATION_ERROR pour les erreurs metier (-20001 a -20999).',fullDef:'RAISE leve une exception declaree. RAISE_APPLICATION_ERROR(code, message) leve une erreur applicative (code -20001 a -20999). En PUI, RAISE_APPLICATION_ERROR(-20001, \'Expire\') bloque une dispensation.',context:'IF v_perem < SYSDATE THEN RAISE_APPLICATION_ERROR(-20001, \'Medicament expire\'); END IF;',exampleId:''},
+  {id:'goto',termFr:'GOTO (deconseille)',termEn:'GOTO Statement',category:'PL/SQL',shortDef:'Branchement inconditionnel vers un label. Fortement deconseille (anti-pattern).',fullDef:'GOTO saute a un label <<label>>. Syntaxiquement valide mais deconseille. Rend le code illisible et difficile a maintenir. Les structures controlees (IF, LOOP, EXIT) doivent etre preferees.',context:'<<error_handler>> ROLLBACK; DBMS_OUTPUT.PUT_LINE(\'Erreur\'); -- A EVITER',exampleId:''},
+  {id:'pragma',termFr:'PRAGMA',termEn:'Pragma Directive',category:'PL/SQL',shortDef:'Directive de compilation qui fournit des instructions au compilateur PL/SQL.',fullDef:'Un PRAGMA est traite a la compilation. PRAGMA EXCEPTION_INIT associe un numero d erreur a une exception. PRAGMA AUTONOMOUS_TRANSACTION cree une transaction independante. PRAGMA SERIALLY_REUSABLE optimise la memoire.',context:'PRAGMA EXCEPTION_INIT(e_exp, -20001); -- Associe -20001 a l exception e_exp',exampleId:''},
+
+  {id:'trigger_before',termFr:'Trigger BEFORE',termEn:'BEFORE Trigger',category:'Triggers',shortDef:'Trigger execute AVANT l operation DML. Valide ou modifie les donnees avant persistance.',fullDef:'Un trigger BEFORE s execute avant l operation DML. Il peut modifier :NEW dans un trigger FOR EACH ROW. Ideal pour la validation. En PUI, un trigger BEFORE INSERT verifie la peremption.',context:'CREATE TRIGGER trg_check BEFORE INSERT ON sortie FOR EACH ROW BEGIN IF :NEW.date_p < SYSDATE THEN RAISE_APPLICATION_ERROR(-20001,\'Expire\'); END IF; END;',exampleId:''},
+  {id:'trigger_after',termFr:'Trigger AFTER',termEn:'AFTER Trigger',category:'Triggers',shortDef:'Trigger execute APRES l operation DML. Ideal pour l audit, notifications, calculs derives.',fullDef:'Un trigger AFTER s execute apres l application du DML. Il ne peut pas modifier :NEW. Utilise pour l audit (tracer qui a modifie quoi), les notifications, et les calculs derives.',context:'CREATE TRIGGER trg_audit AFTER UPDATE ON stock_med FOR EACH ROW BEGIN INSERT INTO audit VALUES (:OLD.id, :OLD.qty, :NEW.qty, SYSDATE); END;',exampleId:''},
+  {id:'for_each_row',termFr:'FOR EACH ROW',termEn:'Row-level Trigger',category:'Triggers',shortDef:'Transforme un trigger statement-level en row-level. S execute pour chaque ligne affectee.',fullDef:'FOR EACH ROW execute le code une fois par ligne affectee. Sans cette clause, le trigger s execute une seule fois (statement-level). Necessaire pour acceder a :OLD et :NEW.',context:'CREATE TRIGGER trg BEFORE UPDATE ON stock_med FOR EACH ROW BEGIN :NEW.date_maj := SYSDATE; END;',exampleId:''},
+  {id:'old_new',termFr:':OLD / :NEW Pseudo-records',termEn:':OLD/:NEW',category:'Triggers',shortDef:'Pseudo-records dans un trigger FOR EACH ROW. :OLD = avant, :NEW = apres modification.',fullDef:':OLD et :NEW sont disponibles dans les triggers FOR EACH ROW. :OLD = valeurs avant (NULL pour INSERT), :NEW = valeurs apres (NULL pour DELETE). Permettent de comparer et valider les modifications.',context:'IF :OLD.qty <> :NEW.qty THEN INSERT INTO audit VALUES (:OLD.id, :OLD.qty, :NEW.qty, SYSDATE); END IF;',exampleId:'ex_old_new'},
+  {id:'table_mutante',termFr:'Table Mutante',termEn:'Mutating Table',category:'Triggers',shortDef:'Table en cours de modification qu un trigger ne peut pas lire via SELECT. Erreur ORA-04091.',fullDef:'Une table mutante est en cours de modification. Oracle interdit au trigger row-level de la lire via SELECT car les donnees sont incoherentes. ORA-04091 est levee. Solution : Compound Trigger ou variable de contexte.',context:'ORA-04091: table PUI.STOCK_MED is mutating, trigger/function may not see it',exampleId:'ex_table_mutante'},
+  {id:'compound_trigger',termFr:'Trigger Compose',termEn:'Compound Trigger',category:'Triggers',shortDef:'Trigger Oracle 11g+ avec 4 sections temporelles. Variables partagees pour eviter les tables mutantes.',fullDef:'Un Compound Trigger combine BEFORE STATEMENT, BEFORE EACH ROW, AFTER EACH ROW, AFTER STATEMENT. Les variables declarees sont partagees. Solution recommandee pour les tables mutantes : accumulation en memoire puis traitement.',context:'CREATE TRIGGER trg FOR INSERT ON sortie COMPOUND TRIGGER ... AFTER STATEMENT IS BEGIN /* table non mutante */ END;',exampleId:'ex_compound_trigger'},
+  {id:'instead_of',termFr:'Trigger INSTEAD OF',termEn:'INSTEAD OF Trigger',category:'Triggers',shortDef:'Trigger sur vue qui remplace l operation DML. Permet d updater des vues non-updatables.',fullDef:'Un trigger INSTEAD OF est cree sur une vue. Il remplace le DML par un traitement personnalise. Essentiel pour les vues complexes (jointures, GROUP BY) non-updatables directement.',context:'CREATE TRIGGER trg_io ON v_stock INSTEAD OF INSERT BEGIN INSERT INTO stock_med ...; INSERT INTO lot ...; END;',exampleId:''},
+  {id:'trigger_ddl',termFr:'Trigger DDL',termEn:'DDL Trigger',category:'Triggers',shortDef:'Trigger declenche par CREATE, ALTER, DROP. Utilise pour l audit schema et la gouvernance.',fullDef:'Un trigger DDL s execute lors de modifications de structure. Utile pour l audit (qui a cree/modifie/supprime), la gouvernance (empecher DROP de tables critiques), et la compliance HDS.',context:'CREATE TRIGGER trg_ddl AFTER DDL ON SCHEMA BEGIN INSERT INTO ddl_log VALUES (ORA_SYSEVENT, ORA_DICT_OBJ_NAME, SYSDATE); END;',exampleId:''},
+
+  {id:'explain_plan',termFr:'Explain Plan',termEn:'Explain Plan',category:'Performance',shortDef:'Representation visuelle du plan d execution. Montre les operations et leur cout.',fullDef:'L Explain Plan est la representation hierarchique du plan choisi par l optimiseur. Il montre chaque operation (TABLE ACCESS FULL, INDEX SCAN, HASH JOIN), son cout, sa cardinalite, ses predicats.',context:'EXPLAIN PLAN FOR SELECT * FROM stock_med WHERE qty < 50; SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);',exampleId:'ex_explain_plan'},
+  {id:'cbo',termFr:'Optimiseur CBO',termEn:'Cost-Based Optimizer',category:'Performance',shortDef:'Optimiseur qui choisit le plan le moins couteux selon les statistiques des objets.',fullDef:'Le CBO utilise les statistiques (nb lignes, taille blocs, distribution) pour estimer le cout de chaque plan. Le plan avec le cout le plus bas est selectionne. Des statistiques obsoletes = plans sous-optimaux.',context:'EXEC DBMS_STATS.GATHER_TABLE_STATS(\'PUI_ADMIN\', \'STOCK_MED\');',exampleId:''},
+  {id:'cardinalite',termFr:'Cardinalite',termEn:'Cardinality',category:'Performance',shortDef:'Nombre estime de lignes retournees par une operation du plan. Influence le choix des jointures.',fullDef:'La cardinalite est le nb estime de lignes produites par une operation. Le CBO l utilise pour choisir entre NESTED LOOPS (faible), HASH JOIN (moyenne), MERGE JOIN (haute). Une cardinalite mal estimee degrade les performances.',context:'Plan: HASH JOIN (Card=142, Cost=398) - estimation de 142 lignes retournees',exampleId:''},
+  {id:'hint',termFr:'Hint (Indice)',termEn:'Optimizer Hint',category:'Performance',shortDef:'Indicatif dans le SQL suggere au CBO un plan specifique. Syntaxe : /*+ HINT */.',fullDef:'Un hint est un commentaire special /*+ ... */ qui fournit des instructions a l optimiseur. INDEX (forcer index), FULL (forcer FTS), LEADING (ordre des tables). A utiliser avec prudence car peut devenir contre-productif.',context:'SELECT /*+ INDEX(m idx_stock_med) */ * FROM stock_med m WHERE med_id = 42;',exampleId:'ex_hint'},
+  {id:'fts',termFr:'Full Table Scan',termEn:'Full Table Scan',category:'Performance',shortDef:'Parcours integral de toutes les lignes d une table. Couteux sur les grandes tables.',fullDef:'Un FTS lit tous les blocs d une table. C est l operation la plus couteuse pour une grande table. Justifie quand la requete retourne > 10-15% des lignes. En PUI, un FTS sur SORTIE_STOCK bloque la dispensation.',context:'TABLE ACCESS FULL | STOCK_MED | Cost=128 | Card=2400',exampleId:''},
+  {id:'irs',termFr:'Index Range Scan',termEn:'Index Range Scan',category:'Performance',shortDef:'Parcours d index pour un sous-ensemble de lignes. Beaucoup plus rapide qu un FTS.',fullDef:'Un Index Range Scan parcourt un index B-tree pour trouver les entrees correspondant a un predicat. Il ne lit que les blocs pertinents, puis accede aux lignes via ROWID. Ideal pour les requetes selectives.',context:'INDEX RANGE SCAN | IDX_STOCK_MED | Cost=2 | Card=1',exampleId:''},
+  {id:'hash_join',termFr:'HASH JOIN',termEn:'Hash Join',category:'Performance',shortDef:'Jointure qui construit une table de hash en memoire. Optimale pour les grandes tables.',fullDef:'Le HASH JOIN construit une table de hash a partir de la plus petite table (build), puis probe la plus grande (probe). Optimal pour les jointures de grandes tables sans index.',context:'HASH JOIN | Cost=398 | Card=142 - Table hash en PGA',exampleId:''},
+  {id:'nested_loops',termFr:'NESTED LOOPS',termEn:'Nested Loops',category:'Performance',shortDef:'Jointure qui itere sur la table externe et probe l interne via index. Optimale pour les petites jointures.',fullDef:'Le NESTED LOOPS joint chaque ligne de la table externe a l interne via Index Range Scan. Optimal quand la table externe retourne peu de lignes et que l interne a un index sur la colonne de jointure.',context:'NESTED LOOPS | Cost=12 | Card=5 - 5 iterations avec INDEX RANGE SCAN',exampleId:''},
+  {id:'stats',termFr:'Statistiques',termEn:'Statistics',category:'Performance',shortDef:'Metadonnees sur les tables et index (nb lignes, taille blocs, histogrammes). Essentiel pour le CBO.',fullDef:'Les statistiques sont des metadonnees collectees sur les objets : nb lignes, nb blocs, taille moyenne, distribution. Le CBO en depend. Des statistiques obsoletes = plans sous-optimaux. En PUI, rafraichissement quotidien recommande.',context:'EXEC DBMS_STATS.GATHER_SCHEMA_STATS(\'PUI_ADMIN\');',exampleId:''},
+
+  {id:'rbac',termFr:'RBAC (Controle d Acces)',termEn:'Role-Based Access Control',category:'Securite',shortDef:'Modele de securite base sur les roles. Les privileges sont accordes aux roles, pas aux utilisateurs.',fullDef:'Le RBAC est le modele de securite standard d Oracle. Les privileges sont accordes a des roles, assigns aux utilisateurs. Simplifie la gestion et garantit la coherence. En PUI : LECTURE_STOCK, EXEC_BATCH, AUDIT_HDS.',context:'CREATE ROLE lecture_stock; GRANT SELECT ON stock_med TO lecture_stock; GRANT lecture_stock TO user_pharma;',exampleId:''},
+  {id:'grant_revoke',termFr:'GRANT / REVOKE',termEn:'GRANT/REVOKE',category:'Securite',shortDef:'Accorder (GRANT) ou retirer (REVOKE) des privileges sur des objets ou des roles.',fullDef:'GRANT accorde un privilege (SELECT, INSERT, UPDATE, DELETE, EXECUTE). REVOKE le retire. Le Least Privilege impose de ne donner que le strict necessaire. En PUI, un pharmacien a SELECT sur stock_med mais pas DELETE.',context:'GRANT SELECT, UPDATE ON stock_med TO user_pharma; REVOKE DELETE ON stock_med FROM user_pharma;',exampleId:'ex_grant'},
+  {id:'role',termFr:'Role Oracle',termEn:'Oracle Role',category:'Securite',shortDef:'Conteneur de privileges nomme. Gere les autorisations par groupe fonctionnel.',fullDef:'Un role est un conteneur de privileges systeme et objet. Simplifie la gestion : au lieu de privileges utilisateur par utilisateur, on assigne des roles. Roles predefinis : DBA, CONNECT, RESOURCE. En PUI : ROLE_PHARMACIEN, ROLE_PREPARATEUR.',context:'CREATE ROLE role_pharmacien; GRANT SELECT, UPDATE ON stock_med TO role_pharmacien;',exampleId:''},
+  {id:'profile',termFr:'Profile Utilisateur',termEn:'User Profile',category:'Securite',shortDef:'Limites et politiques pour un utilisateur : mot de passe, ressources, idle time.',fullDef:'Un profile definit des limites : complexite du mot de passe, tentatives de connexion, duree de vie, idle time, sessions simultanees. Outil de securite essentiel pour proteger les comptes de service PUI.',context:'CREATE PROFILE pui_profile LIMIT PASSWORD_LIFE_TIME 90 IDLE_TIME 30 FAILED_LOGIN_ATTEMPTS 3;',exampleId:''},
+  {id:'audit',termFr:'Audit Oracle',termEn:'Oracle Audit',category:'Securite',shortDef:'Tracage des operations. Qui a fait quoi, quand, et avec quel resultat.',fullDef:'L audit enregistre les operations dans SYS.AUD$. Active par statement, objet, ou utilisateur. BY ACCESS logue chaque acces, BY SESSION une fois par session. En contexte HDS, l audit est obligatoire.',context:'AUDIT SELECT, UPDATE ON sortie_stock BY ACCESS WHENEVER SUCCESSFUL;',exampleId:'ex_audit'},
+  {id:'vpd',termFr:'VPD (Virtual Private Database)',termEn:'VPD / RLS',category:'Securite',shortDef:'Politique de securite qui filtre les lignes automatiquement selon le contexte de session.',fullDef:'Le VPD (ou RLS) applique un predicat WHERE automatique a chaque requete. Le predicat est genere par une fonction de politique. En PUI, un VPD filtre les stocks par service : un utilisateur URGENCES ne voit que ses lignes.',context:'DBMS_RLS.ADD_POLICY(\'PUI_ADMIN\', \'stock_med\', \'policy_srv\', \'pkg_sec\', \'fn_policy_srv\');',exampleId:'ex_vpd'},
+  {id:'least_privilege',termFr:'Least Privilege',termEn:'Principle of Least Privilege',category:'Securite',shortDef:'Accorder uniquement les privileges strictement necessaires pour accomplir une tache.',fullDef:'Le Least Privilege est la pierre angulaire de la securite Oracle. Chaque utilisateur n a que le strict necessaire. Un preparateur a SELECT sur stock_med mais pas DELETE. DBA_PUI peut tout faire : violation du principe. En HDS, c est une exigence RGPD.',context:'user_pharma : GRANT SELECT, UPDATE sur stock_med - PAS de DELETE, PAS de DROP',exampleId:''}
+];
+// ============================================================
+// LEXIQUE EXAMPLES - 18 pedagogical examples
+// ============================================================
+const LEXIQUE_EXAMPLES = [
+  {id:'ex_table',title:'CREATE TABLE PUI avec contraintes',lang:'SQL',code:`-- Table STOCK_MED avec contraintes integrites\n-- PK, FK, CHECK, NOT NULL, DEFAULT\n\nCREATE TABLE stock_med (\n  med_id          NUMBER(10)\n                    CONSTRAINT pk_stock_med PRIMARY KEY,\n  molecule        VARCHAR2(100)\n                    CONSTRAINT nn_molecule NOT NULL,\n  forme           VARCHAR2(50)\n                    CONSTRAINT nn_forme NOT NULL,\n  qty_stock       NUMBER(8) DEFAULT 0\n                    CONSTRAINT chk_qty CHECK (qty_stock >= 0),\n  seuil_alerte    NUMBER(8) DEFAULT 50,\n  lot_id          NUMBER(10),\n  date_maj        DATE DEFAULT SYSDATE,\n  CONSTRAINT fk_lot\n    FOREIGN KEY (lot_id) REFERENCES lot_simu(lot_id)\n);\n\nCOMMENT ON TABLE stock_med IS\n  'Stock medicaments PUI - Conforme HDS Art. L1111-8';\n\nCREATE INDEX idx_stock_med_lot ON stock_med(lot_id);`,simulateResult:'success',explanation:`Cette table est le pilier du systeme PUI. Chaque contrainte a un role :\n- <code>PRIMARY KEY</code> : identifiant unique\n- <code>NOT NULL</code> : molecule et forme obligatoires\n- <code>CHECK (qty_stock >= 0)</code> : empeche les stocks negatifs\n- <code>FOREIGN KEY</code> : lie le stock a un lot existant\n- <code>DEFAULT</code> : valeurs par defaut\nLes commentaires sont visibles dans <code>USER_TAB_COMMENTS</code>.`},
+
+  {id:'ex_vue',title:'Vue materialisee pour reporting PUI',lang:'SQL',code:`-- Vue materialisee : resultats stockes physiquement\n-- Refresh on demand pour reporting quotidien\n\nCREATE MATERIALIZED VIEW mv_stock_report\nBUILD IMMEDIATE\nREFRESH COMPLETE ON DEMAND\nAS\nSELECT s.med_id, s.molecule, s.forme, s.qty_stock,\n       l.lot_id, l.date_peremption, srv.srv_nom,\n       CASE\n         WHEN s.qty_stock < s.seuil_alerte THEN 'CRITIQUE'\n         WHEN s.qty_stock < s.seuil_alerte * 3 THEN 'ATTENTION'\n         ELSE 'OK'\n       END AS niveau_critique\nFROM stock_med s\nJOIN lot_simu l ON s.lot_id = l.lot_id\nJOIN service_simu srv ON l.srv_id = srv.srv_id;\n\nCREATE INDEX idx_mv_stock_crit ON mv_stock_report(niveau_critique);`,simulateResult:'success',explanation:`La vue materialisee stocke physiquement les resultats, actualisee par refresh explicite :\n- <code>BUILD IMMEDIATE</code> : peuplee immediatement\n- <code>REFRESH COMPLETE ON DEMAND</code> : recalcul complet quand demande\n- Ideale pour les rapports quotidiens (1 refresh/jour)\n- L index sur <code>niveau_critique</code> permet le filtrage instantane`},
+
+  {id:'ex_index',title:'Index composite pour jointure PUI',lang:'SQL',code:`-- Index composite (multi-colonnes) pour dispensation\n\nCREATE INDEX idx_stock_med_composite\n  ON stock_med(med_id, lot_id)\n  TABLESPACE ts_pui_index;\n\nCREATE INDEX idx_lot_peremption\n  ON lot_simu(TRUNC(date_peremption))\n  TABLESPACE ts_pui_index;\n\nEXPLAIN PLAN FOR\nSELECT * FROM stock_med\nWHERE med_id = 42 AND lot_id = 1000;\n\nSELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);`,simulateResult:'success',explanation:`L index composite sur (med_id, lot_id) est optimal car la premiere colonne est utilisee seule ou les deux ensemble. L index fonctionnel sur TRUNC(date_peremption) permet la recherche par jour sans ignorer l index.`},
+
+  {id:'ex_sequence',title:'Sequence pour generation ID lot',lang:'SQL',code:`-- Sequence : generateur de cles uniques\n\nCREATE SEQUENCE seq_lot_simu\n  START WITH 1000\n  INCREMENT BY 1\n  NOCACHE\n  NOCYCLE;\n\nINSERT INTO lot_simu (lot_id, molecule, qty)\nVALUES (seq_lot_simu.NEXTVAL, 'PARACETAMOL', 200);\n\nSELECT seq_lot_simu.CURRVAL FROM DUAL;\n\nSELECT sequence_name, last_number, cache_size\nFROM user_sequences\nWHERE sequence_name = 'SEQ_LOT_SIMU';`,simulateResult:'success',explanation:`Sequence Oracle : generateur thread-safe de nombres uniques.\n- <code>NEXTVAL</code> : prochaine valeur, incremente le compteur\n- <code>CURRVAL</code> : derniere valeur generee dans la session\n- <code>NOCACHE</code> : pas de perte en cas de crash\n- Essentiel en PUI multi-postes : IDs uniques sans coordination`},
+
+  {id:'ex_tablespace',title:'Creation et monitoring de tablespace',lang:'SQL',code:`-- Tablespace dedie PUI avec autoextend\n\nCREATE TABLESPACE ts_pui_data\n  DATAFILE '/u01/app/oracle/oradata/pui_data01.dbf'\n  SIZE 2G\n  AUTOEXTEND ON\n  NEXT 500M\n  MAXSIZE 10G;\n\nSELECT tablespace_name,\n  ROUND(SUM(bytes)/1024/1024,2) AS used_mb,\n  ROUND(SUM(maxbytes)/1024/1024,2) AS max_mb,\n  ROUND(SUM(bytes)/SUM(maxbytes)*100,2) AS pct_used\nFROM dba_data_files\nWHERE tablespace_name LIKE 'TS_PUI%'\nGROUP BY tablespace_name;`,simulateResult:'success',explanation:`Les tablespaces sont l'unite logique de stockage physique :\n- <code>AUTOEXTEND ON</code> : agrandissement auto de 500M jusqu'a 10G\n- Monitoring : > 80% = warning, > 90% = critique\n- Un tablespace plein bloque TOUTES les operations DML`},
+
+  {id:'ex_partition',title:'Partitionnement par date de peremption',lang:'SQL',code:`-- Partitionnement RANGE sur date_dispensation\n\nCREATE TABLE sortie_stock_part (\n  disp_id         NUMBER(10) PRIMARY KEY,\n  med_id          NUMBER(10),\n  qty_dispensee   NUMBER(8),\n  date_dispensation DATE,\n  srv_id          NUMBER(10)\n)\nPARTITION BY RANGE (date_dispensation) (\n  PARTITION p_2023 VALUES LESS THAN (TO_DATE('2024-01-01','YYYY-MM-DD')),\n  PARTITION p_2024 VALUES LESS THAN (TO_DATE('2025-01-01','YYYY-MM-DD')),\n  PARTITION p_2025 VALUES LESS THAN (TO_DATE('2026-01-01','YYYY-MM-DD')),\n  PARTITION p_future VALUES LESS THAN (MAXVALUE)\n);\n\n-- Pruning : seule p_2025 est scannee\nSELECT COUNT(*) FROM sortie_stock_part\nWHERE date_dispensation >= TO_DATE('2025-01-01','YYYY-MM-DD');`,simulateResult:'success',explanation:`Le partitionnement RANGE divise la table en segments independants.\n- Le <code>partition pruning</code> ne scanne que les partitions pertinentes\n- Pour une requete sur 2025, seule p_2025 est lue\n- <code>MAXVALUE</code> capture toutes les dates futures`},
+
+  {id:'ex_package',title:'Package PKG_PUI avec spec + body',lang:'PL/SQL',code:`-- Specification (interface publique)\nCREATE OR REPLACE PACKAGE pkg_pui IS\n  PROCEDURE reapprovisionnement(p_seuil IN NUMBER DEFAULT 50);\n  FUNCTION stock_critique RETURN NUMBER;\n  g_last_run DATE;\nEND pkg_pui;\n/\n\n-- Body (implementation)\nCREATE OR REPLACE PACKAGE BODY pkg_pui IS\n\n  PROCEDURE reapprovisionnement(p_seuil IN NUMBER DEFAULT 50) IS\n  BEGIN\n    UPDATE stock_med\n       SET qty_stock = qty_stock + 200, date_maj = SYSDATE\n     WHERE qty_stock < p_seuil;\n    g_last_run := SYSDATE;\n    DBMS_OUTPUT.PUT_LINE(SQL%ROWCOUNT || ' medicaments reappro');\n  END reapprovisionnement;\n\n  FUNCTION stock_critique RETURN NUMBER IS\n    v_count NUMBER;\n  BEGIN\n    SELECT COUNT(*) INTO v_count\n      FROM stock_med WHERE qty_stock < 50;\n    RETURN v_count;\n  END stock_critique;\n\nEND pkg_pui;\n/`,simulateResult:'success',explanation:`Un package separe l'interface (spec) de l'implementation (body) :\n- La <code>spec</code> declare le visible de l'exterieur\n- Le <code>body</code> contient le code. Tout non-declare est prive\n- <code>g_last_run</code> : variable de session persistante\n- <code>pkg_pui.reapprovisionnement()</code> = batch nocturne`},
+
+  {id:'ex_bulk_collect',title:'BULK COLLECT vs curseur classique',lang:'PL/SQL',code:`-- COMPARAISON : Curseur classique vs BULK COLLECT\n\n-- APPROCHE 1 : Curseur classique (N context switches)\nDECLARE\n  CURSOR c IS SELECT med_id, qty FROM stock_med WHERE qty < 50;\n  v_id NUMBER; v_q NUMBER;\nBEGIN\n  OPEN c;\n  LOOP\n    FETCH c INTO v_id, v_q;  -- 1 context switch PAR ligne\n    EXIT WHEN c%NOTFOUND;\n    DBMS_OUTPUT.PUT_LINE(v_id || ': ' || v_q);\n  END LOOP;\n  CLOSE c;\nEND;\n/\n\n-- APPROCHE 2 : BULK COLLECT (1 context switch)\nDECLARE\n  TYPE t_tab IS TABLE OF stock_med%ROWTYPE;\n  v_stocks t_tab;\nBEGIN\n  SELECT * BULK COLLECT INTO v_stocks\n    FROM stock_med WHERE qty < 50;  -- 1 context switch pour TOUT\n\n  FOR i IN 1 .. v_stocks.COUNT LOOP\n    DBMS_OUTPUT.PUT_LINE(v_stocks(i).med_id || ': ' || v_stocks(i).qty_stock);\n  END LOOP;\nEND;\n/`,simulateResult:'success',explanation:`Difference de performance spectaculaire :\n- Approche 1 : N context switches (~340ms pour 1000 lignes)\n- Approche 2 : 1 context switch (~12ms pour 1000 lignes)\n- Gain de 10x a 50x sur volumes importants\n- Pour tres gros volumes : <code>BULK COLLECT ... LIMIT 1000</code>`},
+
+  {id:'ex_exception',title:'Gestion d exceptions avec WHEN OTHERS',lang:'PL/SQL',code:`-- Gestion complete des exceptions\n\nDECLARE\n  v_med     stock_med%ROWTYPE;\n  e_stock_neg EXCEPTION;\n  PRAGMA EXCEPTION_INIT(e_stock_neg, -20002);\nBEGIN\n  SELECT * INTO v_med FROM stock_med WHERE med_id = 42;\n\n  IF v_med.qty_stock < 0 THEN\n    RAISE e_stock_neg;\n  END IF;\n\n  DBMS_OUTPUT.PUT_LINE('Medicament: ' || v_med.molecule);\n\nEXCEPTION\n  WHEN NO_DATA_FOUND THEN\n    DBMS_OUTPUT.PUT_LINE('ERREUR: Medicament introuvable');\n    INSERT INTO error_log VALUES ('NO_DATA_FOUND', SYSDATE);\n\n  WHEN e_stock_neg THEN\n    DBMS_OUTPUT.PUT_LINE('ERREUR: Stock negatif!');\n    RAISE_APPLICATION_ERROR(-20002, 'Stock negatif med_id=42');\n\n  WHEN OTHERS THEN\n    DBMS_OUTPUT.PUT_LINE('ERREUR INATTENDUE: ' || SQLERRM);\n    ROLLBACK;\n    RAISE;\nEND;\n/`,simulateResult:'success',explanation:`Gestion d'exceptions structuree :\n- <code>NO_DATA_FOUND</code> : SELECT INTO sans resultat (ORA-01403)\n- <code>TOO_MANY_ROWS</code> : SELECT INTO avec plusieurs lignes (ORA-01422)\n- <code>WHEN OTHERS</code> : filet de securite pour toutes erreurs non traitees\n- <code>SQLERRM</code> : message d'erreur Oracle`},
+
+  {id:'ex_pct_type',title:'%TYPE et %ROWTYPE pour typage fort',lang:'PL/SQL',code:`-- Typage dynamique : %TYPE et %ROWTYPE\n\nDECLARE\n  v_molecule  stock_med.molecule%TYPE;\n  v_qty       stock_med.qty_stock%TYPE;\n  v_med       stock_med%ROWTYPE;\nBEGIN\n  SELECT molecule INTO v_molecule\n    FROM stock_med WHERE med_id = 42;\n\n  SELECT * INTO v_med\n    FROM stock_med WHERE med_id = 42;\n\n  DBMS_OUTPUT.PUT_LINE('Molecule: ' || v_med.molecule);\n  DBMS_OUTPUT.PUT_LINE('Quantite: ' || v_med.qty_stock);\n  DBMS_OUTPUT.PUT_LINE('Derniere MAJ: ' || TO_CHAR(v_med.date_maj, 'DD/MM/YYYY'));\nEND;\n/`,simulateResult:'success',explanation:`Typage dynamique = meilleure pratique Oracle :\n- <code>%TYPE</code> herite le type exact d'une colonne\n- <code>%ROWTYPE</code> cree un record avec un champ par colonne\n- Si la colonne change de type, la variable suit sans recompilation`},
+
+  {id:'ex_table_mutante',title:'Erreur ORA-04091 - Table Mutante',lang:'PL/SQL',code:`-- PROBLEME : Ce trigger cause ORA-04091\n\nCREATE OR REPLACE TRIGGER trg_stock_mutant\nAFTER INSERT ON sortie_stock\nFOR EACH ROW\nDECLARE\n  v_total NUMBER;\nBEGIN\n  -- ERREUR : SELECT sur table en cours de modification\n  SELECT SUM(qty_dispensee)\n    INTO v_total\n    FROM sortie_stock          -- TABLE MUTANTE !\n    WHERE med_id = :NEW.med_id;\n\n  IF v_total > 1000 THEN\n    DBMS_OUTPUT.PUT_LINE('Seuil depasse!');\n  END IF;\nEND;\n/\n\n-- TEST :\nINSERT INTO sortie_stock (disp_id, med_id, qty_disp)\nVALUES (1, 42, 100);\n\n-- RESULTAT :\n-- ORA-04091: table PUI.SORTIE_STOCK is mutating,\n-- trigger/function may not see it\n\n-- SOLUTION : voir ex_compound_trigger`,simulateResult:'error',explanation:`L'erreur ORA-04091 est classique en PL/SQL :\n- Table mutante = table en cours de modification par le DML trigger\n- Oracle interdit le SELECT car donnees incoherentes\n- Solution : <strong>Compound Trigger</strong> avec variables de contexte (voir exemple suivant)`},
+
+  {id:'ex_compound_trigger',title:'Compound Trigger pour eviter table mutante',lang:'PL/SQL',code:`-- SOLUTION : Compound Trigger (Oracle 11g+)\n\nCREATE OR REPLACE TRIGGER trg_stock_compound\nFOR INSERT ON sortie_stock\nCOMPOUND TRIGGER\n\n  TYPE t_med_tab IS TABLE OF NUMBER INDEX BY VARCHAR2(20);\n  g_med_totals t_med_tab;\n\n  BEFORE STATEMENT IS\n  BEGIN\n    g_med_totals.DELETE;\n    DBMS_OUTPUT.PUT_LINE('--- Debut INSERT ---');\n  END BEFORE STATEMENT;\n\n  BEFORE EACH ROW IS\n  BEGIN\n    NULL;\n  END BEFORE EACH ROW;\n\n  AFTER EACH ROW IS\n  BEGIN\n    IF g_med_totals.EXISTS(:NEW.med_id) THEN\n      g_med_totals(:NEW.med_id) :=\n        g_med_totals(:NEW.med_id) + :NEW.qty_disp;\n    ELSE\n      g_med_totals(:NEW.med_id) := :NEW.qty_disp;\n    END IF;\n  END AFTER EACH ROW;\n\n  AFTER STATEMENT IS\n  BEGIN\n    FOR med_id IN g_med_totals.FIRST .. g_med_totals.LAST LOOP\n      IF g_med_totals(med_id) > 1000 THEN\n        DBMS_OUTPUT.PUT_LINE(\n          'ALERTE: Seuil depasse med_id=' || med_id ||\n          ' (total=' || g_med_totals(med_id) || ')');\n      END IF;\n    END LOOP;\n    DBMS_OUTPUT.PUT_LINE('--- Fin INSERT ---');\n  END AFTER STATEMENT;\n\nEND trg_stock_compound;\n/`,simulateResult:'success',explanation:`Le Compound Trigger resout les tables mutantes :\n- <code>BEFORE STATEMENT</code> : initialisation (1 fois)\n- <code>AFTER EACH ROW</code> : accumulation en memoire (PAS de SELECT)\n- <code>AFTER STATEMENT</code> : traitement final, table NON mutante\n- Variables declarees partagees entre les 4 sections`},
+
+  {id:'ex_old_new',title:':OLD et :NEW dans un trigger',lang:'PL/SQL',code:`-- Trigger audit trail avec :OLD et :NEW\n\nCREATE OR REPLACE TRIGGER trg_audit_stock\nBEFORE UPDATE OF qty_stock ON stock_med\nFOR EACH ROW\nBEGIN\n  -- :OLD = avant, :NEW = apres\n  :NEW.date_maj := SYSDATE;\n\n  INSERT INTO audit_stock (\n    audit_id, med_id, qty_ancien, qty_nouveau,\n    delta, date_modif, utilisateur\n  ) VALUES (\n    seq_audit.NEXTVAL,\n    :OLD.med_id,\n    :OLD.qty_stock,\n    :NEW.qty_stock,\n    :NEW.qty_stock - :OLD.qty_stock,\n    SYSDATE,\n    USER\n  );\n\n  IF :NEW.qty_stock < :OLD.qty_stock * 0.5 THEN\n    DBMS_OUTPUT.PUT_LINE('ALERTE: Stock reduit de ' ||\n      ROUND((1-:NEW.qty_stock/:OLD.qty_stock)*100)||'%');\n  END IF;\nEND;\n/`,simulateResult:'success',explanation:`Pseudo-records :OLD et :NEW :\n- <code>:OLD</code> : valeurs avant modification (NULL pour INSERT)\n- <code>:NEW</code> : valeurs apres modification (NULL pour DELETE)\n- En trigger BEFORE, on peut modifier <code>:NEW</code>\n- <code>USER</code> = utilisateur Oracle connecte\n- Audit trail obligatoire pour conformite HDS`},
+
+  {id:'ex_explain_plan',title:'Explain Plan - Analyse de requete PUI',lang:'SQL',code:`-- Analyse du plan d execution\n\nEXPLAIN PLAN FOR\nSELECT m.molecule, l.lot_id, l.date_perem, s.qty_stock\nFROM stock_med s\nJOIN lot_simu l ON s.lot_id = l.lot_id\nJOIN stock_med m ON m.med_id = s.med_id\nWHERE s.qty_stock < 50\n  AND l.date_perem > SYSDATE;\n\nSELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);\n\n-- RESULTAT SIMULE :\n-- | Id | Operation            | Name      | Rows | Cost |\n-- |----|----------------------|-----------|------|------|\n-- |  0 | SELECT STATEMENT     |           |   18 |  412 |\n-- |  1 |  HASH JOIN           |           |   18 |  412 |\n-- |  2 |   HASH JOIN          |           |  142 |  256 |\n-- |  3 |    TABLE ACCESS FULL | STOCK_MED | 2400 |  128 |\n-- |  4 |    TABLE ACCESS FULL | LOT_SIMU  | 1200 |   89 |\n-- |  5 |   TABLE ACCESS FULL  | STOCK_MED | 2400 |  128 |\n--\n-- 3 Full Table Scan = ALERTE !`,simulateResult:'success',explanation:`L'Explain Plan est l'outil principal d'optimisation :\n- <code>EXPLAIN PLAN FOR</code> genere le plan sans executer\n- Cost=412 est eleve\n- 3 Full Table Scan = alertes majeures\n- Solution : index sur colonnes de jointure et de filtre`},
+
+  {id:'ex_hint',title:'Hints - Forcer un plan d execution',lang:'SQL',code:`-- Hints : instructions a l'optimiseur\n\n-- Sans hint : Full Table Scan\nSELECT m.molecule, s.qty_stock\nFROM stock_med s\nJOIN lot_simu l ON s.lot_id = l.lot_id\nWHERE s.med_id = 42;\n-- TABLE ACCESS FULL (Cost=128)\n\n-- Avec hint INDEX\nSELECT /*+ INDEX(s idx_stock_med_lot) */\n       m.molecule, s.qty_stock\nFROM stock_med s\nJOIN lot_simu l ON s.lot_id = l.lot_id\nWHERE s.med_id = 42;\n-- INDEX RANGE SCAN (Cost=2)\n\n-- Hint LEADING + USE_NL\nSELECT /*+ LEADING(l s) USE_NL(s) */\n       m.molecule, s.qty_stock\nFROM stock_med s\nJOIN lot_simu l ON s.lot_id = l.lot_id\nWHERE l.date_perem > SYSDATE;`,simulateResult:'success',explanation:`Hints = directives puissantes mais a utiliser avec prudence :\n- <code>/*+ INDEX */</code> : force un index specifique\n- <code>/*+ FULL */</code> : force un Full Table Scan\n- <code>/*+ LEADING */</code> : force l'ordre des tables\n- Un hint peut devenir contre-productif si les donnees evoluent`},
+
+  {id:'ex_grant',title:'GRANT selectif sur tables PUI',lang:'SQL',code:`-- Gestion des privileges - Least Privilege\n\n-- 1. Creer un role\nCREATE ROLE role_pharmacien;\n\n-- 2. Privileges SELECTIFS\nGRANT SELECT ON stock_med TO role_pharmacien;\nGRANT UPDATE (qty_stock, date_maj) ON stock_med TO role_pharmacien;\n-- UPDATE sur 2 colonnes seulement\n\n-- 3. NE PAS accorder DELETE ou DROP\n\n-- 4. Assigner a un utilisateur\nCREATE USER user_pharma_01 IDENTIFIED BY <password>;\nGRANT role_pharmacien TO user_pharma_01;\nGRANT CREATE SESSION TO user_pharma_01;\n\n-- 5. Verification\nSELECT grantee, privilege, table_name\nFROM user_tab_privs_made\nWHERE grantee = 'ROLE_PHARMACIEN';`,simulateResult:'success',explanation:`Gestion fine des privileges en contexte HDS :\n- <code>GRANT SELECT</code> : lecture seule\n- <code>GRANT UPDATE (col1, col2)</code> : modification limitee\n- Le pharmacien peut consulter TOUS les stocks, modifier les quantites, mais PAS les molecules\n- <code>CREATE SESSION</code> = privilege minimum pour se connecter`},
+
+  {id:'ex_audit',title:'Audit fin sur dispensation medicaments',lang:'SQL',code:`-- Audit Oracle - trace operations sensibles\n\n-- 1. Audit sur table de dispensation\nAUDIT SELECT, UPDATE, DELETE ON sortie_stock BY ACCESS\nWHENEVER SUCCESSFUL;\n\n-- 2. Audit par utilisateur\nAUDIT ALL BY pui_user BY ACCESS;\n\n-- 3. Audit DDL\nAUDIT TABLE, INDEX, PROCEDURE BY ACCESS;\n\n-- 4. Consulter les logs\nSELECT username, action_name, obj_name,\n  TO_CHAR(timestamp, 'DD/MM/YYYY HH24:MI:SS') AS event_time\nFROM dba_audit_trail\nWHERE obj_name = 'SORTIE_STOCK'\nORDER BY timestamp DESC;\n\n-- 5. Desactiver\nNOAUDIT SELECT, UPDATE, DELETE ON sortie_stock;`,simulateResult:'success',explanation:`L'audit Oracle est obligatoire en contexte HDS :\n- <code>BY ACCESS</code> : logue chaque acces individuellement\n- <code>WHENEVER SUCCESSFUL</code> : uniquement les operations reussies\n- <code>dba_audit_trail</code> : tous les logs (qui, quoi, quand)\n- Logs chiffres AES-256 au repos, conserves 5 ans minimum`},
+
+  {id:'ex_vpd',title:'VPD - Politique de securite par service',lang:'SQL',code:`-- VPD / RLS : filtre automatique selon contexte session\n\n-- 1. Fonction de politique\nCREATE OR REPLACE PACKAGE pkg_security IS\n  FUNCTION fn_policy_srv(\n    p_schema IN VARCHAR2,\n    p_object IN VARCHAR2\n  ) RETURN VARCHAR2;\nEND pkg_security;\n/\n\nCREATE OR REPLACE PACKAGE BODY pkg_security IS\n  FUNCTION fn_policy_srv(\n    p_schema IN VARCHAR2,\n    p_object IN VARCHAR2\n  ) RETURN VARCHAR2 IS\n    v_srv_id NUMBER;\n  BEGIN\n    SELECT srv_id INTO v_srv_id\n      FROM user_srv_map\n      WHERE username = SYS_CONTEXT('USERENV', 'SESSION_USER');\n    RETURN 'srv_id = ' || v_srv_id;\n  EXCEPTION\n    WHEN NO_DATA_FOUND THEN\n      RETURN '1=0';\n  END fn_policy_srv;\nEND pkg_security;\n/\n\n-- 2. Appliquer la politique\nBEGIN\n  DBMS_RLS.ADD_POLICY(\n    object_schema   => 'PUI_ADMIN',\n    object_name     => 'stock_med',\n    policy_name     => 'policy_srv',\n    function_schema => 'PUI_ADMIN',\n    policy_function => 'pkg_security.fn_policy_srv',\n    statement_types => 'SELECT, UPDATE',\n    update_check    => TRUE\n  );\nEND;\n/\n\n-- SELECT * FROM stock_med devient automatiquement :\n-- SELECT * FROM stock_med WHERE srv_id = <service_user>`,simulateResult:'success',explanation:`Le VPD applique un filtre invisible a chaque requete :\n- La fonction retourne un predicat WHERE base sur l'utilisateur\n- <code>SYS_CONTEXT('USERENV', 'SESSION_USER')</code> = utilisateur connecte\n- <code>update_check => TRUE</code> : empeche l'insertion hors filtre\n- Resultat : chaque utilisateur ne voit QUE les lignes de son service\n- Un utilisateur URGENCES ne voit jamais les stocks de GERIATRIE`}
+];
+// ============================================================
+// QUIZ DATA - 20 questions
+// ============================================================
+const QUIZ_QUESTIONS = [
+  {id:1,question:'Qu\'est-ce qu\'une <code>table mutante</code> ?',options:[
+    {text:'Une table en cours de modification qu\'un trigger row-level ne peut pas lire via SELECT',correct:true},
+    {text:'Une table corrompue par une coupure de courant',correct:false},
+    {text:'Une table qui change de structure automatiquement',correct:false}
+  ],explanation:'Une table mutante est en cours de modification. Oracle interdit la lecture via SELECT (ORA-04091) pour proteger l\'integrite.',termRef:'table_mutante'},
+  {id:2,question:'Quel est l\'avantage principal de <code>BULK COLLECT</code> ?',options:[
+    {text:'Il cree des tables temporaires automatiquement',correct:false},
+    {text:'Il reduit les context switches entre SQL et PL/SQL',correct:true},
+    {text:'Il chiffre les donnees en memoire',correct:false}
+  ],explanation:'BULK COLLECT charge toutes les lignes en 1 transition PGA/SGA au lieu de N. Gain de 10x a 50x.',termRef:'bulk_collect'},
+  {id:3,question:'Quel code d\'erreur signale une table mutante ?',options:[
+    {text:'ORA-04091',correct:true},
+    {text:'ORA-00001 (contrainte unique)',correct:false},
+    {text:'ORA-01403 (NO_DATA_FOUND)',correct:false}
+  ],explanation:'ORA-04091 : "table X is mutating, trigger/function may not see it".',termRef:'table_mutante'},
+  {id:4,question:'Que fait un trigger <code>BEFORE INSERT</code> ?',options:[
+    {text:'Il s\'execute apres l\'insertion',correct:false},
+    {text:'Il empeche toute insertion',correct:false},
+    {text:'Il s\'execute avant l\'insertion, permettant validation et modification de :NEW',correct:true}
+  ],explanation:'Un trigger BEFORE INSERT s\'execute avant la persistance. Il peut valider et modifier :NEW.',termRef:'trigger_before'},
+  {id:5,question:'Difference entre <code>%TYPE</code> et <code>%ROWTYPE</code> ?',options:[
+    {text:'%TYPE pour les nombres, %ROWTYPE pour les chaines',correct:false},
+    {text:'%TYPE herite le type d\'une colonne, %ROWTYPE la structure d\'une ligne',correct:true},
+    {text:'Aucune difference, ce sont des synonymes',correct:false}
+  ],explanation:'%TYPE = type d\'une colonne specifique. %ROWTYPE = record avec un champ par colonne.',termRef:'pct_type'},
+  {id:6,question:'Comment resoudre une table mutante (ORA-04091) ?',options:[
+    {text:'Supprimer et recreer la table',correct:false},
+    {text:'Ajouter un index',correct:false},
+    {text:'Utiliser un Compound Trigger avec variables de contexte',correct:true}
+  ],explanation:'Le Compound Trigger accumule en memoire (AFTER EACH ROW) puis traite (AFTER STATEMENT) ou la table n\'est plus mutante.',termRef:'compound_trigger'},
+  {id:7,question:'Que retourne <code>CURRVAL</code> d\'une sequence ?',options:[
+    {text:'La prochaine valeur',correct:false},
+    {text:'La derniere valeur generee par NEXTVAL dans la session',correct:true},
+    {text:'Le total de valeurs generees',correct:false}
+  ],explanation:'CURRVAL = derniere valeur de NEXTVAL dans la session courante. NEXTVAL doit etre appele au moins une fois avant.',termRef:'sequence'},
+  {id:8,question:'Que se passe-t-il si on supprime une ligne referencee par une FK sans CASCADE ?',options:[
+    {text:'Oracle supprime les enfants automatiquement',correct:false},
+    {text:'Oracle bloque et leve ORA-02292',correct:true},
+    {text:'Oracle supprime la FK',correct:false}
+  ],explanation:'Sans ON DELETE CASCADE, Oracle protege l\'integrite referentielle en bloquant la suppression (ORA-02292).',termRef:'table'},
+  {id:9,question:'Qu\'est-ce qu\'un <code>Compound Trigger</code> ?',options:[
+    {text:'Un trigger combinant plusieurs tables',correct:false},
+    {text:'Un trigger avec 4 sections temporelles partageant des variables',correct:true},
+    {text:'Un trigger nocturne',correct:false}
+  ],explanation:'Un Compound Trigger combine BEFORE/AFTER STATEMENT et BEFORE/AFTER EACH ROW avec variables partagees.',termRef:'compound_trigger'},
+  {id:10,question:'Quel indicateur mesure le cout d\'un plan d\'execution ?',options:[
+    {text:'Le nombre de lignes',correct:false},
+    {text:'Le temps en millisecondes',correct:false},
+    {text:'Le cout CBO estime en unites de cout',correct:true}
+  ],explanation:'Le CBO calcule un cout relatif pour chaque plan et choisit le minimum. Ce n\'est pas un temps reel.',termRef:'cbo'},
+  {id:11,question:'Que signifie <code>VPD</code> ?',options:[
+    {text:'Virtual Private Database',correct:true},
+    {text:'Very Protected Data',correct:false},
+    {text:'Variable Privilege Definition',correct:false}
+  ],explanation:'VPD = Virtual Private Database (aussi appele RLS = Row Level Security). Filtre automatique des lignes.',termRef:'vpd'},
+  {id:12,question:'Meilleure pratique pour l\'attribution de privileges ?',options:[
+    {text:'Donner DBA a tous pour simplifier',correct:false},
+    {text:'Least Privilege : minimum necessaire',correct:true},
+    {text:'Aucun privilege, tout faire via le schema admin',correct:false}
+  ],explanation:'Le Least Privilege est exige en contexte HDS/RGPD. Chaque utilisateur n\'a que le strict necessaire.',termRef:'least_privilege'},
+  {id:13,question:'Quel scan est le plus couteux sur une grande table ?',options:[
+    {text:'Index Range Scan',correct:false},
+    {text:'Index Unique Scan',correct:false},
+    {text:'Full Table Scan',correct:true}
+  ],explanation:'Le Full Table Scan lit TOUS les blocs. Sur une table de milliers de lignes, c\'est l\'operation la plus couteuse.',termRef:'fts'},
+  {id:14,question:'Que fait <code>DBMS_RLS.ADD_POLICY</code> ?',options:[
+    {text:'Applique une politique VPD',correct:true},
+    {text:'Cree un nouveau role',correct:false},
+    {text:'Active l\'audit sur une table',correct:false}
+  ],explanation:'DBMS_RLS.ADD_POLICY attache une fonction de politique VPD a une table, filtrant automatiquement les requetes.',termRef:'vpd'},
+  {id:15,question:'Quelle section d\'un compound trigger s\'execute une seule fois ?',options:[
+    {text:'BEFORE EACH ROW et AFTER EACH ROW',correct:false},
+    {text:'BEFORE STATEMENT et AFTER STATEMENT',correct:true},
+    {text:'Toutes les sections s\'executent N fois',correct:false}
+  ],explanation:'BEFORE/AFTER STATEMENT s\'executent 1 fois (avant/apres l\'operation). BEFORE/AFTER EACH ROW s\'executent par ligne.',termRef:'compound_trigger'},
+  {id:16,question:'Que fait <code>FORALL</code> en PL/SQL ?',options:[
+    {text:'Cree une boucle FOR classique',correct:false},
+    {text:'Execute un DML en batch sur une collection',correct:true},
+    {text:'Definit une collection PL/SQL',correct:false}
+  ],explanation:'FORALL execute un DML pour chaque element d\'une collection en un seul appel SQL. Combine avec BULK COLLECT = pattern ETL optimal.',termRef:'forall'},
+  {id:17,question:'Qu\'est-ce qu\'une vue materialisee ?',options:[
+    {text:'Une vue avec un trigger AFTER',correct:false},
+    {text:'Une vue sur une table partitionnee',correct:false},
+    {text:'Une vue dont les resultats sont stockes physiquement',correct:true}
+  ],explanation:'Une vue materialisee stocke les resultats de la requete physiquement. Actualisee par refresh (COMPLETE/FAST, ON DEMAND/COMMIT).',termRef:'vue'},
+  {id:18,question:'Quel privilege permet de creer des tables ?',options:[
+    {text:'SELECT ANY TABLE',correct:false},
+    {text:'CREATE TABLE (privil. systeme)',correct:true},
+    {text:'CONNECT (role par defaut)',correct:false}
+  ],explanation:'CREATE TABLE est un privilege systeme. CONNECT permet uniquement la connexion, pas la creation d\'objets.',termRef:'grant_revoke'},
+  {id:19,question:'LIKE \'%xxx\' (avec % au debut) peut-il utiliser un index ?',options:[
+    {text:'Oui, toujours',correct:false},
+    {text:'Oui, si l\'index est composite',correct:false},
+    {text:'Non, jamais',correct:true}
+  ],explanation:'Un LIKE avec % au debut ne peut pas utiliser d\'index B-tree car le prefixe est inconnu. Full Table Scan obligatoire.',termRef:'hint'},
+  {id:20,question:'Que fait <code>AUDIT ... BY ACCESS</code> ?',options:[
+    {text:'Logue une fois par session',correct:false},
+    {text:'Logue chaque acces individuellement',correct:true},
+    {text:'Active le chiffrement des donnees',correct:false}
+  ],explanation:'BY ACCESS logue chaque operation individuellement. BY SESSION ne logue qu\'une fois par session (moins granulaire).',termRef:'audit'}
+];
+// ============================================================
+// HELP MANAGER
+// ============================================================
+class HelpManager {
+  constructor() {
+    this._overlay = document.getElementById('help-overlay');
+    this._active = null;
+    this._boundKey = this._onKey.bind(this);
+    this._overlay.addEventListener('click', () => this.close());
+  }
+  open(id) {
+    const modal = document.getElementById('help-' + id);
+    if (!modal) return;
+    this._active = modal;
+    this._overlay.classList.add('help-overlay--active');
+    this._overlay.setAttribute('aria-hidden', 'false');
+    modal.classList.add('help-modal--active');
+    modal.setAttribute('aria-hidden', 'false');
+    document.addEventListener('keydown', this._boundKey);
+    const cb = modal.querySelector('.help-modal__close');
+    if (cb) cb.focus();
+  }
+  close() {
+    if (!this._active) return;
+    this._active.classList.remove('help-modal--active');
+    this._active.setAttribute('aria-hidden', 'true');
+    this._overlay.classList.remove('help-overlay--active');
+    this._overlay.setAttribute('aria-hidden', 'true');
+    document.removeEventListener('keydown', this._boundKey);
+    this._active = null;
+  }
+  _onKey(e) {
+    if (e.key === 'Escape') { this.close(); return; }
+    if (e.key !== 'Tab' || !this._active) return;
+    const focusable = this._active.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    if (!focusable.length) return;
+    const first = focusable[0], last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
+}
+
+// ============================================================
+// DICTIONARY MANAGER
+// ============================================================
+class DictionaryManager extends EventDispatcher {
+  constructor(terms, stateMgr) {
+    super();
+    this._terms = terms;
+    this._sm = stateMgr;
+    this._activeCat = 'all';
+    this._query = '';
+    this._catColors = {
+      'Structure': 'tag--blue', 'Objets': 'tag--cyan', 'PL/SQL': 'tag--green',
+      'Triggers': 'tag--amber', 'Performance': 'tag--purple', 'Securite': 'tag--red'
+    };
+  }
+  getFiltered() {
+    let list = this._terms;
+    if (this._activeCat !== 'all') list = list.filter(t => t.category === this._activeCat);
+    if (this._query) {
+      const q = this._query.toLowerCase();
+      list = list.filter(t =>
+        t.termFr.toLowerCase().includes(q) ||
+        t.termEn.toLowerCase().includes(q) ||
+        t.shortDef.toLowerCase().includes(q) ||
+        t.fullDef.toLowerCase().includes(q) ||
+        t.category.toLowerCase().includes(q)
+      );
+    }
+    return list;
+  }
+  setCategory(cat) { this._activeCat = cat; this.emit('change'); }
+  setQuery(q) { this._query = q; this.emit('change'); }
+  track(id) { this._sm.trackTerm(id); }
+  render() {
+    const grid = document.getElementById('lex-grid');
+    const filtered = this.getFiltered();
+    const count = document.getElementById('lex-filter-count');
+    count.textContent = filtered.length + ' / ' + this._terms.length + ' termes';
+    grid.innerHTML = filtered.map(t => {
+      const cls = this._catColors[t.category] || 'tag--blue';
+      return `<div class="lex-card" data-term-id="${t.id}">
+        <div class="lex-card__inner">
+          <div class="lex-card__face lex-card__front">
+            <div class="lex-card__category"><span class="tag ${cls}">${t.category}</span></div>
+            <div class="lex-card__term-fr">${t.termFr}</div>
+            <div class="lex-card__term-en">${t.termEn}</div>
+            <div class="lex-card__short-def">${t.shortDef}</div>
+          </div>
+          <div class="lex-card__face lex-card__back">
+            <div class="lex-card__category"><span class="tag ${cls}">${t.category}</span></div>
+            <div class="lex-card__term-fr">${t.termFr}</div>
+            <div class="lex-card__full-def">${t.fullDef}</div>
+            <div class="lex-card__context">${t.context}</div>
+            ${t.exampleId ? '<button class="btn btn--primary btn--sm lex-card__btn" data-example="' + t.exampleId + '">Voir l\'exemple &rarr;</button>' : ''}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  flipCard(el) { el.closest('.lex-card').classList.toggle('lex-card--flipped'); }
+}
+// ============================================================
+// EXAMPLE LAB
+// ============================================================
+class ExampleLab extends EventDispatcher {
+  constructor(examples, stateMgr) {
+    super();
+    this._examples = examples;
+    this._sm = stateMgr;
+    this._state = 'IDLE';
+    this._currentId = '';
+    this._map = {};
+    this._examples.forEach(ex => { this._map[ex.id] = ex; });
+  }
+  populateSelect() {
+    const sel = document.getElementById('example-select');
+    let html = '<option value="">-- Choisir un exemple --</option>';
+    this._examples.forEach(ex => {
+      html += '<option value="' + ex.id + '">[' + ex.lang + '] ' + ex.title + '</option>';
+    });
+    sel.innerHTML = html;
+  }
+  loadExample(id) {
+    const ex = this._map[id];
+    if (!ex) return;
+    this._currentId = id;
+    document.getElementById('example-code').value = ex.code;
+    document.getElementById('example-filename').textContent = id.replace('ex_', '') + '.' + (ex.lang === 'PL/SQL' ? 'plsql' : 'sql');
+    document.getElementById('example-lang').textContent = ex.lang;
+    this._resetState();
+    const ec = document.getElementById('example-explanation-container');
+    const eb = document.getElementById('explanation-body');
+    const et = document.getElementById('explanation-title');
+    et.textContent = ex.title;
+    eb.innerHTML = ex.explanation;
+    ec.style.display = 'block';
+    this._sm.lastExample = id;
+    this._clearConsole();
+    this._logToConsole('info', 'Exemple charge: ' + ex.title);
+  }
+  async execute() {
+    const ex = this._map[this._currentId];
+    if (!ex) { this._logToConsole('warn', 'Aucun exemple selectionne.'); return; }
+    this._resetState();
+    this._clearConsole();
+    this._disableBtn(true);
+    this._setState('PARSING', 'Analyse syntaxique du code...');
+    this._logToConsole('info', '[PARSE] Type: ' + ex.lang);
+    await this._delay(800);
+    this._setState('COMPILING', 'Compilation PL/SQL en cours...');
+    this._logToConsole('info', '[COMPILE] ' + (ex.lang === 'PL/SQL' ? 'Compilation bloc PL/SQL...' : 'Validation syntaxe SQL...'));
+    await this._delay(1000);
+    if (ex.simulateResult === 'error') {
+      this._logToConsole('error', 'ERREUR: ORA-04091: table PUI.SORTIE_STOCK is mutating');
+      this._logToConsole('error', 'trigger/function may not see it');
+      this._setState('ERROR', 'ORA-04091: Table mutante detectee');
+      await this._delay(1200);
+      this._logToConsole('warn', '[SOLUTION] Voir le code du Compound Trigger pour la correction.');
+      this._setState('COMPLETED', 'Erreur simulee - Solution disponible dans l explication ci-dessous');
+    } else {
+      this._logToConsole('info', '[EXEC] Execution du plan...');
+      await this._delay(1200);
+      this._logToConsole('success', '[DONE] Execution terminee avec succes. ' + (Math.floor(Math.random() * 50) + 10) + 'ms');
+      this._setState('COMPLETED', 'Termine - Execution reussie');
+    }
+    this._disableBtn(false);
+  }
+  reset() {
+    this._resetState();
+    this._clearConsole();
+    document.getElementById('example-code').value = '';
+    document.getElementById('example-explanation-container').style.display = 'none';
+    this._logToConsole('info', 'Laboratoire reinitialise.');
+  }
+  _setState(s, info) {
+    this._state = s;
+    const map = { IDLE:'ex-state-idle', PARSING:'ex-state-parsing', COMPILING:'ex-state-compiling', EXECUTING:'ex-state-executing', COMPLETED:'ex-state-completed', ERROR:'ex-state-completed' };
+    const steps = ['ex-state-idle','ex-state-parsing','ex-state-compiling','ex-state-executing','ex-state-completed'];
+    const order = {'ex-state-idle':0,'ex-state-parsing':1,'ex-state-compiling':2,'ex-state-executing':3,'ex-state-completed':4};
+    const target = map[s];
+    steps.forEach(id => {
+      const el = document.getElementById(id);
+      el.className = 'state-step';
+      if (order[id] < order[target]) el.classList.add('state-step--done');
+      else if (id === target) el.classList.add(s === 'ERROR' ? 'state-step--error' : 'state-step--active');
+    });
+    document.getElementById('ex-state-info').textContent = info || '';
+  }
+  _resetState() {
+    ['ex-state-idle','ex-state-parsing','ex-state-compiling','ex-state-executing','ex-state-completed'].forEach(id => {
+      document.getElementById(id).className = 'state-step';
+    });
+    document.getElementById('ex-state-idle').classList.add('state-step--active');
+    document.getElementById('ex-state-info').textContent = 'Pret.';
+  }
+  _clearConsole() { document.getElementById('example-console').innerHTML = ''; }
+  _logToConsole(level, msg) {
+    const c = document.getElementById('example-console');
+    const ts = new Date().toISOString().slice(11, 19);
+    const cls = 'log-console__entry log-console__entry--' + level;
+    const div = document.createElement('div');
+    div.className = cls;
+    div.innerHTML = '<span class="log-console__timestamp">[' + ts + ']</span>' + msg;
+    c.appendChild(div);
+    c.scrollTop = c.scrollHeight;
+  }
+  _disableBtn(dis) { document.getElementById('btn-execute-example').disabled = dis; }
+  _delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+}
+// ============================================================
+// QUIZ ENGINE
+// ============================================================
+class QuizEngine extends EventDispatcher {
+  constructor(questions, stateMgr) {
+    super();
+    this._all = questions;
+    this._sm = stateMgr;
+    this._questions = [];
+    this._idx = 0;
+    this._score = 0;
+    this._streak = 0;
+    this._bestStreak = 0;
+    this._answered = false;
+    this._shuffle();
+  }
+  _shuffle() {
+    this._questions = this._all.map((q, i) => {
+      const shuffled = [...q.options];
+      for (let j = shuffled.length - 1; j > 0; j--) {
+        const k = Math.floor(Math.random() * (j + 1));
+        [shuffled[j], shuffled[k]] = [shuffled[k], shuffled[j]];
+      }
+      return { ...q, options: shuffled };
+    });
+    for (let j = this._questions.length - 1; j > 0; j--) {
+      const k = Math.floor(Math.random() * (j + 1));
+      [this._questions[j], this._questions[k]] = [this._questions[k], this._questions[j]];
+    }
+  }
+  get progress() {
+    return { current: this._idx + 1, total: this._questions.length, score: this._score, streak: this._streak, best: this._bestStreak, pct: this._questions.length ? Math.round(this._score / this._questions.length * 100) : 0 };
+  }
+  loadQuestion() {
+    if (this._idx >= this._questions.length) {
+      this.emit('finished');
+      return;
+    }
+    this._answered = false;
+    const q = this._questions[this._idx];
+    document.getElementById('quiz-question').innerHTML = q.question;
+    const letters = ['A', 'B', 'C'];
+    document.getElementById('quiz-options').innerHTML = q.options.map((o, i) =>
+      '<button class="quiz-option" data-idx="' + i + '"><span class="quiz-option__letter">' + letters[i] + '</span><span>' + o.text + '</span></button>'
+    ).join('');
+    document.getElementById('quiz-feedback').style.display = 'none';
+    document.getElementById('btn-next-question').style.display = 'none';
+    this._updateStats();
+    this.emit('loaded');
+  }
+  checkAnswer(idx) {
+    if (this._answered) return;
+    this._answered = true;
+    const q = this._questions[this._idx];
+    const correct = q.options[idx].correct;
+    const btns = document.querySelectorAll('.quiz-option');
+    btns.forEach((b, i) => {
+      b.disabled = true;
+      if (q.options[i].correct) b.classList.add('quiz-option--correct');
+      else if (i === idx && !correct) b.classList.add('quiz-option--wrong');
+    });
+    if (correct) { this._score++; this._streak++; if (this._streak > this._bestStreak) this._bestStreak = this._streak; }
+    else { this._streak = 0; }
+    const fb = document.getElementById('quiz-feedback');
+    fb.innerHTML = '<div class="alert alert--' + (correct ? 'success' : 'error') + '">' +
+      (correct ? 'Correct !' : 'Incorrect.') + ' ' + q.explanation +
+      (q.termRef ? ' <br><a href="#" data-nav-to="dictionary" data-term="' + q.termRef + '">Voir le terme dans le dictionnaire &rarr;</a>' : '') + '</div>';
+    fb.style.display = 'block';
+    document.getElementById('btn-next-question').style.display = 'inline-flex';
+    this._updateStats();
+    this.emit('answered', { correct, score: this._score });
+  }
+  next() {
+    this._idx++;
+    if (this._idx >= this._questions.length) {
+      this.emit('finished');
+      this._sm.updateQuiz(this._score, this._questions.length);
+      return;
+    }
+    this.loadQuestion();
+  }
+  restart() {
+    this._idx = 0;
+    this._score = 0;
+    this._streak = 0;
+    this._bestStreak = 0;
+    this._shuffle();
+    this._sm.updateQuiz(this._score, 0);
+    this.loadQuestion();
+  }
+  _updateStats() {
+    const p = this.progress;
+    document.getElementById('quiz-score').textContent = p.score;
+    document.getElementById('quiz-total').textContent = p.current + '/' + p.total;
+    document.getElementById('quiz-streak').textContent = p.streak;
+    document.getElementById('quiz-pct').textContent = p.pct + '%';
+    document.getElementById('quiz-progress-text').textContent = 'Question ' + p.current + ' / ' + p.total;
+    document.getElementById('quiz-progress-pct').textContent = p.pct + '%';
+    document.getElementById('quiz-progress-fill').style.width = ((p.current - 1) / p.total * 100) + '%';
+  }
+}
+// ============================================================
+// LEXIQUE APP (main orchestrator)
+// ============================================================
+class LexiqueApp {
+  constructor() {
+    this._sm = new StateManager();
+    this._helpMgr = new HelpManager();
+    this._dictMgr = new DictionaryManager(LEXIQUE_TERMS, this._sm);
+    this._exLab = new ExampleLab(LEXIQUE_EXAMPLES, this._sm);
+    this._quiz = new QuizEngine(QUIZ_QUESTIONS, this._sm);
+  }
+  init() {
+    this._dictMgr.render();
+    this._exLab.populateSelect();
+    this._quiz.loadQuestion();
+    this._bindNav();
+    this._bindDictionary();
+    this._bindExamples();
+    this._bindQuiz();
+    this._bindHelp();
+    this._updateSessionUI();
+    this._sm.on('change', () => this._updateSessionUI());
+    if (this._sm.lastExample) {
+      const sel = document.getElementById('example-select');
+      if (sel) sel.value = this._sm.lastExample;
+    }
+  }
+  _updateSessionUI() {
+    const tc = document.getElementById('session-terms-count');
+    if (tc) tc.textContent = this._sm.termsViewed.length + ' / 50';
+    const qs = document.getElementById('session-quiz-score');
+    const qd = this._sm.quizData;
+    if (qs) qs.textContent = (qd.total ? Math.round(qd.score / qd.total * 100) : 0) + '%';
+  }
+  _switchTab(tabId) {
+    document.querySelectorAll('.app-nav__item').forEach(b => b.classList.remove('app-nav__item--active'));
+    const btn = document.querySelector('.app-nav__item[data-tab="' + tabId + '"]');
+    if (btn) btn.classList.add('app-nav__item--active');
+    document.querySelectorAll('.module-section').forEach(s => s.classList.remove('module-section--active'));
+    const sec = document.getElementById('tab-' + tabId);
+    if (sec) sec.classList.add('module-section--active');
+  }
+  _bindNav() {
+    document.querySelectorAll('.app-nav__item[data-tab]').forEach(btn => {
+      btn.addEventListener('click', () => this._switchTab(btn.dataset.tab));
+    });
+  }
+  _bindDictionary() {
+    const grid = document.getElementById('lex-grid');
+    const searchInput = document.getElementById('lex-search');
+    // Event delegation for card flips and "Voir l'exemple" buttons
+    grid.addEventListener('click', (e) => {
+      const card = e.target.closest('.lex-card');
+      const exBtn = e.target.closest('[data-example]');
+      if (exBtn) {
+        e.stopPropagation();
+        const exId = exBtn.dataset.example;
+        this._switchTab('examples');
+        const sel = document.getElementById('example-select');
+        sel.value = exId;
+        this._exLab.loadExample(exId);
+        return;
+      }
+      if (card) {
+        this._dictMgr.flipCard(card);
+        const termId = card.dataset.termId;
+        this._dictMgr.track(termId);
+        this._updateSessionUI();
+      }
+    });
+    // Filter pills
+    document.getElementById('filter-pills').addEventListener('click', (e) => {
+      const pill = e.target.closest('.filter-pill');
+      if (!pill) return;
+      document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('filter-pill--active'));
+      pill.classList.add('filter-pill--active');
+      this._dictMgr.setCategory(pill.dataset.category);
+      this._dictMgr.render();
+    });
+    // Search with debounce
+    let timer;
+    searchInput.addEventListener('input', (e) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        this._dictMgr.setQuery(e.target.value);
+        this._dictMgr.render();
+      }, 150);
+    });
+    // Re-render on category change
+    this._dictMgr.on('change', () => this._dictMgr.render());
+  }
+  _bindExamples() {
+    document.getElementById('example-select').addEventListener('change', (e) => {
+      if (e.target.value) this._exLab.loadExample(e.target.value);
+    });
+    document.getElementById('btn-execute-example').addEventListener('click', () => this._exLab.execute());
+    document.getElementById('btn-reset-example').addEventListener('click', () => this._exLab.reset());
+  }
+  _bindQuiz() {
+    const optsContainer = document.getElementById('quiz-options');
+    optsContainer.addEventListener('click', (e) => {
+      const btn = e.target.closest('.quiz-option');
+      if (!btn) return;
+      this._quiz.checkAnswer(parseInt(btn.dataset.idx));
+    });
+    document.getElementById('btn-next-question').addEventListener('click', () => this._quiz.next());
+    document.getElementById('btn-restart-quiz').addEventListener('click', () => this._quiz.restart());
+    // Handle "finished" state
+    this._quiz.on('finished', () => {
+      document.getElementById('quiz-question').textContent = 'Quiz termine ! Score final: ' + this._quiz.progress.score + '/' + this._quiz.progress.total;
+      document.getElementById('quiz-options').innerHTML = '';
+      document.getElementById('quiz-feedback').style.display = 'none';
+      document.getElementById('btn-next-question').style.display = 'none';
+      document.getElementById('btn-restart-quiz').style.display = 'inline-flex';
+      this._sm.updateQuiz(this._quiz.progress.score, this._quiz.progress.total);
+      this._updateSessionUI();
+    });
+    // Handle nav links from quiz feedback back to dictionary
+    document.addEventListener('click', (e) => {
+      const link = e.target.closest('[data-nav-to]');
+      if (link && link.dataset.navTo === 'dictionary') {
+        e.preventDefault();
+        this._switchTab('dictionary');
+      }
+    });
+  }
+  _bindHelp() {
+    document.querySelectorAll('[data-help]').forEach(btn => {
+      btn.addEventListener('click', () => this._helpMgr.open(btn.dataset.help));
+    });
+    document.querySelectorAll('.help-modal__close').forEach(btn => {
+      btn.addEventListener('click', () => this._helpMgr.close());
+    });
+    document.querySelectorAll('.help-modal__footer-btn').forEach(btn => {
+      btn.addEventListener('click', () => this._helpMgr.close());
+    });
+  }
+}
+
+// ============================================================
+// BOOTSTRAP
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  new LexiqueApp().init();
+});
+</script>
+</body>
+</html>
