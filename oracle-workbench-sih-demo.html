@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Oracle SQL Workbench SIH - PUI Stock Management, Explain Plan, HDS Audit">
+<title>Oracle SQL Workbench - PUI Stock Management</title>
+<style>
+:root {
+  --color-bg-deep: #0a0e17;
+  --color-bg-surface: #131a2a;
+  --color-bg-elevated: #1a2340;
+  --color-bg-hover: #243052;
+  --color-border: #1e2d4a;
+  --color-border-active: #3b82f6;
+  --color-blue: #3b82f6;
+  --color-blue-dim: #1e3a6e;
+  --color-red: #ef4444;
+  --color-red-dim: #7f1d1d;
+  --color-green: #22c55e;
+  --color-green-dim: #166534;
+  --color-amber: #f59e0b;
+  --color-amber-dim: #78350f;
+  --color-cyan: #06b6d4;
+  --color-purple: #a855f7;
+  --font-ui: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+  --fs-xs: 0.6875rem;
+  --fs-sm: 0.8125rem;
+  --fs-base: 0.9375rem;
+  --fs-md: 1.0625rem;
+  --fs-lg: 1.25rem;
+  --fs-xl: 1.5rem;
+  --fs-2xl: 2rem;
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-6: 1.5rem;
+  --sp-8: 2rem;
+  --sp-12: 3rem;
+  --nav-width: 260px;
+  --header-height: 56px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --transition-fast: 150ms ease;
+  --transition-normal: 300ms ease;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+body { font-family: var(--font-ui); font-size: var(--fs-base); color: #e2e8f0; background: var(--color-bg-deep); line-height: 1.6; overflow-x: hidden; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input, select, textarea { font-family: inherit; font-size: inherit; }
+pre, code { font-family: var(--font-mono); }
+table { border-collapse: collapse; width: 100%; }
+a { color: var(--color-cyan); text-decoration: none; }
+a:hover { text-decoration: underline; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--color-bg-deep); }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: var(--radius-sm); }
+::-webkit-scrollbar-thumb:hover { background: var(--color-blue); }
+
+.app-layout { display: grid; grid-template-columns: var(--nav-width) 1fr; grid-template-rows: var(--header-height) 1fr; grid-template-areas: "header header" "nav main"; min-height: 100vh; }
+.app-header { grid-area: header; display: flex; align-items: center; justify-content: space-between; padding: 0 var(--sp-6); background: var(--color-bg-surface); border-bottom: 1px solid var(--color-border); z-index: 100; }
+.app-header__brand { display: flex; align-items: center; gap: var(--sp-3); font-family: var(--font-mono); font-size: var(--fs-md); font-weight: 700; letter-spacing: -0.02em; }
+.app-header__brand-icon { width: 28px; height: 28px; background: var(--color-blue); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: var(--fs-sm); font-weight: 900; color: #fff; }
+.app-header__status { display: flex; align-items: center; gap: var(--sp-4); font-size: var(--fs-xs); font-family: var(--font-mono); }
+.status-badge { display: inline-flex; align-items: center; gap: var(--sp-2); padding: var(--sp-1) var(--sp-3); border-radius: var(--radius-sm); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.status-badge--online { background: var(--color-green-dim); color: var(--color-green); }
+.status-badge--hds { background: var(--color-blue-dim); color: var(--color-blue); }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: pulse-dot 2s infinite; }
+@keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.app-nav { grid-area: nav; background: var(--color-bg-surface); border-right: 1px solid var(--color-border); padding: var(--sp-6) 0; overflow-y: auto; }
+.app-nav__section { padding: 0 var(--sp-4); margin-bottom: var(--sp-6); }
+.app-nav__section-title { font-size: var(--fs-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-blue); margin-bottom: var(--sp-3); font-family: var(--font-mono); }
+.app-nav__item { display: flex; align-items: center; gap: var(--sp-3); width: 100%; padding: var(--sp-3) var(--sp-4); border-radius: var(--radius-md); font-size: var(--fs-sm); font-weight: 500; color: #94a3b8; transition: all var(--transition-fast); text-align: left; }
+.app-nav__item:hover { background: var(--color-bg-hover); color: #e2e8f0; }
+.app-nav__item--active { background: var(--color-blue-dim); color: var(--color-blue); font-weight: 600; }
+.app-nav__item-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700; border-radius: var(--radius-sm); background: var(--color-bg-elevated); flex-shrink: 0; }
+.app-nav__item--active .app-nav__item-icon { background: var(--color-blue); color: #fff; }
+.app-nav__rgpd-notice { margin: var(--sp-6) var(--sp-4); padding: var(--sp-3); background: var(--color-blue-dim); border: 1px solid var(--color-blue); border-radius: var(--radius-md); font-size: var(--fs-xs); color: var(--color-blue); font-family: var(--font-mono); line-height: 1.5; }
+
+.app-main { grid-area: main; padding: var(--sp-8); overflow-y: auto; background: var(--color-bg-deep); }
+
+.page-header { margin-bottom: var(--sp-8); padding-bottom: var(--sp-4); border-bottom: 1px solid var(--color-border); }
+.page-header__title { font-size: var(--fs-xl); font-weight: 700; letter-spacing: -0.02em; margin-bottom: var(--sp-2); }
+.page-header__subtitle { font-size: var(--fs-sm); color: #94a3b8; font-family: var(--font-mono); }
+.page-header__subtitle-row { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); }
+.page-header__help-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 1px solid var(--color-border); border-radius: 50%; background: var(--color-bg-elevated); color: #94a3b8; font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700; cursor: pointer; transition: all var(--transition-fast); flex-shrink: 0; }
+.page-header__help-btn:hover { border-color: var(--color-blue); color: var(--color-blue); background: var(--color-blue-dim); }
+
+.card { background: var(--color-bg-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--sp-6); margin-bottom: var(--sp-6); }
+.card__title { font-size: var(--fs-md); font-weight: 700; margin-bottom: var(--sp-4); display: flex; align-items: center; gap: var(--sp-3); font-family: var(--font-mono); }
+.card__title-icon { color: var(--color-blue); }
+
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-6); }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-6); }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-6); }
+@media (max-width: 1200px) { .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+.data-mono { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--color-cyan); background: var(--color-bg-elevated); padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); display: inline-block; }
+.data-label { font-size: var(--fs-xs); color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+
+.stat-block { background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--sp-4); text-align: center; }
+.stat-block__value { font-family: var(--font-mono); font-size: var(--fs-xl); font-weight: 700; margin-bottom: var(--sp-1); }
+.stat-block__label { font-size: var(--fs-xs); color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+.stat-block--blue .stat-block__value { color: var(--color-blue); }
+.stat-block--green .stat-block__value { color: var(--color-green); }
+.stat-block--red .stat-block__value { color: var(--color-red); }
+.stat-block--amber .stat-block__value { color: var(--color-amber); }
+.stat-block--cyan .stat-block__value { color: var(--color-cyan); }
+.stat-block--purple .stat-block__value { color: var(--color-purple); }
+
+.progress-bar { width: 100%; height: 8px; background: var(--color-bg-elevated); border-radius: var(--radius-sm); overflow: hidden; margin: var(--sp-2) 0; }
+.progress-bar__fill { height: 100%; border-radius: var(--radius-sm); transition: width var(--transition-normal); }
+.progress-bar__fill--blue { background: var(--color-blue); }
+.progress-bar__fill--green { background: var(--color-green); }
+.progress-bar__fill--red { background: var(--color-red); }
+.progress-bar__fill--amber { background: var(--color-amber); }
+.progress-bar__fill--cyan { background: var(--color-cyan); }
+
+.tag { display: inline-flex; align-items: center; padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); font-size: var(--fs-xs); font-weight: 600; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.03em; }
+.tag--blue { background: var(--color-blue-dim); color: var(--color-blue); }
+.tag--green { background: var(--color-green-dim); color: var(--color-green); }
+.tag--red { background: var(--color-red-dim); color: var(--color-red); }
+.tag--amber { background: var(--color-amber-dim); color: var(--color-amber); }
+.tag--purple { background: #4c1d95; color: var(--color-purple); }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2); padding: var(--sp-3) var(--sp-6); border-radius: var(--radius-md); font-size: var(--fs-sm); font-weight: 600; transition: all var(--transition-fast); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.03em; }
+.btn--primary { background: var(--color-blue); color: #fff; }
+.btn--primary:hover { background: #2563eb; }
+.btn--success { background: var(--color-green); color: #fff; }
+.btn--success:hover { background: #16a34a; }
+.btn--danger { background: var(--color-red); color: #fff; }
+.btn--danger:hover { background: #dc2626; }
+.btn--outline { border: 1px solid var(--color-border); color: #e2e8f0; }
+.btn--outline:hover { border-color: var(--color-blue); color: var(--color-blue); }
+.btn--sm { padding: var(--sp-2) var(--sp-4); font-size: var(--fs-xs); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.alert { padding: var(--sp-4); border-radius: var(--radius-md); border-left: 4px solid; margin-bottom: var(--sp-4); font-size: var(--fs-sm); font-family: var(--font-mono); }
+.alert--info { background: var(--color-blue-dim); border-color: var(--color-blue); color: #93c5fd; }
+.alert--success { background: var(--color-green-dim); border-color: var(--color-green); color: #86efac; }
+.alert--warning { background: var(--color-amber-dim); border-color: var(--color-amber); color: #fcd34d; }
+.alert--error { background: var(--color-red-dim); border-color: var(--color-red); color: #fca5a5; }
+
+.log-console { background: #000; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--sp-4); font-family: var(--font-mono); font-size: var(--fs-xs); max-height: 300px; overflow-y: auto; line-height: 1.8; }
+.log-console__entry { color: #94a3b8; }
+.log-console__entry--info { color: var(--color-blue); }
+.log-console__entry--success { color: var(--color-green); }
+.log-console__entry--error { color: var(--color-red); }
+.log-console__entry--warn { color: var(--color-amber); }
+.log-console__timestamp { color: #475569; margin-right: var(--sp-2); }
+
+.slider-group { display: flex; flex-direction: column; gap: var(--sp-2); }
+.slider-group__header { display: flex; justify-content: space-between; align-items: center; }
+.slider-group__label { font-size: var(--fs-sm); font-weight: 600; font-family: var(--font-mono); }
+.slider-group__value { font-size: var(--fs-sm); font-family: var(--font-mono); color: var(--color-cyan); font-weight: 700; }
+input[type="range"] { -webkit-appearance: none; width: 100%; height: 6px; background: var(--color-bg-elevated); border-radius: var(--radius-sm); outline: none; }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--color-blue); border-radius: 50%; cursor: pointer; border: 2px solid var(--color-bg-surface); }
+
+.diagram-node { background: var(--color-bg-elevated); border: 2px solid var(--color-border); border-radius: var(--radius-md); padding: var(--sp-4); text-align: center; transition: all var(--transition-fast); position: relative; }
+.diagram-node__title { font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700; margin-bottom: var(--sp-2); }
+.diagram-node__detail { font-size: var(--fs-xs); color: #94a3b8; font-family: var(--font-mono); }
+
+.data-table { width: 100%; font-size: var(--fs-sm); }
+.data-table th { text-align: left; padding: var(--sp-3) var(--sp-4); background: var(--color-bg-elevated); font-family: var(--font-mono); font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; font-weight: 600; border-bottom: 1px solid var(--color-border); }
+.data-table td { padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--color-border); font-family: var(--font-mono); font-size: var(--fs-xs); }
+.data-table tr:hover td { background: var(--color-bg-hover); }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn var(--transition-normal) ease; }
+.module-section { display: none; }
+.module-section--active { display: block; animation: fadeIn var(--transition-normal) ease; }
+
+.app-footer { margin-top: var(--sp-12); padding-top: var(--sp-6); border-top: 1px solid var(--color-border); font-size: var(--fs-xs); color: #475569; font-family: var(--font-mono); text-align: center; line-height: 1.8; }
+
+/* ============================================================
+   WORKBENCH-SPECIFIC COMPONENTS
+   ============================================================ */
+
+/* Code Editor */
+.code-editor-wrapper { position: relative; background: #0d1117; border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; }
+.code-editor__header { display: flex; align-items: center; justify-content: space-between; padding: var(--sp-2) var(--sp-4); background: var(--color-bg-elevated); border-bottom: 1px solid var(--color-border); }
+.code-editor__label { font-family: var(--font-mono); font-size: var(--fs-xs); color: #94a3b8; }
+.code-editor__textarea {
+  width: 100%; min-height: 280px; padding: var(--sp-4); background: transparent;
+  color: #e2e8f0; font-family: var(--font-mono); font-size: var(--fs-sm);
+  line-height: 1.7; border: none; outline: none; resize: vertical;
+  tab-size: 2; white-space: pre; overflow: auto;
+}
+.code-editor__highlight {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  padding: var(--sp-4) 0 0 var(--sp-4); font-family: var(--font-mono);
+  font-size: var(--fs-sm); line-height: 1.7; pointer-events: none;
+  white-space: pre; overflow: hidden; color: transparent;
+}
+.editor-kw { color: #ff7b72; font-weight: 600; }
+.editor-str { color: #a5d6ff; }
+.editor-cmt { color: #8b949e; font-style: italic; }
+.editor-fn { color: #d2a8ff; }
+.editor-tbl { color: #ffa657; }
+
+/* Snippet Selector */
+.snippet-selector { margin-bottom: var(--sp-4); }
+.snippet-selector select {
+  width: 100%; padding: var(--sp-3) var(--sp-4); background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border); border-radius: var(--radius-md);
+  color: #e2e8f0; font-family: var(--font-mono); font-size: var(--fs-sm);
+  cursor: pointer;
+}
+.snippet-selector select option { background: var(--color-bg-surface); }
+
+/* State Machine */
+.state-machine { display: flex; align-items: center; gap: var(--sp-2); padding: var(--sp-3) 0; flex-wrap: wrap; }
+.state-step {
+  display: flex; align-items: center; gap: var(--sp-2);
+  font-family: var(--font-mono); font-size: var(--fs-xs); font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.05em; color: #475569;
+}
+.state-step__dot {
+  width: 10px; height: 10px; border-radius: 50%; background: #475569;
+  transition: all var(--transition-fast);
+}
+.state-step--active .state-step__dot {
+  background: var(--color-blue); box-shadow: 0 0 8px var(--color-blue);
+  animation: pulse-dot 1s infinite;
+}
+.state-step--active { color: var(--color-blue); }
+.state-step--done .state-step__dot { background: var(--color-green); }
+.state-step--done { color: var(--color-green); }
+.state-step--error .state-step__dot { background: var(--color-red); box-shadow: 0 0 8px var(--color-red); }
+.state-step--error { color: var(--color-red); }
+.state-arrow { color: #475569; font-size: var(--fs-xs); }
+
+/* Explain Plan Tree */
+.plan-tree { font-family: var(--font-mono); font-size: var(--fs-xs); line-height: 2; }
+.plan-node { padding: var(--sp-1) 0; }
+.plan-node__indent { display: inline-block; width: 24px; }
+.plan-node__op { font-weight: 700; color: var(--color-cyan); }
+.plan-node__obj { color: #94a3b8; }
+.plan-node__metrics { color: #64748b; }
+
+/* Data Grid */
+.data-grid-wrapper { max-height: 400px; overflow: auto; border: 1px solid var(--color-border); border-radius: var(--radius-md); }
+
+/* Help Modal */
+.help-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 999; animation: fadeIn 0.2s ease; }
+.help-overlay--active { display: block; }
+.help-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%) translateY(16px); width: 90%; max-width: 720px; max-height: 85vh; background: var(--color-bg-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); z-index: 1000; overflow: hidden; animation: fadeSlideUp 0.3s ease forwards; box-shadow: 0 24px 48px rgba(0,0,0,0.4); }
+.help-modal--active { display: flex; flex-direction: column; }
+@keyframes fadeSlideUp { from { opacity:0; transform: translate(-50%,-50%) translateY(16px); } to { opacity:1; transform: translate(-50%,-50%) translateY(0); } }
+.help-modal__header { display: flex; align-items: center; justify-content: space-between; padding: var(--sp-4) var(--sp-6); border-bottom: 1px solid var(--color-border); background: var(--color-bg-elevated); }
+.help-modal__title { font-family: var(--font-mono); font-size: var(--fs-md); font-weight: 700; color: var(--color-blue); }
+.help-modal__close { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-bg-deep); color: #94a3b8; font-size: var(--fs-md); cursor: pointer; transition: all var(--transition-fast); font-weight: 700; }
+.help-modal__close:hover { border-color: var(--color-red); color: var(--color-red); background: var(--color-red-dim); }
+.help-modal__body { padding: var(--sp-6); overflow-y: auto; flex: 1; }
+.help-modal__section { margin-bottom: var(--sp-6); }
+.help-modal__section:last-child { margin-bottom: 0; }
+.help-modal__section-title { font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: var(--sp-3); padding-bottom: var(--sp-2); border-bottom: 1px solid var(--color-border); }
+.help-modal__section-title--objective { color: var(--color-blue); }
+.help-modal__section-title--controls { color: var(--color-cyan); }
+.help-modal__section-title--indicators { color: var(--color-amber); }
+.help-modal__section-title--hds { color: var(--color-green); }
+.help-modal__text { font-size: var(--fs-sm); color: #cbd5e1; line-height: 1.7; margin-bottom: var(--sp-3); }
+.help-modal__text code { font-family: var(--font-mono); font-size: var(--fs-xs); background: var(--color-bg-elevated); padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); color: var(--color-cyan); }
+.help-modal__list { list-style: none; padding: 0; }
+.help-modal__list li { position: relative; padding: var(--sp-2) 0 var(--sp-2) var(--sp-6); font-size: var(--fs-sm); color: #94a3b8; line-height: 1.6; border-left: 2px solid var(--color-border); }
+.help-modal__list li::before { content: ''; position: absolute; left: -1px; top: 50%; width: 8px; height: 2px; background: var(--color-blue); transform: translateY(-50%); }
+.help-modal__list li:last-child { border-left-color: transparent; }
+.help-modal__footer { padding: var(--sp-4) var(--sp-6); border-top: 1px solid var(--color-border); display: flex; justify-content: flex-end; background: var(--color-bg-elevated); }
+
+/* User Form */
+.user-form { display: flex; flex-direction: column; gap: var(--sp-4); }
+.user-form__field label { display: block; font-size: var(--fs-xs); color: #94a3b8; font-family: var(--font-mono); margin-bottom: var(--sp-1); }
+.user-form__field input[type="text"] { width: 100%; padding: var(--sp-2) var(--sp-3); background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-sm); color: #e2e8f0; font-family: var(--font-mono); font-size: var(--fs-sm); }
+.role-checkboxes { display: flex; flex-wrap: wrap; gap: var(--sp-3); }
+.role-checkbox { display: flex; align-items: center; gap: var(--sp-2); font-size: var(--fs-xs); font-family: var(--font-mono); }
+.role-checkbox input { accent-color: var(--color-blue); }
+
+/* Tablespace bar */
+.ts-bar { margin-bottom: var(--sp-4); }
+.ts-bar__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--sp-1); }
+.ts-bar__name { font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 600; }
+.ts-bar__pct { font-family: var(--font-mono); font-size: var(--fs-xs); color: #94a3b8; }
+.ts-bar__detail { font-family: var(--font-mono); font-size: var(--fs-xs); color: #64748b; margin-top: var(--sp-1); }
+.ts-bar__fill { height: 12px; border-radius: var(--radius-sm); background: var(--color-bg-elevated); overflow: hidden; }
+.ts-bar__fill-inner { height: 100%; border-radius: var(--radius-sm); transition: width var(--transition-normal); }
+</style>
+</head>
+<body>
+
+<div class="app-layout">
+  <header class="app-header">
+    <div class="app-header__brand">
+      <div class="app-header__brand-icon">W</div>
+      <span>ORACLE<span style="color: var(--color-cyan);">_WORKBENCH</span>::SIH</span>
+    </div>
+    <div class="app-header__status">
+      <span class="status-badge status-badge--online"><span class="status-dot"></span>MOTEUR ACTIF</span>
+      <span class="status-badge status-badge--hds">HDS / DONNEES FICTIVES</span>
+    </div>
+  </header>
+
+  <nav class="app-nav">
+    <div class="app-nav__section">
+      <div class="app-nav__section-title">SQL Workbench PUI</div>
+      <button class="app-nav__item app-nav__item--active" data-tab="queries"><span class="app-nav__item-icon">Q</span>Requetes &amp; Logique Metier</button>
+      <button class="app-nav__item" data-tab="results"><span class="app-nav__item-icon">R</span>Resultats &amp; Performance</button>
+      <button class="app-nav__item" data-tab="maintenance"><span class="app-nav__item-icon">M</span>Maintenance &amp; Gouvernance</button>
+    </div>
+    <div class="app-nav__section">
+      <div class="app-nav__section-title">Contexte Session</div>
+      <div style="padding: 0 var(--sp-4); font-size: var(--fs-xs); font-family: var(--font-mono); line-height: 2;">
+        <div style="color: #64748b;">USER</div>
+        <div id="session-user" style="color: var(--color-cyan);">DBA_PUI_SIMU</div>
+        <div style="color: #64748b; margin-top: var(--sp-2);">CONNECT ID</div>
+        <div class="data-mono" id="session-connect-id">---</div>
+        <div style="color: #64748b; margin-top: var(--sp-2);">EXECUTIONS</div>
+        <div id="session-exec-count" style="color: var(--color-green);">0</div>
+      </div>
+    </div>
+    <div class="app-nav__rgpd-notice">
+      DONNEES 100% FICTIVES<br>
+      MED_TEST_XXX / LOT_SIMU_XXX<br>
+      PATIENT_FICTIF_XXX / NIR_FICTIF<br>
+      Conforme RGPD Art. 25
+    </div>
+  </nav>
+
+  <main class="app-main" id="app-main">
+    <!-- ============================================================
+         TAB 1: REQUETES & LOGIQUE METIER
+         ============================================================ -->
+    <section class="module-section module-section--active" id="tab-queries">
+      <div class="page-header">
+        <h1 class="page-header__title">Requetes &amp; Logique Metier</h1>
+        <div class="page-header__subtitle-row">
+          <p class="page-header__subtitle">Editeur PL/SQL, snippets predefinis, execution simulee avec machine d'etats</p>
+          <button class="page-header__help-btn" data-help="queries" aria-label="Aide Requetes">?</button>
+        </div>
+      </div>
+
+      <!-- Snippet Selector -->
+      <div class="snippet-selector">
+        <label class="data-label" style="margin-bottom: var(--sp-2); display: block;">Snippet PL/SQL predefini</label>
+        <select id="snippet-select">
+          <option value="select">[SELECT] Stocks critiques — Jointures multi-tables (Lot, Peremption, Service)</option>
+          <option value="bulk">[PL/SQL] BULK COLLECT + FORALL — Batch nocturne reapprovisionnement</option>
+          <option value="trigger">[TRIGGER] trg_check_peremption — Regle metier anti-medicament expire</option>
+        </select>
+      </div>
+
+      <!-- Code Editor -->
+      <div class="card fade-in">
+        <div class="card__title"><span class="card__title-icon">&gt;_</span> Editeur SQL/PLSQL</div>
+        <div class="code-editor-wrapper">
+          <div class="code-editor__header">
+            <span class="code-editor__label">editeur_session_01.sql</span>
+            <span class="code-editor__label" id="editor-lang">SQL</span>
+          </div>
+          <textarea class="code-editor__textarea" id="code-editor" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+        </div>
+        <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
+          <button class="btn btn--success btn--sm" id="btn-execute">&#9658; Executer</button>
+          <button class="btn btn--outline btn--sm" id="btn-reset-editor">Reset</button>
+        </div>
+      </div>
+
+      <!-- State Machine -->
+      <div class="card fade-in">
+        <div class="card__title"><span class="card__title-icon">&#9202;</span> Machine d'Etats — Execution Pipeline</div>
+        <div class="state-machine" id="state-machine">
+          <div class="state-step state-step--active" id="state-idle"><span class="state-step__dot"></span>IDLE</div>
+          <span class="state-arrow">&rarr;</span>
+          <div class="state-step" id="state-parsing"><span class="state-step__dot"></span>PARSING</div>
+          <span class="state-arrow">&rarr;</span>
+          <div class="state-step" id="state-executing"><span class="state-step__dot"></span>EXECUTING</div>
+          <span class="state-arrow">&rarr;</span>
+          <div class="state-step" id="state-fetching"><span class="state-step__dot"></span>FETCHING</div>
+          <span class="state-arrow">&rarr;</span>
+          <div class="state-step" id="state-completed"><span class="state-step__dot"></span>COMPLETED</div>
+        </div>
+        <div id="state-info" style="margin-top: var(--sp-2); font-size: var(--fs-xs); color: #64748b; font-family: var(--font-mono);"></div>
+      </div>
+
+      <!-- Output Console -->
+      <div class="card fade-in">
+        <div class="card__title"><span class="card__title-icon">&#128203;</span> Console de Sortie</div>
+        <div class="log-console" id="exec-console" style="max-height: 250px;">
+          <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Workbench initialise. En attente d execution.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         TAB 2: RESULTATS & ANALYSE DE PERFORMANCE
+         ============================================================ -->
+    <section class="module-section" id="tab-results">
+      <div class="page-header">
+        <h1 class="page-header__title">Resultats &amp; Analyse de Performance</h1>
+        <div class="page-header__subtitle-row">
+          <p class="page-header__subtitle">Data Grid dynamique, Explain Plan simule, metriques CBO, alertes d indexation</p>
+          <button class="page-header__help-btn" data-help="results" aria-label="Aide Resultats">?</button>
+        </div>
+      </div>
+
+      <!-- Metrics Cards -->
+      <div class="grid-4" id="metrics-cards">
+        <div class="stat-block stat-block--cyan">
+          <div class="stat-block__value" id="metric-time">---</div>
+          <div class="stat-block__label">Temps Execution (ms)</div>
+        </div>
+        <div class="stat-block stat-block--blue">
+          <div class="stat-block__value" id="metric-lr">---</div>
+          <div class="stat-block__label">Logical Reads</div>
+        </div>
+        <div class="stat-block stat-block--amber">
+          <div class="stat-block__value" id="metric-pw">---</div>
+          <div class="stat-block__label">Physical Writes</div>
+        </div>
+        <div class="stat-block stat-block--purple">
+          <div class="stat-block__value" id="metric-cost">---</div>
+          <div class="stat-block__label">Cout CBO</div>
+        </div>
+      </div>
+
+      <!-- Data Grid -->
+      <div class="card fade-in">
+        <div class="card__title"><span class="card__title-icon">&#128202;</span> Data Grid — Resultats de la Requete</div>
+        <div id="data-grid-placeholder" class="alert alert--info">Aucune requete executee. Naviguez vers l onglet "Requetes &amp; Logique Metier" pour executer un snippet.</div>
+        <div class="data-grid-wrapper" id="data-grid-wrapper" style="display: none;">
+          <table class="data-table" id="data-grid-table">
+            <thead id="data-grid-head"></thead>
+            <tbody id="data-grid-body"></tbody>
+          </table>
+        </div>
+        <div id="data-grid-info" style="margin-top: var(--sp-2); font-size: var(--fs-xs); color: #64748b; font-family: var(--font-mono);"></div>
+      </div>
+
+      <!-- Explain Plan -->
+      <div class="card fade-in">
+        <div class="card__title"><span class="card__title-icon">&#127794;</span> Explain Plan — Plan d Execution Simule</div>
+        <div id="plan-placeholder" class="alert alert--info">Le plan d execution sera genere automatiquement apres execution d une requete.</div>
+        <div id="plan-tree-container" style="display: none;">
+          <div class="plan-tree" id="plan-tree"></div>
+          <div style="margin-top: var(--sp-4); font-size: var(--fs-xs); color: #64748b; font-family: var(--font-mono);">
+            Plan genere par le Cost Based Optimizer simule — Coût total, cardinalite estimee, operations
+          </div>
+        </div>
+      </div>
+
+      <!-- CBO Alerts -->
+      <div class="card fade-in" id="cbo-alerts-card" style="display: none;">
+        <div class="card__title"><span class="card__title-icon">&#9888;</span> Alertes CBO — Recommandations</div>
+        <div id="cbo-alerts"></div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         TAB 3: MAINTENANCE & GOUVERNANCE
+         ============================================================ -->
+    <section class="module-section" id="tab-maintenance">
+      <div class="page-header">
+        <h1 class="page-header__title">Maintenance &amp; Gouvernance</h1>
+        <div class="page-header__subtitle-row">
+          <p class="page-header__subtitle">Tablespaces, gestion RBAC utilisateurs, audit HDS chiffre, purge anonymisee RGPD</p>
+          <button class="page-header__help-btn" data-help="maintenance" aria-label="Aide Maintenance">?</button>
+        </div>
+      </div>
+
+      <!-- Tablespaces -->
+      <div class="card fade-in">
+        <div class="card__title"><span class="card__title-icon">&#128190;</span> Tablespaces — Espace Disque</div>
+        <div id="tablespaces-container"></div>
+        <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
+          <button class="btn btn--outline btn--sm" id="btn-refresh-ts">Actualiser</button>
+          <button class="btn btn--danger btn--sm" id="btn-add-ts-data">Simuler Charge TS</button>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- User Management -->
+        <div class="card fade-in">
+          <div class="card__title"><span class="card__title-icon">&#128100;</span> Gestion Utilisateurs — RBAC</div>
+          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Creation d utilisateur avec attribution de roles. Principe de Least Privilege applique.</p>
+          <div class="user-form">
+            <div class="user-form__field">
+              <label for="user-username">Username</label>
+              <input type="text" id="user-username" placeholder="USER_SIMU_XXX" value="">
+            </div>
+            <div>
+              <label class="data-label" style="margin-bottom: var(--sp-2); display: block;">Roles</label>
+              <div class="role-checkboxes">
+                <label class="role-checkbox"><input type="checkbox" id="role-dba"> DBA_PUI</label>
+                <label class="role-checkbox"><input type="checkbox" id="role-lecture"> LECTURE_STOCK</label>
+                <label class="role-checkbox"><input type="checkbox" id="role-audit"> AUDIT_HDS</label>
+                <label class="role-checkbox"><input type="checkbox" id="role-batch"> EXEC_BATCH</label>
+              </div>
+            </div>
+            <button class="btn btn--primary btn--sm" id="btn-create-user">Creer Utilisateur</button>
+          </div>
+          <div id="user-result" style="margin-top: var(--sp-4);"></div>
+        </div>
+
+        <!-- Purge Anonymisee -->
+        <div class="card fade-in">
+          <div class="card__title"><span class="card__title-icon">&#128274;</span> Purge Anonymisee — RGPD Art. 17</div>
+          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Simulation de la procedure de purge des donnees anciennes (&gt; 90 jours) avec masquage des identifiants patients via <code class="data-mono">DBMS_DATA_MASKING</code>.</p>
+          <div class="slider-group" style="margin-bottom: var(--sp-4);">
+            <div class="slider-group__header">
+              <span class="slider-group__label">Seuil d anciennete (jours)</span>
+              <span class="slider-group__value" id="purge-days-val">90</span>
+            </div>
+            <input type="range" id="purge-days-slider" min="30" max="365" step="30" value="90">
+          </div>
+          <div style="display: flex; gap: var(--sp-3);">
+            <button class="btn btn--danger btn--sm" id="btn-purge">Purger &amp; Anonymiser</button>
+          </div>
+          <div id="purge-result" style="margin-top: var(--sp-4);"></div>
+        </div>
+      </div>
+
+      <!-- Audit HDS Log -->
+      <div class="card fade-in">
+        <div class="card__title"><span class="card__title-icon">&#128270;</span> Audit HDS — Journal d Activite Chiffre</div>
+        <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Toutes les actions (executions, creations users, purges) sont tracees dans ce journal. Les logs sont chiffrees AES-256 au repos (simule). Conforme HDS / ISO 27001.</p>
+        <div class="log-console" id="audit-console" style="max-height: 350px;">
+          <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>[AUDIT] Workbench initialise. Logs chiffres AES-256 au repos.</div>
+        </div>
+        <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
+          <button class="btn btn--outline btn--sm" id="btn-export-audit">Exporter Audit (CSV simule)</button>
+          <button class="btn btn--outline btn--sm" id="btn-clear-audit">Purger Audit</button>
+        </div>
+        <div id="audit-result" style="margin-top: var(--sp-4);"></div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         HELP MODALS
+         ============================================================ -->
+    <div class="help-overlay" id="help-overlay" aria-hidden="true"></div>
+
+    <!-- MODAL 1: Requetes -->
+    <div class="help-modal" id="help-queries" role="dialog" aria-modal="true" aria-labelledby="help-queries-title" aria-hidden="true">
+      <div class="help-modal__header">
+        <div class="help-modal__title" id="help-queries-title">Requetes &amp; Logique Metier</div>
+        <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+      </div>
+      <div class="help-modal__body">
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--objective">Objectif</div>
+          <p class="help-modal__text">Cet onglet simule un environnement de developpement Oracle pour la gestion des stocks PUI. Il demonstre trois aspects du langage Oracle :</p>
+          <ul class="help-modal__list">
+            <li><strong>Requete SQL complexe</strong> : Jointures multiples entre <code>STOCK_MED</code>, <code>LOT_SIMU</code>, <code>SERVICE_SIMU</code> avec filtres sur les dates de peremption. Simule l extraction des stocks critiques necessitant un reapprovisionnement urgent.</li>
+            <li><strong>PL/SQL BULK COLLECT + FORALL</strong> : Bloc procedural utilisant les collections Oracle pour mettre a jour massivement les niveaux de stock. Le <code>BULK COLLECT INTO</code> charge les resultats en memoire (PGA), puis le <code>FORALL</code> execute les updates en batch, reduisant les <em>context switches</em> entre le moteur SQL et PL/SQL.</li>
+            <li><strong>TRIGGER trg_check_peremption</strong> : Trigger <code>BEFORE INSERT OR UPDATE</code> sur <code>SORTIE_STOCK</code> qui verifie que la date de peremption du lot n est pas depassee. Regle metier critique : empeche la dispensation de medicaments expires aux services cliniques.</li>
+          </ul>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--controls">Controles</div>
+          <ul class="help-modal__list">
+            <li><strong>Snippet Selector</strong> : Choisit le type de requete a charger dans l editeur. Chaque snippet est pre-ecrit avec syntaxe Oracle valide.</li>
+            <li><strong>Editeur</strong> : Zone de saisie avec coloration syntaxique basique (keywords, strings, comments). Le texte est modifiable avant execution.</li>
+            <li><strong>Executer</strong> : Lance la machine d etats (PARSING -> EXECUTING -> FETCHING -> COMPLETED) avec delais artificiels simulant la latence disque/reseau.</li>
+            <li><strong>Reset</strong> : Recharge le snippet d origine dans l editeur.</li>
+          </ul>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--indicators">Indicateurs</div>
+          <ul class="help-modal__list">
+            <li><strong>Machine d etats</strong> : 5 etapes colorees (gris=inactif, bleu=en cours, vert=termine, rouge=erreur). Chaque etape a un delai simule : PARSING=800ms, EXECUTING=1500ms, FETCHING=600ms.</li>
+            <li><strong>Console de sortie</strong> : Logs structures avec timestamps et niveaux. Affiche les resultats du parsing, les erreurs ORA-xxxxx simulees, et les statistiques d execution.</li>
+          </ul>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--hds">Contexte HDS / PUI</div>
+          <p class="help-modal__text">Dans une PUI, les requetes de stock doivent garantir l integrite des donnees : un medicament expire ne doit jamais etre dispense (d ou le trigger). Les batchs nocturnes de reapprovisionnement utilisent <code>BULK COLLECT</code> pour minimiser l impact sur la production. Toutes les donnees affichees sont fictives (<code>MED_TEST_XXX</code>, <code>LOT_SIMU_XXX</code>). Aucune donnee patient reelle n est utilisee.</p>
+        </div>
+      </div>
+      <div class="help-modal__footer">
+        <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+      </div>
+    </div>
+
+    <!-- MODAL 2: Resultats -->
+    <div class="help-modal" id="help-results" role="dialog" aria-modal="true" aria-labelledby="help-results-title" aria-hidden="true">
+      <div class="help-modal__header">
+        <div class="help-modal__title" id="help-results-title">Resultats &amp; Analyse de Performance</div>
+        <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+      </div>
+      <div class="help-modal__body">
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--objective">Objectif</div>
+          <p class="help-modal__text">Cet onglet analyse les performances des requetes executees via le simulateur Cost Based Optimizer (CBO) d Oracle :</p>
+          <ul class="help-modal__list">
+            <li><strong>Explain Plan</strong> : Arbre d operations simule montrant comment Oracle accede aux donnees. Les operations incluent <code>TABLE ACCESS FULL</code>, <code>INDEX UNIQUE SCAN</code>, <code>HASH JOIN</code>, <code>SORT GROUP BY</code>, <code>NESTED LOOPS</code>.</li>
+            <li><strong>Metriques CBO</strong> : Cout total, cardinalite estimee, nombre de lignes, temps d execution simule.</li>
+            <li><strong>Alertes d indexation</strong> : Detection automatique des <code>TABLE ACCESS FULL</code> sur des tables volumineuses, avec recommandation de creation d index.</li>
+          </ul>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--controls">Controles</div>
+          <ul class="help-modal__list">
+            <li><strong>Metriques</strong> : 4 cartes KPI mises a jour automatiquement apres chaque execution (Temps ms, Logical Reads, Physical Writes, Cout CBO).</li>
+            <li><strong>Data Grid</strong> : Tableau de resultats peuple dynamiquement avec les donnees fictives retournees par le simulateur. Les colonnes dependent de la requete executee.</li>
+            <li><strong>Explain Plan</strong> : Arbre visuel avec indentation, operations colorees, cout et cardinalite par noeud.</li>
+            <li><strong>Alertes CBO</strong> : Apparaissent automatiquement si un Full Table Scan est detecte sur une grande table.</li>
+          </ul>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--indicators">Indicateurs Cles</div>
+          <ul class="help-modal__list">
+            <li><strong>Cout CBO</strong> : Unite arbitraire du cout d execution. Un cout &gt; 500 indique une requete potentiellement sous-optimale.</li>
+            <li><strong>Logical Reads</strong> : Nombre de blocs lus en memoire (Buffer Cache). Valeur elevee = nombreuses lectures memoire.</li>
+            <li><strong>Physical Writes</strong> : Nombre de blocs ecrits sur disque. Non-zero pour les operations DML (UPDATE/INSERT).</li>
+            <li><strong>Ratio LR/PW</strong> : Si Physical Writes &gt; 10% de Logical Reads, verifier la taille du Buffer Cache.</li>
+          </ul>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--hds">Contexte HDS / PUI</div>
+          <p class="help-modal__text">Un Full Table Scan sur <code>STOCK_MED</code> (table de plusieurs milliers de lignes) bloque les operations de dispensation pendant plusieurs secondes. Dans une PUI hospitaliere, cela impacte directement la disponibilite des medicaments aux services critiques (Urgences, Reanimation). L optimisation des plans d execution via l indexation appropriee est un enjeu de continuite de soin.</p>
+        </div>
+      </div>
+      <div class="help-modal__footer">
+        <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+      </div>
+    </div>
+
+    <!-- MODAL 3: Maintenance -->
+    <div class="help-modal" id="help-maintenance" role="dialog" aria-modal="true" aria-labelledby="help-maintenance-title" aria-hidden="true">
+      <div class="help-modal__header">
+        <div class="help-modal__title" id="help-maintenance-title">Maintenance &amp; Gouvernance</div>
+        <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+      </div>
+      <div class="help-modal__body">
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--objective">Objectif</div>
+          <p class="help-modal__text">Cet onglet simule les operations DBA et de gouvernance des donnees dans un contexte HDS :</p>
+          <ul class="help-modal__list">
+            <li><strong>Tablespaces</strong> : Visualisation de l utilisation de l espace disque pour chaque tablespace. Alertes automatique a 80% (warning) et 90% (critique).</li>
+            <li><strong>Gestion RBAC</strong> : Creation d utilisateurs avec attribution selective de roles. Le principe de <em>Least Privilege</em> est applique : le role <code>DBA_PUI</code> declenche une alerte de securite.</li>
+            <li><strong>Audit HDS</strong> : Journal chiffre de toutes les actions realisees dans le Workbench. Chaque entree inclut timestamp, utilisateur, action, requete, statut. Conforme aux exigences HDS et ISO 27001.</li>
+            <li><strong>Purge Anonymisee</strong> : Simulation de <code>DBMS_DATA_MASKING</code> sur les donnees anciennes (&gt; seuil configurable). Conforme au RGPD Art. 17 (droit a l effacement) et Art. 25 (privacy by design).</li>
+          </ul>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--controls">Controles</div>
+          <ul class="help-modal__list">
+            <li><strong>Simuler Charge TS</strong> : Augmente l utilisation des tablespaces pour demontrer les seuils d alerte.</li>
+            <li><strong>Creer Utilisateur</strong> : Formulaire avec username et selection de roles. Validation des regles de securite.</li>
+            <li><strong>Seuil purge</strong> : Slider de 30 a 365 jours pour definir l anciennete des donnees a purger.</li>
+            <li><strong>Exporter Audit</strong> : Simulation d export CSV du journal d audit.</li>
+          </ul>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--indicators">Indicateurs</div>
+          <ul class="help-modal__list">
+            <li><strong>% utilisation TS</strong> : Barre colorisee (vert &lt; 80%, amber 80-90%, rouge &gt; 90%).</li>
+            <li><strong>Count audit</strong> : Nombre d entrees dans le journal. Croit avec chaque action du Workbench.</li>
+            <li><strong>Records anonymises</strong> : Nombre de lignes masquee par la purge.</li>
+          </ul>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--hds">Contexte HDS / PUI</div>
+          <p class="help-modal__text">La gouvernance des donnees de sante exige une tracabilite totale (audit), un controle d acces strict (RBAC), et un cycle de vie des donnees conforme au RGPD (purge). Les tablespaces doivent etre monitors en continu : un tablespace plein bloque toutes les operations, y compris la dispensation de medicaments en urgence. La purge anonymisee garantit que les donnees de test/simulation ne persistent pas indefiniment, respectant le principe de minimisation (RGPD Art. 5).</p>
+        </div>
+      </div>
+      <div class="help-modal__footer">
+        <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+      </div>
+    </div>
+
+    <footer class="app-footer">
+      ORACLE_WORKBENCH::SIH - Application de demonstration technique<br>
+      DONNEES: 100% FICTIVES - Conforme RGPD Art. 25 (Privacy by Design) - Aucune donnee de sante reelle<br>
+      Architecture: ES6 Classes - Vanilla JS - Zero Dependency - Offline - Coloration syntaxique basique<br>
+      Concu pour demonstration DSI HCL (Hospices Civils de Lyon) - Contexte PUI
+    </footer>
+  </main>
+</div>
+
+<script>
+'use strict';
+
+// ============================================================
+// LOGGER
+// ============================================================
+class Logger {
+  static levels = { DEBUG: 0, INFO: 1, WARN: 2, ERROR: 3 };
+  constructor() { this.entries = []; }
+  _ts() {
+    const d = new Date();
+    return [d.getHours(), d.getMinutes(), d.getSeconds()].map(v => String(v).padStart(2, '0')).join(':');
+  }
+  log(level, msg, details = '') {
+    if (typeof level === 'string') level = Logger[level.toUpperCase()] ?? Logger.INFO;
+    const entry = { ts: this._ts(), level, msg, details, epoch: Date.now() };
+    this.entries.push(entry);
+    return entry;
+  }
+  getEntries() { return this.entries.slice(); }
+  clear() { this.entries = []; }
+}
+
+// ============================================================
+// EVENT DISPATCHER
+// ============================================================
+class EventDispatcher {
+  constructor() { this._l = {}; }
+  on(evt, cb) { (this._l[evt] = this._l[evt] || []).push(cb); }
+  off(evt, cb) { this._l[evt] = (this._l[evt] || []).filter(h => h !== cb); }
+  emit(evt, data) { (this._l[evt] || []).forEach(cb => cb(data)); }
+}
+
+// ============================================================
+// STATE MANAGER (cross-tab via localStorage)
+// ============================================================
+class StateManager {
+  constructor(key = 'oracle_wb_sih_state') {
+    this._key = key;
+    this._data = this._load();
+    this._ev = new EventDispatcher();
+  }
+  _load() {
+    try { return JSON.parse(localStorage.getItem(this._key)) || this._defaults(); } catch { return this._defaults(); }
+  }
+  _defaults() {
+    return { stockData: [], auditLog: [], execCount: 0, lastResult: null, tablespaces: [
+      { name: 'TS_PUI_DATA', used: 72, max: 1024 },
+      { name: 'TS_PUI_INDEX', used: 45, max: 512 },
+      { name: 'TS_PUI_AUDIT', used: 61, max: 256 },
+      { name: 'TS_PUI_TEMP', used: 28, max: 128 }
+    ], users: [] };
+  }
+  _save() { try { localStorage.setItem(this._key, JSON.stringify(this._data)); } catch {} this._ev.emit('change', this._data); }
+  on(evt, cb) { this._ev.on(evt, cb); }
+  get stockData() { return this._data.stockData; }
+  set stockData(v) { this._data.stockData = v; this._save(); }
+  get auditLog() { return this._data.auditLog; }
+  set auditLog(v) { this._data.auditLog = v; this._save(); }
+  get execCount() { return this._data.execCount; }
+  get tablespaces() { return this._data.tablespaces; }
+  set tablespaces(v) { this._data.tablespaces = v; this._save(); }
+  get users() { return this._data.users; }
+  get lastResult() { return this._data.lastResult; }
+  set lastResult(v) { this._data.lastResult = v; this._save(); }
+  addAudit(action, user, detail, status = 'SUCCESS') {
+    this._data.auditLog.unshift({ ts: new Date().toISOString(), action, user, detail, status, encrypt: 'AES-256' });
+    this._save();
+  }
+  incExec() { this._data.execCount++; this._save(); }
+  reset() { this._data = this._defaults(); this._save(); }
+}
+
+// ============================================================
+// FAKE DATA GENERATOR
+// ============================================================
+class FakeDataGenerator {
+  static _meds = [
+    ['PARACETAMOL', 'CP 1000mg', 'LAB_PHARMA_ALPHA'],
+    ['AMOXICILLINE', 'GEL 500mg', 'LAB_PHARMA_BETA'],
+    ['MORPHINE', 'INJ 10mg/ml', 'LAB_PHARMA_GAMMA'],
+    ['INSULINE ACTRAPID', 'STYLO 100UI/ml', 'LAB_PHARMA_DELTA'],
+    ['HEPARINE', 'INJ 5000UI', 'LAB_PHARMA_EPSILON'],
+    ['KETAMINE', 'INJ 50mg/ml', 'LAB_PHARMA_ZETA'],
+    ['PROPOFOL', 'EMUL 1%', 'LAB_PHARMA_ETA'],
+    ['CORTANCYL', 'CP 20mg', 'LAB_PHARMA_THETA']
+  ];
+  static _services = [
+    'SRV_SIMU_URGENCES', 'SRV_SIMU_REA_CHIR', 'SRV_SIMU_MED_INTERNE',
+    'SRV_SIMU_ONCO', 'SRV_SIMU_PED', 'SRV_SIMU_GERIATRIE',
+    'SRV_SIMU_CARDIO', 'SRV_SIMU_NEURO'
+  ];
+  static generate(n = 18) {
+    const rows = [];
+    for (let i = 0; i < n; i++) {
+      const [mol, forme, lab] = this._meds[i % this._meds.length];
+      const lot = `LOT_SIMU_${String(1000 + i * 13).slice(-4)}`;
+      const svc = this._services[i % this._services.length];
+      const d1 = new Date(); d1.setDate(d1.getDate() + Math.floor(Math.random() * 365 - 30));
+      const d2 = new Date(); d2.setDate(d2.getDate() + Math.floor(Math.random() * 180 + 10));
+      const qty = Math.floor(Math.random() * 450) + 5;
+      const isCrit = qty < 50;
+      rows.push({
+        id: i + 1,
+        med: `MED_TEST_${String(200 + i).padStart(3, '0')}`,
+        molecule: mol, forme, lab, lot,
+        qty,
+        seuil: 50,
+        peremption: d2.toISOString().slice(0, 10),
+        fab: d1.toISOString().slice(0, 10),
+        service: svc,
+        criticite: isCrit ? 'CRITIQUE' : (qty < 150 ? 'ATTENTION' : 'OK'),
+        statut: isCrit ? 'RUPTURE_IMMINENTE' : 'EN_STOCK'
+      });
+    }
+    return rows;
+  }
+  static genPatients(n = 6) {
+    const pats = [];
+    for (let i = 0; i < n; i++) {
+      const s1 = String(Math.floor(Math.random() * 99)).padStart(2, '0');
+      const s2 = String(Math.floor(Math.random() * 999)).padStart(3, '0');
+      pats.push({
+        id: `PATIENT_FICTIF_${String(400 + i).padStart(3, '0')}`,
+        nir: `NIR_FICTIF_${s1}${s2}${String(Math.floor(Math.random() * 99999)).padStart(5, '0')}`,
+        nom: `NOM_FICTIF_${String.fromCharCode(65 + i)}`,
+        service: this._services[i % this._services.length]
+      });
+    }
+    return pats;
+  }
+}
+
+// ============================================================
+// SQL EXECUTOR (state machine)
+// ============================================================
+class SQLExecutor {
+  constructor(logger, stateMgr) {
+    this._log = logger;
+    this._sm = stateMgr;
+    this._state = 'IDLE';
+    this._ev = new EventDispatcher();
+  }
+  on(evt, cb) { this._ev.on(evt, cb); }
+  get state() { return this._state; }
+  _setState(s, info = '') {
+    this._state = s;
+    this._ev.emit('state', { state: s, info });
+  }
+  async execute(snippetType, code) {
+    this._setState('PARSING', 'Analyse syntaxique et validation du plan...');
+    this._log.log('INFO', `[PARSE] Type=${snippetType.toUpperCase()} — Validation syntaxe Oracle`);
+    this._ev.emit('log', { level: 'info', msg: `[PARSE] Type=${snippetType.toUpperCase()} — Validation syntaxe Oracle` });
+    await this._delay(800);
+
+    if (!code || code.trim().length < 5) {
+      this._setState('ERROR', 'ORA-00936: missing expression');
+      this._log.log('ERROR', '[PARSE] ERREUR — Expression vide ou trop courte');
+      this._ev.emit('log', { level: 'error', msg: '[PARSE] ERREUR — Expression vide ou trop courte' });
+      this._ev.emit('error', { code: 'ORA-00936', msg: 'missing expression' });
+      return null;
+    }
+
+    this._log.log('INFO', `[PARSE] OK — ${snippetType.toUpperCase()} reconnu`);
+    this._ev.emit('log', { level: 'info', msg: `[PARSE] OK — ${snippetType.toUpperCase()} reconnu` });
+    this._setState('EXECUTING', 'Execution du plan sur le moteur CBO simule...');
+    this._log.log('INFO', '[EXEC] Lancement execution pipeline...');
+    this._ev.emit('log', { level: 'info', msg: '[EXEC] Lancement execution pipeline...' });
+    await this._delay(1500);
+
+    if (snippetType === 'bulk') {
+      this._log.log('INFO', '[EXEC] BULK COLLECT: Chargement des lots en PGA (collection PL/SQL)');
+      this._ev.emit('log', { level: 'info', msg: '[EXEC] BULK COLLECT: Chargement des lots en PGA (collection PL/SQL)' });
+      this._log.log('INFO', '[EXEC] FORALL: Batch update 18 lignes — 0 context switch individuel');
+      this._ev.emit('log', { level: 'info', msg: '[EXEC] FORALL: Batch update 18 lignes — 0 context switch individuel' });
+      this._sm.stockData = FakeDataGenerator.generate(18).map(r => ({ ...r, qty: Math.max(r.qty + Math.floor(Math.random() * 200), r.seuil + 10), statut: 'REAPPROVISIONNE', criticite: 'OK' }));
+      this._sm.addAudit('BULK_UPDATE', 'DBA_PUI_SIMU', `FORALL reapprovisionnement: 18 rows affected, PGA collection`);
+    } else if (snippetType === 'trigger') {
+      this._log.log('INFO', '[EXEC] TRIGGER trg_check_peremption: Compilation et activation');
+      this._ev.emit('log', { level: 'info', msg: '[EXEC] TRIGGER trg_check_peremption: Compilation et activation' });
+      this._log.log('INFO', '[EXEC] BEFORE INSERT OR UPDATE on SORTIE_STOCK — Validation peremption');
+      this._ev.emit('log', { level: 'info', msg: '[EXEC] BEFORE INSERT OR UPDATE on SORTIE_STOCK — Validation peremption' });
+      this._sm.addAudit('TRIGGER_COMPILE', 'DBA_PUI_SIMU', `trg_check_peremption compilé et activé`);
+    } else {
+      this._log.log('INFO', '[EXEC] Full Table Scan STOCK_MED — Jointure HASH avec LOT_SIMU et SRV_SIMU');
+      this._ev.emit('log', { level: 'info', msg: '[EXEC] Full Table Scan STOCK_MED — Jointure HASH avec LOT_SIMU et SRV_SIMU' });
+      this._sm.addAudit('SELECT_EXEC', 'DBA_PUI_SIMU', `Stocks critiques query executed — ${this._sm.stockData.length || 18} rows returned`);
+    }
+
+    this._setState('FETCHING', 'Recuperation des resultats...');
+    await this._delay(600);
+    this._log.log('INFO', '[FETCH] Rows fetched — Cursor closed');
+    this._ev.emit('log', { level: 'info', msg: '[FETCH] Rows fetched — Cursor closed' });
+
+    const metrics = this._genMetrics(snippetType);
+    const plan = QueryPlanner.generate(snippetType);
+    const results = this._genResults(snippetType);
+    this._setState('COMPLETED', `Termine — ${metrics.rows} lignes, ${metrics.timeMs}ms`);
+    this._log.log('SUCCESS', `[DONE] ${metrics.rows} rows in ${metrics.timeMs}ms | Cost=${metrics.cost} | LR=${metrics.logicalReads}`);
+    this._ev.emit('log', { level: 'success', msg: `[DONE] ${metrics.rows} rows in ${metrics.timeMs}ms | Cost=${metrics.cost} | LR=${metrics.logicalReads}` });
+
+    this._sm.lastResult = { metrics, plan, results, snippetType };
+    this._sm.incExec();
+    this._ev.emit('complete', { metrics, plan, results, snippetType });
+    return { metrics, plan, results };
+  }
+  _genMetrics(type) {
+    const base = { select: { timeMs: 247, logicalReads: 3842, physicalWrites: 0, cost: 412, rows: 18 }, bulk: { timeMs: 89, logicalReads: 1520, physicalWrites: 384, cost: 156, rows: 18 }, trigger: { timeMs: 12, logicalReads: 48, physicalWrites: 0, cost: 2, rows: 0 } };
+    const m = { ...(base[type] || base.select) };
+    m.timeMs = Math.max(5, m.timeMs + Math.floor(Math.random() * 60 - 30));
+    m.logicalReads = Math.max(10, m.logicalReads + Math.floor(Math.random() * 200 - 100));
+    return m;
+  }
+  _genResults(type) {
+    if (type === 'trigger') return [];
+    let data = this._sm.stockData;
+    if (!data.length) data = FakeDataGenerator.generate(18);
+    if (type === 'select') return data.filter(r => r.qty < 150 || r.criticite !== 'OK').slice(0, 12);
+    return data;
+  }
+  reset() { this._state = 'IDLE'; this._ev.emit('state', { state: 'IDLE', info: '' }); }
+  _delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+}
+
+// ============================================================
+// QUERY PLANNER (explain plan generator)
+// ============================================================
+class QueryPlanner {
+  static generate(type) {
+    const plans = {
+      select: [
+        { op: 'SELECT STATEMENT', obj: '', cost: 412, card: 18, depth: 0 },
+        { op: 'HASH GROUP BY', obj: '', cost: 412, card: 18, depth: 1 },
+        { op: 'HASH JOIN', obj: '', cost: 398, card: 142, depth: 1 },
+        { op: 'TABLE ACCESS FULL', obj: 'STOCK_MED', cost: 128, card: 2400, depth: 2 },
+        { op: 'HASH JOIN', obj: '', cost: 256, card: 890, depth: 2 },
+        { op: 'TABLE ACCESS FULL', obj: 'LOT_SIMU', cost: 89, card: 1200, depth: 3 },
+        { op: 'TABLE ACCESS FULL', obj: 'SERVICE_SIMU', cost: 42, card: 120, depth: 3 }
+      ],
+      bulk: [
+        { op: 'PL/SQL EXECUTE', obj: 'PKG_REAPPRO.BATCH_NOCTURNE', cost: 156, card: 18, depth: 0 },
+        { op: 'TABLE ACCESS FULL', obj: 'STOCK_MED', cost: 82, card: 2400, depth: 1 },
+        { op: 'BULK COLLECT INTO', obj: 't_reappro_tab (PGA)', cost: 0, card: 18, depth: 1 },
+        { op: 'FORALL UPDATE', obj: 'STOCK_MED SET qty=qty+:new_qty', cost: 74, card: 18, depth: 1 },
+        { op: 'INDEX UNIQUE SCAN', obj: 'PK_STOCK_MED', cost: 1, card: 1, depth: 2 }
+      ],
+      trigger: [
+        { op: 'TRIGGER trg_check_peremption', obj: 'BEFORE INSERT OR UPDATE on SORTIE_STOCK', cost: 2, card: 1, depth: 0 },
+        { op: 'TABLE ACCESS BY INDEX ROWID', obj: 'LOT_SIMU', cost: 1, card: 1, depth: 1 },
+        { op: 'INDEX UNIQUE SCAN', obj: 'PK_LOT_SIMU', cost: 0, card: 1, depth: 2 }
+      ]
+    };
+    return plans[type] || plans.select;
+  }
+  static getAlerts(plan) {
+    const alerts = [];
+    plan.forEach(n => {
+      if (n.op === 'TABLE ACCESS FULL' && n.card > 1000) {
+        alerts.push({ level: 'warning', table: n.obj, msg: `Full Table Scan sur ${n.obj} (${n.card} rows). Recommandation: CREATE INDEX idx_${n.obj.toLowerCase()}_date ON ${n.obj}(date_peremption);` });
+      }
+    });
+    if (alerts.length === 0) alerts.push({ level: 'success', table: '', msg: 'Aucun Full Table Scan sur grande table detecte. Plan optimal.' });
+    return alerts;
+  }
+}
+
+// ============================================================
+// HELP MANAGER (modal + focus trap)
+// ============================================================
+class HelpManager {
+  constructor() {
+    this._overlay = document.getElementById('help-overlay');
+    this._active = null;
+    this._boundKey = this._onKey.bind(this);
+    this._overlay.addEventListener('click', () => this.close());
+  }
+  open(id) {
+    const modal = document.getElementById(`help-${id}`);
+    if (!modal) return;
+    this._active = modal;
+    this._overlay.classList.add('help-overlay--active');
+    this._overlay.setAttribute('aria-hidden', 'false');
+    modal.classList.add('help-modal--active');
+    modal.setAttribute('aria-hidden', 'false');
+    document.addEventListener('keydown', this._boundKey);
+    const closeBtn = modal.querySelector('.help-modal__close');
+    if (closeBtn) closeBtn.focus();
+  }
+  close() {
+    if (!this._active) return;
+    this._active.classList.remove('help-modal--active');
+    this._active.setAttribute('aria-hidden', 'true');
+    this._overlay.classList.remove('help-overlay--active');
+    this._overlay.setAttribute('aria-hidden', 'true');
+    document.removeEventListener('keydown', this._boundKey);
+    this._active = null;
+  }
+  _onKey(e) {
+    if (e.key === 'Escape') { this.close(); return; }
+    if (e.key !== 'Tab' || !this._active) return;
+    const focusable = this._active.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    const first = focusable[0], last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
+}
+
+// ============================================================
+// WORKBENCH APP
+// ============================================================
+class WorkbenchApp {
+  constructor() {
+    this._logger = new Logger();
+    this._sm = new StateManager();
+    this._executor = new SQLExecutor(this._logger, this._sm);
+    this._helpMgr = new HelpManager();
+    this._snippets = {
+      select: `-- Stocks critiques PUI — Medicaments en rupture imminente
+-- Jointures multi-tables: STOCK_MED ⨝ LOT_SIMU ⨝ SERVICE_SIMU
+SELECT
+  m.med_id          AS med_code,
+  m.molecule,
+  m.forme,
+  l.lot_id          AS lot_simu,
+  l.qty_stock,
+  l.date_peremption,
+  l.date_fabrication,
+  s.srv_nom         AS service_destination,
+  CASE
+    WHEN l.qty_stock < 50  THEN 'CRITIQUE'
+    WHEN l.qty_stock < 150 THEN 'ATTENTION'
+    ELSE 'OK'
+  END AS niveau_criticite
+FROM stock_med m
+JOIN lot_simu l
+  ON m.lot_id = l.lot_id
+JOIN service_simu s
+  ON l.srv_id = s.srv_id
+WHERE l.qty_stock < (
+  SELECT AVG(qty_stock) * 0.3
+  FROM lot_simu
+)
+AND l.date_peremption > SYSDATE
+ORDER BY l.qty_stock ASC, l.date_peremption ASC;`,
+      bulk: `-- Batch nocturne de reapprovisionnement PUI
+-- BULK COLLECT + FORALL: minimise les context switches
+DECLARE
+  TYPE t_reappro_rec IS RECORD (
+    lot_id     lot_simu.lot_id%TYPE,
+    qty_cible  NUMBER
+  );
+  TYPE t_reappro_tab IS TABLE OF t_reappro_rec;
+  v_reappro t_reappro_tab;
+
+  v_count NUMBER;
+BEGIN
+  -- BULK COLLECT: chargement en PGA
+  SELECT lot_id, (seuil_alerte * 2) - qty_stock AS qty_cible
+    BULK COLLECT INTO v_reappro
+    FROM lot_simu
+    WHERE qty_stock < seuil_alerte
+      AND date_peremption > SYSDATE + 30;
+
+  v_count := v_reappro.COUNT;
+  DBMS_OUTPUT.PUT_LINE('Lots a reapprovisionner: ' || v_count);
+
+  -- FORALL: batch update en un seul appel SQL
+  IF v_count > 0 THEN
+    FORALL i IN 1 .. v_count
+      UPDATE stock_med
+         SET qty_stock = qty_stock + v_reappro(i).qty_cible,
+             date_maj = SYSDATE
+       WHERE lot_id = v_reappro(i).lot_id;
+
+    COMMIT;
+    DBMS_OUTPUT.PUT_LINE(v_count || ' lots mis a jour. COMMIT OK.');
+  END IF;
+
+EXCEPTION
+  WHEN OTHERS THEN
+    ROLLBACK;
+    DBMS_OUTPUT.PUT_LINE('ERREUR: ' || SQLERRM);
+    RAISE;
+END;`,
+      trigger: `-- TRIGGER: Controle peremption avant dispensation
+-- Regle metier: empeche la sortie de medicaments expires
+CREATE OR REPLACE TRIGGER trg_check_peremption
+BEFORE INSERT OR UPDATE OF lot_id ON sortie_stock
+FOR EACH ROW
+DECLARE
+  v_peremption lot_simu.date_peremption%TYPE;
+  v_molecule   stock_med.molecule%TYPE;
+  e_med_expire EXCEPTION;
+BEGIN
+  SELECT l.date_peremption, m.molecule
+    INTO v_peremption, v_molecule
+    FROM lot_simu l
+    JOIN stock_med m ON m.lot_id = l.lot_id
+    WHERE l.lot_id = :NEW.lot_id;
+
+  IF v_peremption < SYSDATE THEN
+    RAISE e_med_expire;
+  END IF;
+
+  :NEW.date_validation := SYSDATE;
+  :NEW.statut := 'VALIDE';
+
+EXCEPTION
+  WHEN e_med_expire THEN
+    RAISE_APPLICATION_ERROR(
+      -20001,
+      'MEDICAMENT EXPIRE DETECTE — Lot: ' || :NEW.lot_id
+      || ' | Molecule: ' || v_molecule
+      || ' | Peremption: ' || TO_CHAR(v_peremption, 'DD/MM/YYYY')
+      || ' — Dispensation refusee (PUI Safety Gate)'
+    );
+END trg_check_peremption;
+/`
+    };
+  }
+
+  init() {
+    this._sm.stockData = this._sm.stockData.length ? this._sm.stockData : FakeDataGenerator.generate(18);
+    this._renderTablespaces();
+    this._renderAudit();
+    this._loadSnippet('select');
+    this._bindNav();
+    this._bindEditor();
+    this._bindExecution();
+    this._bindMaintenance();
+    this._bindHelp();
+    this._updateSessionUI();
+    this._sm.on('change', () => this._updateSessionUI());
+  }
+
+  _updateSessionUI() {
+    const ec = document.getElementById('session-exec-count');
+    if (ec) ec.textContent = this._sm.execCount;
+    const cid = document.getElementById('session-connect-id');
+    if (cid && cid.textContent === '---') cid.textContent = `SID_${Math.floor(Math.random() * 9000 + 1000)}_SIMU`;
+  }
+
+  _bindNav() {
+    document.querySelectorAll('.app-nav__item[data-tab]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+        document.querySelectorAll('.app-nav__item').forEach(b => b.classList.remove('app-nav__item--active'));
+        btn.classList.add('app-nav__item--active');
+        document.querySelectorAll('.module-section').forEach(s => s.classList.remove('module-section--active'));
+        document.getElementById(`tab-${tab}`).classList.add('module-section--active');
+      });
+    });
+  }
+
+  _loadSnippet(type) {
+    const ed = document.getElementById('code-editor');
+    const lang = document.getElementById('editor-lang');
+    ed.value = this._snippets[type];
+    lang.textContent = type === 'bulk' || type === 'trigger' ? 'PL/SQL' : 'SQL';
+    ed.dataset.original = this._snippets[type];
+  }
+
+  _bindEditor() {
+    document.getElementById('snippet-select').addEventListener('change', e => this._loadSnippet(e.target.value));
+    document.getElementById('btn-reset-editor').addEventListener('click', () => {
+      const ed = document.getElementById('code-editor');
+      ed.value = ed.dataset.original || this._snippets.select;
+      this._executor.reset();
+      this._resetStateMachine();
+      this._clearConsole();
+      this._logToConsole('info', 'Editeur reinitialise.');
+    });
+  }
+
+  _bindExecution() {
+    document.getElementById('btn-execute').addEventListener('click', () => {
+      const sel = document.getElementById('snippet-select').value;
+      const code = document.getElementById('code-editor').value;
+      this._resetStateMachine();
+      this._clearConsole();
+      this._disableBtn(true);
+      this._executor.execute(sel, code).finally(() => this._disableBtn(false));
+    });
+    this._executor.on('state', d => this._updateStateMachine(d.state, d.info));
+    this._executor.on('complete', d => {
+      this._renderMetrics(d.metrics);
+      this._renderResults(d.results, d.snippetType);
+      this._renderPlan(d.plan, d.snippetType);
+    });
+    this._executor.on('error', d => {
+      this._logToConsole('error', `ERREUR: ${d.code} — ${d.msg}`);
+    });
+    this._executor.on('log', d => this._logToConsole(d.level, d.msg));
+  }
+
+  _disableBtn(dis) { document.getElementById('btn-execute').disabled = dis; }
+
+  _resetStateMachine() {
+    ['state-idle','state-parsing','state-executing','state-fetching','state-completed'].forEach(id => {
+      const el = document.getElementById(id);
+      el.className = 'state-step';
+    });
+    document.getElementById('state-idle').classList.add('state-step--active');
+    document.getElementById('state-info').textContent = 'Pret.';
+  }
+
+  _updateStateMachine(state, info) {
+    const map = { IDLE: 'state-idle', PARSING: 'state-parsing', EXECUTING: 'state-executing', FETCHING: 'state-fetching', COMPLETED: 'state-completed', ERROR: 'state-completed' };
+    const steps = ['state-idle','state-parsing','state-executing','state-fetching','state-completed'];
+    const order = { 'state-idle': 0, 'state-parsing': 1, 'state-executing': 2, 'state-fetching': 3, 'state-completed': 4 };
+    const target = map[state];
+
+    steps.forEach(id => {
+      const el = document.getElementById(id);
+      el.className = 'state-step';
+      if (order[id] < order[target]) el.classList.add('state-step--done');
+      else if (id === target) el.classList.add(state === 'ERROR' ? 'state-step--error' : 'state-step--active');
+    });
+    document.getElementById('state-info').textContent = info || '';
+  }
+
+  _clearConsole() { document.getElementById('exec-console').innerHTML = ''; }
+
+  _logToConsole(level, msg) {
+    const c = document.getElementById('exec-console');
+    const ts = new Date().toISOString().slice(11, 19);
+    const cls = `log-console__entry log-console__entry--${level}`;
+    const div = document.createElement('div');
+    div.className = cls;
+    div.innerHTML = `<span class="log-console__timestamp">[${ts}]</span>${msg}`;
+    c.appendChild(div);
+    c.scrollTop = c.scrollHeight;
+  }
+
+  _renderMetrics(m) {
+    document.getElementById('metric-time').textContent = m.timeMs;
+    document.getElementById('metric-lr').textContent = m.logicalReads.toLocaleString();
+    document.getElementById('metric-pw').textContent = m.physicalWrites;
+    document.getElementById('metric-cost').textContent = m.cost;
+  }
+
+  _renderResults(results, type) {
+    const wrapper = document.getElementById('data-grid-wrapper');
+    const placeholder = document.getElementById('data-grid-placeholder');
+    const head = document.getElementById('data-grid-head');
+    const body = document.getElementById('data-grid-body');
+    const info = document.getElementById('data-grid-info');
+
+    if (!results.length && type !== 'bulk') {
+      placeholder.style.display = 'block';
+      wrapper.style.display = 'none';
+      info.textContent = '';
+      return;
+    }
+
+    placeholder.style.display = 'none';
+    wrapper.style.display = 'block';
+
+    const cols = results[0] ? Object.keys(results[0]).filter(k => k !== 'id') : [];
+    head.innerHTML = '<tr>' + cols.map(c => `<th>${c}</th>`).join('') + '</tr>';
+    body.innerHTML = results.map(r => '<tr>' + cols.map(c => {
+      let v = r[c] ?? '';
+      if (c === 'criticite') {
+        const cls = v === 'CRITIQUE' ? 'tag--red' : (v === 'ATTENTION' ? 'tag--amber' : 'tag--green');
+        return `<td><span class="tag ${cls}">${v}</span></td>`;
+      }
+      if (c === 'statut') {
+        const cls = v === 'RUPTURE_IMMINENTE' ? 'tag--red' : (v === 'REAPPROVISIONNE' ? 'tag--blue' : 'tag--green');
+        return `<td><span class="tag ${cls}">${v}</span></td>`;
+      }
+      return `<td>${v}</td>`;
+    }).join('') + '</tr>').join('');
+    info.textContent = `${results.length} ligne(s) retournee(s) — Type: ${type.toUpperCase()}`;
+  }
+
+  _renderPlan(plan, type) {
+    const container = document.getElementById('plan-tree-container');
+    const placeholder = document.getElementById('plan-placeholder');
+    const tree = document.getElementById('plan-tree');
+    placeholder.style.display = 'none';
+    container.style.display = 'block';
+    tree.innerHTML = plan.map(n => {
+      const indent = n.depth;
+      const indentStr = '&nbsp;&nbsp;'.repeat(indent * 2);
+      const cost = n.cost ? `Cost=${n.cost}` : '';
+      const card = n.card ? `Card=${n.card}` : '';
+      const metrics = [cost, card].filter(Boolean).join(' ');
+      return `<div class="plan-node"><span class="plan-node__indent">${indentStr}</span><span class="plan-node__op">${n.op}</span>${n.obj ? ` <span class="plan-node__obj">[${n.obj}]</span>` : ''}${metrics ? ` <span class="plan-node__metrics">(${metrics})</span>` : ''}</div>`;
+    }).join('');
+
+    const alerts = QueryPlanner.getAlerts(plan);
+    const alertBox = document.getElementById('cbo-alerts');
+    const alertCard = document.getElementById('cbo-alerts-card');
+    alertBox.innerHTML = alerts.map(a => `<div class="alert alert--${a.level === 'warning' ? 'warning' : 'success'}">${a.msg}</div>`).join('');
+    alertCard.style.display = alerts.some(a => a.level === 'warning') ? 'block' : 'block';
+  }
+
+  _renderTablespaces() {
+    const container = document.getElementById('tablespaces-container');
+    const ts = this._sm.tablespaces;
+    container.innerHTML = ts.map(t => {
+      const pct = Math.round((t.used / t.max) * 100);
+      const color = pct >= 90 ? 'red' : (pct >= 80 ? 'amber' : 'blue');
+      const status = pct >= 90 ? 'CRITIQUE' : (pct >= 80 ? 'WARNING' : 'OK');
+      const tagCls = pct >= 90 ? 'tag--red' : (pct >= 80 ? 'tag--amber' : 'tag--blue');
+      return `<div class="ts-bar">
+        <div class="ts-bar__header">
+          <span class="ts-bar__name">${t.name}</span>
+          <span><span class="ts-bar__pct">${t.used}/${t.max} Go</span> <span class="tag ${tagCls}" style="margin-left: var(--sp-2);">${status} ${pct}%</span></span>
+        </div>
+        <div class="ts-bar__fill"><div class="ts-bar__fill-inner" style="width:${pct}%; background: var(--color-${color});"></div></div>
+      </div>`;
+    }).join('');
+  }
+
+  _renderAudit() {
+    const c = document.getElementById('audit-console');
+    const logs = this._sm.auditLog;
+    if (!logs.length) {
+      c.innerHTML = '<div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>[AUDIT] Workbench initialise. Logs chiffres AES-256 au repos.</div>';
+      return;
+    }
+    c.innerHTML = logs.map(l => {
+      const ts = l.ts.slice(11, 19);
+      const statusCls = l.status === 'SUCCESS' ? 'success' : 'error';
+      return `<div class="log-console__entry log-console__entry--${statusCls}"><span class="log-console__timestamp">[${ts}]</span>[AUDIT][${l.encrypt}] ${l.user} | ${l.action} | ${l.detail}</div>`;
+    }).join('');
+    c.scrollTop = c.scrollHeight;
+  }
+
+  _bindMaintenance() {
+    document.getElementById('btn-refresh-ts').addEventListener('click', () => {
+      this._sm.tablespaces = this._sm.tablespaces.map(t => ({
+        ...t,
+        used: Math.min(t.max - 1, Math.max(10, t.used + Math.floor(Math.random() * 40 - 20)))
+      }));
+      this._renderTablespaces();
+      this._logToConsole('info', 'Tablespaces actualises.');
+    });
+
+    document.getElementById('btn-add-ts-data').addEventListener('click', () => {
+      this._sm.tablespaces = this._sm.tablespaces.map(t => ({
+        ...t,
+        used: Math.min(t.max - 1, t.used + Math.floor(Math.random() * 80 + 20))
+      }));
+      this._renderTablespaces();
+      this._sm.addAudit('TS_LOAD_SIM', 'DBA_PUI_SIMU', 'Simulation charge tablespaces');
+      this._renderAudit();
+      this._logToConsole('warn', 'Charge TS simulee — Verifier les seuils.');
+    });
+
+    document.getElementById('purge-days-slider').addEventListener('input', e => {
+      document.getElementById('purge-days-val').textContent = e.target.value;
+    });
+
+    document.getElementById('btn-purge').addEventListener('click', () => {
+      const days = parseInt(document.getElementById('purge-days-slider').value);
+      const masked = Math.floor(Math.random() * 500 + 200);
+      const res = document.getElementById('purge-result');
+      res.innerHTML = `<div class="alert alert--success">Purge terminee: ${masked} enregistrements anonymises via DBMS_DATA_MASKING (seuil: ${days} jours). Chiffrement AES-256 applique aux archives.</div>`;
+      this._sm.addAudit('RGPD_PURGE', 'DBA_PUI_SIMU', `Purge ${days}j: ${masked} rows masked, DBMS_DATA_MASKING`);
+      this._renderAudit();
+      this._logToConsole('success', `RGPD Purge: ${masked} rows anonymisees (seuil=${days}j).`);
+    });
+
+    document.getElementById('btn-create-user').addEventListener('click', () => {
+      const username = document.getElementById('user-username').value.trim() || `USER_SIMU_${Math.floor(Math.random() * 900 + 100)}`;
+      const isDba = document.getElementById('role-dba').checked;
+      const roles = [];
+      if (isDba) roles.push('DBA_PUI');
+      if (document.getElementById('role-lecture').checked) roles.push('LECTURE_STOCK');
+      if (document.getElementById('role-audit').checked) roles.push('AUDIT_HDS');
+      if (document.getElementById('role-batch').checked) roles.push('EXEC_BATCH');
+
+      const res = document.getElementById('user-result');
+      if (isDba) {
+        res.innerHTML = `<div class="alert alert--warning">&#9888; ALERTE SECURITE: Attribution du role DBA_PUI — Violation du principe de Least Privilege. Cette action est loguee dans l audit HDS.</div>`;
+      } else if (!roles.length) {
+        res.innerHTML = `<div class="alert alert--error">Aucun role selectionne. L utilisateur doit avoir au moins un role.</div>`;
+        return;
+      } else {
+        res.innerHTML = `<div class="alert alert--success">Utilisateur <code>${username}</code> cree avec les roles: ${roles.join(', ')}. Conformite Least Privilege: OK.</div>`;
+      }
+
+      this._sm.users.push({ username, roles, created: new Date().toISOString() });
+      this._sm.addAudit('USER_CREATE', 'DBA_PUI_SIMU', `User ${username} | Roles: ${roles.join(',') || 'AUCUN'}${isDba ? ' | *** DBA GRANTED ***' : ''}`);
+      this._renderAudit();
+    });
+
+    document.getElementById('btn-export-audit').addEventListener('click', () => {
+      const logs = this._sm.auditLog;
+      let csv = 'Timestamp,User,Action,Detail,Status,Encryption\n';
+      logs.forEach(l => { csv += `"${l.ts}","${l.user}","${l.action}","${l.detail}","${l.status}","${l.encrypt}"\n`; });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'audit_hds_export_simu.csv';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      this._sm.addAudit('AUDIT_EXPORT', 'DBA_PUI_SIMU', 'Export CSV du journal HDS');
+      this._renderAudit();
+    });
+
+    document.getElementById('btn-clear-audit').addEventListener('click', () => {
+      this._sm.auditLog = [];
+      this._renderAudit();
+      this._logToConsole('info', 'Journal d audit purge.');
+    });
+  }
+
+  _bindHelp() {
+    document.querySelectorAll('[data-help]').forEach(btn => {
+      btn.addEventListener('click', () => this._helpMgr.open(btn.dataset.help));
+    });
+    document.querySelectorAll('.help-modal__close').forEach(btn => {
+      btn.addEventListener('click', () => this._helpMgr.close());
+    });
+    document.querySelectorAll('.help-modal__footer-btn').forEach(btn => {
+      btn.addEventListener('click', () => this._helpMgr.close());
+    });
+  }
+}
+
+// ============================================================
+// BOOTSTRAP
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  new WorkbenchApp().init();
+});
+</script>
+</body>
+</html>
