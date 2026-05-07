@@ -1,0 +1,1653 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Oracle Database HDS Demo - Architecture Multitenant, SGA/PGA, I/O Internals, Cloud Souverain">
+<title>Oracle HDS Demo - Architecture Systems CHU</title>
+<style>
+/* ============================================================
+   DESIGN SYSTEM - INSTRUMENTATION SCIENTIFIQUE
+   ============================================================ */
+:root {
+  --color-bg-deep: #0a0e17;
+  --color-bg-surface: #131a2a;
+  --color-bg-elevated: #1a2340;
+  --color-bg-hover: #243052;
+  --color-border: #1e2d4a;
+  --color-border-active: #3b82f6;
+  --color-blue: #3b82f6;
+  --color-blue-dim: #1e3a6e;
+  --color-red: #ef4444;
+  --color-red-dim: #7f1d1d;
+  --color-green: #22c55e;
+  --color-green-dim: #166534;
+  --color-amber: #f59e0b;
+  --color-amber-dim: #78350f;
+  --color-cyan: #06b6d4;
+  --color-purple: #a855f7;
+  --font-ui: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+  --fs-xs: 0.6875rem;
+  --fs-sm: 0.8125rem;
+  --fs-base: 0.9375rem;
+  --fs-md: 1.0625rem;
+  --fs-lg: 1.25rem;
+  --fs-xl: 1.5rem;
+  --fs-2xl: 2rem;
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-6: 1.5rem;
+  --sp-8: 2rem;
+  --sp-12: 3rem;
+  --nav-width: 260px;
+  --header-height: 56px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --transition-fast: 150ms ease;
+  --transition-normal: 300ms ease;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+body { font-family: var(--font-ui); font-size: var(--fs-base); color: #e2e8f0; background: var(--color-bg-deep); line-height: 1.6; overflow-x: hidden; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input, select, textarea { font-family: inherit; font-size: inherit; }
+pre, code { font-family: var(--font-mono); }
+table { border-collapse: collapse; width: 100%; }
+a { color: var(--color-cyan); text-decoration: none; }
+a:hover { text-decoration: underline; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--color-bg-deep); }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: var(--radius-sm); }
+::-webkit-scrollbar-thumb:hover { background: var(--color-blue); }
+
+.app-layout { display: grid; grid-template-columns: var(--nav-width) 1fr; grid-template-rows: var(--header-height) 1fr; grid-template-areas: "header header" "nav main"; min-height: 100vh; }
+.app-header { grid-area: header; display: flex; align-items: center; justify-content: space-between; padding: 0 var(--sp-6); background: var(--color-bg-surface); border-bottom: 1px solid var(--color-border); z-index: 100; }
+.app-header__brand { display: flex; align-items: center; gap: var(--sp-3); font-family: var(--font-mono); font-size: var(--fs-md); font-weight: 700; letter-spacing: -0.02em; }
+.app-header__brand-icon { width: 28px; height: 28px; background: var(--color-blue); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: var(--fs-sm); font-weight: 900; color: #fff; }
+.app-header__status { display: flex; align-items: center; gap: var(--sp-4); font-size: var(--fs-xs); font-family: var(--font-mono); }
+.status-badge { display: inline-flex; align-items: center; gap: var(--sp-2); padding: var(--sp-1) var(--sp-3); border-radius: var(--radius-sm); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.status-badge--online { background: var(--color-green-dim); color: var(--color-green); }
+.status-badge--rgpd { background: var(--color-blue-dim); color: var(--color-blue); }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: pulse-dot 2s infinite; }
+@keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.app-nav { grid-area: nav; background: var(--color-bg-surface); border-right: 1px solid var(--color-border); padding: var(--sp-6) 0; overflow-y: auto; }
+.app-nav__section { padding: 0 var(--sp-4); margin-bottom: var(--sp-6); }
+.app-nav__section-title { font-size: var(--fs-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-blue); margin-bottom: var(--sp-3); font-family: var(--font-mono); }
+.app-nav__item { display: flex; align-items: center; gap: var(--sp-3); width: 100%; padding: var(--sp-3) var(--sp-4); border-radius: var(--radius-md); font-size: var(--fs-sm); font-weight: 500; color: #94a3b8; transition: all var(--transition-fast); text-align: left; }
+.app-nav__item:hover { background: var(--color-bg-hover); color: #e2e8f0; }
+.app-nav__item--active { background: var(--color-blue-dim); color: var(--color-blue); font-weight: 600; }
+.app-nav__item-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700; border-radius: var(--radius-sm); background: var(--color-bg-elevated); flex-shrink: 0; }
+.app-nav__item--active .app-nav__item-icon { background: var(--color-blue); color: #fff; }
+.app-nav__rgpd-notice { margin: var(--sp-6) var(--sp-4); padding: var(--sp-3); background: var(--color-blue-dim); border: 1px solid var(--color-blue); border-radius: var(--radius-md); font-size: var(--fs-xs); color: var(--color-blue); font-family: var(--font-mono); line-height: 1.5; }
+
+.app-main { grid-area: main; padding: var(--sp-8); overflow-y: auto; background: var(--color-bg-deep); }
+
+.page-header { margin-bottom: var(--sp-8); padding-bottom: var(--sp-4); border-bottom: 1px solid var(--color-border); }
+.page-header__title { font-size: var(--fs-xl); font-weight: 700; letter-spacing: -0.02em; margin-bottom: var(--sp-2); }
+.page-header__subtitle { font-size: var(--fs-sm); color: #94a3b8; font-family: var(--font-mono); }
+.page-header__subtitle-row { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); }
+
+.card { background: var(--color-bg-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--sp-6); margin-bottom: var(--sp-6); }
+.card__title { font-size: var(--fs-md); font-weight: 700; margin-bottom: var(--sp-4); display: flex; align-items: center; gap: var(--sp-3); font-family: var(--font-mono); }
+.card__title-icon { color: var(--color-blue); }
+
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-6); }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-6); }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-6); }
+@media (max-width: 1200px) { .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+.data-mono { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--color-cyan); background: var(--color-bg-elevated); padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); display: inline-block; }
+.data-label { font-size: var(--fs-xs); color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+.data-value { font-family: var(--font-mono); font-size: var(--fs-base); font-weight: 600; }
+
+.stat-block { background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--sp-4); text-align: center; }
+.stat-block__value { font-family: var(--font-mono); font-size: var(--fs-xl); font-weight: 700; margin-bottom: var(--sp-1); }
+.stat-block__label { font-size: var(--fs-xs); color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+.stat-block--blue .stat-block__value { color: var(--color-blue); }
+.stat-block--green .stat-block__value { color: var(--color-green); }
+.stat-block--red .stat-block__value { color: var(--color-red); }
+.stat-block--amber .stat-block__value { color: var(--color-amber); }
+.stat-block--cyan .stat-block__value { color: var(--color-cyan); }
+.stat-block--purple .stat-block__value { color: var(--color-purple); }
+
+.progress-bar { width: 100%; height: 8px; background: var(--color-bg-elevated); border-radius: var(--radius-sm); overflow: hidden; margin: var(--sp-2) 0; }
+.progress-bar__fill { height: 100%; border-radius: var(--radius-sm); transition: width var(--transition-normal); }
+.progress-bar__fill--blue { background: var(--color-blue); }
+.progress-bar__fill--green { background: var(--color-green); }
+.progress-bar__fill--red { background: var(--color-red); }
+.progress-bar__fill--amber { background: var(--color-amber); }
+.progress-bar__fill--cyan { background: var(--color-cyan); }
+
+.data-table { width: 100%; font-size: var(--fs-sm); }
+.data-table th { text-align: left; padding: var(--sp-3) var(--sp-4); background: var(--color-bg-elevated); font-family: var(--font-mono); font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; font-weight: 600; border-bottom: 1px solid var(--color-border); }
+.data-table td { padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--color-border); font-family: var(--font-mono); font-size: var(--fs-xs); }
+.data-table tr:hover td { background: var(--color-bg-hover); }
+
+.tag { display: inline-flex; align-items: center; padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); font-size: var(--fs-xs); font-weight: 600; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.03em; }
+.tag--blue { background: var(--color-blue-dim); color: var(--color-blue); }
+.tag--green { background: var(--color-green-dim); color: var(--color-green); }
+.tag--red { background: var(--color-red-dim); color: var(--color-red); }
+.tag--amber { background: var(--color-amber-dim); color: var(--color-amber); }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2); padding: var(--sp-3) var(--sp-6); border-radius: var(--radius-md); font-size: var(--fs-sm); font-weight: 600; transition: all var(--transition-fast); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.03em; }
+.btn--primary { background: var(--color-blue); color: #fff; }
+.btn--primary:hover { background: #2563eb; }
+.btn--success { background: var(--color-green); color: #fff; }
+.btn--success:hover { background: #16a34a; }
+.btn--danger { background: var(--color-red); color: #fff; }
+.btn--danger:hover { background: #dc2626; }
+.btn--outline { border: 1px solid var(--color-border); color: #e2e8f0; }
+.btn--outline:hover { border-color: var(--color-blue); color: var(--color-blue); }
+.btn--sm { padding: var(--sp-2) var(--sp-4); font-size: var(--fs-xs); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.slider-group { display: flex; flex-direction: column; gap: var(--sp-2); }
+.slider-group__header { display: flex; justify-content: space-between; align-items: center; }
+.slider-group__label { font-size: var(--fs-sm); font-weight: 600; font-family: var(--font-mono); }
+.slider-group__value { font-size: var(--fs-sm); font-family: var(--font-mono); color: var(--color-cyan); font-weight: 700; }
+input[type="range"] { -webkit-appearance: none; width: 100%; height: 6px; background: var(--color-bg-elevated); border-radius: var(--radius-sm); outline: none; }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--color-blue); border-radius: 50%; cursor: pointer; border: 2px solid var(--color-bg-surface); }
+
+.alert { padding: var(--sp-4); border-radius: var(--radius-md); border-left: 4px solid; margin-bottom: var(--sp-4); font-size: var(--fs-sm); font-family: var(--font-mono); }
+.alert--info { background: var(--color-blue-dim); border-color: var(--color-blue); color: #93c5fd; }
+.alert--success { background: var(--color-green-dim); border-color: var(--color-green); color: #86efac; }
+.alert--warning { background: var(--color-amber-dim); border-color: var(--color-amber); color: #fcd34d; }
+.alert--error { background: var(--color-red-dim); border-color: var(--color-red); color: #fca5a5; }
+
+.log-console { background: #000; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--sp-4); font-family: var(--font-mono); font-size: var(--fs-xs); max-height: 300px; overflow-y: auto; line-height: 1.8; }
+.log-console__entry { color: #94a3b8; }
+.log-console__entry--info { color: var(--color-blue); }
+.log-console__entry--success { color: var(--color-green); }
+.log-console__entry--error { color: var(--color-red); }
+.log-console__entry--warn { color: var(--color-amber); }
+.log-console__timestamp { color: #475569; margin-right: var(--sp-2); }
+
+.diagram-node { background: var(--color-bg-elevated); border: 2px solid var(--color-border); border-radius: var(--radius-md); padding: var(--sp-4); text-align: center; transition: all var(--transition-fast); position: relative; }
+.diagram-node--root { border-color: var(--color-blue); background: var(--color-blue-dim); }
+.diagram-node--critical { border-color: var(--color-red); background: var(--color-red-dim); }
+.diagram-node--normal { border-color: var(--color-green); background: var(--color-green-dim); }
+.diagram-node--warning { border-color: var(--color-amber); background: var(--color-amber-dim); }
+.diagram-node__title { font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700; margin-bottom: var(--sp-2); }
+.diagram-node__detail { font-size: var(--fs-xs); color: #94a3b8; font-family: var(--font-mono); }
+
+.diagram-connector { display: flex; align-items: center; justify-content: center; padding: var(--sp-2) 0; color: var(--color-border); font-size: var(--fs-lg); font-family: var(--font-mono); }
+
+.section-divider { border: none; border-top: 1px solid var(--color-border); margin: var(--sp-6) 0; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn var(--transition-normal) ease; }
+
+.module-section { display: none; }
+.module-section--active { display: block; animation: fadeIn var(--transition-normal) ease; }
+
+.flow-step { display: flex; align-items: flex-start; gap: var(--sp-4); padding: var(--sp-3) 0; position: relative; }
+.flow-step__marker { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: var(--fs-xs); font-weight: 700; flex-shrink: 0; background: var(--color-bg-elevated); border: 2px solid var(--color-border); color: #94a3b8; }
+.flow-step__marker--active { border-color: var(--color-blue); color: var(--color-blue); background: var(--color-blue-dim); }
+.flow-step__marker--done { border-color: var(--color-green); color: var(--color-green); background: var(--color-green-dim); }
+.flow-step__marker--error { border-color: var(--color-red); color: var(--color-red); background: var(--color-red-dim); }
+.flow-step__content { flex: 1; }
+.flow-step__title { font-weight: 600; font-size: var(--fs-sm); margin-bottom: var(--sp-1); }
+.flow-step__desc { font-size: var(--fs-xs); color: #94a3b8; font-family: var(--font-mono); }
+
+.app-footer { margin-top: var(--sp-12); padding-top: var(--sp-6); border-top: 1px solid var(--color-border); font-size: var(--fs-xs); color: #475569; font-family: var(--font-mono); text-align: center; line-height: 1.8; }
+
+.masked { color: var(--color-amber); font-weight: 700; }
+.clear-text { color: var(--color-red); }
+.encrypted { color: var(--color-purple); }
+
+/* ============================================================
+   HELP MODAL SYSTEM
+   ============================================================ */
+.page-header__help-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px;
+  border: 1px solid var(--color-border); border-radius: 50%;
+  background: var(--color-bg-elevated); color: #94a3b8;
+  font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700;
+  cursor: pointer; transition: all var(--transition-fast);
+  vertical-align: middle; flex-shrink: 0;
+}
+.page-header__help-btn:hover {
+  border-color: var(--color-blue); color: var(--color-blue);
+  background: var(--color-blue-dim);
+}
+.help-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  z-index: 999; animation: fadeIn 0.2s ease;
+}
+.help-overlay--active { display: block; }
+.help-modal {
+  display: none; position: fixed;
+  top: 50%; left: 50%; transform: translate(-50%,-50%) translateY(16px);
+  width: 90%; max-width: 720px; max-height: 85vh;
+  background: var(--color-bg-surface); border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg); z-index: 1000; overflow: hidden;
+  animation: fadeSlideUp 0.3s ease forwards;
+  box-shadow: 0 24px 48px rgba(0,0,0,0.4);
+}
+.help-modal--active { display: flex; flex-direction: column; }
+@keyframes fadeSlideUp {
+  from { opacity:0; transform: translate(-50%,-50%) translateY(16px); }
+  to   { opacity:1; transform: translate(-50%,-50%) translateY(0); }
+}
+.help-modal__header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--sp-4) var(--sp-6); border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+}
+.help-modal__title {
+  font-family: var(--font-mono); font-size: var(--fs-md);
+  font-weight: 700; color: var(--color-blue);
+}
+.help-modal__close {
+  width: 32px; height: 32px; display: flex; align-items: center;
+  justify-content: center; border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm); background: var(--color-bg-deep);
+  color: #94a3b8; font-size: var(--fs-md); cursor: pointer;
+  transition: all var(--transition-fast); font-weight: 700;
+}
+.help-modal__close:hover {
+  border-color: var(--color-red); color: var(--color-red);
+  background: var(--color-red-dim);
+}
+.help-modal__body { padding: var(--sp-6); overflow-y: auto; flex: 1; }
+.help-modal__section { margin-bottom: var(--sp-6); }
+.help-modal__section:last-child { margin-bottom: 0; }
+.help-modal__section-title {
+  font-family: var(--font-mono); font-size: var(--fs-sm);
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+  margin-bottom: var(--sp-3); padding-bottom: var(--sp-2);
+  border-bottom: 1px solid var(--color-border);
+}
+.help-modal__section-title--objective { color: var(--color-blue); }
+.help-modal__section-title--controls  { color: var(--color-cyan); }
+.help-modal__section-title--indicators { color: var(--color-amber); }
+.help-modal__section-title--hds        { color: var(--color-green); }
+.help-modal__text {
+  font-size: var(--fs-sm); color: #cbd5e1; line-height: 1.7;
+  margin-bottom: var(--sp-3);
+}
+.help-modal__text code {
+  font-family: var(--font-mono); font-size: var(--fs-xs);
+  background: var(--color-bg-elevated); padding: var(--sp-1) var(--sp-2);
+  border-radius: var(--radius-sm); color: var(--color-cyan);
+}
+.help-modal__list { list-style: none; padding: 0; }
+.help-modal__list li {
+  position: relative; padding: var(--sp-2) 0 var(--sp-2) var(--sp-6);
+  font-size: var(--fs-sm); color: #94a3b8; line-height: 1.6;
+  border-left: 2px solid var(--color-border);
+}
+.help-modal__list li::before {
+  content: ''; position: absolute; left: -1px; top: 50%;
+  width: 8px; height: 2px; background: var(--color-blue);
+  transform: translateY(-50%);
+}
+.help-modal__footer {
+  padding: var(--sp-4) var(--sp-6); border-top: 1px solid var(--color-border);
+  display: flex; justify-content: flex-end; background: var(--color-bg-elevated);
+}
+</style>
+</head>
+<body>
+
+<div class="app-layout">
+  <header class="app-header">
+    <div class="app-header__brand">
+      <div class="app-header__brand-icon">O</div>
+      <span>ORACLE<span style="color: var(--color-cyan);">_HDS</span>::DEMO</span>
+    </div>
+    <div class="app-header__status">
+      <span class="status-badge status-badge--online"><span class="status-dot"></span>SIMULATION ACTIVE</span>
+      <span class="status-badge status-badge--rgpd">DONNEES FICTIVES / RGPD</span>
+    </div>
+  </header>
+
+  <nav class="app-nav">
+    <div class="app-nav__section">
+      <div class="app-nav__section-title">Architecture</div>
+      <button class="app-nav__item app-nav__item--active" data-module="multitenant"><span class="app-nav__item-icon">M</span>Multitenant CDB/PDB</button>
+      <button class="app-nav__item" data-module="memory"><span class="app-nav__item-icon">S</span>SGA / PGA Internals</button>
+      <button class="app-nav__item" data-module="io"><span class="app-nav__item-icon">I</span>I/O &amp; Coherence</button>
+      <button class="app-nav__item" data-module="cloud"><span class="app-nav__item-icon">C</span>Cloud Souverain &amp; IA</button>
+    </div>
+    <div class="app-nav__section">
+      <div class="app-nav__section-title">Etat Systeme</div>
+      <div id="system-status-panel" style="padding: 0 var(--sp-4);">
+        <div style="font-size: var(--fs-xs); color: #64748b; font-family: var(--font-mono); margin-bottom: var(--sp-2);">SCN GLOBAL</div>
+        <div id="global-scn" class="data-mono" style="width: 100%; text-align: center;">0</div>
+        <div style="margin-top: var(--sp-4); font-size: var(--fs-xs); color: #64748b; font-family: var(--font-mono); margin-bottom: var(--sp-2);">TRANSACTIONS ACTIVES</div>
+        <div id="active-txns" class="data-mono" style="width: 100%; text-align: center;">0</div>
+      </div>
+    </div>
+    <div class="app-nav__rgpd-notice">
+      &#9888; DONNEES 100% FICTIVES<br>
+      Patients_TEST_XXX / Dr_DUMMY_XX<br>
+      NIR_FICTIF / Sejour_SIMU_XXX<br>
+      Conforme RGPD Art. 25 - Privacy by Design
+    </div>
+  </nav>
+
+  <main class="app-main" id="app-main">
+    <!-- MODULE 1: MULTITENANT -->
+    <section class="module-section module-section--active" id="mod-multitenant">
+      <div class="page-header">
+        <h1 class="page-header__title">Module 1 - Architecture Multitenant (CDB/PDB)</h1>
+        <div class="page-header__subtitle-row">
+          <p class="page-header__subtitle">Isolation logique, contention dictionnaire partage, Resource Plans, Data Masking RGPD</p>
+          <button class="page-header__help-btn" data-help="multitenant" aria-label="Aide module Multitenant">?</button>
+        </div>
+      </div>
+      <div class="card fade-in">
+        <div class="card__title"><span class="card__title-icon">&#9632;</span> Topologie CDB - CHU_DEMO</div>
+        <div class="grid-3" style="margin-bottom: var(--sp-6);">
+          <div class="diagram-node diagram-node--root" style="grid-column: 1 / -1; max-width: 600px; margin: 0 auto;">
+            <div class="diagram-node__title">CDB$ROOT</div>
+            <div class="diagram-node__detail">Dictionnaire partage - Undo/Tablespace SYSTEM partages</div>
+            <div class="diagram-node__detail">Resource Plan: DEFAULT_CDB_PLAN</div>
+          </div>
+        </div>
+        <div class="diagram-connector">&#8659;</div>
+        <div class="grid-4" id="pdb-diagram"></div>
+      </div>
+      <div class="grid-2">
+        <div class="card fade-in">
+          <div class="card__title"><span class="card__title-icon">&#9881;</span> Resource Plan Simulator</div>
+          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Allouez les parts CPU/IO entre PDBs. Les PDB critiques (Urgences/Bloc) necessitent un share minimum garanti.</p>
+          <div id="resource-plan-controls"></div>
+          <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
+            <button class="btn btn--primary btn--sm" id="btn-apply-plan">Appliquer le Plan</button>
+            <button class="btn btn--outline btn--sm" id="btn-reset-plan">Reset Defaut</button>
+          </div>
+          <div id="resource-plan-result" style="margin-top: var(--sp-4);"></div>
+        </div>
+        <div class="card fade-in">
+          <div class="card__title"><span class="card__title-icon">&#9889;</span> Moniteur de Contention Dictionnaire</div>
+          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Le CDB$ROOT partage le dictionnaire de donnees. Simulez la contention sur les latches <code class="data-mono">row cache objects</code> et <code class="data-mono">shared pool</code>.</p>
+          <div id="contention-monitor">
+            <div class="grid-2" style="margin-bottom: var(--sp-4);">
+              <div class="stat-block"><div class="stat-block__value" id="latch-waits">0</div><div class="stat-block__label">Latch Waits / sec</div></div>
+              <div class="stat-block"><div class="stat-block__value" id="dict-cache-hit">99.8%</div><div class="stat-block__label">Dict Cache Hit Ratio</div></div>
+            </div>
+            <button class="btn btn--danger btn--sm" id="btn-sim-contention">Simuler Pic de Charge</button>
+            <div class="log-console" id="contention-log" style="margin-top: var(--sp-4);">
+              <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Moniteur contention initialise.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card fade-in">
+        <div class="card__title"><span class="card__title-icon">&#128274;</span> Data Masking &amp; Clonage PDB - Conformite RGPD</div>
+        <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Lors du clonage d'un PDB de production vers un environnement de test/recherche, les donnees de santé DOIVENT etre masquees (DBMS_DATA_MASKING). Cette demo illustre le processus avec des donnees <strong>entierement fictives</strong>.</p>
+        <div class="grid-3" id="data-masking-demo"></div>
+        <div style="margin-top: var(--sp-4);">
+          <button class="btn btn--primary btn--sm" id="btn-run-masking">Executer DBMS_DATA_MASKING</button>
+          <button class="btn btn--outline btn--sm" id="btn-verify-masking">Verifier Conformite</button>
+        </div>
+        <div id="masking-result" style="margin-top: var(--sp-4);"></div>
+      </div>
+    </section>
+
+    <!-- MODULE 2: SGA/PGA -->
+    <section class="module-section" id="mod-memory">
+      <div class="page-header">
+        <h1 class="page-header__title">Module 2 - SGA / PGA &amp; Algorithmes de Memoire</h1>
+        <div class="page-header__subtitle-row">
+          <p class="page-header__subtitle">Buffer Cache LRU/Touch Count, Latch/Mutex contention, PGA Temp Spill, impact PMSI/T2A</p>
+          <button class="page-header__help-btn" data-help="memory" aria-label="Aide module SGA/PGA">?</button>
+        </div>
+      </div>
+      <div class="card fade-in">
+        <div class="card__title"><span class="card__title-icon">&#9632;</span> System Global Area (SGA) - Layout</div>
+        <div class="grid-4" id="sga-layout"></div>
+        <div style="margin-top: var(--sp-6);">
+          <div class="slider-group" style="max-width: 600px;">
+            <div class="slider-group__header"><span class="slider-group__label">SGA_TARGET</span><span class="slider-group__value" id="sga-target-val">4096 MB</span></div>
+            <input type="range" id="sga-target-slider" min="1024" max="16384" step="512" value="4096">
+          </div>
+          <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
+            <button class="btn btn--primary btn--sm" id="btn-apply-sga">Appliquer SGA_TARGET</button>
+            <button class="btn btn--outline btn--sm" id="btn-auto-tune-sga">Auto-Tune (AMM)</button>
+          </div>
+          <div id="sga-result" style="margin-top: var(--sp-4);"></div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card fade-in">
+          <div class="card__title"><span class="card__title-icon">&#128260;</span> Algorithme LRU - Buffer Cache</div>
+          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Oracle maintient une liste LRU pour les blocs du buffer cache. Depuis 10g, l'algorithme <strong>Touch Count</strong> (Midpoint Insertion) empeche les full table scans de polluer le cache.</p>
+          <div id="lru-visualization"></div>
+          <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
+            <button class="btn btn--primary btn--sm" id="btn-lru-access">Acces Bloc (Touch)</button>
+            <button class="btn btn--outline btn--sm" id="btn-lru-full-scan">Full Table Scan</button>
+            <button class="btn btn--danger btn--sm" id="btn-lru-flush">Checkpoint / Flush</button>
+          </div>
+          <div id="lru-result" style="margin-top: var(--sp-4);"></div>
+        </div>
+        <div class="card fade-in">
+          <div class="card__title"><span class="card__title-icon">&#9889;</span> Latch &amp; Mutex - Cache Buffers Chains</div>
+          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Les latches protegent les structures memoire critiques. Le latch <code class="data-mono">cache buffers chains</code> est un point de contention classique (hot block).</p>
+          <div class="slider-group" style="margin-bottom: var(--sp-4);">
+            <div class="slider-group__header"><span class="slider-group__label">Sessions Concurrentes</span><span class="slider-group__value" id="latch-sessions-val">4</span></div>
+            <input type="range" id="latch-sessions-slider" min="1" max="32" step="1" value="4">
+          </div>
+          <button class="btn btn--danger btn--sm" id="btn-sim-latch">Simuler Contention Latch</button>
+          <div id="latch-result" style="margin-top: var(--sp-4);"></div>
+          <div class="log-console" id="latch-log" style="margin-top: var(--sp-4); max-height: 200px;">
+            <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Latch simulator ready.</div>
+          </div>
+        </div>
+      </div>
+      <div class="card fade-in">
+        <div class="card__title"><span class="card__title-icon">&#128190;</span> PGA Memory &amp; Temp Spill - Impact Requetes PMSI/T2A</div>
+        <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Quand une operation (sort/hash join) excede la memoire PGA allouee, Oracle bascule sur des <strong>Temp Segments</strong> (I/O disque). Impact: latence x1000 a x10000.</p>
+        <div class="grid-2">
+          <div>
+            <div class="slider-group" style="margin-bottom: var(--sp-4);">
+              <div class="slider-group__header"><span class="slider-group__label">Taille du Tri (MB)</span><span class="slider-group__value" id="sort-size-val">64</span></div>
+              <input type="range" id="sort-size-slider" min="1" max="512" step="1" value="64">
+            </div>
+            <div class="slider-group" style="margin-bottom: var(--sp-4);">
+              <div class="slider-group__header"><span class="slider-group__label">PGA_AGGREGATE_LIMIT (MB)</span><span class="slider-group__value" id="pga-limit-val">256</span></div>
+              <input type="range" id="pga-limit-slider" min="64" max="2048" step="64" value="256">
+            </div>
+            <button class="btn btn--primary btn--sm" id="btn-sim-sql">Executer Requete PMSI</button>
+          </div>
+          <div id="pga-result"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODULE 3: I/O & COHERENCE -->
+    <section class="module-section" id="mod-io">
+      <div class="page-header">
+        <h1 class="page-header__title">Module 3 - Flux de Donnees &amp; Coherence (I/O Internals)</h1>
+        <div class="page-header__subtitle-row">
+          <p class="page-header__subtitle">Cycle Redo/Undo, SCN, Instance Recovery, ORA-01555 Snapshot Too Old</p>
+          <button class="page-header__help-btn" data-help="io" aria-label="Aide module I/O">?</button>
+        </div>
+      </div>
+      <div class="card fade-in">
+        <div class="card__title"><span class="card__title-icon">&#128260;</span> Cycle de Vie d'une Transaction - PMSI_FACTURATION</div>
+        <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Chaque transaction suit un cycle strict: Undo (rollback) -&gt; Redo (recovery) -&gt; Commit -&gt; LGWR write -&gt; DBWR write. Le SCN (System Change Number) garantit la coherence de lecture.</p>
+        <div id="txn-lifecycle"></div>
+        <div style="margin-top: var(--sp-4);">
+          <button class="btn btn--primary btn--sm" id="btn-run-txn">Executer Transaction Complete</button>
+          <button class="btn btn--danger btn--sm" id="btn-sim-crash">Simuler Crash (SHUTDOWN ABORT)</button>
+          <button class="btn btn--success btn--sm" id="btn-recovery">Instance Recovery</button>
+        </div>
+        <div id="txn-result" style="margin-top: var(--sp-4);"></div>
+      </div>
+      <div class="grid-2">
+        <div class="card fade-in">
+          <div class="card__title"><span class="card__title-icon">&#9201;</span> SCN - System Change Number</div>
+          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Le SCN est l'horloge logique d'Oracle. Il avance a chaque commit. Il garantit la coherence de lecture.</p>
+          <div style="text-align: center; margin: var(--sp-6) 0;">
+            <div style="font-family: var(--font-mono); font-size: 3rem; font-weight: 900; color: var(--color-cyan); letter-spacing: 0.05em;" id="scn-display">0</div>
+            <div style="font-size: var(--fs-xs); color: #64748b; font-family: var(--font-mono); margin-top: var(--sp-2);">SCN courant</div>
+          </div>
+          <div style="display: flex; gap: var(--sp-3); justify-content: center;">
+            <button class="btn btn--primary btn--sm" id="btn-increment-scn">Commit (SCN++)</button>
+            <button class="btn btn--outline btn--sm" id="btn-query-scn">Query a SCN donne</button>
+          </div>
+          <div id="scn-result" style="margin-top: var(--sp-4);"></div>
+        </div>
+        <div class="card fade-in">
+          <div class="card__title"><span class="card__title-icon">&#128270;</span> Coherence de Lecture - Facturation T2A</div>
+          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">La facturation T2A exige une coherence absolue: la requete de facturation doit voir un etat stable des donnees.</p>
+          <div id="read-consistency-demo"></div>
+          <div style="margin-top: var(--sp-4);">
+            <button class="btn btn--primary btn--sm" id="btn-sim-read-consistency">Simuler Lecture Coherente</button>
+          </div>
+          <div id="read-consistency-result" style="margin-top: var(--sp-4);"></div>
+        </div>
+      </div>
+      <div class="card fade-in">
+        <div class="card__title"><span class="card__title-icon">&#9888;</span> Simulation ORA-01555 - Snapshot Too Old</div>
+        <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">L'erreur <code class="data-mono">ORA-01555: snapshot too old</code> survient quand les donnees Undo necessaires a la coherence de lecture ont ete ecrasees.</p>
+        <div class="grid-2">
+          <div>
+            <div class="slider-group" style="margin-bottom: var(--sp-4);">
+              <div class="slider-group__header"><span class="slider-group__label">UNDO_RETENTION (secondes)</span><span class="slider-group__value" id="undo-retention-val">900</span></div>
+              <input type="range" id="undo-retention-slider" min="60" max="3600" step="60" value="900">
+            </div>
+            <div class="slider-group" style="margin-bottom: var(--sp-4);">
+              <div class="slider-group__header"><span class="slider-group__label">Duree de la requete (secondes simulees)</span><span class="slider-group__value" id="query-duration-val">120</span></div>
+              <input type="range" id="query-duration-slider" min="10" max="600" step="10" value="120">
+            </div>
+            <div class="slider-group" style="margin-bottom: var(--sp-4);">
+              <div class="slider-group__header"><span class="slider-group__label">Charge DML concurrente (% taux rotation Undo)</span><span class="slider-group__value" id="dml-load-val">30</span></div>
+              <input type="range" id="dml-load-slider" min="5" max="100" step="5" value="30">
+            </div>
+            <button class="btn btn--primary btn--sm" id="btn-run-long-query">Lancer Requete Longue</button>
+          </div>
+          <div id="ora-1555-result"></div>
+        </div>
+        <div class="log-console" id="ora-1555-log" style="margin-top: var(--sp-4); max-height: 250px;">
+          <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Simulateur ORA-01555 pret.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODULE 4: CLOUD SOUVERAIN & IA -->
+    <section class="module-section" id="mod-cloud">
+      <div class="page-header">
+        <h1 class="page-header__title">Module 4 - Cloud Souverain &amp; IA Controlee</h1>
+        <div class="page-header__subtitle-row">
+          <p class="page-header__subtitle">TDE/BYOK, Autonomous Database OCI France (HDS), Auto-Tuning, IA embarquee vs IA generative</p>
+          <button class="page-header__help-btn" data-help="cloud" aria-label="Aide module Cloud/IA">?</button>
+        </div>
+      </div>
+      <div class="card fade-in">
+        <div class="card__title"><span class="card__title-icon">&#128274;</span> Transparent Data Encryption (TDE) - BYOK</div>
+        <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Le TDE chiffre les donnees au repos (data-at-rest) avec AES-256. En mode BYOK, le CHU garde le controle des cles maitresses dans un HSM souverain. <strong>Aucune donnee reelle n'est utilisee dans cette simulation.</strong></p>
+        <div class="grid-3" id="tde-demo"></div>
+        <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
+          <button class="btn btn--primary btn--sm" id="btn-tde-encrypt">Chiffrer (TDE AES-256)</button>
+          <button class="btn btn--success btn--sm" id="btn-tde-decrypt">Dechiffrer (Cle HSM)</button>
+          <button class="btn btn--danger btn--sm" id="btn-tde-revoke">Revoquer Cle (BYOK)</button>
+        </div>
+        <div id="tde-result" style="margin-top: var(--sp-4);"></div>
+      </div>
+      <div class="grid-2">
+        <div class="card fade-in">
+          <div class="card__title"><span class="card__title-icon">&#9881;</span> SQL Auto-Tuning - IA Embarquee</div>
+          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">L'Autonomous Database inclut un moteur d'auto-tuning local: analyse des plans d'execution, creation automatique d'index, SQL Plan Management.</p>
+          <div id="autotune-demo">
+            <div style="margin-bottom: var(--sp-4);">
+              <div class="data-label">Requete soumise</div>
+              <div class="data-mono" style="width: 100%; white-space: pre-wrap; padding: var(--sp-3);">SELECT p.nir_fictif, SUM(f.montant_t2a)
+  FROM sejour_simu s
+  JOIN patient_test p ON s.patient_id = p.id
+  JOIN facturation_t2a f ON s.sejour_id = f.sejour_id
+ WHERE s.date_entree BETWEEN '2025-01-01' AND '2025-12-31'
+ GROUP BY p.nir_fictif
+ ORDER BY SUM(f.montant_t2a) DESC;</div>
+            </div>
+            <button class="btn btn--primary btn--sm" id="btn-run-autotune">Lancer Auto-Tuning</button>
+          </div>
+          <div id="autotune-result" style="margin-top: var(--sp-4);"></div>
+        </div>
+        <div class="card fade-in">
+          <div class="card__title"><span class="card__title-icon">&#129504;</span> IA Controlee - Human-in-the-Loop</div>
+          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Distinction methodologique entre l'IA embarquee (auto-tuning local) et l'IA generative externe (LLM cloud). En contexte HDS/RGPD, seule l'IA embarquee est acceptable pour les donnees de sante.</p>
+          <div id="ia-comparison"></div>
+          <div class="alert alert--info" style="margin-top: var(--sp-4);">
+            <strong>Note methodologique:</strong> Ce module de demonstration a ete concu avec l'assistance d'IA generative pour la structuration du contenu pedagogique. Cependant, <strong>toute la logique metier Oracle, l'architecture logicielle, et les validations techniques ont ete realisees par un ingenieur expert</strong> (approche Human-in-the-Loop). Aucune donnee de sante n'a ete utilisee, transmise ou traitee par un systeme d'IA externe.
+          </div>
+        </div>
+      </div>
+      <div class="card fade-in">
+        <div class="card__title"><span class="card__title-icon">&#127758;</span> Architecture Cloud Souverain - OCI France (HDS)</div>
+        <div class="grid-4" id="sovereign-arch"></div>
+        <div class="alert alert--success" style="margin-top: var(--sp-4);">
+          <strong>Conformite:</strong> OCI Region France (Paris) certifiee HDS, ISO 27001, ISO 27018, SOC 1/2. Chiffrement TDE active par defaut. BYOK supporte via OCI Vault.
+          <br><span class="data-mono">Region: eu-france-1 | Data Residency: France | Certification HDS: ANS</span>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================
+         HELP MODALS - 4 contextuelle help panels
+         ============================================================ -->
+
+    <!-- Overlay shared by all modals -->
+    <div class="help-overlay" id="help-overlay" aria-hidden="true"></div>
+
+    <!-- MODAL 1: Multitenant -->
+    <div class="help-modal" id="help-multitenant" role="dialog" aria-modal="true" aria-labelledby="help-multitenant-title" aria-hidden="true">
+      <div class="help-modal__header">
+        <div class="help-modal__title" id="help-multitenant-title">Module 1 - Multitenant CDB/PDB</div>
+        <button class="help-modal__close" aria-label="Fermer l'aide" tabindex="0">&times;</button>
+      </div>
+      <div class="help-modal__body">
+
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--objective">Objectif de la Simulation</div>
+          <p class="help-modal__text">Ce module modelise l'architecture <code>Multitenant</code> d'Oracle 12c+ dans un contexte CHU. Il demontre trois phenomenes internes critiques :</p>
+          <ul class="help-modal__list">
+            <li><strong>Isolation logique CDB/PDB</strong> : Le <code>CDB$ROOT</code> heberge le dictionnaire de donnees partage (SYSTEM, SYSAUX, Undo). Chaque PDB (Pluggable Database) possede ses propres tablespaces utilisateurs mais partage les structures de controle. L'isolation est logique, non physique : une contention sur le dictionnaire partage affecte tous les PDBs.</li>
+            <li><strong>Resource Manager</strong> : Le <code>DEFAULT_CDB_PLAN</code> distribue les ressources CPU/IO via des <em>shares</em> proportionnelles. Les PDBs critiques (Urgences, Bloc operatoire) recoivent des shares eleves garantissant un SLA meme sous contention. Les PDBs de recherche fonctionnent en best-effort.</li>
+            <li><strong>Data Masking RGPD</strong> : Lors du clonage PDB (production vers test/recherche), <code>DBMS_DATA_MASKING</code> anonymise les champs sensibles (NIR, nom, diagnostic) pour conformite RGPD Art. 25 (Privacy by Design).</li>
+          </ul>
+        </div>
+
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--controls">Controles Disponibles</div>
+          <ul class="help-modal__list">
+            <li><strong>Sliders de shares</strong> : Ajustez les parts CPU/IO pour chaque PDB (0 a 10). Le pourcentage alloue est calcule proportionnellement au total des shares. Un PDB avec 0 share ne recoit aucune ressource garantie.</li>
+            <li><strong>Appliquer le Plan</strong> : Valide la repartition et affiche un diagnostic de conformite SLA (les PDBs critiques doivent avoir &gt;= 50% du total).</li>
+            <li><strong>Reset Defaut</strong> : Restaure les shares par defaut (Urgences:4, Bloc:3, PMSI:2, Recherche:1).</li>
+            <li><strong>Simuler Pic de Charge</strong> : Genere une sequence temporelle simulant la contention sur les latches <code>row cache objects</code> et <code>shared pool</code> quand 4 PDBs accedent simultanement au dictionnaire partage du <code>CDB$ROOT</code>.</li>
+            <li><strong>Executer DBMS_DATA_MASKING</strong> : Applique le masque sur les champs NIR et nom dans le PDB cible, demontrant le processus de clonage conforme RGPD.</li>
+          </ul>
+        </div>
+
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--indicators">Indicateurs Cles</div>
+          <ul class="help-modal__list">
+            <li><strong>Latch Waits/sec</strong> : Nombre d'attentes sur les latches du dictionnaire. Un pic indique une contention qui degrade le temps de reponse de tous les PDBs.</li>
+            <li><strong>Dict Cache Hit Ratio</strong> : Taux de hit du dictionnaire de donnees en memoire. En dessous de 95%, les hard parses augmentent, degradant les performances.</li>
+            <li><strong>CPU % par PDB</strong> : Repartition proportionnelle issue des shares. Verifiez que les PDBs critiques (Urgences, Bloc) totalisent au moins 50%.</li>
+          </ul>
+        </div>
+
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--hds">Contexte HDS / CHU</div>
+          <p class="help-modal__text">Dans un CHU, l'isolation multitenant permet de separer les environnements (production, recherche, test) sur une seule instance Oracle, reduisant les couts de licence et d'administration. Le <strong>Data Masking</strong> est obligatoire pour tout clonage vers un environnement non-production contenant des donnees de santé. Les <strong>Resource Plans</strong> garantissent que les processus critiques (Urgences, Bloc operatoire) ne sont jamais affames par des requetes de recherche ou des batchs PMSI/T2A.</p>
+        </div>
+
+      </div>
+      <div class="help-modal__footer">
+        <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+      </div>
+    </div>
+
+    <!-- MODAL 2: SGA/PGA -->
+    <div class="help-modal" id="help-memory" role="dialog" aria-modal="true" aria-labelledby="help-memory-title" aria-hidden="true">
+      <div class="help-modal__header">
+        <div class="help-modal__title" id="help-memory-title">Module 2 - SGA / PGA Internals</div>
+        <button class="help-modal__close" aria-label="Fermer l'aide" tabindex="0">&times;</button>
+      </div>
+      <div class="help-modal__body">
+
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--objective">Objectif de la Simulation</div>
+          <p class="help-modal__text">Ce module modelise la gestion memoire interne d'Oracle, couvrant trois mecanismes algorithmiques fondamentaux :</p>
+          <ul class="help-modal__list">
+            <li><strong>Buffer Cache LRU / Touch Count</strong> : Oracle utilise un algorithme de remplacement de blocs base sur le <em>Touch Count</em> (introduit en 10g). Les blocs accedes frequemment migrent vers la "hot end" de la liste LRU. Les full table scans inserent les blocs au "midpoint" avec TC=0, evitant de polluer le cache avec des donnees a usage unique.</li>
+            <li><strong>Latch Cache Buffers Chains (CBC)</strong> : Les latches protegent les chaines de hash du buffer cache. Quand N sessions accedent concurrentiellement au meme block (hot block), la contention est <em>quadratique</em> : le temps total d'attente croit comme O(N^2). Le mecanisme de spin/sleep determine la gravite de la contention.</li>
+            <li><strong>PGA Work Areas &amp; Temp Spill</strong> : Chaque session dispose d'une zone memoire privee (PGA) pour les operations de tri, hash join, et bitmap merge. Quand l'operation excede la memoire allouee (<code>PGA_AGGREGATE_TARGET</code>), Oracle bascule sur des <em>Temp Segments</em> en disque, multipliant la latence par 500 a 10000.</li>
+          </ul>
+        </div>
+
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--controls">Controles Disponibles</div>
+          <ul class="help-modal__list">
+            <li><strong>SGA_TARGET slider</strong> : Redimensionne la taille totale de la SGA (1024 a 16384 MB). Le <em>Auto-Tune</em> (AMM) analyse les advisors internes et propose une valeur optimale.</li>
+            <li><strong>Acces Bloc (Touch)</strong> : Incremente le Touch Count d'un bloc aleatoire, simulant un acces recurrent. Observez la migration vers la HOT END.</li>
+            <li><strong>Full Table Scan</strong> : Simule un parcours sequentiel complet : les blocs touches recoivent TC=0 et restent a la COLD END grace au Midpoint Insertion.</li>
+            <li><strong>Checkpoint / Flush</strong> : Declenche un checkpoint : tous les dirty blocks sont marques pour ecriture par DBWR, les TC sont decrementes.</li>
+            <li><strong>Sessions Concurrentes (latch)</strong> : Definit le nombre de sessions accedant au meme hot block (1 a 32). La contention croit de maniere quadratique.</li>
+            <li><strong>Taille du Tri / PGA Limit</strong> : Definit la taille de l'operation de sort et le plafond PGA. Si le tri excede 20% du PGA (work area), un Temp Spill se produit.</li>
+          </ul>
+        </div>
+
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--indicators">Indicateurs Cles</div>
+          <ul class="help-modal__list">
+            <li><strong>Touch Count (TC)</strong> : Blocs avec TC >= 3 migrent vers la HOT END. TC = 0 signifie bloc froid (FTS ou jamais accede).</li>
+            <li><strong>DIRTY / PINNED</strong> : Un bloc DIRTY a ete modifie en memoire mais pas encore ecrit sur disque. Un bloc PINNED est en cours d'utilisation par une session.</li>
+            <li><strong>Wait Time Total (latch)</strong> : Temps cumule d'attente sur le latch CBC. Comparez les valeurs entre 4 et 32 sessions pour observer la croissance quadratique.</li>
+            <li><strong>Mode execution (PGA)</strong> : OPTIMAL (tout en memoire) vs SPILLED (bascule disque). Le temps total en mode SPILLED inclut la penalite I/O disque (50ms/MB vs 0.1ms/MB en memoire).</li>
+          </ul>
+        </div>
+
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--hds">Contexte HDS / CHU</div>
+          <p class="help-modal__text">Les requetes PMSI/T2A de facturation impliquent des aggregations sur des millions de sejours (RSA). Un Temp Spill sur ces requetes peut bloquer la production T2A pendant plusieurs minutes, impactant la facturation mensuelle du CHU. La contention sur les latches CBC peut survenir quand plusieurs sessions accedent aux memes blocs de reference (tables de parametres, nomenclatures). Le dimensionnement correct du SGA (via AMM) et du PGA garantit des temps de reponse stables pour les workflows critiques.</p>
+        </div>
+
+      </div>
+      <div class="help-modal__footer">
+        <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+      </div>
+    </div>
+
+    <!-- MODAL 3: I/O & Coherence -->
+    <div class="help-modal" id="help-io" role="dialog" aria-modal="true" aria-labelledby="help-io-title" aria-hidden="true">
+      <div class="help-modal__header">
+        <div class="help-modal__title" id="help-io-title">Module 3 - I/O &amp; Coherence</div>
+        <button class="help-modal__close" aria-label="Fermer l'aide" tabindex="0">&times;</button>
+      </div>
+      <div class="help-modal__body">
+
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--objective">Objectif de la Simulation</div>
+          <p class="help-modal__text">Ce module modelise le cycle de vie complet d'une transaction Oracle et les mecanismes de garantie de coherence, couvrant quatre concepts fondamentaux :</p>
+          <ul class="help-modal__list">
+            <li><strong>Cycle Redo/Undo</strong> : Chaque DML genere deux traces : les <em>Undo blocks</em> (avant-image, pour le rollback et la read consistency) dans le tablespace UNDO, et les <em>Redo entries</em> (apres-image, pour la recovery) dans le <code>Redo Log Buffer</code>. Au commit, <code>LGWR</code> force l'ecriture synchrone des redo entries sur disque. Les dirty blocks sont ecrits asynchronement par <code>DBWR</code> (lazy write).</li>
+            <li><strong>SCN (System Change Number)</strong> : Horloge logique d'Oracle, incrementee a chaque commit. Le SCN garantit la <em>read consistency</em> : une requete voit les donnees telles qu'elles etaient a son SCN de depart, reconstruites via l'Undo si necessaire.</li>
+            <li><strong>Instance Recovery</strong> : Apres un crash (<code>SHUTDOWN ABORT</code>), <code>SMON</code> execute deux phases : <em>Redo Apply</em> (roll-forward, rejoue tous les redo records depuis le dernier checkpoint) puis <em>Undo Apply</em> (rollback des transactions non commitrees). La base est alors ouverte et coherente.</li>
+            <li><strong>ORA-01555 Snapshot Too Old</strong> : Erreur critique survenant quand les donnees Undo necessaires a la read consistency d'une longue requete ont ete ecrasees par des DMLs concurrents. Le risque depend de <code>UNDO_RETENTION</code>, de la duree de la requete, et du taux de rotation Undo.</li>
+          </ul>
+        </div>
+
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--controls">Controles Disponibles</div>
+          <ul class="help-modal__list">
+            <li><strong>Executer Transaction Complete</strong> : Anime le cycle BEGIN -&gt; DML (Undo) -&gt; Redo -&gt; COMMIT (LGWR) -&gt; DBWR, avec changement de couleur des marqueurs a chaque etape.</li>
+            <li><strong>Simuler Crash (SHUTDOWN ABORT)</strong> : Simule un crash instance : les dirty blocks en Buffer Cache sont perdus. Les marqueurs passent en rouge (erreur).</li>
+            <li><strong>Instance Recovery</strong> : Execute la sequence de recovery SMON : Redo Apply puis Undo Apply. Les marqueurs repassent au vert.</li>
+            <li><strong>Commit (SCN++)</strong> : Incremente le SCN, simulant un commit. Le compteur SCN central s'actualise.</li>
+            <li><strong>Query a SCN donne</strong> : Simule une Flashback Query (<code>AS OF SCN</code>), reconstruisant l'image des donnees a un SCN historique via l'Undo.</li>
+            <li><strong>Simuler Lecture Coherente</strong> : Affiche deux sessions paralleles : Session A voit les donnees a son SCN de depart (reconstruites via Undo), Session B voit les modifications courantes. Demontre que Session A n'est pas affectee par les modifications de Session B.</li>
+            <li><strong>UNDO_RETENTION slider</strong> : Definit la duree de conservation des Undo blocks (60 a 3600 secondes). Combine avec la duree de requete et la charge DML, determine le risque d'ORA-01555.</li>
+          </ul>
+        </div>
+
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--indicators">Indicateurs Cles</div>
+          <ul class="help-modal__list">
+            <li><strong>Compteur SCN</strong> : S'auto-incremente toutes les 2 secondes (simulation d'activite background). Chaque commit avance le SCN.</li>
+            <li><strong>Marqueurs de flux</strong> : 5 etapes colorees (gris = en attente, bleu = en cours, vert = complete, rouge = erreur). Permettent de suivre visuellement la progression de la transaction.</li>
+            <li><strong>Retention effective</strong> : Valeur calculee = UNDO_RETENTION * (1 - DML_load / 200). Si la duree de requete excede cette valeur, ORA-01555 se produit.</li>
+            <li><strong>Log console ORA-01555</strong> : Affiche la progression de la requete longue et le moment ou les Undo blocks sont ecrases.</li>
+          </ul>
+        </div>
+
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--hds">Contexte HDS / CHU</div>
+          <p class="help-modal__text">La <strong>coherence de lecture</strong> est vitale pour la facturation T2A : une requete de facturation lancée a 23h doit produire le meme resultat qu'une requete identique lancée a 23h05, meme si des modifications sont en cours. Le <strong>SCN</strong> garantit cette propriete. L'<strong>Instance Recovery</strong> assure qu'aucune donnee n'est corrompue apres un crash, meme pendant un pic d'activite aux Urgences. L'<strong>ORA-01555</strong> peut faire echouer les batchs de facturation nocturnes : un <code>UNDO_RETENTION</code> mal calibre (ou un tablespace UNDO sous-dimensionne) provoque l'echec de requetes de plusieurs heures.</p>
+        </div>
+
+      </div>
+      <div class="help-modal__footer">
+        <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+      </div>
+    </div>
+
+    <!-- MODAL 4: Cloud Souverain & IA -->
+    <div class="help-modal" id="help-cloud" role="dialog" aria-modal="true" aria-labelledby="help-cloud-title" aria-hidden="true">
+      <div class="help-modal__header">
+        <div class="help-modal__title" id="help-cloud-title">Module 4 - Cloud Souverain &amp; IA Controlee</div>
+        <button class="help-modal__close" aria-label="Fermer l'aide" tabindex="0">&times;</button>
+      </div>
+      <div class="help-modal__body">
+
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--objective">Objectif de la Simulation</div>
+          <p class="help-modal__text">Ce module adresse les enjeux de souverainete des donnees de santé et d'usage de l'IA dans un contexte hospitalier reglemente (HDS, RGPD, ANS) :</p>
+          <ul class="help-modal__list">
+            <li><strong>TDE (Transparent Data Encryption) AES-256</strong> : Chiffrement des donnees au repos (data-at-rest) au niveau tablespace. La cle maitresse est stockee dans un HSM (Hardware Security Module). En mode <code>BYOK</code> (Bring Your Own Key), le CHU controle ses propres cles, independamment d'Oracle.</li>
+            <li><strong>Auto-Tuning (IA embarquee)</strong> : L'Autonomous Database integre un moteur d'optimisation local : creation automatique d'indexes, <em>SQL Plan Management</em> (SPM), collecte adaptive de statistiques. Aucune donnee ne quitte le perimetre OCI France.</li>
+            <li><strong>IA embarquee vs IA generative externe</strong> : Distinction methodologique critique. L'IA embarquee (Auto-Tuning) s'execute localement sur l'instance, sans transfert de donnees. L'IA generative externe (LLM cloud) implique un transfert de donnees hors du perimetre HDS, soumis au RGPD Art. 44-49 (transferts internationaux).</li>
+            <li><strong>Souverainete OCI France</strong> : Architecture en couches : HSM (cles) -&gt; TDE (chiffrement) -&gt; Autonomous DB (eu-france-1) -&gt; Data CHU. Chaque couche est certifiee HDS par l'ANS.</li>
+          </ul>
+        </div>
+
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--controls">Controles Disponibles</div>
+          <ul class="help-modal__list">
+            <li><strong>Chiffrer (TDE AES-256)</strong> : Simule le chiffrement des champs sensibles (NIR, nom, diagnostic). Affiche les cles hexadecimales simulees avec les metadonnees de chiffrement (Key ID, algorithme, mode).</li>
+            <li><strong>Dechiffrer (Cle HSM)</strong> : Tente de dechiffrer avec la cle HSM. Si la cle a ete revoquee, l'operation echoue (ORA-28365), demontrant que sans la cle, les donnees sont irrecuperables.</li>
+            <li><strong>Revoquer Cle (BYOK)</strong> : Simule la rotation de cle maitresse. Apres revocation, le dechiffrement est impossible jusqu'a la re-importation de la nouvelle cle. En production HDS, une periode de coexistence des cles est necessaire.</li>
+            <li><strong>Lancer Auto-Tuning</strong> : Execute une simulation d'analyse de plan d'execution avec 3 recommandations : creation d'index, SQL Plan Baseline, et ajustement des statistiques. Affiche l'amelioration de performance estimee (x21).</li>
+          </ul>
+        </div>
+
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--indicators">Indicateurs Cles</div>
+          <ul class="help-modal__list">
+            <li><strong>Statut TDE</strong> : <code>V$ENCRYPTED_TABLESPACES: ENCRYPTED</code> confirme le chiffrement actif. Overhead CPU : ~3-5%.</li>
+            <li><strong>Revoquer Cle</strong> : <code>ORA-28365: wallet is not open</code> confirme que la revocation rend les donnees inaccesibles. C'est le comportement attendu et desire.</li>
+            <li><strong>Auto-Tuning</strong> : <code>V$SQL_AUTO_INDEX: INDEX CREATED</code> et <code>SQL_PLAN_BASELINE: ACCEPTED</code> confirment les optimisations appliquees automatiquement.</li>
+            <li><strong>Tableau comparatif IA</strong> : Compare IA embarquee vs generative externe sur 5 criteres : localisation des donnees, conformite RGPD, certification HDS, controle humain, et cas d'usage.</li>
+          </ul>
+        </div>
+
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--hds">Contexte HDS / CHU</div>
+          <p class="help-modal__text">Dans un contexte HDS, le <strong>chiffrement TDE</strong> est une mesure de securite obligatoire (Art. 32 RGPD : securite du traitement). Le mode <strong>BYOK</strong> garantit que le CHU conserve la souverainete sur ses cles de chiffrement, independamment du fournisseur cloud. La distinction entre <strong>IA embarquee</strong> et <strong>IA generative externe</strong> est methodologiquement critique : l'IA embarquee ne pose aucun probleme de transfert de donnees de santé (les donnees restent dans OCI France, region certifiee HDS). L'IA generative externe necessite une analyse d'impact RGPD (DPIA) et potentiellement des clauses contractuelles pour les transferts hors UE. L'<strong>approche Human-in-the-Loop</strong> garantit que toute recommandation d'IA (auto-tuning) est soumise a validation humaine avant application en production.</p>
+        </div>
+
+      </div>
+      <div class="help-modal__footer">
+        <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+      </div>
+    </div>
+    <footer class="app-footer">
+      ORACLE_HDS::DEMO - Application de demonstration technique<br>
+      DONNEES: 100% FICTIVES - Conforme RGPD Art. 25 (Privacy by Design) - Aucune donnee de sante reelle<br>
+      Architecture: ES6 Classes - Vanilla JS - Zero Dependency - Offline<br>
+      Concu pour demonstration DSI CHU - Usage pedagogique et technique uniquement
+    </footer>
+  </main>
+</div>
+
+<script>
+'use strict';
+
+/* ============================================================
+   CORE INFRASTRUCTURE
+   ============================================================ */
+
+const Logger = (() => {
+  const LEVELS = { DEBUG: 0, INFO: 1, WARN: 2, ERROR: 3 };
+  const COLORS = { DEBUG: '#64748b', INFO: '#3b82f6', WARN: '#f59e0b', ERROR: '#ef4444' };
+  const prefix = '[OracleHDS]';
+  function _log(level, ...args) {
+    const ts = new Date().toISOString().slice(11, 19);
+    console.log('%c' + prefix + ' [' + ts + '] [' + level + ']', 'color: ' + (COLORS[level]||'#fff') + '; font-weight: bold;', ...args);
+  }
+  return { debug: (...a) => _log('DEBUG', ...a), info: (...a) => _log('INFO', ...a), warn: (...a) => _log('WARN', ...a), error: (...a) => _log('ERROR', ...a) };
+})();
+
+class EventDispatcher {
+  constructor() { this._listeners = new Map(); }
+  on(event, callback) {
+    if (!this._listeners.has(event)) this._listeners.set(event, []);
+    this._listeners.get(event).push(callback);
+  }
+  emit(event, payload) {
+    const cbs = this._listeners.get(event) || [];
+    cbs.forEach(cb => { try { cb(payload); } catch(e) { Logger.error('Listener error:', e); } });
+  }
+  off(event, callback) {
+    const cbs = this._listeners.get(event) || [];
+    const idx = cbs.indexOf(callback);
+    if (idx >= 0) cbs.splice(idx, 1);
+  }
+}
+
+class StateManager {
+  constructor() { this._state = new Map(); this.events = new EventDispatcher(); Logger.info('StateManager initialized'); }
+  set(key, value) { const old = this._state.get(key); this._state.set(key, value); this.events.emit('state:' + key, { key, old, value }); this.events.emit('state:changed', { key, old, value }); }
+  get(key, defaultValue) { return this._state.has(key) ? this._state.get(key) : defaultValue; }
+  subscribe(key, callback) { this.events.on('state:' + key, callback); }
+}
+
+/* ============================================================
+   FAKE DATA GENERATOR - DONNEES 100% FICTIVES / RGPD
+   ============================================================ */
+
+class FakeDataGenerator {
+  constructor() { this._patientCounter = 0; this._sejourCounter = 0; }
+  generateNIR() { return 'NIR_FICTIF_' + String(Math.floor(Math.random() * 9999999999999)).padStart(13, '0'); }
+  generatePatientId() { this._patientCounter++; return 'Patient_TEST_' + String(this._patientCounter).padStart(3, '0'); }
+  generatePatientNom() {
+    const noms = ['TEST_ALPHA', 'TEST_BETA', 'TEST_GAMMA', 'TEST_DELTA', 'TEST_EPSILON', 'TEST_ZETA', 'TEST_ETA', 'TEST_THETA'];
+    return noms[Math.floor(Math.random() * noms.length)];
+  }
+  generateSejourId() { this._sejourCounter++; return 'Sejour_SIMU_' + String(this._sejourCounter).padStart(4, '0'); }
+  generateMedecinId() { return 'Dr_DUMMY_' + String(Math.floor(Math.random() * 10) + 1).padStart(2, '0'); }
+  generateService() {
+    const svcs = ['SRV_URGENCES', 'SRV_BLOC_OPERATOIRE', 'SRV_RADIOLOGIE', 'SRV_PMSI', 'SRV_RECHERCHE', 'SRV_CARDIO', 'SRV_REA'];
+    return svcs[Math.floor(Math.random() * svcs.length)];
+  }
+  generateMontantT2A() { return Math.round((Math.random() * 15000 + 500) * 100) / 100; }
+  generateDataset(count) {
+    const patients = [];
+    for (let i = 0; i < count; i++) {
+      patients.push({ id: this.generatePatientId(), nir: this.generateNIR(), nom: this.generatePatientNom(), medecin: this.generateMedecinId(), service: this.generateService(), montant_t2a: this.generateMontantT2A(), sejour_id: this.generateSejourId(), _meta: 'FICTIF - Ne pas utiliser en production' });
+    }
+    return patients;
+  }
+}
+
+/* ============================================================
+   DATABASE ENGINE - Moteur Oracle Simule
+   ============================================================ */
+
+class DatabaseEngine {
+  constructor(stateManager) {
+    this._state = stateManager;
+    this._scn = 0;
+    this._transactions = new Map();
+    this._undoTable = [];
+    this._redoLog = [];
+    this._state.set('scn', 0);
+    this._state.set('activeTxns', 0);
+    Logger.info('DatabaseEngine initialized - SCN=0');
+  }
+  get scn() { return this._scn; }
+  commit() { this._scn++; this._state.set('scn', this._scn); Logger.info('COMMIT - SCN=' + this._scn); return this._scn; }
+  beginTransaction(txnId) {
+    const txn = { id: txnId, scn_start: this._scn, status: 'ACTIVE', undo_entries: [], redo_entries: [] };
+    this._transactions.set(txnId, txn);
+    this._state.set('activeTxns', this._transactions.size);
+    Logger.info('BEGIN TXN ' + txnId + ' SCN_start=' + this._scn);
+    return txn;
+  }
+  executeDML(txnId, operation, data) {
+    const txn = this._transactions.get(txnId);
+    if (!txn) throw new Error('Transaction ' + txnId + ' introuvable');
+    const undo = { scn: this._scn, operation: 'UNDO_' + operation, data: Object.assign({}, data), txn_id: txnId };
+    this._undoTable.push(undo); txn.undo_entries.push(undo);
+    const redo = { scn: this._scn, operation: 'REDO_' + operation, data: Object.assign({}, data), txn_id: txnId, timestamp: Date.now() };
+    this._redoLog.push(redo); txn.redo_entries.push(redo);
+    Logger.debug('DML ' + operation + ' in ' + txnId + ' - Undo/Redo generes');
+  }
+  instanceRecovery() {
+    const steps = []; const activeTxns = [];
+    steps.push({ phase: 'Redo Apply', desc: 'Rejeu de tous les redo records depuis le dernier checkpoint', count: this._redoLog.length });
+    Logger.info('Recovery - Redo Apply: ' + this._redoLog.length + ' records');
+    this._transactions.forEach((txn, id) => { if (txn.status === 'ACTIVE') activeTxns.push(id); });
+    steps.push({ phase: 'Undo Apply', desc: 'Rollback de ' + activeTxns.length + ' txns non commitees', txns: activeTxns });
+    Logger.info('Recovery - Undo Apply: ' + activeTxns.length + ' txns a rollbacker');
+    this._transactions.clear();
+    this._state.set('activeTxns', 0);
+    steps.push({ phase: 'Database Open', desc: 'Base ouverte et coherente', scn: this._scn });
+    return { status: 'RECOVERED', steps: steps, activeTxnsRollbacked: activeTxns.length };
+  }
+  applyDataMasking(dataset) {
+    return dataset.map(row => ({
+      id: row.id, nir: 'XXXX-XXX-XXX-' + row.nir.slice(-4), nom: 'PATIENT_MASQUE',
+      medecin: row.medecin, service: row.service, montant_t2a: row.montant_t2a,
+      sejour_id: row.sejour_id, _meta: 'MASQUE - DBMS_DATA_MASKING applique', _masked_fields: ['nir', 'nom']
+    }));
+  }
+  tdeEncrypt(plaintext) {
+    var chars = '0123456789ABCDEF'; var enc = 'TDE$AES256$';
+    for (var i = 0; i < plaintext.length; i++) enc += chars[Math.floor(Math.random() * chars.length)];
+    return enc;
+  }
+  checkORA1555(undoRetention, queryDuration, dmlLoad) {
+    const effectiveRetention = undoRetention * (1 - (dmlLoad / 200));
+    const willFail = queryDuration > effectiveRetention;
+    const riskPercent = Math.min(100, Math.round((queryDuration / Math.max(effectiveRetention, 1)) * 50));
+    return { willFail: willFail, riskPercent: riskPercent, effectiveRetention: Math.round(effectiveRetention),
+      error: willFail ? 'ORA-01555: snapshot too old: rollback segment number too small' : null,
+      recommendation: willFail ? 'Augmenter UNDO_RETENTION a au moins ' + Math.ceil(queryDuration * 1.5) + 's ou activer GUARANTEE' : 'UNDO_RETENTION suffisant pour cette charge' };
+  }
+}
+
+/* ============================================================
+   MODULE 1: MULTITENANT ARCHITECTURE
+   ============================================================ */
+
+class MultitenantModule {
+  constructor(state, engine, fakeData) {
+    this._state = state; this._engine = engine; this._fakeData = fakeData;
+    this._pdbShares = { PDB_URGENCES: 4, PDB_BLOC: 3, PDB_PMSI: 2, PDB_RECHERCHE: 1 };
+  }
+  init() { this._renderPDBDiagram(); this._renderResourcePlan(); this._renderDataMasking(); this._bindEvents(); Logger.info('MultitenantModule initialized'); }
+
+  _renderPDBDiagram() {
+    var c = document.getElementById('pdb-diagram'); if (!c) return;
+    var pdbs = [
+      { name: 'PDB_URGENCES', type: 'critical', cpu: '25%', io: 'HIGH', desc: 'SLA < 100ms' },
+      { name: 'PDB_BLOC', type: 'critical', cpu: '25%', io: 'HIGH', desc: 'SLA < 50ms' },
+      { name: 'PDB_PMSI', type: 'normal', cpu: '15%', io: 'MED', desc: 'Batch T2A' },
+      { name: 'PDB_RECHERCHE', type: 'warning', cpu: '5%', io: 'LOW', desc: 'Best effort' }
+    ];
+    c.innerHTML = pdbs.map(function(p) {
+      var tc = p.type === 'critical' ? 'red' : p.type === 'warning' ? 'amber' : 'green';
+      return '<div class="diagram-node diagram-node--' + p.type + '"><div class="diagram-node__title">' + p.name + '</div><div class="diagram-node__detail">CPU: ' + p.cpu + ' | I/O: ' + p.io + '</div><div class="diagram-node__detail">' + p.desc + '</div><div style="margin-top:var(--sp-2);"><span class="tag tag--' + tc + '">' + p.type.toUpperCase() + '</span></div></div>';
+    }).join('');
+  }
+
+  _renderResourcePlan() {
+    var c = document.getElementById('resource-plan-controls'); if (!c) return;
+    var self = this;
+    var names = Object.keys(this._pdbShares);
+    c.innerHTML = names.map(function(name) {
+      var isCrit = name.indexOf('URGENCES') >= 0 || name.indexOf('BLOC') >= 0;
+      return '<div class="slider-group" style="margin-bottom:var(--sp-3);"><div class="slider-group__header"><span class="slider-group__label">' + name + (isCrit ? ' <span class="tag tag--red">CRITIQUE</span>' : '') + '</span><span class="slider-group__value" id="share-val-' + name + '">' + self._pdbShares[name] + '</span></div><input type="range" id="share-slider-' + name + '" min="0" max="10" step="1" value="' + self._pdbShares[name] + '" data-pdb="' + name + '"></div>';
+    }).join('');
+    names.forEach(function(name) {
+      var slider = document.getElementById('share-slider-' + name);
+      var valDisp = document.getElementById('share-val-' + name);
+      if (slider && valDisp) slider.addEventListener('input', function() { self._pdbShares[name] = parseInt(slider.value); valDisp.textContent = slider.value; });
+    });
+  }
+
+  _renderDataMasking() {
+    var c = document.getElementById('data-masking-demo'); if (!c) return;
+    var data = this._fakeData.generateDataset(3);
+    c.innerHTML = '<div><div class="data-label" style="margin-bottom:var(--sp-2);">Source (PDB_PRODUCTION)</div><table class="data-table"><thead><tr><th>ID</th><th>NIR</th><th>Nom</th></tr></thead><tbody id="masking-source">' + data.map(function(d) { return '<tr><td>' + d.id + '</td><td class="clear-text">' + d.nir + '</td><td class="clear-text">' + d.nom + '</td></tr>'; }).join('') + '</tbody></table></div><div style="display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);color:var(--color-amber);font-size:var(--fs-xl);">&#8594;</div><div><div class="data-label" style="margin-bottom:var(--sp-2);">Cible (PDB_RECHERCHE - Clone & Masque)</div><table class="data-table"><thead><tr><th>ID</th><th>NIR</th><th>Nom</th></tr></thead><tbody id="masking-target"><tr><td colspan="3" style="color:#64748b;font-style:italic;">En attente du masking...</td></tr></tbody></table></div>';
+  }
+
+  _bindEvents() {
+    var self = this;
+    var b1 = document.getElementById('btn-apply-plan'); if (b1) b1.addEventListener('click', function() { self._applyPlan(); });
+    var b2 = document.getElementById('btn-reset-plan'); if (b2) b2.addEventListener('click', function() { self._pdbShares = { PDB_URGENCES: 4, PDB_BLOC: 3, PDB_PMSI: 2, PDB_RECHERCHE: 1 }; self._renderResourcePlan(); document.getElementById('resource-plan-result').innerHTML = '<div class="alert alert--info">Plan reinitialise a DEFAULT_CDB_PLAN.</div>'; });
+    var b3 = document.getElementById('btn-sim-contention'); if (b3) b3.addEventListener('click', function() { self._simulateContention(); });
+    var b4 = document.getElementById('btn-run-masking'); if (b4) b4.addEventListener('click', function() { self._runMasking(); });
+    var b5 = document.getElementById('btn-verify-masking'); if (b5) b5.addEventListener('click', function() { self._verifyMasking(); });
+  }
+
+  _applyPlan() {
+    var total = 0; Object.values(this._pdbShares).forEach(function(v) { total += v; });
+    if (total === 0) { document.getElementById('resource-plan-result').innerHTML = '<div class="alert alert--error">ERREUR: Aucun share alloue.</div>'; return; }
+    var self = this; var result = [];
+    Object.entries(this._pdbShares).forEach(function(entry) {
+      var name = entry[0], shares = entry[1];
+      var pct = ((shares / total) * 100).toFixed(1);
+      var isCrit = name.indexOf('URGENCES') >= 0 || name.indexOf('BLOC') >= 0;
+      result.push({ name: name, shares: shares, pct: pct, isCritical: isCrit });
+    });
+    var critPct = 0; result.forEach(function(r) { if (r.isCritical) critPct += parseFloat(r.pct); });
+    var ac = critPct >= 50 ? 'success' : 'warning';
+    var msg = critPct >= 50 ? 'PDBs critiques garantis: ' + critPct.toFixed(1) + '% du CPU total - Plan conforme SLA.' : 'ATTENTION: PDBs critiques a ' + critPct.toFixed(1) + '% - Risque violation SLA Urgences/Bloc.';
+    var html = '<div class="alert alert--' + ac + '"><strong>Resource Plan:</strong><br>';
+    result.forEach(function(r) { html += r.name + ': <strong>' + r.pct + '%</strong> (' + r.shares + ' shares) ' + (r.isCritical ? '<span class="tag tag--red">CRITIQUE</span>' : '') + '<br>'; });
+    html += '<br>' + msg + '</div>';
+    document.getElementById('resource-plan-result').innerHTML = html;
+    Logger.info('Resource Plan applique - Total: ' + total + ' - Critiques: ' + critPct.toFixed(1) + '%');
+  }
+
+  _simulateContention() {
+    var log = document.getElementById('contention-log'); var lw = document.getElementById('latch-waits'); var dh = document.getElementById('dict-cache-hit');
+    var entries = [
+      { l: 'warn', t: 'Pic de charge - 4 PDB accedent simultanement au dictionnaire partage' },
+      { l: 'error', t: 'LATCH: row cache objects - 234 waits en 0.5s' },
+      { l: 'warn', t: 'LATCH: shared pool - contention sur CDB$ROOT (shared dictionary miss)' },
+      { l: 'info', t: 'PDB_URGENCES: dict cache hit ratio chute a 87.3%' },
+      { l: 'error', t: 'Session hang sur PDB_RECHERCHE (full parse storm)' },
+      { l: 'info', t: 'Auto-resolution: Oracle augmente _shared_pool_reserved_pct' },
+      { l: 'success', t: 'Contention resolue apres 2.3s - Hit ratio restaure a 99.1%' }
+    ];
+    var idx = 0;
+    var iv = setInterval(function() {
+      if (idx >= entries.length) { clearInterval(iv); if(lw) lw.textContent = '12'; if(dh) dh.textContent = '99.1%'; return; }
+      var e = entries[idx]; var ts = new Date().toISOString().slice(11, 19);
+      if (log) { log.innerHTML += '<div class="log-console__entry log-console__entry--' + e.l + '"><span class="log-console__timestamp">[' + ts + ']</span>' + e.t + '</div>'; log.scrollTop = log.scrollHeight; }
+      if (lw) lw.textContent = Math.floor(Math.random() * 500 + 50);
+      if (dh) dh.textContent = (Math.random() * 10 + 88).toFixed(1) + '%';
+      idx++;
+    }, 600);
+    Logger.warn('Contention dictionnaire simulee');
+  }
+
+  _runMasking() {
+    var data = this._fakeData.generateDataset(3);
+    var masked = this._engine.applyDataMasking(data);
+    var target = document.getElementById('masking-target');
+    if (target) target.innerHTML = masked.map(function(d) { return '<tr><td>' + d.id + '</td><td class="masked">' + d.nir + '</td><td class="masked">' + d.nom + '</td></tr>'; }).join('');
+    document.getElementById('masking-result').innerHTML = '<div class="alert alert--success">DBMS_DATA_MASKING execute avec succes. Champs sensibles (NIR, Nom) masques. Clonage PDB conforme RGPD.</div>';
+    Logger.info('Data Masking applique');
+  }
+
+  _verifyMasking() {
+    document.getElementById('masking-result').innerHTML = '<div class="alert alert--success">&#10003; Verification RGPD: <strong>PAS de donnees sensibles detectees.</strong><br>NIR: masque (format XXXX-XXX-XXX-XXXX) - Nom: remplace par PATIENT_MASQUE<br>Conformite: Art. 25 RGPD (Privacy by Design) - Art. 32 (Securite du traitement)</div>';
+  }
+}
+
+/* ============================================================
+   MODULE 2: MEMORY & ALGORITHMS
+   ============================================================ */
+
+class MemoryModule {
+  constructor(state, engine) { this._state = state; this._engine = engine; this._bufferCache = []; this._maxCacheSize = 8; }
+  init() { this._renderSGA(); this._renderLRU(); this._renderPGA(); this._bindEvents(); Logger.info('MemoryModule initialized'); }
+
+  _renderSGA() {
+    var c = document.getElementById('sga-layout'); if (!c) return;
+    var sga = [
+      { name: 'Buffer Cache', size: 2048, pct: 50, color: 'blue', desc: 'DB_BLOCK_SIZE x blocs' },
+      { name: 'Shared Pool', size: 1024, pct: 25, color: 'cyan', desc: 'Library Cache + Dict Cache' },
+      { name: 'Redo Log Buffer', size: 256, pct: 6, color: 'amber', desc: 'Buffer circulaire - LGWR' },
+      { name: 'Large Pool', size: 512, pct: 13, color: 'green', desc: 'RMAN / Parallel / Streams' },
+      { name: 'Java Pool', size: 128, pct: 3, color: 'purple', desc: 'Java VM (rare en CHU)' },
+      { name: 'Streams Pool', size: 128, pct: 3, color: 'purple', desc: 'GoldenGate / Streams' }
+    ];
+    c.innerHTML = sga.map(function(s) {
+      return '<div class="stat-block stat-block--' + s.color + '"><div class="stat-block__value">' + s.size + '</div><div class="stat-block__label">' + s.name + ' (MB)</div><div class="progress-bar" style="margin-top:var(--sp-2);"><div class="progress-bar__fill progress-bar__fill--' + s.color + '" style="width:' + s.pct + '%;"></div></div><div style="font-size:var(--fs-xs);color:#64748b;margin-top:var(--sp-1);font-family:var(--font-mono);">' + s.desc + '</div></div>';
+    }).join('');
+  }
+
+  _renderLRU() {
+    this._bufferCache = [];
+    var tables = ['PATIENT_TEST', 'PATIENT_TEST', 'PATIENT_TEST', 'SEJOUR_SIMU', 'SEJOUR_SIMU', 'SEJOUR_SIMU', 'FACTURATION_T2A', 'FACTURATION_T2A'];
+    for (var i = 0; i < this._maxCacheSize; i++) {
+      this._bufferCache.push({ id: 'BLK_' + String(i + 1).padStart(3, '0'), touchCount: 0, dirty: false, pinned: false, table: tables[i] });
+    }
+    this._renderLRUList();
+  }
+
+  _renderLRUList() {
+    var c = document.getElementById('lru-visualization'); if (!c) return;
+    var sorted = this._bufferCache.slice().sort(function(a, b) { return b.touchCount - a.touchCount; });
+    var dirtyCount = 0; this._bufferCache.forEach(function(b) { if (b.dirty) dirtyCount++; });
+    c.innerHTML = '<div style="display:flex;justify-content:space-between;font-size:var(--fs-xs);color:#64748b;font-family:var(--font-mono);margin-bottom:var(--sp-2);"><span>&#8592; HOT END (Touch Count eleve)</span><span>COLD END &#8594;</span></div><div style="display:flex;gap:var(--sp-2);overflow-x:auto;padding:var(--sp-2) 0;">' + sorted.map(function(b) {
+      var nc = b.touchCount > 2 ? 'critical' : b.dirty ? 'warning' : 'normal';
+      return '<div class="diagram-node diagram-node--' + nc + '" style="min-width:90px;flex-shrink:0;"><div class="diagram-node__title">' + b.id + '</div><div class="diagram-node__detail">TC: ' + b.touchCount + '</div><div class="diagram-node__detail">' + b.table + '</div>' + (b.dirty ? '<span class="tag tag--amber">DIRTY</span>' : '') + (b.pinned ? '<span class="tag tag--blue">PINNED</span>' : '') + '</div>';
+    }).join('') + '</div><div style="font-size:var(--fs-xs);color:#64748b;margin-top:var(--sp-2);font-family:var(--font-mono);">Blocs en cache: ' + this._bufferCache.length + '/' + this._maxCacheSize + ' | Dirty: ' + dirtyCount + ' | Hit ratio simule: ' + (Math.random() * 5 + 93).toFixed(1) + '%</div>';
+  }
+
+  _renderPGA() {
+    var c = document.getElementById('pga-result'); if (!c) return;
+    c.innerHTML = '<div class="alert alert--info">Ajustez les sliders et cliquez "Executer Requete PMSI" pour simuler un Temp Spill.</div>';
+  }
+
+  _bindEvents() {
+    var self = this;
+    var sgas = document.getElementById('sga-target-slider'); var sgav = document.getElementById('sga-target-val');
+    if (sgas && sgav) sgas.addEventListener('input', function() { sgav.textContent = sgas.value + ' MB'; });
+    var bsga = document.getElementById('btn-apply-sga'); if (bsga) bsga.addEventListener('click', function() { var v = parseInt(sgas.value); document.getElementById('sga-result').innerHTML = '<div class="alert alert--success">SGA_TARGET redimensionne a ' + v + ' MB. AMM ajuste dynamiquement Buffer Cache et Shared Pool.</div>'; });
+    var bats = document.getElementById('btn-auto-tune-sga'); if (bats) bats.addEventListener('click', function() { document.getElementById('sga-result').innerHTML = '<div class="alert alert--info">AMM Auto-Tune: Oracle analyse les advisor et recommande SGA_TARGET = 6144 MB pour la charge CHU actuelle.</div>'; });
+
+    var blrua = document.getElementById('btn-lru-access'); if (blrua) blrua.addEventListener('click', function() { self._lruAccessBlock(); });
+    var blruf = document.getElementById('btn-lru-full-scan'); if (blruf) blruf.addEventListener('click', function() { self._lruFullScan(); });
+    var blruf2 = document.getElementById('btn-lru-flush'); if (blruf2) blruf2.addEventListener('click', function() { self._lruFlush(); });
+
+    var lss = document.getElementById('latch-sessions-slider'); var lsv = document.getElementById('latch-sessions-val');
+    if (lss && lsv) lss.addEventListener('input', function() { lsv.textContent = lss.value; });
+    var blatch = document.getElementById('btn-sim-latch'); if (blatch) blatch.addEventListener('click', function() { self._simulateLatch(); });
+
+    var ss = document.getElementById('sort-size-slider'); var sv = document.getElementById('sort-size-val');
+    if (ss && sv) ss.addEventListener('input', function() { sv.textContent = ss.value; });
+    var ps = document.getElementById('pga-limit-slider'); var pv = document.getElementById('pga-limit-val');
+    if (ps && pv) ps.addEventListener('input', function() { pv.textContent = ps.value; });
+    var bsql = document.getElementById('btn-sim-sql'); if (bsql) bsql.addEventListener('click', function() { self._simulateSQL(); });
+  }
+
+  _lruAccessBlock() {
+    var idx = Math.floor(Math.random() * this._bufferCache.length);
+    this._bufferCache[idx].touchCount++; this._bufferCache[idx].dirty = Math.random() > 0.5;
+    this._renderLRUList();
+    document.getElementById('lru-result').innerHTML = '<div class="alert alert--info">Bloc ' + this._bufferCache[idx].id + ' touche - Touch Count: ' + this._bufferCache[idx].touchCount + '. Migration vers HOT END si TC >= 3.</div>';
+  }
+
+  _lruFullScan() {
+    for (var i = 0; i < 3; i++) { var idx = Math.floor(Math.random() * this._bufferCache.length); this._bufferCache[idx].touchCount = 0; this._bufferCache[idx].dirty = false; }
+    this._renderLRUList();
+    document.getElementById('lru-result').innerHTML = '<div class="alert alert--warning">Full Table Scan simule - Blocs inseres au MIDPOINT (TC=0). Ne polluent PAS la HOT END grace a Touch Count.</div>';
+  }
+
+  _lruFlush() {
+    var dirtyCount = 0; this._bufferCache.forEach(function(b) { if (b.dirty) dirtyCount++; b.dirty = false; b.touchCount = Math.max(0, b.touchCount - 1); });
+    this._renderLRUList();
+    document.getElementById('lru-result').innerHTML = '<div class="alert alert--success">Checkpoint complet - ' + dirtyCount + ' dirty blocks ecrits par DBWR. Buffer Cache nettoye.</div>';
+  }
+
+  _simulateLatch() {
+    var sessions = parseInt(document.getElementById('latch-sessions-slider').value);
+    var log = document.getElementById('latch-log'); var resultDiv = document.getElementById('latch-result');
+    var totalWaitTime = sessions * sessions * 0.5;
+    var spins = Math.min(sessions * 3, 64);
+    var sleeps = Math.max(sessions - 4, 0);
+    var entries = [];
+    for (var i = 0; i < Math.min(sessions, 8); i++) { entries.push({ l: i < 2 ? 'error' : 'warn', t: 'Session ' + (i+1) + ': LATCH "cache buffers chains" - spin=' + spins + ', sleep=' + sleeps + ', wait=' + (totalWaitTime / sessions).toFixed(1) + 'ms' }); }
+    entries.push({ l: sessions > 8 ? 'error' : 'warn', t: 'Contention totale: ' + totalWaitTime.toFixed(0) + 'ms | Hot Block CBC Latch | Sessions: ' + sessions });
+    entries.push({ l: 'success', t: 'Recommendation: ' + (sessions > 8 ? 'Partitionner les donnees / Reduire les full scans concurrents' : 'Contention acceptable pour cette charge') });
+    var idx = 0; if (log) log.innerHTML = '';
+    var iv = setInterval(function() {
+      if (idx >= entries.length) {
+        clearInterval(iv);
+        if (resultDiv) resultDiv.innerHTML = '<div class="grid-3" style="margin-top:var(--sp-4);"><div class="stat-block stat-block--red"><div class="stat-block__value">' + totalWaitTime.toFixed(0) + 'ms</div><div class="stat-block__label">Wait Time Total</div></div><div class="stat-block stat-block--amber"><div class="stat-block__value">' + spins + '</div><div class="stat-block__label">Spins/Session</div></div><div class="stat-block stat-block--blue"><div class="stat-block__value">' + sleeps + '</div><div class="stat-block__label">Sleeps</div></div></div>';
+        return;
+      }
+      var e = entries[idx]; var ts = new Date().toISOString().slice(11, 19);
+      if (log) { log.innerHTML += '<div class="log-console__entry log-console__entry--' + e.l + '"><span class="log-console__timestamp">[' + ts + ']</span>' + e.t + '</div>'; log.scrollTop = log.scrollHeight; }
+      idx++;
+    }, 300);
+    Logger.warn('Latch contention simulee - ' + sessions + ' sessions');
+  }
+
+  _simulateSQL() {
+    var sortSize = parseInt(document.getElementById('sort-size-slider').value);
+    var pgaLimit = parseInt(document.getElementById('pga-limit-slider').value);
+    var container = document.getElementById('pga-result');
+    var workAreaSize = Math.floor(pgaLimit * 0.2);
+    var spills = sortSize > workAreaSize;
+    var spillMB = spills ? sortSize - workAreaSize : 0;
+    var memTime = sortSize * 0.1;
+    var diskTime = spills ? spillMB * 50 : 0;
+    var totalTime = memTime + diskTime;
+    var sc = spills ? 'red' : 'green'; var tc2 = totalTime > 1000 ? 'red' : 'cyan';
+    var html = '<div class="grid-2" style="margin-bottom:var(--sp-4);"><div class="stat-block stat-block--' + sc + '"><div class="stat-block__value">' + (spills ? 'TEMP SPILL' : 'OPTIMAL') + '</div><div class="stat-block__label">Mode execution</div></div><div class="stat-block stat-block--' + tc2 + '"><div class="stat-block__value">' + totalTime.toFixed(0) + 'ms</div><div class="stat-block__label">Temps estime</div></div></div>';
+    html += '<div class="alert alert--' + (spills ? 'error' : 'success') + '">';
+    if (spills) { html += '<strong>TEMP SPILL DETECTE:</strong> Sort de ' + sortSize + 'MB excede work area (' + workAreaSize + 'MB). ' + spillMB + 'MB bascules en TEMP. Impact: +' + diskTime.toFixed(0) + 'ms I/O disque.<br><span class="data-mono">V$SQL_WORKAREA_ACTIVE: PASSIVE -&gt; ACTIVE -&gt; SPILLED</span>'; }
+    else { html += '<strong>Execution OPTIMALE:</strong> Sort de ' + sortSize + 'MB tient en memoire (work area: ' + workAreaSize + 'MB). Pas d I/O disque.<br><span class="data-mono">V$SQL_WORKAREA_ACTIVE: OPTIMAL</span>'; }
+    html += '</div>';
+    if (spills) html += '<div class="alert alert--warning">Impact PMSI/T2A: Les requetes volumineuses avec TEMP SPILL peuvent bloquer la production T2A. Solution: augmenter PGA_AGGREGATE_TARGET ou optimiser la requete.</div>';
+    container.innerHTML = html;
+    Logger.info('Requete PMSI simulee - Sort: ' + sortSize + 'MB, PGA: ' + pgaLimit + 'MB - ' + (spills ? 'TEMP SPILL' : 'OPTIMAL'));
+  }
+}
+
+/* ============================================================
+   MODULE 3: I/O & CONSISTENCY
+   ============================================================ */
+
+class IOModule {
+  constructor(state, engine, fakeData) { this._state = state; this._engine = engine; this._fakeData = fakeData; this._crashed = false; }
+  init() { this._renderTXNLifecycle(); this._renderReadConsistency(); this._bindEvents();
+    var self = this; this._state.subscribe('scn', function(data) { var d = document.getElementById('scn-display'); if (d) d.textContent = data.value; });
+    Logger.info('IOModule initialized');
+  }
+
+  _renderTXNLifecycle() {
+    var c = document.getElementById('txn-lifecycle'); if (!c) return;
+    var steps = [
+      { id: 1, title: 'BEGIN TRANSACTION', desc: 'Allocation ITL (Interested Transaction List) dans le block header. SCN de depart enregistre.' },
+      { id: 2, title: 'DML - UPDATE facturation_t2a', desc: 'Anciens blocs copies dans UNDO (avant-image). Nouveaux blocs modifies en memoire (Buffer Cache).' },
+      { id: 3, title: 'REDO - LGWR Buffer', desc: 'Redo entries (apres-image) ecrites dans le Redo Log Buffer. Protection contre la perte.' },
+      { id: 4, title: 'COMMIT', desc: 'LGWR force l ecriture des redo entries sur disque. SCN avance. Transaction visible.' },
+      { id: 5, title: 'DBWR - Lazy Write', desc: 'DBWR ecrit les dirty blocks du Buffer Cache vers les datafiles (asynchrone).' }
+    ];
+    c.innerHTML = steps.map(function(s) { return '<div class="flow-step" id="txn-step-' + s.id + '"><div class="flow-step__marker" id="txn-marker-' + s.id + '">' + s.id + '</div><div class="flow-step__content"><div class="flow-step__title">' + s.title + '</div><div class="flow-step__desc">' + s.desc + '</div></div></div>'; }).join('');
+  }
+
+  _renderReadConsistency() {
+    var c = document.getElementById('read-consistency-demo'); if (!c) return;
+    c.innerHTML = '<div class="alert alert--info">Cliquez "Simuler Lecture Coherente" pour observer le mecanisme de read consistency avec Undo.</div><div id="rc-visualization"></div>';
+  }
+
+  _bindEvents() {
+    var self = this;
+    var b1 = document.getElementById('btn-run-txn'); if (b1) b1.addEventListener('click', function() { self._runTransaction(); });
+    var b2 = document.getElementById('btn-sim-crash'); if (b2) b2.addEventListener('click', function() { self._simulateCrash(); });
+    var b3 = document.getElementById('btn-recovery'); if (b3) b3.addEventListener('click', function() { self._runRecovery(); });
+    var b4 = document.getElementById('btn-increment-scn'); if (b4) b4.addEventListener('click', function() { var ns = self._engine.commit(); document.getElementById('scn-result').innerHTML = '<div class="alert alert--success">COMMIT execute - SCN: ' + ns + '</div>'; });
+    var b5 = document.getElementById('btn-query-scn'); if (b5) b5.addEventListener('click', function() { var cs = self._engine.scn; document.getElementById('scn-result').innerHTML = '<div class="alert alert--info">Flashback Query: <code class="data-mono">SELECT * FROM facturation_t2a AS OF SCN ' + (cs - 5) + '</code><br>Retourne les donnees telles qu elles etaient au SCN ' + (cs - 5) + ' (reconstruites depuis Undo).</div>'; });
+    var b6 = document.getElementById('btn-sim-read-consistency'); if (b6) b6.addEventListener('click', function() { self._simulateReadConsistency(); });
+    var us = document.getElementById('undo-retention-slider'); var uv = document.getElementById('undo-retention-val');
+    if (us && uv) us.addEventListener('input', function() { uv.textContent = us.value; });
+    var qs = document.getElementById('query-duration-slider'); var qv = document.getElementById('query-duration-val');
+    if (qs && qv) qs.addEventListener('input', function() { qv.textContent = qs.value; });
+    var ds = document.getElementById('dml-load-slider'); var dv = document.getElementById('dml-load-val');
+    if (ds && dv) ds.addEventListener('input', function() { dv.textContent = ds.value; });
+    var b7 = document.getElementById('btn-run-long-query'); if (b7) b7.addEventListener('click', function() { self._runLongQuery(); });
+  }
+
+  _runTransaction() {
+    var self = this; var txnId = 'TXN_PMSI_' + Date.now();
+    var resultDiv = document.getElementById('txn-result');
+    for (var i = 1; i <= 5; i++) { var m = document.getElementById('txn-marker-' + i); if (m) m.className = 'flow-step__marker'; }
+    var steps = [{ id: 1, delay: 800 }, { id: 2, delay: 1200 }, { id: 3, delay: 1000 }, { id: 4, delay: 1500 }, { id: 5, delay: 1200 }];
+    var promises = []; var currentDelay = 0;
+    steps.forEach(function(s) {
+      promises.push(new Promise(function(resolve) {
+        setTimeout(function() {
+          var marker = document.getElementById('txn-marker-' + s.id);
+          if (marker) { marker.className = 'flow-step__marker flow-step__marker--active'; }
+          setTimeout(function() { if (marker) marker.className = 'flow-step__marker flow-step__marker--done'; resolve(); }, 600);
+        }, currentDelay);
+        currentDelay += s.delay;
+      }));
+    });
+    Promise.all(promises).then(function() {
+      self._engine.commit();
+      resultDiv.innerHTML = '<div class="alert alert--success"><strong>Transaction ' + txnId + ' completee.</strong><br>Cycle complet: BEGIN -> DML (Undo) -> Redo -> COMMIT (LGWR) -> DBWR<br>SCN final: ' + self._engine.scn + ' | Coherence garantie pour la facturation T2A.</div>';
+      Logger.info('Transaction ' + txnId + ' completee');
+    });
+  }
+
+  _simulateCrash() {
+    this._crashed = true;
+    var resultDiv = document.getElementById('txn-result');
+    for (var i = 1; i <= 5; i++) { var m = document.getElementById('txn-marker-' + i); if (m) m.className = 'flow-step__marker flow-step__marker--error'; }
+    resultDiv.innerHTML = '<div class="alert alert--error"><strong>SHUTDOWN ABORT simule - Crash Instance.</strong><br>Les dirty blocks en Buffer Cache sont perdus. Les redo logs sur disque sont intacts.<br><span class="data-mono">Instance Recovery requise au prochain startup.</span></div>';
+    Logger.error('CRASH simule - Instance Recovery necessaire');
+  }
+
+  _runRecovery() {
+    if (!this._crashed) { document.getElementById('txn-result').innerHTML = '<div class="alert alert--warning">Aucun crash a recuperer. Simulez d abord un SHUTDOWN ABORT.</div>'; return; }
+    var result = this._engine.instanceRecovery();
+    var resultDiv = document.getElementById('txn-result');
+    for (var i = 1; i <= 5; i++) { var m = document.getElementById('txn-marker-' + i); if (m) m.className = 'flow-step__marker flow-step__marker--done'; }
+    var stepsHtml = result.steps.map(function(s) { return '<strong>' + s.phase + ':</strong> ' + s.desc + (s.txns ? ' - TXNs: ' + s.txns.join(', ') : '') + '<br>'; }).join('');
+    resultDiv.innerHTML = '<div class="alert alert--success"><strong>Instance Recovery completee - Statut: ' + result.status + '</strong><br><br>' + stepsHtml + '<br>Base ouverte et coherente. SCN: ' + this._engine.scn + '.<br><span class="data-mono">SMON: recovery complete. Database open.</span></div>';
+    this._crashed = false;
+    Logger.info('Instance Recovery completee');
+  }
+
+  _simulateReadConsistency() {
+    var viz = document.getElementById('rc-visualization'); if (!viz) return;
+    var queryScn = Math.max(0, this._engine.scn - 3);
+    var currentScn = this._engine.scn;
+    viz.innerHTML = '<div class="grid-2"><div><div class="data-label">Session A - Requete T2A (SCN ' + queryScn + ')</div><table class="data-table" style="margin-top:var(--sp-2);"><thead><tr><th>Sejour</th><th>Montant</th></tr></thead><tbody><tr><td>Sejour_SIMU_001</td><td>3 250,00 EUR <span class="tag tag--blue">SCN ' + queryScn + '</span></td></tr><tr><td>Sejour_SIMU_002</td><td>7 890,00 EUR <span class="tag tag--blue">SCN ' + queryScn + '</span></td></tr><tr><td>Sejour_SIMU_003</td><td>1 120,00 EUR <span class="tag tag--blue">SCN ' + queryScn + '</span></td></tr></tbody></table><div style="font-size:var(--fs-xs);color:#64748b;margin-top:var(--sp-2);font-family:var(--font-mono);">Reconstruit depuis Undo - Image coherente au SCN ' + queryScn + '</div></div><div><div class="data-label">Session B - Modification en cours (SCN ' + currentScn + ')</div><table class="data-table" style="margin-top:var(--sp-2);"><thead><tr><th>Sejour</th><th>Montant</th></tr></thead><tbody><tr><td>Sejour_SIMU_001</td><td class="clear-text">4 100,00 EUR <span class="tag tag--red">MODIFIE</span></td></tr><tr><td>Sejour_SIMU_002</td><td>7 890,00 EUR</td></tr><tr><td>Sejour_SIMU_003</td><td class="clear-text">1 450,00 EUR <span class="tag tag--red">MODIFIE</span></td></tr></tbody></table><div style="font-size:var(--fs-xs);color:#64748b;margin-top:var(--sp-2);font-family:var(--font-mono);">Donnees actuelles - Non visibles par Session A</div></div></div>';
+    document.getElementById('read-consistency-result').innerHTML = '<div class="alert alert--success">Read consistency garantie: Session A voit les donnees au SCN de depart de sa requete, via reconstruction Undo. La facturation T2A est protegee des modifications concurrentes.</div>';
+  }
+
+  _runLongQuery() {
+    var self = this;
+    var undoRetention = parseInt(document.getElementById('undo-retention-slider').value);
+    var queryDuration = parseInt(document.getElementById('query-duration-slider').value);
+    var dmlLoad = parseInt(document.getElementById('dml-load-slider').value);
+    var log = document.getElementById('ora-1555-log');
+    var resultDiv = document.getElementById('ora-1555-result');
+    if (log) log.innerHTML = '';
+    var addLog = function(level, text) {
+      var ts = new Date().toISOString().slice(11, 19);
+      if (log) { log.innerHTML += '<div class="log-console__entry log-console__entry--' + level + '"><span class="log-console__timestamp">[' + ts + ']</span>' + text + '</div>'; log.scrollTop = log.scrollHeight; }
+    };
+    addLog('info', 'Configuration: UNDO_RETENTION=' + undoRetention + 's, Query=' + queryDuration + 's, DML Load=' + dmlLoad + '%');
+    addLog('info', 'Requete T2A lancee: SELECT SUM(montant_t2a) FROM facturation_t2a WHERE ...');
+    var checkResult = self._engine.checkORA1555(undoRetention, queryDuration, dmlLoad);
+    var simSteps = Math.min(Math.floor(queryDuration / 10), 20);
+    var step = 0;
+    function runStep() {
+      if (step >= simSteps) {
+        if (checkResult.willFail) {
+          addLog('error', 'ORA-01555: snapshot too old: rollback segment number too small');
+          addLog('error', 'Query duration (' + queryDuration + 's) > effective Undo retention (' + checkResult.effectiveRetention + 's)');
+          addLog('warn', checkResult.recommendation);
+          if (resultDiv) resultDiv.innerHTML = '<div class="alert alert--error"><strong>ORA-01555 - Snapshot Too Old</strong><br>La requete a echoue car les donnees Undo necessaires ont ete ecrasees.<br><br><span class="data-mono">Retention configuree: ' + undoRetention + 's</span><br><span class="data-mono">Retention effective: ' + checkResult.effectiveRetention + 's</span><br><span class="data-mono">Duree requete: ' + queryDuration + 's</span><br><br><strong>Recommandation:</strong> ' + checkResult.recommendation + '</div>';
+        } else {
+          addLog('success', 'Query completee avec succes - Aucune erreur ORA-01555.');
+          addLog('info', 'Risk level: ' + checkResult.riskPercent + '% - Effective retention: ' + checkResult.effectiveRetention + 's');
+          if (resultDiv) resultDiv.innerHTML = '<div class="alert alert--success"><strong>Query completee - PAS d erreur ORA-01555</strong><br>UNDO_RETENTION (' + undoRetention + 's) est suffisant.<br>Risk level: ' + checkResult.riskPercent + '% | Effective retention: ' + checkResult.effectiveRetention + 's<br><br>' + checkResult.recommendation + '</div>';
+        }
+        Logger.info('ORA-01555 sim - ' + (checkResult.willFail ? 'FAIL' : 'OK') + ' Risk: ' + checkResult.riskPercent + '%');
+        return;
+      }
+      var progress = Math.round(((step + 1) / simSteps) * 100);
+      addLog('info', 'Query progress: ' + progress + '% - SCN courant avance, Undo en rotation...');
+      if (dmlLoad > 50 && step > simSteps * 0.5) addLog('warn', 'DML concurrent ecrase des segments Undo anciens - retention effective: ' + checkResult.effectiveRetention + 's');
+      step++;
+      setTimeout(runStep, 200);
+    }
+    runStep();
+  }
+}
+
+/* ============================================================
+   MODULE 4: CLOUD SOUVERAIN & IA
+   ============================================================ */
+
+class CloudModule {
+  constructor(state, engine, fakeData) { this._state = state; this._engine = engine; this._fakeData = fakeData; this._tdeKeyRevoked = false; }
+  init() { this._renderTDE(); this._renderIAComparison(); this._renderSovereignArch(); this._bindEvents(); Logger.info('CloudModule initialized'); }
+
+  _renderTDE() {
+    var c = document.getElementById('tde-demo'); if (!c) return;
+    c.innerHTML = '<div><div class="data-label" style="margin-bottom:var(--sp-2);">Donnees en Clair (Avant TDE)</div><div id="tde-plaintext" style="font-family:var(--font-mono);font-size:var(--fs-xs);line-height:2;"><div>NIR: <span class="clear-text">NIR_FICTIF_1234567890123</span></div><div>Nom: <span class="clear-text">Patient_TEST_042</span></div><div>Montant: 3 250,00 EUR</div><div>Diag: <span class="clear-text">Z34.9 - Surveillance grossesse normale (FICTIF)</span></div></div></div><div style="display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);color:var(--color-purple);font-size:var(--fs-xl);">&#8594;</div><div><div class="data-label" style="margin-bottom:var(--sp-2);">Donnees Chiffrees (Apres TDE AES-256)</div><div id="tde-ciphertext" style="font-family:var(--font-mono);font-size:var(--fs-xs);line-height:2;color:#64748b;">En attente du chiffrement...</div></div>';
+  }
+
+  _renderIAComparison() {
+    var c = document.getElementById('ia-comparison'); if (!c) return;
+    c.innerHTML = '<table class="data-table"><thead><tr><th>Critere</th><th>IA Embarquee (Auto-Tuning)</th><th>IA Generative Externe (LLM)</th></tr></thead><tbody><tr><td>Donnees de sante</td><td><span class="tag tag--green">Restent dans OCI France</span></td><td><span class="tag tag--red">Transferees hors perimetre</span></td></tr><tr><td>RGPD Art. 44-49</td><td><span class="tag tag--green">Conforme (pas de transfert)</span></td><td><span class="tag tag--red">Transfert international possible</span></td></tr><tr><td>HDS</td><td><span class="tag tag--green">Certifie HDS</span></td><td><span class="tag tag--amber">A verifier au cas par cas</span></td></tr><tr><td>Controle</td><td><span class="tag tag--green">Human-in-the-loop</span></td><td><span class="tag tag--amber">Black box</span></td></tr><tr><td>Usage</td><td>Auto-indexing, SQL Plan Management, Stats auto</td><td>Assistance redactionnelle, analyse structurelle</td></tr></tbody></table>';
+  }
+
+  _renderSovereignArch() {
+    var c = document.getElementById('sovereign-arch'); if (!c) return;
+    var layers = [
+      { name: 'HSM / OCI Vault', desc: 'Cles maitresses TDE - BYOK', color: 'red' },
+      { name: 'TDE AES-256', desc: 'Chiffrement tablespaces/datafiles', color: 'purple' },
+      { name: 'Autonomous DB', desc: 'OCI Region France (eu-france-1)', color: 'blue' },
+      { name: 'Data CHU', desc: 'Donnees de sante - HDS certifie', color: 'green' }
+    ];
+    c.innerHTML = layers.map(function(l, i) {
+      return '<div class="diagram-node diagram-node--' + l.color + '" style="position:relative;"><div class="diagram-node__title">' + l.name + '</div><div class="diagram-node__detail">' + l.desc + '</div>' + (i < layers.length - 1 ? '<div style="position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);color:var(--color-border);font-size:var(--fs-lg);font-family:var(--font-mono);">&#8595;</div>' : '') + '</div>';
+    }).join('');
+  }
+
+  _bindEvents() {
+    var self = this;
+    var b1 = document.getElementById('btn-tde-encrypt'); if (b1) b1.addEventListener('click', function() { self._tdeEncrypt(); });
+    var b2 = document.getElementById('btn-tde-decrypt'); if (b2) b2.addEventListener('click', function() { self._tdeDecrypt(); });
+    var b3 = document.getElementById('btn-tde-revoke'); if (b3) b3.addEventListener('click', function() { self._tdeRevoke(); });
+    var b4 = document.getElementById('btn-run-autotune'); if (b4) b4.addEventListener('click', function() { self._runAutoTune(); });
+  }
+
+  _tdeEncrypt() {
+    this._tdeKeyRevoked = false;
+    var ct = document.getElementById('tde-ciphertext');
+    var chars = '0123456789ABCDEF';
+    function fakeEnc(len) { var s = 'TDE$AES256$'; for (var i = 0; i < len; i++) s += chars[Math.floor(Math.random() * 16)]; return s; }
+    if (ct) ct.innerHTML = '<div>NIR: <span class="encrypted">' + fakeEnc(20) + '</span></div><div>Nom: <span class="encrypted">' + fakeEnc(20) + '</span></div><div>Montant: <span class="encrypted">' + fakeEnc(20) + '</span></div><div>Diag: <span class="encrypted">' + fakeEnc(20) + '</span></div><div style="margin-top:var(--sp-2);color:var(--color-purple);font-size:var(--fs-xs);">Key ID: TDE_KEY_HSM_CHU_DEMO_001 | Algo: AES-256-CBC | Mode: Tablespace Encryption</div>';
+    document.getElementById('tde-result').innerHTML = '<div class="alert alert--success"><strong>TDE AES-256 active</strong> - Donnees chiffrees au repos (data-at-rest).<br><span class="data-mono">V$ENCRYPTED_TABLESPACES: ENCRYPTED</span><br><span class="data-mono">Cle maitresse stockee dans HSM OCI Vault (BYOK)</span></div>';
+    Logger.info('TDE Encrypt simule - AES-256');
+  }
+
+  _tdeDecrypt() {
+    var ct = document.getElementById('tde-ciphertext');
+    if (this._tdeKeyRevoked) {
+      document.getElementById('tde-result').innerHTML = '<div class="alert alert--error"><strong>ERREUR: Cle TDE revoquee (BYOK).</strong> Impossible de dechiffrer sans la cle maitresse du HSM.<br><span class="data-mono">ORA-28365: wallet is not open</span><br>C est le comportement attendu: sans la cle, les donnees sont irrecuperables.</div>';
+      return;
+    }
+    if (ct) ct.innerHTML = '<div>NIR: <span class="clear-text">NIR_FICTIF_1234567890123</span></div><div>Nom: <span class="clear-text">Patient_TEST_042</span></div><div>Montant: 3 250,00 EUR</div><div>Diag: <span class="clear-text">Z34.9 - Surveillance grossesse normale (FICTIF)</span></div><div style="margin-top:var(--sp-2);color:var(--color-green);font-size:var(--fs-xs);">Dechiffrement reussi - Cle HSM disponible</div>';
+    document.getElementById('tde-result').innerHTML = '<div class="alert alert--success"><strong>Dechiffrement reussi</strong> - Cle maitresse disponible dans le HSM OCI Vault.<br><span class="data-mono">TDE transparent pour l application - overhead CPU: ~3-5%</span></div>';
+  }
+
+  _tdeRevoke() {
+    this._tdeKeyRevoked = true;
+    document.getElementById('tde-result').innerHTML = '<div class="alert alert--error"><strong>Cle TDE revoquee (BYOK) - Simulation de rotation de cle.</strong><br>Les donnees restent chiffrees sur disque. Sans la nouvelle cle, elles sont <strong>irrecuperables</strong>.<br><span class="data-mono">OCI Vault: Key version rotated - Old key: DEPRECATED</span><br><br><strong>En production HDS:</strong> La rotation de cle doit etre planifiee avec une periode de coexistence (ancien + nouveau cle) pour dechiffrer les donnees existantes avant de revoquer definitivement.</div>';
+    Logger.warn('Cle TDE revoquee - BYOK rotation simulee');
+  }
+
+  _runAutoTune() {
+    var resultDiv = document.getElementById('autotune-result');
+    resultDiv.innerHTML = '<div class="alert alert--info">Auto-Tuning en cours - Analyse du plan d execution...</div>';
+    var self = this;
+    setTimeout(function() {
+      resultDiv.innerHTML = '<div class="alert alert--success"><strong>Auto-Tuning complete - 3 recommandations appliquees:</strong><br><br><strong>1. Index automatique:</strong> <span class="data-mono">CREATE INDEX idx_sejour_date_entree ON sejour_simu(date_entree)</span><br><em>Impact: Full Table Scan -&gt; Index Range Scan sur la clause WHERE</em><br><br><strong>2. SQL Plan Baseline:</strong> Plan stabilise pour la requete PMSI (SPM)<br><em>Empeche la regression de plan apres les statistiques gathering</em><br><br><strong>3. Statistiques auto:</strong> Preferences de collecte ajustees (AUTO_SAMPLE_SIZE, GRANULARITY=AUTO)<br><br><span class="data-mono">Temps estime avant: 45.2s -&gt; apres: 2.1s (x21 improvement)</span><br><span class="data-mono">V$SQL_AUTO_INDEX: INDEX CREATED | SQL_PLAN_BASELINE: ACCEPTED</span></div>';
+      Logger.info('Auto-Tuning simule - 3 recommandations appliquees');
+    }, 1500);
+  }
+}
+
+/* ============================================================
+
+/* ============================================================
+   HELP MANAGER - Systeme de modales d'aide contextuelle
+   Gere l'ouverture/fermeture des modales avec focus trap obligatoire.
+   ============================================================ */
+
+class HelpManager {
+  /**
+   * Initialise le gestionnaire d'aide : cree l'overlay, cache les refs,
+   * et bind les evenements (click delegation, Escape, focus trap).
+   */
+  constructor() {
+    this._overlay = null;
+    this._activeModal = null;
+    this._previouslyFocused = null;
+    this._initDOM();
+    this._bindEvents();
+    Logger.info('HelpManager initialized');
+  }
+
+  /**
+   * Cree l'element overlay partage et cache les refs des modales.
+   * @private
+   */
+  _initDOM() {
+    // Overlay partage
+    this._overlay = document.createElement('div');
+    this._overlay.className = 'help-overlay';
+    this._overlay.id = 'help-overlay-dynamic';
+    this._overlay.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(this._overlay);
+
+    // Cache les refs des modales
+    this._modals = document.querySelectorAll('.help-modal');
+  }
+
+  /**
+   * Bind tous les evenements via event delegation.
+   * - Clic sur boutons [data-help] : ouvre la modale correspondante
+   * - Clic sur .help-modal__close ou .help-modal__footer-btn : ferme
+   * - Clic sur l'overlay : ferme (backup)
+   * - Touche Escape : ferme
+   * - Touche Tab/Shift+Tab : focus trap dans la modale active
+   * @private
+   */
+  _bindEvents() {
+    var self = this;
+
+    // Event delegation principal : clic sur boutons d'aide et de fermeture
+    document.addEventListener('click', function(e) {
+      // Ouverture : bouton avec data-help
+      var helpBtn = e.target.closest('[data-help]');
+      if (helpBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        self.open(helpBtn.dataset.help);
+        return;
+      }
+      // Fermeture : bouton X ou footer
+      var closeBtn = e.target.closest('.help-modal__close') || e.target.closest('.help-modal__footer-btn');
+      if (closeBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        self.close();
+      }
+    });
+
+    // Clic sur overlay = fermeture (backup, mais focus trap empeche d'atteindre l'overlay)
+    this._overlay.addEventListener('click', function() { self.close(); });
+
+    // Touche Escape = fermeture
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && self._activeModal) {
+        e.preventDefault();
+        e.stopPropagation();
+        self.close();
+      }
+    });
+
+    // Focus trap : empeche Tab de sortir de la modale active
+    document.addEventListener('keydown', function(e) {
+      if (e.key !== 'Tab' || !self._activeModal) return;
+
+      var focusable = self._activeModal.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable.length === 0) { e.preventDefault(); return; }
+
+      var first = focusable[0];
+      var last = focusable[focusable.length - 1];
+
+      if (e.shiftKey) {
+        // Shift+Tab : si focus sur premier element, loop vers le dernier
+        if (document.activeElement === first || !self._activeModal.contains(document.activeElement)) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        // Tab : si focus sur dernier element, loop vers le premier
+        if (document.activeElement === last || !self._activeModal.contains(document.activeElement)) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    });
+  }
+
+  /**
+   * Ouvre la modale pour le module specifie.
+   * Sauvegarde le focus actuel, active overlay + modale,
+   * place le focus sur le bouton de fermeture, bloque le scroll.
+   * @param {string} moduleId - Identifiant du module ('multitenant', 'memory', 'io', 'cloud')
+   */
+  open(moduleId) {
+    var modalId = 'help-' + moduleId;
+    var modal = document.getElementById(modalId);
+    if (!modal) {
+      Logger.error('Help modal not found: ' + modalId);
+      return;
+    }
+
+    // Sauvegarde du focus pour restauration
+    this._previouslyFocused = document.activeElement;
+    this._activeModal = modal;
+
+    // Active overlay et modale
+    this._overlay.classList.add('help-overlay--active');
+    this._overlay.setAttribute('aria-hidden', 'false');
+    modal.classList.add('help-modal--active');
+    modal.setAttribute('aria-hidden', 'false');
+
+    // Place le focus sur le bouton X par defaut
+    var closeBtn = modal.querySelector('.help-modal__close');
+    if (closeBtn) {
+      setTimeout(function() { closeBtn.focus(); }, 50);
+    }
+
+    // Bloque le scroll du body
+    document.body.style.overflow = 'hidden';
+
+    Logger.info('Help modal opened: ' + moduleId);
+  }
+
+  /**
+   * Ferme la modale active.
+   * Masque overlay et modale, restaure le scroll et le focus precedent.
+   */
+  close() {
+    if (!this._activeModal) return;
+
+    this._overlay.classList.remove('help-overlay--active');
+    this._overlay.setAttribute('aria-hidden', 'true');
+    this._activeModal.classList.remove('help-modal--active');
+    this._activeModal.setAttribute('aria-hidden', 'true');
+    this._activeModal = null;
+
+    // Restaure le scroll et le focus
+    document.body.style.overflow = '';
+    if (this._previouslyFocused && typeof this._previouslyFocused.focus === 'function') {
+      this._previouslyFocused.focus();
+    }
+
+    Logger.info('Help modal closed');
+  }
+}
+/* ============================================================
+   APPLICATION - Router & Bootstrapper
+   ============================================================ */
+
+class Application {
+  constructor() {
+    this._state = new StateManager();
+    this._engine = new DatabaseEngine(this._state);
+    this._fakeData = new FakeDataGenerator();
+    this._modules = {};
+    this._currentModule = 'multitenant';
+  }
+
+  init() {
+    Logger.info('=== Oracle HDS Demo - Initialisation ===');
+    this._modules.multitenant = new MultitenantModule(this._state, this._engine, this._fakeData);
+    this._modules.memory = new MemoryModule(this._state, this._engine);
+    this._modules.io = new IOModule(this._state, this._engine, this._fakeData);
+    this._modules.cloud = new CloudModule(this._state, this._engine, this._fakeData);
+    Object.values(this._modules).forEach(function(m) { m.init(); });
+    this._bindNavigation();
+    this._startSCNTicker();
+    this._helpManager = new HelpManager();
+    Logger.info('=== Oracle HDS Demo - Ready ===');
+  }
+
+  _bindNavigation() {
+    var self = this;
+    var navItems = document.querySelectorAll('.app-nav__item[data-module]');
+    navItems.forEach(function(item) {
+      item.addEventListener('click', function() { self._navigateTo(item.dataset.module); });
+    });
+  }
+
+  _navigateTo(moduleName) {
+    if (!this._modules[moduleName]) { Logger.error('Module not found: ' + moduleName); return; }
+    document.querySelectorAll('.app-nav__item').forEach(function(el) { el.classList.remove('app-nav__item--active'); });
+    var activeNav = document.querySelector('.app-nav__item[data-module="' + moduleName + '"]');
+    if (activeNav) activeNav.classList.add('app-nav__item--active');
+    document.querySelectorAll('.module-section').forEach(function(el) { el.classList.remove('module-section--active'); });
+    var target = document.getElementById('mod-' + moduleName);
+    if (target) target.classList.add('module-section--active');
+    this._currentModule = moduleName;
+    Logger.info('Navigate to: ' + moduleName);
+  }
+
+  _startSCNTicker() {
+    var self = this;
+    var globalScn = document.getElementById('global-scn');
+    var activeTxns = document.getElementById('active-txns');
+    setInterval(function() {
+      if (Math.random() > 0.6) {
+        self._engine.commit();
+      }
+      if (globalScn) globalScn.textContent = self._engine.scn;
+      if (activeTxns) activeTxns.textContent = self._state.get('activeTxns', 0);
+    }, 2000);
+  }
+}
+
+/* ============================================================
+   BOOTSTRAP
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', function() {
+  try {
+    var app = new Application();
+    app.init();
+  } catch(e) {
+    Logger.error('Application bootstrap error:', e);
+    document.getElementById('app-main').innerHTML = '<div class="alert alert--error"><strong>Erreur d initialisation:</strong> ' + e.message + '</div>';
+  }
+});
+</script>
+</body>
+</html>
