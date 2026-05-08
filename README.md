@@ -351,6 +351,33 @@ Ce glossaire détaille le jargon technique utilisé dans les démonstrateurs, co
 
 ---
 
+# Aide intégrée et Lexiques contextuels
+
+Chaque application HTML incluse dans ce projet dispose de sa propre documentation interne, accessible directement depuis l'interface utilisateur. Aucune documentation externe n'est nécessaire pour comprendre les démonstrations.
+
+## Fonctionnalités d'aide par onglet
+
+Chaque onglet ou module au sein des 5 applications contient une section d'aide dédiée, généralement accessible via un bouton « ? » ou un panneau « Aide » en haut de l'interface. Ces sections fournissent :
+
+*   **Le contexte fonctionnel** : Explication du scénario hospitalier (SIH) simulé.
+*   **Les objectifs pédagogiques** : Ce que la démo vise à illustrer (ex: contention, plan d'exécution, workflow).
+*   **Le mode d'emploi** : Instructions pas à pas pour interagir avec les simulateurs.
+*   **Les limites de la simulation** : Rappel des différences entre le modèle pédagogique et le comportement réel d'une base de production.
+
+## Lexiques techniques spécifiques
+
+En plus du glossaire général présent dans ce fichier `README.md`, chaque fichier HTML intègre un **lexique technique contextuel** exhaustif.
+
+Contrairement à un glossaire statique, ces lexiques internes :
+
+1.  **Sont filtrés par pertinence** : Ils ne listent que les termes techniques effectivement utilisés dans l'onglet ou la démo en cours.
+2.  **Sont interactifs** : Les définitions sont souvent accessibles au survol ou au clic sur les termes techniques dans l'interface.
+3.  **Couvrent le spectre complet** : De l'architecture infrastructure (CDB/PDB, SGA) aux concepts Big Data (Spark, Shuffle), en passant par la sécurité (TDE, RBAC) et le développement (PL/SQL, Explain Plan).
+
+Cette approche « *just-in-time*» permet à l'utilisateur de comprendre le jargon technique exactement au moment où il est confronté au concept, sans avoir à quitter l'application pour chercher une définition.
+
+---
+
 # Prérequis
 
 Aucun prérequis logiciel spécifique.
