@@ -1,6 +1,6 @@
 ﻿# Oracle SIH (Système d'Information Hospitalier) — Démonstrations Techniques
 
-> 4 applications HTML/CSS/JS autonomes, zero-dépendance, hors-ligne, à but pédagogique — simulant l'infrastructure, le développement, la connaissance lexicale et les cycles de décision Oracle dans un contexte de Système d'Information Hospitalier (SIH) avec conformité HDS/RGPD.
+> 5 applications HTML/CSS/JS autonomes, zero-dépendance, hors-ligne, à but pédagogique — simulant l'infrastructure, le développement, la connaissance lexicale, les cycles de décision et l'optimisation avancée Oracle dans un contexte de Système d'Information Hospitalier (SIH) avec conformité HDS/RGPD.
 
 ---
 
@@ -10,9 +10,10 @@
 2. [Fichier 2 : SQL Workbench PUI](#fichier-2--sql-workbench-pui)
 3. [Fichier 3 : Lexique & Quiz Oracle](#fichier-3--lexique--quiz-oracle)
 4. [Fichier 4 : Workflow de Décision](#fichier-4--workflow-de-décision)
-5. [Thèmes Transversaux](#thèmes-transversaux)
-6. [Prérequis](#prérequis)
-7. [Licence](#licence)
+5. [Fichier 5 : Advanced Performance Suite](#fichier-5--advanced-performance-suite)
+6. [Thèmes Transversaux](#thèmes-transversaux)
+7. [Prérequis](#prérequis)
+8. [Licence](#licence)
 
 ---
 
@@ -78,13 +79,33 @@ Guide interactif couvrant le cycle de vie Oracle en contexte HDS :
 
 ---
 
+## Fichier 5 : Advanced Performance Suite
+
+**Fichier :** `5.oracle-advanced-sih-demo.html`
+
+4 modules d'optimisation avancée sur 5×10⁹ lignes / 2,5 To avec moteur de calcul algorithmique :
+
+| Module | Contenu |
+|---|---|
+| Partitionnement Avancé | Simulation Range mensuel (120 partitions / 10 ans), Partition Pruning via métadonnées HIGH_VALUE/LOW_VALUE, PEL, réduction I/O de 95 % |
+| In-Memory Column Store | Transposition Row→Column, compression IMCU (6,7×), scan vectorisé SIMD AVX2, passage de 5243 s à 0,1 s |
+| OCI Data Flow & Spark | Architecture distribuée serverless (1–32 nœuds), shuffle, predicate pushdown Oracle Big Data Connector, coût estimé |
+| Dashboard Comparatif | Score global moyenné par technologie active uniquement, barres avant/après, conformité HDS / ISO 27001 / COFRAC |
+
+- **Moteur de calcul :** classe `PerformanceEngine` avec formules réalistes (pruning factor, compression IMCU, débit Spark 20 Go/s par nœud)
+- **Animation interactive :** job Spark simulé en 20 étapes (Map → Shuffle → Reduce → Write) avec barres de progression par exécuteur
+- **3 curseurs de paramétrage :** période d'analyse (1–120 mois), colonnes sélectionnées (2–200), nœuds de calcul (1–32)
+- **Données :** PATIENT_SIMU_XXXX / PRESCRIPTION_HISTORY — NIR fictifs — volumétrie 5×10⁹ lignes
+
+---
+
 ## Thèmes Transversaux
 
 - **Données 100 % fictives** (NIR_FICTIF, MED_TEST_XXX, LOT_SIMU_XXX, PATIENT_FICTIF, Dr_DUMMY) — aucune donnée de santé réelle
 - **Conforme RGPD Art. 25** (Privacy by Design) et **HDS** (Hébergement de Données de Santé)
 - **Architecture :** ES6 Classes · Vanilla JS · Zero Dependency · Offline
 - **Design :** Dark theme · grille responsive · police monospace · modales d'aide contextuelle avec focus trap
-- **Cohérence visuelle** : palette CSS variables partagée, composants réutilisables entre les 4 fichiers
+- **Cohérence visuelle** : palette CSS variables partagée, composants réutilisables entre les 5 fichiers
 
 ---
 
