@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Oracle Lifecycle SIH - Serious Game Deploiement Application PUI">
+<title>Oracle Lifecycle - Deploiement Guide PUI</title>
+<style>
+:root {
+  --color-bg-deep: #0a0e17;
+  --color-bg-surface: #131a2a;
+  --color-bg-elevated: #1a2340;
+  --color-bg-hover: #243052;
+  --color-border: #1e2d4a;
+  --color-border-active: #3b82f6;
+  --color-blue: #3b82f6;
+  --color-blue-dim: #1e3a6e;
+  --color-red: #ef4444;
+  --color-red-dim: #7f1d1d;
+  --color-green: #22c55e;
+  --color-green-dim: #166534;
+  --color-amber: #f59e0b;
+  --color-amber-dim: #78350f;
+  --color-cyan: #06b6d4;
+  --color-purple: #a855f7;
+  --font-ui: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+  --fs-xs: 0.6875rem;
+  --fs-sm: 0.8125rem;
+  --fs-base: 0.9375rem;
+  --fs-md: 1.0625rem;
+  --fs-lg: 1.25rem;
+  --fs-xl: 1.5rem;
+  --fs-2xl: 2rem;
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-6: 1.5rem;
+  --sp-8: 2rem;
+  --sp-12: 3rem;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --transition-fast: 150ms ease;
+  --transition-normal: 300ms ease;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+body { font-family: var(--font-ui); font-size: var(--fs-base); color: #e2e8f0; background: var(--color-bg-deep); line-height: 1.6; overflow-x: hidden; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input, select, textarea { font-family: inherit; font-size: inherit; }
+pre, code { font-family: var(--font-mono); }
+table { border-collapse: collapse; width: 100%; }
+a { color: var(--color-cyan); text-decoration: none; }
+a:hover { text-decoration: underline; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--color-bg-deep); }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: var(--radius-sm); }
+::-webkit-scrollbar-thumb:hover { background: var(--color-blue); }
+
+.app-layout { display: grid; grid-template-columns: 260px 1fr; grid-template-rows: 56px 1fr; grid-template-areas: "header header" "nav main"; min-height: 100vh; }
+.app-header { grid-area: header; display: flex; align-items: center; justify-content: space-between; padding: 0 var(--sp-6); background: var(--color-bg-surface); border-bottom: 1px solid var(--color-border); z-index: 100; }
+.app-header__brand { display: flex; align-items: center; gap: var(--sp-3); font-family: var(--font-mono); font-size: var(--fs-md); font-weight: 700; letter-spacing: -0.02em; }
+.app-header__brand-icon { width: 28px; height: 28px; background: var(--color-blue); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: var(--fs-sm); font-weight: 900; color: #fff; }
+.app-header__status { display: flex; align-items: center; gap: var(--sp-4); font-size: var(--fs-xs); font-family: var(--font-mono); }
+.status-badge { display: inline-flex; align-items: center; gap: var(--sp-2); padding: var(--sp-1) var(--sp-3); border-radius: var(--radius-sm); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.status-badge--online { background: var(--color-green-dim); color: var(--color-green); }
+.status-badge--hds { background: var(--color-blue-dim); color: var(--color-blue); }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: pulse-dot 2s infinite; }
+@keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.app-nav { grid-area: nav; background: var(--color-bg-surface); border-right: 1px solid var(--color-border); padding: var(--sp-6) 0; overflow-y: auto; }
+.app-nav__section { padding: 0 var(--sp-4); margin-bottom: var(--sp-6); }
+.app-nav__section-title { font-size: var(--fs-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-blue); margin-bottom: var(--sp-3); font-family: var(--font-mono); }
+.app-nav__rgpd-notice { margin: var(--sp-6) var(--sp-4); padding: var(--sp-3); background: var(--color-blue-dim); border: 1px solid var(--color-blue); border-radius: var(--radius-md); font-size: var(--fs-xs); color: var(--color-blue); font-family: var(--font-mono); line-height: 1.5; }
+
+.app-main { grid-area: main; padding: var(--sp-8); overflow-y: auto; background: var(--color-bg-deep); }
+
+.page-header { margin-bottom: var(--sp-8); padding-bottom: var(--sp-4); border-bottom: 1px solid var(--color-border); }
+.page-header__title { font-size: var(--fs-xl); font-weight: 700; letter-spacing: -0.02em; margin-bottom: var(--sp-2); }
+.page-header__subtitle { font-size: var(--fs-sm); color: #94a3b8; font-family: var(--font-mono); }
+.page-header__subtitle-row { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); }
+.page-header__help-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 1px solid var(--color-border); border-radius: 50%; background: var(--color-bg-elevated); color: #94a3b8; font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700; cursor: pointer; transition: all var(--transition-fast); flex-shrink: 0; }
+.page-header__help-btn:hover { border-color: var(--color-blue); color: var(--color-blue); background: var(--color-blue-dim); }
+
+.card { background: var(--color-bg-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--sp-6); margin-bottom: var(--sp-6); }
+.card__title { font-size: var(--fs-md); font-weight: 700; margin-bottom: var(--sp-4); display: flex; align-items: center; gap: var(--sp-3); font-family: var(--font-mono); }
+.card__title-icon { color: var(--color-blue); }
+
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-6); }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-6); }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-6); }
+@media (max-width: 1200px) { .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+.data-mono { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--color-cyan); background: var(--color-bg-elevated); padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); display: inline-block; }
+.data-label { font-size: var(--fs-xs); color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+.data-value { font-family: var(--font-mono); font-size: var(--fs-base); font-weight: 600; }
+
+.stat-block { background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--sp-4); text-align: center; }
+.stat-block__value { font-family: var(--font-mono); font-size: var(--fs-xl); font-weight: 700; margin-bottom: var(--sp-1); }
+.stat-block__label { font-size: var(--fs-xs); color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+.stat-block--blue .stat-block__value { color: var(--color-blue); }
+.stat-block--green .stat-block__value { color: var(--color-green); }
+.stat-block--red .stat-block__value { color: var(--color-red); }
+.stat-block--amber .stat-block__value { color: var(--color-amber); }
+.stat-block--cyan .stat-block__value { color: var(--color-cyan); }
+.stat-block--purple .stat-block__value { color: var(--color-purple); }
+
+.progress-bar { width: 100%; height: 8px; background: var(--color-bg-elevated); border-radius: var(--radius-sm); overflow: hidden; margin: var(--sp-2) 0; }
+.progress-bar__fill { height: 100%; border-radius: var(--radius-sm); transition: width var(--transition-normal); }
+.progress-bar__fill--blue { background: var(--color-blue); }
+.progress-bar__fill--green { background: var(--color-green); }
+.progress-bar__fill--red { background: var(--color-red); }
+.progress-bar__fill--amber { background: var(--color-amber); }
+.progress-bar__fill--cyan { background: var(--color-cyan); }
+
+.tag { display: inline-flex; align-items: center; padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); font-size: var(--fs-xs); font-weight: 600; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.03em; }
+.tag--blue { background: var(--color-blue-dim); color: var(--color-blue); }
+.tag--green { background: var(--color-green-dim); color: var(--color-green); }
+.tag--red { background: var(--color-red-dim); color: var(--color-red); }
+.tag--amber { background: var(--color-amber-dim); color: var(--color-amber); }
+.tag--purple { background: #4c1d95; color: var(--color-purple); }
+.tag--neutral { background: #1e293b; color: #94a3b8; border: 1px solid var(--color-border); }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2); padding: var(--sp-3) var(--sp-6); border-radius: var(--radius-md); font-size: var(--fs-sm); font-weight: 600; transition: all var(--transition-fast); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.03em; }
+.btn--primary { background: var(--color-blue); color: #fff; }
+.btn--primary:hover { background: #2563eb; }
+.btn--success { background: var(--color-green); color: #fff; }
+.btn--success:hover { background: #16a34a; }
+.btn--danger { background: var(--color-red); color: #fff; }
+.btn--danger:hover { background: #dc2626; }
+.btn--outline { border: 1px solid var(--color-border); color: #e2e8f0; }
+.btn--outline:hover { border-color: var(--color-blue); color: var(--color-blue); }
+.btn--sm { padding: var(--sp-2) var(--sp-4); font-size: var(--fs-xs); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.alert { padding: var(--sp-4); border-radius: var(--radius-md); border-left: 4px solid; margin-bottom: var(--sp-4); font-size: var(--fs-sm); font-family: var(--font-mono); }
+.alert--info { background: var(--color-blue-dim); border-color: var(--color-blue); color: #93c5fd; }
+.alert--success { background: var(--color-green-dim); border-color: var(--color-green); color: #86efac; }
+.alert--warning { background: var(--color-amber-dim); border-color: var(--color-amber); color: #fcd34d; }
+.alert--error { background: var(--color-red-dim); border-color: var(--color-red); color: #fca5a5; }
+
+.log-console { background: #000; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--sp-4); font-family: var(--font-mono); font-size: var(--fs-xs); max-height: 300px; overflow-y: auto; line-height: 1.8; }
+.log-console__entry { color: #94a3b8; }
+.log-console__entry--info { color: var(--color-blue); }
+.log-console__entry--success { color: var(--color-green); }
+.log-console__entry--error { color: var(--color-red); }
+.log-console__entry--warn { color: var(--color-amber); }
+.log-console__timestamp { color: #475569; margin-right: var(--sp-2); }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn var(--transition-normal) ease; }
+
+.app-footer { margin-top: var(--sp-12); padding-top: var(--sp-6); border-top: 1px solid var(--color-border); font-size: var(--fs-xs); color: #475569; font-family: var(--font-mono); text-align: center; line-height: 1.8; }
+
+/* ===== STEP PROGRESS ===== */
+.step-progress { display: flex; align-items: center; gap: 0; margin-bottom: var(--sp-8); padding: var(--sp-4) var(--sp-6); background: var(--color-bg-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow-x: auto; }
+.step-progress__item { display: flex; align-items: center; gap: var(--sp-3); flex-shrink: 0; padding: var(--sp-2) var(--sp-3); border-radius: var(--radius-md); transition: all var(--transition-fast); cursor: pointer; }
+.step-progress__item--active { background: var(--color-blue-dim); }
+.step-progress__item--done { background: var(--color-green-dim); }
+.step-progress__item--error { background: var(--color-red-dim); }
+.step-progress__num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: var(--fs-xs); font-weight: 700; background: var(--color-bg-elevated); border: 2px solid var(--color-border); color: #94a3b8; flex-shrink: 0; }
+.step-progress__item--active .step-progress__num { border-color: var(--color-blue); color: var(--color-blue); background: var(--color-blue-dim); }
+.step-progress__item--done .step-progress__num { border-color: var(--color-green); color: var(--color-green); background: var(--color-green-dim); }
+.step-progress__item--error .step-progress__num { border-color: var(--color-red); color: var(--color-red); background: var(--color-red-dim); }
+.step-progress__label { font-family: var(--font-mono); font-size: var(--fs-xs); font-weight: 600; white-space: nowrap; }
+.step-progress__item--active .step-progress__label { color: var(--color-blue); }
+.step-progress__item--done .step-progress__label { color: var(--color-green); }
+.step-progress__item--error .step-progress__label { color: var(--color-red); }
+.step-progress__arrow { color: #475569; font-family: var(--font-mono); font-size: var(--fs-sm); flex-shrink: 0; }
+
+/* ===== RISK GAUGE ===== */
+.risk-gauge { display: flex; align-items: center; gap: var(--sp-4); padding: var(--sp-4); background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-md); }
+.risk-gauge__label { font-family: var(--font-mono); font-size: var(--fs-xs); color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.risk-gauge__bar-wrap { flex: 1; height: 16px; background: var(--color-bg-deep); border-radius: var(--radius-sm); overflow: hidden; position: relative; }
+.risk-gauge__bar { height: 100%; border-radius: var(--radius-sm); transition: width var(--transition-normal), background var(--transition-normal); min-width: 2%; }
+.risk-gauge__pct { font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700; min-width: 48px; text-align: right; }
+
+/* ===== DECISION ZONE ===== */
+.decision-zone { display: flex; flex-direction: column; gap: var(--sp-3); margin: var(--sp-4) 0; }
+.decision-opt { display: flex; align-items: center; gap: var(--sp-3); width: 100%; padding: var(--sp-4); background: var(--color-bg-elevated); border: 2px solid var(--color-border); border-radius: var(--radius-md); font-size: var(--fs-sm); color: #e2e8f0; cursor: pointer; transition: all var(--transition-fast); text-align: left; font-family: var(--font-mono); }
+.decision-opt:hover:not(:disabled) { border-color: var(--color-blue); background: var(--color-bg-hover); }
+.decision-opt:disabled { cursor: not-allowed; opacity: 0.5; }
+.decision-opt--selected { border-color: #334155; background: #1e293b; }
+.decision-opt--risky { border-color: var(--color-red); background: var(--color-red-dim); }
+.decision-opt--good { border-color: var(--color-green); background: var(--color-green-dim); }
+.decision-opt__letter { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--color-bg-deep); font-weight: 700; font-size: var(--fs-xs); flex-shrink: 0; }
+.decision-opt__label { flex: 1; }
+.decision-opt__badge { font-size: var(--fs-xs); font-weight: 600; padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); font-family: var(--font-mono); }
+
+.step-content { display: none; }
+.step-content--active { display: block; animation: fadeIn var(--transition-normal) ease; }
+
+.step-desc { font-size: var(--fs-sm); color: #94a3b8; font-family: var(--font-mono); margin-bottom: var(--sp-4); line-height: 1.7; }
+
+/* ===== EXPERT MODAL ===== */
+.help-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 999; animation: fadeIn 0.2s ease; }
+.help-overlay--active { display: block; }
+.help-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%) translateY(16px); width: 90%; max-width: 720px; max-height: 85vh; background: var(--color-bg-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); z-index: 1000; overflow: hidden; animation: fadeSlideUp 0.3s ease forwards; box-shadow: 0 24px 48px rgba(0,0,0,0.4); }
+.help-modal--active { display: flex; flex-direction: column; }
+@keyframes fadeSlideUp { from { opacity:0; transform: translate(-50%,-50%) translateY(16px); } to { opacity:1; transform: translate(-50%,-50%) translateY(0); } }
+.help-modal__header { display: flex; align-items: center; justify-content: space-between; padding: var(--sp-4) var(--sp-6); border-bottom: 1px solid var(--color-border); background: var(--color-bg-elevated); }
+.help-modal__title { font-family: var(--font-mono); font-size: var(--fs-md); font-weight: 700; color: var(--color-blue); }
+.help-modal__close { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-bg-deep); color: #94a3b8; font-size: var(--fs-md); cursor: pointer; transition: all var(--transition-fast); font-weight: 700; }
+.help-modal__close:hover { border-color: var(--color-red); color: var(--color-red); background: var(--color-red-dim); }
+.help-modal__body { padding: var(--sp-6); overflow-y: auto; flex: 1; }
+.help-modal__text { font-size: var(--fs-sm); color: #cbd5e1; line-height: 1.7; margin-bottom: var(--sp-3); }
+.help-modal__text code { font-family: var(--font-mono); font-size: var(--fs-xs); background: var(--color-bg-elevated); padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); color: var(--color-cyan); }
+.help-modal__list { list-style: none; padding: 0; }
+.help-modal__list li { position: relative; padding: var(--sp-2) 0 var(--sp-2) var(--sp-6); font-size: var(--fs-sm); color: #94a3b8; line-height: 1.6; border-left: 2px solid var(--color-border); }
+.help-modal__list li::before { content: ''; position: absolute; left: -1px; top: 50%; width: 8px; height: 2px; background: var(--color-blue); transform: translateY(-50%); }
+.help-modal__footer { padding: var(--sp-4) var(--sp-6); border-top: 1px solid var(--color-border); display: flex; justify-content: flex-end; gap: var(--sp-3); background: var(--color-bg-elevated); }
+
+/* ===== PERF CHART ===== */
+.perf-chart { display: flex; align-items: flex-end; gap: var(--sp-2); height: 120px; padding: var(--sp-4) 0; }
+.perf-chart__bar { flex: 1; display: flex; flex-direction: column; align-items: center; gap: var(--sp-1); }
+.perf-chart__col { width: 100%; border-radius: var(--radius-sm) var(--radius-sm) 0 0; transition: height var(--transition-normal), background var(--transition-normal); min-height: 4px; }
+.perf-chart__label { font-family: var(--font-mono); font-size: 0.5625rem; color: #64748b; text-align: center; white-space: nowrap; }
+
+/* ===== DECISION HISTORY ===== */
+.history-item { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3); border-bottom: 1px solid var(--color-border); font-size: var(--fs-xs); font-family: var(--font-mono); }
+.history-item:last-child { border-bottom: none; }
+.history-item__step { color: #64748b; min-width: 60px; }
+.history-item__icon { font-size: var(--fs-sm); }
+</style>
+</head>
+<body>
+
+<div class="app-layout">
+  <header class="app-header">
+    <div class="app-header__brand">
+      <div class="app-header__brand-icon">P</div>
+      <span>ORACLE<span style="color: var(--color-cyan);">_LIFECYCLE</span>::SIH</span>
+    </div>
+    <div class="app-header__status">
+      <span class="status-badge status-badge--online"><span class="status-dot"></span>GUIDE ACTIF</span>
+      <span class="status-badge status-badge--hds">HDS / DONNEES FICTIVES</span>
+    </div>
+  </header>
+
+  <nav class="app-nav">
+    <div class="app-nav__section">
+      <div class="app-nav__section-title">Projet PUI</div>
+      <div style="padding: 0 var(--sp-4); font-size: var(--fs-xs); font-family: var(--font-mono); line-height: 2;">
+        <div style="color: #64748b;">ETAPE COURANTE</div>
+        <div id="nav-current-step" style="color: var(--color-cyan);">Etape 1</div>
+        <div style="color: #64748b; margin-top: var(--sp-2);">ETAPES VALIDEES</div>
+        <div id="nav-steps-done" style="color: var(--color-green);">0 / 6</div>
+        <div style="color: #64748b; margin-top: var(--sp-2);">NIVEAU RISQUE</div>
+        <div id="nav-risk-level" style="color: var(--color-green);">FAIBLE</div>
+      </div>
+    </div>
+    <div class="app-nav__section">
+      <div class="app-nav__section-title">Historique Decisions</div>
+      <div id="decision-history" style="font-size: var(--fs-xs); font-family: var(--font-mono); max-height: 300px; overflow-y: auto;">
+        <div style="color: #475569; padding: var(--sp-2) var(--sp-4);">Aucune decision encore prise.</div>
+      </div>
+    </div>
+    <div class="app-nav__rgpd-notice">
+      DONNEES 100% FICTIVES<br>
+      Patients_TEST / PUI_SIMU<br>
+      Conforme RGPD Art. 25
+    </div>
+  </nav>
+
+  <main class="app-main" id="app-main">
+    <div class="page-header">
+      <h1 class="page-header__title">Cycle de Vie Projet Oracle PUI</h1>
+      <div class="page-header__subtitle-row">
+        <p class="page-header__subtitle">Guide Interactif de Deploiement — Experimentez les consequences de vos choix techniques</p>
+        <button class="page-header__help-btn" id="btn-help-overview" aria-label="Aide vue d ensemble">?</button>
+      </div>
+    </div>
+
+    <!-- Step Progress Bar -->
+    <div class="step-progress" id="step-progress">
+      <div class="step-progress__item step-progress__item--active" data-step="1">
+        <span class="step-progress__num">1</span>
+        <span class="step-progress__label">Installation</span>
+      </div>
+      <span class="step-progress__arrow">&rarr;</span>
+      <div class="step-progress__item" data-step="2">
+        <span class="step-progress__num">2</span>
+        <span class="step-progress__label">Securite</span>
+      </div>
+      <span class="step-progress__arrow">&rarr;</span>
+      <div class="step-progress__item" data-step="3">
+        <span class="step-progress__num">3</span>
+        <span class="step-progress__label">Developpement</span>
+      </div>
+      <span class="step-progress__arrow">&rarr;</span>
+      <div class="step-progress__item" data-step="4">
+        <span class="step-progress__num">4</span>
+        <span class="step-progress__label">Tuning</span>
+      </div>
+      <span class="step-progress__arrow">&rarr;</span>
+      <div class="step-progress__item" data-step="5">
+        <span class="step-progress__num">5</span>
+        <span class="step-progress__label">Recette</span>
+      </div>
+      <span class="step-progress__arrow">&rarr;</span>
+      <div class="step-progress__item" data-step="6">
+        <span class="step-progress__num">6</span>
+        <span class="step-progress__label">Production</span>
+      </div>
+    </div>
+
+    <!-- Dashboard Row -->
+    <div class="grid-4" style="margin-bottom: var(--sp-6);">
+      <div class="stat-block stat-block--blue">
+        <div class="stat-block__value"><span id="dash-etape">1</span>/6</div>
+        <div class="stat-block__label">Etape Courante</div>
+      </div>
+      <div class="stat-block" id="dash-risk-stat">
+        <div class="stat-block__value" id="dash-risk-val" style="color: var(--color-green);">0%</div>
+        <div class="stat-block__label">Risque Projet</div>
+      </div>
+      <div class="stat-block stat-block--green">
+        <div class="stat-block__value"><span id="dash-good">0</span></div>
+        <div class="stat-block__label">Bonnes Pratiques</div>
+      </div>
+      <div class="stat-block stat-block--cyan">
+        <div class="stat-block__value"><span id="dash-alerts">0</span></div>
+        <div class="stat-block__label">Alertes Declenchees</div>
+      </div>
+    </div>
+
+    <!-- Risk Gauge -->
+    <div class="card fade-in">
+      <div class="card__title"><span class="card__title-icon">&#9888;</span> Jauge de Risque Projet</div>
+      <div class="risk-gauge">
+        <span class="risk-gauge__label">Risque</span>
+        <div class="risk-gauge__bar-wrap">
+          <div class="risk-gauge__bar" id="risk-gauge-bar" style="width: 0%; background: var(--color-green);"></div>
+        </div>
+        <span class="risk-gauge__pct" id="risk-gauge-pct" style="color: var(--color-green);">0%</span>
+      </div>
+      <div id="risk-impact-msg" style="margin-top: var(--sp-3); font-size: var(--fs-xs); color: #64748b; font-family: var(--font-mono);">Projet sain. Aucun risque detecte.</div>
+    </div>
+
+    <!-- ================================================================
+         STEP 1: INSTALLATION & ARCHITECTURE
+         ================================================================ -->
+    <div class="step-content step-content--active" id="step-1">
+      <div class="card fade-in">
+        <div class="card__title"><span class="card__title-icon">&#9733;</span> Etape 1 — Installation &amp; Architecture</div>
+        <div class="step-desc">
+          Fondations du projet PUI. Choix du Character Set et configuration du Resource Plan CDB/PDB.
+          Ces decisions sont <strong>irreversibles</strong> apres creation de la base. Impact direct sur l'internationalisation et l'isolation des ressources.
+        </div>
+        <div class="decision-zone" id="step1-decisions">
+          <div class="decision-opt" data-choice="risky" data-step="1">
+            <span class="decision-opt__letter">A</span>
+            <span class="decision-opt__label">WE8MSWIN1252 + Resource Plan par defaut</span>
+            <span class="decision-opt__badge tag--neutral tag">Encodage 8-bit</span>
+          </div>
+          <div class="decision-opt" data-choice="good" data-step="1">
+            <span class="decision-opt__letter">B</span>
+            <span class="decision-opt__label">AL32UTF8 + Resource Plan CDB avec shares PUI dedies</span>
+            <span class="decision-opt__badge tag--neutral tag">Encodage Unicode</span>
+          </div>
+          <div class="decision-opt" data-choice="risky2" data-step="1">
+            <span class="decision-opt__letter">C</span>
+            <span class="decision-opt__label">AL32UTF8 mais SANS Resource Plan actif</span>
+            <span class="decision-opt__badge tag--neutral tag">Sans Resource Plan</span>
+          </div>
+        </div>
+        <div id="step1-feedback" style="margin-top: var(--sp-4);"></div>
+        <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
+          <button class="btn btn--outline btn--sm btn-expert" data-step="1">Voir la Bonne Pratique</button>
+          <button class="btn btn--outline btn--sm btn-reset-step" data-step="1" style="display:none;">Reinitialiser le choix</button>
+          <button class="btn btn--primary btn--sm btn-validate-step" data-step="1" style="display:none;">Valider l'Etape</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================================================
+         STEP 2: SECURITE & CONFORMITE
+         ================================================================ -->
+    <div class="step-content" id="step-2">
+      <div class="card fade-in">
+        <div class="card__title"><span class="card__title-icon">&#128274;</span> Etape 2 — Securite &amp; Conformite HDS/RGPD</div>
+        <div class="step-desc">
+          Configuration du chiffrement TDE, de l'audit HDS et des profils de securite.
+          En environnement hospitalier, la non-conformite expose a des sanctions juridiques et a la suspension de l'habilitation HDS.
+        </div>
+        <div class="decision-zone" id="step2-decisions">
+          <div class="decision-opt" data-choice="risky" data-step="2">
+            <span class="decision-opt__letter">A</span>
+            <span class="decision-opt__label">Pas de TDE, Audit desactive (gain perf estime 5%)</span>
+            <span class="decision-opt__badge tag--neutral tag">Audit desactive</span>
+          </div>
+          <div class="decision-opt" data-choice="good" data-step="2">
+            <span class="decision-opt__letter">B</span>
+            <span class="decision-opt__label">TDE AES-256 + Audit HDS standard + Profil SECURE_PUI</span>
+            <span class="decision-opt__badge tag--neutral tag">Audit complet</span>
+          </div>
+          <div class="decision-opt" data-choice="risky2" data-step="2">
+            <span class="decision-opt__letter">C</span>
+            <span class="decision-opt__label">Audit partiel (echecs seulement), TDE sur TS DATA seulement</span>
+            <span class="decision-opt__badge tag--neutral tag">Audit partiel</span>
+          </div>
+        </div>
+        <div id="step2-feedback" style="margin-top: var(--sp-4);"></div>
+        <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
+          <button class="btn btn--outline btn--sm btn-expert" data-step="2">Voir la Bonne Pratique</button>
+          <button class="btn btn--outline btn--sm btn-reset-step" data-step="2" style="display:none;">Reinitialiser le choix</button>
+          <button class="btn btn--primary btn--sm btn-validate-step" data-step="2" style="display:none;">Valider l'Etape</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================================================
+         STEP 3: DEVELOPPEMENT & REQUETAGE
+         ================================================================ -->
+    <div class="step-content" id="step-3">
+      <div class="card fade-in">
+        <div class="card__title"><span class="card__title-icon">&#128187;</span> Etape 3 — Developpement &amp; Requetage</div>
+        <div class="step-desc">
+          Revue de code PL/SQL avant mise en production. Les choix d'ecriture SQL impactent directement
+          les performances de la PUI et la charge sur le serveur de base de donnees.
+        </div>
+        <div class="decision-zone" id="step3-decisions">
+          <div class="decision-opt" data-choice="risky" data-step="3">
+            <span class="decision-opt__letter">A</span>
+            <span class="decision-opt__label">SELECT * FROM stock_med s JOIN ligne_disp l ON s.med_id = l.med_id</span>
+            <span class="decision-opt__badge tag--neutral tag">Colonnes implicites</span>
+          </div>
+          <div class="decision-opt" data-choice="good" data-step="3">
+            <span class="decision-opt__letter">B</span>
+            <span class="decision-opt__label">SELECT s.med_id, s.molecule, l.qte FROM stock_med s JOIN ligne_disp l ON s.med_id = l.med_id</span>
+            <span class="decision-opt__badge tag--neutral tag">Colonnes explicites</span>
+          </div>
+          <div class="decision-opt" data-choice="risky2" data-step="3">
+            <span class="decision-opt__letter">C</span>
+            <span class="decision-opt__label">Curseur PL/SQL ligne a ligne sans BULK COLLECT</span>
+            <span class="decision-opt__badge tag--neutral tag">Parcours ligne/ligne</span>
+          </div>
+        </div>
+        <div id="step3-feedback" style="margin-top: var(--sp-4);"></div>
+        <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
+          <button class="btn btn--outline btn--sm btn-expert" data-step="3">Voir la Bonne Pratique</button>
+          <button class="btn btn--outline btn--sm btn-reset-step" data-step="3" style="display:none;">Reinitialiser le choix</button>
+          <button class="btn btn--primary btn--sm btn-validate-step" data-step="3" style="display:none;">Valider l'Etape</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================================================
+         STEP 4: TUNING SYSTEME
+         ================================================================ -->
+    <div class="step-content" id="step-4">
+      <div class="card fade-in">
+        <div class="card__title"><span class="card__title-icon">&#9881;</span> Etape 4 — Tuning Systeme (SGA/PGA/Undo)</div>
+        <div class="step-desc">
+          Ajustement des parametres memoire face a une charge simulee de reporting PMSI/T2A.
+          Un mauvais dimensionnement entraine des ORA-01555 et des temps de reponse degradés.
+        </div>
+        <div class="decision-zone" id="step4-decisions">
+          <div class="decision-opt" data-choice="risky" data-step="4">
+            <span class="decision-opt__letter">A</span>
+            <span class="decision-opt__label">UNDO_RETENTION=900s, SGA=2G, pas de tuning</span>
+            <span class="decision-opt__badge tag--neutral tag">UNDO par defaut</span>
+          </div>
+          <div class="decision-opt" data-choice="good" data-step="4">
+            <span class="decision-opt__letter">B</span>
+            <span class="decision-opt__label">UNDO_RETENTION=1800s, SGA=4G, PGA=1G, undo tablespace 4G</span>
+            <span class="decision-opt__badge tag--neutral tag">UNDO dimensionne</span>
+          </div>
+          <div class="decision-opt" data-choice="risky2" data-step="4">
+            <span class="decision-opt__letter">C</span>
+            <span class="decision-opt__label">SGA=8G mais UNDO_RETENTION=600s, pas de monitoring</span>
+            <span class="decision-opt__badge tag--neutral tag">SGA sur-dimensionnee</span>
+          </div>
+        </div>
+        <div id="step4-feedback" style="margin-top: var(--sp-4);"></div>
+        <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
+          <button class="btn btn--outline btn--sm btn-expert" data-step="4">Voir la Bonne Pratique</button>
+          <button class="btn btn--outline btn--sm btn-reset-step" data-step="4" style="display:none;">Reinitialiser le choix</button>
+          <button class="btn btn--primary btn--sm btn-validate-step" data-step="4" style="display:none;">Valider l'Etape</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================================================
+         STEP 5: TESTS DE CHARGE & RECETTE
+         ================================================================ -->
+    <div class="step-content" id="step-5">
+      <div class="card fade-in">
+        <div class="card__title"><span class="card__title-icon">&#128202;</span> Etape 5 — Tests de Charge &amp; Recette</div>
+        <div class="step-desc">
+          Simulation de 500 utilisateurs concurrents. Un ralentissement est detecte.
+          A vous d'identifier la cause a travers les Wait Events et de proposer la correction.
+        </div>
+        <div class="decision-zone" id="step5-decisions">
+          <div class="decision-opt" data-choice="risky" data-step="5">
+            <span class="decision-opt__letter">A</span>
+            <span class="decision-opt__label">Ignorer les Wait Events, augmenter la memoire (solution palliative)</span>
+            <span class="decision-opt__badge tag--neutral tag">Correction memoire</span>
+          </div>
+          <div class="decision-opt" data-choice="good" data-step="5">
+            <span class="decision-opt__letter">B</span>
+            <span class="decision-opt__label">Analyser enq: TX - row lock contention, corriger le CACHE de sequence</span>
+            <span class="decision-opt__badge tag--neutral tag">Diagnostic Wait Event</span>
+          </div>
+          <div class="decision-opt" data-choice="risky2" data-step="5">
+            <span class="decision-opt__letter">C</span>
+            <span class="decision-opt__label">Rebuild de tous les index (couteux, sans diagnostic)</span>
+            <span class="decision-opt__badge tag--neutral tag">Rebuild index</span>
+          </div>
+        </div>
+        <div id="step5-feedback" style="margin-top: var(--sp-4);"></div>
+        <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
+          <button class="btn btn--outline btn--sm btn-expert" data-step="5">Voir la Bonne Pratique</button>
+          <button class="btn btn--outline btn--sm btn-reset-step" data-step="5" style="display:none;">Reinitialiser le choix</button>
+          <button class="btn btn--primary btn--sm btn-validate-step" data-step="5" style="display:none;">Valider l'Etape</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================================================
+         STEP 6: MISE EN PRODUCTION & MAINTENANCE
+         ================================================================ -->
+    <div class="step-content" id="step-6">
+      <div class="card fade-in">
+        <div class="card__title"><span class="card__title-icon">&#127758;</span> Etape 6 — Mise en Production &amp; Maintenance</div>
+        <div class="step-desc">
+          Validation de la strategie de Backup/PRA avant le Go-Live.
+          La capacite a restaurer les donnees est la seule verite en cas de sinistre.
+        </div>
+        <div class="decision-zone" id="step6-decisions">
+          <div class="decision-opt" data-choice="risky" data-step="6">
+            <span class="decision-opt__letter">A</span>
+            <span class="decision-opt__label">Valider sans test de restauration, backup journalier seulement</span>
+            <span class="decision-opt__badge tag--neutral tag">Backup simple</span>
+          </div>
+          <div class="decision-opt" data-choice="good" data-step="6">
+            <span class="decision-opt__letter">B</span>
+            <span class="decision-opt__label">RMAN validate + Data Guard Physical Standby + test trimestriel</span>
+            <span class="decision-opt__badge tag--neutral tag">Backup + Standby</span>
+          </div>
+          <div class="decision-opt" data-choice="risky2" data-step="6">
+            <span class="decision-opt__letter">C</span>
+            <span class="decision-opt__label">Export logique expdp seulement (pas de RMAN ni standby)</span>
+            <span class="decision-opt__badge tag--neutral tag">Export logique</span>
+          </div>
+        </div>
+        <div id="step6-feedback" style="margin-top: var(--sp-4);"></div>
+        <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
+          <button class="btn btn--outline btn--sm btn-expert" data-step="6">Voir la Bonne Pratique</button>
+          <button class="btn btn--outline btn--sm btn-reset-step" data-step="6" style="display:none;">Reinitialiser le choix</button>
+          <button class="btn btn--primary btn--sm btn-validate-step" data-step="6" style="display:none;">Valider l'Etape</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Log Console -->
+    <div class="card fade-in">
+      <div class="card__title"><span class="card__title-icon">&#128203;</span> Console de Simulation — Logs Temps Reel</div>
+      <div class="log-console" id="sim-log" style="max-height: 280px;">
+        <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Guide de deploiement initialise. Etape 1 active.</div>
+      </div>
+    </div>
+
+    <!-- Performance Chart -->
+    <div class="card fade-in">
+      <div class="card__title"><span class="card__title-icon">&#128200;</span> Performance Projet — Indicateurs d Impact</div>
+      <div class="perf-chart" id="perf-chart">
+        <div class="perf-chart__bar"><div class="perf-chart__col" id="pc-install" style="height: 20%; background: var(--color-green);"></div><span class="perf-chart__label">Install</span></div>
+        <div class="perf-chart__bar"><div class="perf-chart__col" id="pc-securite" style="height: 20%; background: var(--color-border);"></div><span class="perf-chart__label">Securite</span></div>
+        <div class="perf-chart__bar"><div class="perf-chart__col" id="pc-dev" style="height: 20%; background: var(--color-border);"></div><span class="perf-chart__label">Dev</span></div>
+        <div class="perf-chart__bar"><div class="perf-chart__col" id="pc-tuning" style="height: 20%; background: var(--color-border);"></div><span class="perf-chart__label">Tuning</span></div>
+        <div class="perf-chart__bar"><div class="perf-chart__col" id="pc-recette" style="height: 20%; background: var(--color-border);"></div><span class="perf-chart__label">Recette</span></div>
+        <div class="perf-chart__bar"><div class="perf-chart__col" id="pc-prod" style="height: 20%; background: var(--color-border);"></div><span class="perf-chart__label">Prod</span></div>
+      </div>
+      <div style="font-size: var(--fs-xs); color: #64748b; font-family: var(--font-mono); text-align: center; margin-top: var(--sp-2);">Sante par domaine: vert (bonne pratique) / rouge (risque) / gris (en attente)</div>
+    </div>
+
+    <!-- Completion Banner -->
+    <div id="completion-banner" class="card fade-in" style="display: none;">
+      <div class="card__title" style="color: var(--color-green);"><span class="card__title-icon">&#10004;</span> Projet PUI Termine !</div>
+      <div id="completion-msg" class="alert alert--success" style="margin-bottom: 0;">
+        Felicitations ! Vous avez complete le cycle de deploiement.
+      </div>
+      <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
+        <button class="btn btn--outline btn--sm" id="btn-restart">Recommencer le Projet</button>
+      </div>
+    </div>
+
+    <!-- Overview Help Modal -->
+    <div class="help-overlay" id="help-overlay" aria-hidden="true"></div>
+    <div class="help-modal" id="help-overview" role="dialog" aria-modal="true" aria-labelledby="help-overview-title" aria-hidden="true">
+      <div class="help-modal__header"><div class="help-modal__title" id="help-overview-title">Guide de Deploiement — Vue d'Ensemble</div><button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button></div>
+      <div class="help-modal__body">
+        <div class="help-modal__text">
+          Ce serious game vous guide a travers les <strong>6 etapes</strong> du cycle de vie d'un projet Oracle en contexte hospitalier PUI :<br><br>
+          <strong>Etape 1 — Installation</strong> : Choix du Character Set (AL32UTF8 vs legacy), Resource Plan CDB/PDB<br>
+          <strong>Etape 2 — Securite</strong> : TDE, Audit HDS, Profils de securite — conformite obligatoire<br>
+          <strong>Etape 3 — Developpement</strong> : Revue de code PL/SQL, SELECT explicite, indexation<br>
+          <strong>Etape 4 — Tuning</strong> : SGA/PGA/Undo — eviter ORA-01555 et les temps de reponse degradés<br>
+          <strong>Etape 5 — Recette</strong> : Analyse des Wait Events sous charge, contention de sequence<br>
+          <strong>Etape 6 — Production</strong> : Backup RMAN, Data Guard, PRA — la restauration est la seule verite<br><br>
+          Chaque choix a des consequences visibles immediatement. Utilisez le bouton "Voir la Bonne Pratique" si vous souhaitez de l'aide.
+        </div>
+      </div>
+      <div class="help-modal__footer"><button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button></div>
+    </div>
+
+    <!-- Expert Modal Placeholder (dynamic) -->
+    <div class="help-modal" id="help-expert" role="dialog" aria-modal="true" aria-labelledby="help-expert-title" aria-hidden="true">
+      <div class="help-modal__header"><div class="help-modal__title" id="help-expert-title">Recommandation Expert</div><button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button></div>
+      <div class="help-modal__body" id="help-expert-body">
+        <div class="help-modal__text">Contenu dynamique charge selon l'etape.</div>
+      </div>
+      <div class="help-modal__footer">
+        <button class="btn btn--primary btn--sm" id="btn-expert-apply">Appliquer la Bonne Pratique</button>
+        <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+      </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="help-modal" id="help-confirm" role="dialog" aria-modal="true" aria-hidden="true">
+      <div class="help-modal__header">
+        <div class="help-modal__title">Reflechissez avant de valider</div>
+      </div>
+      <div class="help-modal__body" style="text-align: center; padding: var(--sp-8) var(--sp-6);">
+        <div class="help-modal__text" style="font-size: var(--fs-md); margin-bottom: var(--sp-6);">
+          Etes-vous sur(e) de vouloir voir la bonne pratique ?<br>
+          <span style="font-size: var(--fs-sm); color: #94a3b8;">
+            Prenez le temps de reflechir a votre choix avant de valider.<br>
+            L'objectif pedagogique est de comprendre par l'experience.
+          </span>
+        </div>
+        <div style="display: flex; gap: var(--sp-4); justify-content: center;">
+          <button class="btn btn--primary btn--sm" id="btn-confirm-yes">Oui, voir la solution</button>
+          <button class="btn btn--outline btn--sm" id="btn-confirm-no">Non, je reflechis encore</button>
+        </div>
+      </div>
+    </div>
+
+    <footer class="app-footer">
+      ORACLE_LIFECYCLE::SIH — Guide Interactif de Deploiement Oracle PUI<br>
+      DONNEES: 100% FICTIVES — Conforme RGPD Art. 25 — Aucune donnee de sante reelle<br>
+      Architecture: WorkflowEngine — Vanilla JS — Zero Dependency — Offline
+    </footer>
+  </main>
+</div>
+
+<script>
+'use strict';
+
+// ============================================================
+// LOGGER
+// ============================================================
+class Logger {
+  constructor() { this.entries = []; }
+  _ts() {
+    const d = new Date();
+    return [d.getHours(), d.getMinutes(), d.getSeconds()].map(v => String(v).padStart(2, '0')).join(':');
+  }
+  log(level, msg) {
+    const entry = { ts: this._ts(), level, msg, epoch: Date.now() };
+    this.entries.push(entry);
+    return entry;
+  }
+  getEntries() { return this.entries.slice(); }
+  clear() { this.entries = []; }
+}
+
+// ============================================================
+// EVENT DISPATCHER
+// ============================================================
+class EventDispatcher {
+  constructor() { this._l = {}; }
+  on(evt, cb) { (this._l[evt] = this._l[evt] || []).push(cb); }
+  off(evt, cb) { this._l[evt] = (this._l[evt] || []).filter(h => h !== cb); }
+  emit(evt, data) { (this._l[evt] || []).forEach(cb => cb(data)); }
+}
+
+// ============================================================
+// WORKFLOW ENGINE
+// ============================================================
+class WorkflowEngine {
+  constructor() {
+    this.ev = new EventDispatcher();
+    this.logger = new Logger();
+    this.steps = {
+      1: { id: 1, name: 'Installation', status: 'active', decision: null, feedback: null },
+      2: { id: 2, name: 'Securite', status: 'pending', decision: null, feedback: null },
+      3: { id: 3, name: 'Developpement', status: 'pending', decision: null, feedback: null },
+      4: { id: 4, name: 'Tuning', status: 'pending', decision: null, feedback: null },
+      5: { id: 5, name: 'Recette', status: 'pending', decision: null, feedback: null },
+      6: { id: 6, name: 'Production', status: 'pending', decision: null, feedback: null }
+    };
+    this.currentStep = 1;
+    this.riskLevel = 0;
+    this.goodPractices = 0;
+    this.alertCount = 0;
+    this.history = [];
+    this.completed = false;
+  }
+
+  get current() { return this.steps[this.currentStep]; }
+  get totalSteps() { return 6; }
+  get doneCount() { return Object.values(this.steps).filter(s => s.status === 'done').length; }
+
+  selectDecision(stepId, choice) {
+    const step = this.steps[stepId];
+    if (!step || step.status === 'done') return null;
+
+    step.decision = choice;
+    const feedback = this._evaluate(stepId, choice);
+    step.feedback = feedback;
+
+    if (feedback.risky) {
+      this.riskLevel = Math.min(100, this.riskLevel + feedback.riskDelta);
+      this.alertCount++;
+    } else {
+      this.goodPractices++;
+    }
+
+    this.history.push({ step: stepId, stepName: step.name, choice, risky: feedback.risky, time: new Date().toLocaleTimeString() });
+
+    if (feedback.risky) {
+      step.status = 'error';
+    } else {
+      step.status = 'done';
+    }
+
+    this.ev.emit('decision', { stepId, choice, feedback });
+    this.ev.emit('state-change', this.getState());
+    return feedback;
+  }
+
+  validateStep(stepId) {
+    const step = this.steps[stepId];
+    if (!step || step.status === 'done') return;
+
+    step.status = 'done';
+    if (!step.feedback || !step.feedback.risky) {
+      this.goodPractices++;
+    }
+    this._advance();
+    this.ev.emit('state-change', this.getState());
+  }
+
+  applyExpert(stepId) {
+    const step = this.steps[stepId];
+    if (!step) return;
+    const expertChoice = this._expertChoice(stepId);
+    step.decision = expertChoice;
+    step.feedback = { risky: false, message: this._expertMsg(stepId), detail: this._expertDetail(stepId), riskDelta: 0 };
+    step.status = 'done';
+    this.goodPractices++;
+    this.history.push({ step: stepId, stepName: step.name, choice: expertChoice, risky: false, time: new Date().toLocaleTimeString() });
+    this._advance();
+    this.ev.emit('decision', { stepId, choice: expertChoice, feedback: step.feedback });
+    this.ev.emit('state-change', this.getState());
+    return step.feedback;
+  }
+
+  _advance() {
+    if (this.currentStep < 6) {
+      this.currentStep++;
+      this.steps[this.currentStep].status = 'active';
+    } else {
+      this.completed = true;
+    }
+  }
+
+  _expertChoice(stepId) {
+    const map = { 1: 'B', 2: 'B', 3: 'B', 4: 'B', 5: 'B', 6: 'B' };
+    return map[stepId] || 'B';
+  }
+
+  _expertMsg(stepId) {
+    const msgs = {
+      1: 'Configuration optimale appliquee : AL32UTF8 + Resource Plan.',
+      2: 'Configuration HDS standard appliquee : TDE + Audit + Profils.',
+      3: 'Code optimise : colonnes explicites, index adaptes, BULK COLLECT.',
+      4: 'Dimensionnement expert : UNDO_RETENTION ajuste, SGA/PGA dimensionnes.',
+      5: 'Correction appliquee : cache de sequence augmente, contention resolue.',
+      6: 'PRA valide : RMAN + Data Guard + test de restauration planifie.'
+    };
+    return msgs[stepId] || 'Bonne pratique appliquee.';
+  }
+
+  _expertDetail(stepId) {
+    const details = {
+      1: 'AL32UTF8 (UTF-8) est le seul choix viable : compatibilite Unicode complete, caractères speciaux des noms de patients stockes correctement, evolution vers l\'internationalisation possible. Le Resource Plan CDB isole les ressources pour la PUI (shares=8) vs les autres PDBs, garantissant un SLA meme sous contention. ORA-12737: "Character set mismatch" evite.',
+      2: 'TDE AES-256 chiffre les donnees au repos sans modification applicative. L\'audit HDS trace TOUTES les operations sur les donnees de sante (LOGON, LOGOFF, DDL, DML sur tables sensibles). Le profil SECURE_PUI applique : FAILED_LOGIN_ATTEMPTS=3, PASSWORD_LOCK_TIME=1, IDLE_TIME=30. Conforme HDS et ISO 27001.',
+      3: 'SELECT * transfere toutes les colonnes au reseau, consommant de la bande passante inutilement. L\'absence d\'index sur les cles de jointure (med_id, id_lot) force des Full Table Scan. BULK COLLECT reduit les context switches de N a 1 entre SQL et PL/SQL. Gain: 10x a 50x sur les batchs de nuit.',
+      4: 'UNDO_RETENTION a 900s est insuffisant pour les rapports T2A longs (parfois >30min). ORA-01555 "Snapshot too old" survient quand les donnees Undo sont ecrasees. Formule: UNDO_RETENTION = duree_transaction_max * 1.5 + 300s de securite. Avec des rapports de 30min => 1800s minimum. SGA a 4G adapte pour 500 sessions.',
+      5: 'enq: TX - row lock contention indique un verrouillage de ligne sur une table a forte concurrence. La cause frequente est une sequence avec CACHE=1 (defaut) : chaque NEXTVAL ecrit dans le dictionnaire, creant un verrou exclusif. Solution: CACHE=1000 ou plus. Pour les sequences utilisees par 500 sessions concurrentes, CACHE=10000 est recommandé.',
+      6: 'Un backup non teste n\'existe pas. RMAN validate verifie l\'integrite des blocs sans restaurer. Data Guard Physical Standby assure zero data loss en cas de crash disque. RPO=0, RTO<30min. Procedure de test trimestrielle obligatoire : switchover, restauration sur un environnement de test, validation des donnees.'
+    };
+    return details[stepId] || 'Recommandation technique detaillee.';
+  }
+
+  _evaluate(stepId, choice) {
+    const scenarios = {
+      1: {
+        risky: { msg: 'ALERTE : WE8MSWIN1252 bloque l\'internationalisation. Les caractères speciaux des noms de patients (ex: "François", "Müller") seront corrompus. Risque de corruption de donnees silencieuse. ORA-12737 simule : "Character set mismatch".', detail: 'Le Character Set est definitif apres creation de la base. La seule solution est de recreer la base. En contexte hospitalier, les noms de patients contiennent frequemment des accents et caracteres speciaux. WE8MSWIN1252 ne supporte que l\'Europe de l\'Ouest.', riskDelta: 25 },
+        risky2: { msg: 'ATTENTION : Pas de Resource Plan actif. En cas de contention CPU/IO, les requetes de recherche peuvent etre affamees par les batchs PMSI. Risque de degradation des temps de reponse aux Urgences.', detail: 'Le Resource Manager Oracle (DBMS_RESOURCE_MANAGER) garantit l\'isolation des ressources. Sans lui, un batch non controle peut consommer 100% CPU et impacter la dispensation en PUI.', riskDelta: 15 },
+        good: { msg: 'BON CHOIX : AL32UTF8 est le standard Unicode. Le Resource Plan isole la PUI avec des shares dediees. Architecture resiliente.', detail: 'AL32UTF8 supporte tous les caracteres Unicode. Le Resource Plan CDB avec shares proportionnelles garantit que la PUI recoit un minimum de CPU/IO meme sous charge.', riskDelta: 0 }
+      },
+      2: {
+        risky: { msg: 'ALERTE HDS : Sans audit, la tracabilite des acces aux donnees de sante est impossible. Non-conformite legale majeure (articles L.1111-8 CSP). Sanction : jusqu\'a 4% du chiffre d\'affaires ou 20M EUR (RGPD).', detail: 'L\'audit HDS est obligatoire depuis le decret 2018-112. L\'impact performance de l\'audit est <2% sur les requetes OLTP. Le cout de la non-conformite est infini (suspension d\'habilitation, poursuites). TDE est obligatoire pour les donnees de sante (art. L.1110-4-1 CSP).', riskDelta: 30 },
+        risky2: { msg: 'ATTENTION : L\'audit partiel ne couvre pas les acces en lecture aux donnees de sante. Un acces non autorise a un dossier patient ne serait pas trace. Couverture insuffisante pour la certification HDS.', detail: 'La norme HDS exige l\'audit de tous les acces aux donnees de sante, y compris les SELECT et les tentatives echouees. L\'audit partiel est considere comme non-conforme.', riskDelta: 15 },
+        good: { msg: 'EXCELLENT : TDE AES-256 + Audit HDS complet + Profil SECURE_PUI. Conforme HDS, ISO 27001, RGPD. La regle d\'or : la securite des donnees de sante n\'est pas optionnelle.', detail: 'TDE chiffre les fichiers de donnees (.dbf), les backups RMAN, et les tempfiles. L\'audit est gere par UNIFIED_AUDIT_POLICY. Profil SECURE_PUI applique le mot de passe robuste et le verrouillage de session.', riskDelta: 0 }
+      },
+      3: {
+        risky: { msg: 'ALERTE PERFORMANCE : SELECT * sur STOCK_MED renvoie 15 colonnes quand seules 2 sont necessaires. Trafic reseau multiplie par 7. L\'absence d\'index sur med_id provoque un Full Table Scan sur la table de jointure.', detail: 'SELECT * transfere toutes les colonnes (meme les LOBs) au reseau. L\'index sur les cles de jointure transforme un Full Table Scan (O(n)) en Index Scan (O(log n)). Sur 10M de lignes, le TFS dure plusieurs secondes.', riskDelta: 20 },
+        risky2: { msg: 'ATTENTION : Curseur ligne a ligne (N * context switches). Pour 100000 lignes, 100000 transitions entre moteur SQL et PL/SQL. Temps estime : 15 secondes vs 0.5s avec BULK COLLECT.', detail: 'Chaque FETCH dans une boucle FOR LOIN entraine un context switch. BULK COLLECT charge le jeu de resultats en une operation dans la PGA. FORALL applique les DML en un seul appel. Gain : 10x a 50x.', riskDelta: 15 },
+        good: { msg: 'CODE OPTIMAL : Colonnes explicites reduisent le trafic reseau. Index sur les cles de jointure assurent un acces O(log n). Pour les batchs, BULK COLLECT + FORALL est le pattern ETL standard.', detail: 'SELECT avec colonnes explicites, index composite (med_id, lot_id), et BULK COLLECT pour le traitement par lot. Pattern recommande par Oracle pour les applications de sante.', riskDelta: 0 }
+      },
+      4: {
+        risky: { msg: 'SIMULATION : Echec du rapport T2A avec ORA-01555 "Snapshot too old". Les donnees Undo ont ete ecrasees apres 900s alors que le rapport dure 1800s. Perte de coherence de lecture.', detail: 'ORA-01555 survient quand le snapshot SCN requis pour la coherence de lecture n\'est plus disponible dans l\'undo tablespace. La requete de facturation T2A doit etre re-executee entierement. En production, cela retarde la cloture mensuelle.', riskDelta: 25 },
+        risky2: { msg: 'ATTENTION : SGA a 8G sur un serveur de 16G empeche le PGA de s\'allouer suffisamment. UNDO_RETENTION a 600s insuffisant pour les rapports longs.', detail: 'La memoire totale Oracle (SGA+PGA) ne doit pas depasser 80% de la RAM physique pour laisser de la place a l\'OS et au HugePages. SGA=8G + PGA=2G + OS=2G = 12G (75%) acceptable mais sous-optimal.', riskDelta: 10 },
+        good: { msg: 'DIMENSIONNEMENT EXPERT : UNDO_RETENTION=1800s couvre les rapports T2A les plus longs. SGA=4G pour buffer cache + shared pool, PGA=1G pour les tris. Undo tablespace=4G pour les segments Undo.', detail: 'Formule : UNDO_RETENTION = max(transaction_duration * 1.5, 900). Pour des rapports de 30min => 1800s. Taille undo = UNDO_RETENTION * UNDO_BLOCK_SIZE * blocks_per_sec. SGA/PGA dimensionnes pour 500 sessions concurrentes.', riskDelta: 0 }
+      },
+      5: {
+        risky: { msg: 'ALERTE : Ignorer les Wait Events masque le probleme. L\'augmentation memoire est un palliatif : le verrouillage de sequence continue et le nombre de sessions bloquees croit. A 500 utilisateurs, 40% sont en attente "enq: TX - row lock contention".', detail: 'Les Wait Events sont le premier indicateur de sante d\'Oracle. enq: TX - row lock contention apparait quand N sessions attendent un verrou exclusif sur la meme ressource. Ici, la sequence SEQ_DISPENSE avec CACHE=1 est le bottleneck. Chaque NEXTVAL ecrit dans le dictionnaire.', riskDelta: 25 },
+        risky2: { msg: 'ATTENTION : Rebuild d\'index sans diagnostic est une operation couteuse (I/O massif, verrouillage). Les index ne sont pas en cause ici : la contention est sur les locks TX lies a la sequence.', detail: 'ALTER INDEX ... REBUILD consomme des ressources et verrouille les index pendant l\'operation. C\'est une operation de maintenance, pas une correction de performance. Le rebuild d\'index sans analyse AWR prealable est une perte de temps.', riskDelta: 10 },
+        good: { msg: 'DIAGNOSTIC CORRECT : enq: TX - row lock contention identifie. Sequence cache augmente a 10000. Les 500 utilisateurs obtiennent NEXTVAL sans contention. Resolution definitive.', detail: 'ALTER SEQUENCE seq_dispense CACHE 10000; Le CACHE pre-alloue les valeurs en memoire, evitant les ecritures dictionnaire a chaque NEXTVAL. Pour les sequences en forte concurrence, CACHE=1000 a 10000 est standard. Avec ORDER si l\'ordre chronologique strict est requis.', riskDelta: 0 }
+      },
+      6: {
+        risky: { msg: 'ALERTE CRITIQUE : Un backup non teste n\'est pas un backup. En cas de crash disque demain, les donnees patients sont perdues. RPO non defini, RTO inconnu. Impact juridique et medical catastrophique.', detail: 'Sans test de restauration, personne ne sait si les backups sont utilisables. Erreurs classiques : fichier manquant, corruption silencieuse, incompatibilite de version. Les backups RMAN doivent etre VALIDATE regulierement.', riskDelta: 35 },
+        risky2: { msg: 'ATTENTION : expdp est un export logique (pas physique). Il ne permet pas le point-in-time recovery, ne protege pas contre les corruptions de blocs, et le temps de restauration est prohibitif pour 5 To de donnees.', detail: 'Data Pump exporte logiquement les donnees (objets, lignes). La restauration necessite de recreer les tablespaces et d\'importer, ce qui prend des heures. RMAN restaure un fichier .dbf en quelques minutes. Data Guard offre le basculement en secondes.', riskDelta: 20 },
+        good: { msg: 'PLAN DE REPRISE EXPERT : RMAN validate hebdomadaire + Data Guard Physical Standby (RPO=0) + test de restauration trimestriel. La fonction de base de donnees n\'est pas de sauvegarder mais de RESTAURER.', detail: 'Configuration : RMAN> BACKUP VALIDATE CHECK LOGICAL DATABASE; Data Guard en mode SYNC (RPO=0). Test trimestriel : switchover, verification des donnees, basculement retour. Cette procedure est auditee annuellement par l\'organisme de certification HDS.', riskDelta: 0 }
+      }
+    };
+    const stepScenarios = scenarios[stepId] || {};
+    return stepScenarios[choice] || { risky: true, msg: 'Choix non reconnu.', detail: '', riskDelta: 10 };
+  }
+
+  getState() {
+    return {
+      currentStep: this.currentStep,
+      steps: { ...this.steps },
+      riskLevel: this.riskLevel,
+      goodPractices: this.goodPractices,
+      alertCount: this.alertCount,
+      history: this.history.slice(),
+      completed: this.completed,
+      doneCount: this.doneCount
+    };
+  }
+
+  restart() {
+    Object.keys(this.steps).forEach(k => {
+      this.steps[k] = { id: parseInt(k), name: this.steps[k].name, status: 'pending', decision: null, feedback: null };
+    });
+    this.steps[1].status = 'active';
+    this.currentStep = 1;
+    this.riskLevel = 0;
+    this.goodPractices = 0;
+    this.alertCount = 0;
+    this.history = [];
+    this.completed = false;
+    this.logger.clear();
+    this.ev.emit('state-change', this.getState());
+  }
+
+  resetDecision(stepId) {
+    const step = this.steps[stepId];
+    if (!step || !step.feedback) return;
+    if (step.feedback.risky) {
+      this.riskLevel = Math.max(0, this.riskLevel - step.feedback.riskDelta);
+      this.alertCount = Math.max(0, this.alertCount - 1);
+    } else {
+      this.goodPractices = Math.max(0, this.goodPractices - 1);
+    }
+    const idx = this.history.map(h => h.step).lastIndexOf(stepId);
+    if (idx !== -1) this.history.splice(idx, 1);
+    step.status = 'active';
+    step.decision = null;
+    step.feedback = null;
+    this.ev.emit('state-change', this.getState());
+  }
+}
+
+// ============================================================
+// UI CONTROLLER
+// ============================================================
+class UIController {
+  constructor(engine) {
+    this.engine = engine;
+    this.simLog = document.getElementById('sim-log');
+    this._pendingExpertStep = null;
+    this._bind();
+    engine.ev.on('state-change', state => this._render(state));
+    engine.ev.on('decision', d => this._onDecision(d));
+    engine._advance = this._patchedAdvance.bind(engine);
+    this._render(engine.getState());
+    this._log('info', 'Guide de deploiement initialise. Etape 1 active.');
+  }
+
+  _bind() {
+    // Decision options
+    document.querySelectorAll('.decision-opt').forEach(el => {
+      el.addEventListener('click', () => {
+        const step = parseInt(el.dataset.step);
+        const choice = el.dataset.choice;
+        const stepData = this.engine.steps[step];
+        if (stepData.status === 'done') return;
+        this.engine.selectDecision(step, choice);
+      });
+    });
+
+    // Expert buttons
+    document.querySelectorAll('.btn-expert').forEach(el => {
+      el.addEventListener('click', () => {
+        const step = parseInt(el.dataset.step);
+        this._askConfirm(step);
+      });
+    });
+
+    // Confirmation modal
+    document.getElementById('btn-confirm-yes').addEventListener('click', () => {
+      const step = this._pendingExpertStep;
+      if (!step) return;
+      this._closeModal('help-confirm');
+      this._closeOverlay();
+      this._openExpert(step);
+    });
+    document.getElementById('btn-confirm-no').addEventListener('click', () => {
+      this._pendingExpertStep = null;
+      this._closeModal('help-confirm');
+      this._closeOverlay();
+    });
+
+    // Validate step buttons
+    document.querySelectorAll('.btn-validate-step').forEach(el => {
+      el.addEventListener('click', () => {
+        const step = parseInt(el.dataset.step);
+        this.engine.validateStep(step);
+      });
+    });
+
+    // Reset step buttons
+    document.querySelectorAll('.btn-reset-step').forEach(el => {
+      el.addEventListener('click', () => {
+        const stepId = parseInt(el.dataset.step);
+        this.engine.resetDecision(stepId);
+        const stepEl = document.getElementById('step-' + stepId);
+        stepEl.querySelectorAll('.decision-opt').forEach(opt => {
+          opt.disabled = false;
+          opt.classList.remove('decision-opt--selected');
+        });
+        document.getElementById('step' + stepId + '-feedback').innerHTML = '';
+        stepEl.querySelector('.btn-reset-step').style.display = 'none';
+        stepEl.querySelector('.btn-validate-step').style.display = 'none';
+        this._log('info', '[Etape ' + stepId + '] Choix reinitialise. Vous pouvez choisir a nouveau.');
+      });
+    });
+
+    // Expert modal apply
+    document.getElementById('btn-expert-apply').addEventListener('click', () => {
+      const step = parseInt(document.getElementById('help-expert').dataset.engineStep);
+      if (!step) return;
+      this.engine.applyExpert(step);
+      this._closeModal('help-expert');
+      this._closeModal('help-overlay');
+    });
+
+    // Help
+    document.getElementById('btn-help-overview').addEventListener('click', () => this._openModal('help-overview'));
+    document.querySelectorAll('.help-modal__close, .help-modal__footer-btn').forEach(el => {
+      el.addEventListener('click', () => {
+        this._closeModal('help-expert');
+        this._closeModal('help-overview');
+        this._closeModal('help-confirm');
+        this._closeOverlay();
+      });
+    });
+    document.getElementById('help-overlay').addEventListener('click', () => {
+      this._closeModal('help-expert');
+      this._closeModal('help-overview');
+      this._closeModal('help-confirm');
+      this._closeOverlay();
+    });
+
+    // Restart
+    document.getElementById('btn-restart').addEventListener('click', () => {
+      this.engine.restart();
+      this._log('info', 'Projet reinitialise. Retour a l\'etape 1.');
+    });
+
+    // Step progress clicks (go to active step)
+    document.querySelectorAll('.step-progress__item').forEach(el => {
+      el.addEventListener('click', () => {
+        // Just informative - no navigation
+      });
+    });
+  }
+
+  _patchedAdvance() {
+    if (this.currentStep < 6) {
+      this.currentStep++;
+      this.steps[this.currentStep].status = 'active';
+    } else {
+      this.completed = true;
+    }
+  }
+
+  _onDecision(d) {
+    const stepEl = document.getElementById('step-' + d.stepId);
+    const feedbackEl = document.getElementById('step' + d.stepId + '-feedback');
+    const step = this.engine.steps[d.stepId];
+    const fb = d.feedback;
+
+    // Clear selected state
+    stepEl.querySelectorAll('.decision-opt').forEach(el => {
+      el.classList.remove('decision-opt--selected', 'decision-opt--risky', 'decision-opt--good');
+    });
+
+    // Mark selected option — always neutral
+    stepEl.querySelectorAll('.decision-opt').forEach(el => {
+      if (el.dataset.choice === d.choice) {
+        el.classList.add('decision-opt--selected');
+      }
+    });
+
+    // Show feedback — severity-aware
+    let alertClass = 'alert--success';
+    let icon = '&#10004;';
+    let logLevel = 'success';
+    let prefix = 'Bonne pratique : ';
+    if (d.choice === 'risky') {
+      alertClass = 'alert--error'; icon = '&#9888;'; logLevel = 'error'; prefix = 'Choix risque (critique) : ';
+    } else if (d.choice === 'risky2') {
+      alertClass = 'alert--warning'; icon = '&#9888;'; logLevel = 'warn'; prefix = 'Choix risque (modere) : ';
+    }
+    feedbackEl.innerHTML = '<div class="alert ' + alertClass + '"><strong>' + icon + ' </strong>' + fb.msg + '</div>';
+
+    // Log
+    this._log(logLevel, '[Etape ' + d.stepId + '] ' + prefix + fb.msg);
+
+    // Show detail if risky
+    if (fb.risky && fb.detail) {
+      feedbackEl.innerHTML += '<div style="margin-top: var(--sp-2); font-size: var(--fs-xs); color: #94a3b8; font-family: var(--font-mono); background: var(--color-bg-deep); padding: var(--sp-3); border-radius: var(--radius-sm);">' + fb.detail + '</div>';
+    }
+
+    // Disable options
+    stepEl.querySelectorAll('.decision-opt').forEach(el => el.disabled = true);
+
+    // Show reset button (always visible after a choice)
+    const resetBtn = stepEl.querySelector('.btn-reset-step');
+    if (resetBtn) resetBtn.style.display = 'inline-flex';
+
+    // Show validate button only if good choice or after expert
+    const validateBtn = stepEl.querySelector('.btn-validate-step');
+    if (!fb.risky) {
+      validateBtn.style.display = 'inline-flex';
+    } else {
+      validateBtn.style.display = 'none';
+    }
+  }
+
+  _render(state) {
+    // Update progress bar
+    document.querySelectorAll('.step-progress__item').forEach(el => {
+      const s = parseInt(el.dataset.step);
+      el.classList.remove('step-progress__item--active', 'step-progress__item--done', 'step-progress__item--error');
+      if (state.steps[s].status === 'active') el.classList.add('step-progress__item--active');
+      else if (state.steps[s].status === 'done') el.classList.add('step-progress__item--done');
+      else if (state.steps[s].status === 'error') el.classList.add('step-progress__item--error');
+    });
+
+    // Show active step content
+    document.querySelectorAll('.step-content').forEach(el => {
+      el.classList.toggle('step-content--active', el.id === 'step-' + state.currentStep);
+    });
+
+    // Dashboard
+    document.getElementById('dash-etape').textContent = state.currentStep;
+    document.getElementById('dash-good').textContent = state.goodPractices;
+    document.getElementById('dash-alerts').textContent = state.alertCount;
+
+    // Risk
+    const riskVal = document.getElementById('dash-risk-val');
+    const riskGaugeBar = document.getElementById('risk-gauge-bar');
+    const riskGaugePct = document.getElementById('risk-gauge-pct');
+    const riskMsg = document.getElementById('risk-impact-msg');
+    riskVal.textContent = state.riskLevel + '%';
+    riskGaugeBar.style.width = state.riskLevel + '%';
+    riskGaugePct.textContent = state.riskLevel + '%';
+
+    let riskColor = 'var(--color-green)';
+    let riskText = 'Faible';
+    let riskMsgText = 'Projet sain. Aucun risque detecte.';
+    if (state.riskLevel > 70) {
+      riskColor = 'var(--color-red)';
+      riskText = 'CRITIQUE';
+      riskMsgText = 'Niveau de risque critique. Decisions non conformes menace le deploiement.';
+    } else if (state.riskLevel > 40) {
+      riskColor = 'var(--color-amber)';
+      riskText = 'Eleve';
+      riskMsgText = 'Risque significatif. Plusieurs decisions non conformes cumulees.';
+    } else if (state.riskLevel > 15) {
+      riskColor = 'var(--color-amber)';
+      riskText = 'Modere';
+      riskMsgText = 'Quelques choix risques detectes. Revoyez les etapes concernees.';
+    }
+
+    riskVal.style.color = riskColor;
+    riskGaugeBar.style.background = riskColor;
+    riskGaugePct.style.color = riskColor;
+    document.getElementById('nav-risk-level').textContent = riskText;
+    document.getElementById('nav-risk-level').style.color = riskColor;
+    riskMsg.textContent = riskMsgText;
+
+    // Nav
+    document.getElementById('nav-current-step').textContent = 'Etape ' + state.currentStep;
+    document.getElementById('nav-steps-done').textContent = state.doneCount + ' / 6';
+
+    // Chart
+    this._updateChart(state);
+
+    // History
+    const histEl = document.getElementById('decision-history');
+    if (state.history.length === 0) {
+      histEl.innerHTML = '<div style="color: #475569; padding: var(--sp-2) var(--sp-4);">Aucune decision encore prise.</div>';
+    } else {
+      histEl.innerHTML = state.history.map(h => {
+        let hIcon = '&#10004;';
+        if (h.choice === 'risky') hIcon = '&#9888;';
+        else if (h.choice === 'risky2') hIcon = '&#9888;&#65039;';
+        return '<div class="history-item"><span class="history-item__step">E' + h.step + '</span><span class="history-item__icon">' + hIcon + '</span><span>' + h.choice + ' — ' + h.stepName + '</span></div>';
+      }).join('');
+    }
+
+    // Completion
+    const banner = document.getElementById('completion-banner');
+    if (state.completed) {
+      banner.style.display = 'block';
+      const totalRisk = state.riskLevel;
+      let completionMsg = '';
+      if (totalRisk === 0) {
+        completionMsg = 'Parfait ! Aucun risque pris. Vous maîtrisez parfaitement le cycle de vie Oracle. Projet certifiable HDS.';
+      } else if (totalRisk <= 20) {
+        completionMsg = 'Tres bien ! Risque minimal. Quelques points d\'attention identifies, mais le projet est solide.';
+      } else if (totalRisk <= 50) {
+        completionMsg = 'Projet livre avec des risques moderes. Pensez a revoir les etapes concernees avant l\'audit HDS.';
+      } else {
+        completionMsg = 'Projet livre avec un niveau de risque eleve ! Non conforme HDS. Recommandez le projet avec les bonnes pratiques.';
+      }
+      document.getElementById('completion-msg').textContent = completionMsg;
+      this._log('success', 'PROJET TERMINE. Risque final: ' + totalRisk + '%.');
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+
+  _updateChart(state) {
+    for (let i = 1; i <= 6; i++) {
+      const bar = document.getElementById('pc-' + ['install', 'securite', 'dev', 'tuning', 'recette', 'prod'][i - 1]);
+      if (!bar) continue;
+      const s = state.steps[i];
+      if (s.status === 'done') {
+        bar.style.background = 'var(--color-green)';
+        bar.style.height = '80%';
+      } else if (s.status === 'error') {
+        bar.style.background = 'var(--color-red)';
+        bar.style.height = '60%';
+      } else if (s.status === 'active') {
+        bar.style.background = 'var(--color-blue)';
+        bar.style.height = '30%';
+      } else {
+        bar.style.background = 'var(--color-border)';
+        bar.style.height = '20%';
+      }
+    }
+  }
+
+  _askConfirm(step) {
+    this._pendingExpertStep = step;
+    this._openModal('help-confirm');
+  }
+
+  _openExpert(step) {
+    const modal = document.getElementById('help-expert');
+    const body = document.getElementById('help-expert-body');
+    modal.dataset.engineStep = step;
+    const titles = {
+      1: 'Etape 1 — AL32UTF8 + Resource Plan',
+      2: 'Etape 2 — TDE, Audit HDS, Profil SECURE_PUI',
+      3: 'Etape 3 — Colonnes explicites, Index, BULK COLLECT',
+      4: 'Etape 4 — Undo/SGA/PGA dimensionnement expert',
+      5: 'Etape 5 — Sequence Cache, Wait Events',
+      6: 'Etape 6 — RMAN, Data Guard, PRA'
+    };
+    document.getElementById('help-expert-title').textContent = 'Recommandation Expert — ' + titles[step];
+    const detail = this.engine._expertDetail(step);
+    const msg = this.engine._expertMsg(step);
+    body.innerHTML =
+      '<div class="help-modal__text"><strong>Constat :</strong><br>' + msg + '</div>' +
+      '<div class="help-modal__text"><strong>Justification technique :</strong><br>' + detail + '</div>' +
+      '<div class="help-modal__text" style="border-left: 2px solid var(--color-cyan); padding-left: var(--sp-4);">' +
+      '<strong>Regle d\'or :</strong> Cette recommandation est basee sur les principes d\'architecture Oracle et les exigences HDS/ISO 27001.' +
+      '<br>Cliquez "Appliquer la Bonne Pratique" pour valider l\'etape avec la configuration optimale.</div>';
+    this._openModal('help-expert');
+  }
+
+  _openModal(id) {
+    document.getElementById(id).classList.add('help-modal--active');
+    document.getElementById('help-overlay').classList.add('help-overlay--active');
+  }
+
+  _closeModal(id) {
+    document.getElementById(id).classList.remove('help-modal--active');
+  }
+
+  _closeOverlay() {
+    document.getElementById('help-overlay').classList.remove('help-overlay--active');
+  }
+
+  _log(level, msg) {
+    const entry = this.engine.logger.log(level, msg);
+    const div = document.createElement('div');
+    div.className = 'log-console__entry log-console__entry--' + level;
+    div.innerHTML = '<span class="log-console__timestamp">[' + entry.ts + ']</span>' + msg;
+    this.simLog.appendChild(div);
+    this.simLog.scrollTop = this.simLog.scrollHeight;
+    // Keep max 50 lines
+    while (this.simLog.children.length > 50) {
+      this.simLog.removeChild(this.simLog.firstChild);
+    }
+  }
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  const engine = new WorkflowEngine();
+  const ui = new UIController(engine);
+});
+</script>
+</body>
+</html>
