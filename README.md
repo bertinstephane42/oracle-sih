@@ -1,153 +1,274 @@
-﻿# Oracle SIH (Système d'Information Hospitalier) — Démonstrations Techniques
+﻿Voici une version réécrite dans un style :
 
-> 5 applications HTML/CSS/JS autonomes, zero-dépendance, hors-ligne, à but pédagogique — simulant l'infrastructure, le développement, la connaissance lexicale, les cycles de décision et l'optimisation avancée Oracle dans un contexte de Système d'Information Hospitalier (SIH) avec conformité HDS/RGPD.
+* techniquement défendable,
+* sans sur-promesse,
+* sans vocabulaire marketing fragile,
+* avec terminologie Oracle correcte,
+* avec prudence scientifique compatible revue d’ingénieur ENSIMAG / INSA / EPITA / DBA senior.
 
----
+J’ai volontairement :
 
-## Table des matières
-
-1. [Fichier 1 : Architecture Infrastructure](#fichier-1--architecture-infrastructure)
-2. [Fichier 2 : SQL Workbench PUI](#fichier-2--sql-workbench-pui)
-3. [Fichier 3 : Lexique & Quiz Oracle](#fichier-3--lexique--quiz-oracle)
-4. [Fichier 4 : Workflow de Décision](#fichier-4--workflow-de-décision)
-5. [Fichier 5 : Advanced Performance Suite](#fichier-5--advanced-performance-suite)
-6. [Thèmes Transversaux](#thèmes-transversaux)
-7. [Prérequis](#prérequis)
-8. [Licence](#licence)
-
----
-
-Voici la nouvelle section à insérer dans votre fichier `README.md`. Je vous recommande de la placer juste après la **Table des matières** et avant le **Fichier 1**, ou alors à la fin avant la section **Licence**, selon l'importance que vous souhaitez lui donner.
-
-Voici le contenu prêt à copier-coller :
+* supprimé les affirmations impossibles à prouver,
+* remplacé les formulations absolues par des formulations falsifiables,
+* clarifié les limites de simulation,
+* corrigé la licence GPL,
+* retiré les éléments juridiquement ou techniquement discutables.
 
 ---
 
-## Méthodologie de Conception et Avertissements
+# Oracle SIH (Système d'Information Hospitalier) — Démonstrations Techniques
 
-**Origine et Expertise :**
-L'idée originale de ce projet, l'architecture fonctionnelle, le design UX/UI et la sélection rigoureuse des concepts techniques proviennent intégralement de **Stéphane Bertin**, ingénieur en bases de données. La conception repose sur une analyse approfondie des besoins réels en contexte SIH et des mécanismes internes d'Oracle.
-
-**Développement Collaboratif et Supervision :**
-La réalisation du code (HTML/CSS/JS) a été confiée à l'agent IA **OpenCode (Big Pickle)**, agissant comme un assistant de développement exécutant les spécifications de l'auteur. Cependant, la maîtrise intellectuelle du projet reste entièrement humaine :
-- **Supervision :** Stéphane Bertin a dirigé chaque étape du développement, validant les choix d'implémentation.
-- **Contrôle et Débogage :** Le code généré a été intégralement relu, testé, débogué et optimisé sous la supervision directe de l'auteur.
-- **Validation Technique Croisée :** L'exactitude des informations techniques (algorithmes de performance, comportements du SGA/PGA, protocoles de sécurité) a été garantie par une méthode de vérification stricte : confrontation systématique avec la **documentation officielle Oracle** et recoupement des données auprès de **plusieurs modèles de langage (LLM)** indépendants pour éliminer tout risque d'hallucination ou d'erreur conceptuelle.
-
-**Précision des Simulations et Limites :**
-Les applications visent une fidélité technique estimée à **99 %** par rapport à la réalité des moteurs de bases de données Oracle dans un contexte pédagogique.
-- **Éléments Déterministes :** Les concepts liés au stockage (Partition Pruning, compression IMCU, gestion LRU), à la cohérence (Undo/Redo, SCN) et à la sécurité (TDE, Masking) sont modélisés avec une exactitude algorithmique rigoureuse.
-- **Éléments Non-Déterministes :** Certaines simulations, notamment celles relatives à **Apache Spark (OCI Data Flow)**, impliquent des variables stochastiques (latence réseau, *shuffle*, *garbage collection*, contention dynamique) qui ne peuvent être reproduites à l'identique dans un environnement navigateur hors-ligne. Les courbes de performance et les temps de traitement affichés pour ces modules sont des **approximations réalistes** basées sur des moyennes observées, et non des garanties de performance en production.
-
-**Usage :**
-Ces outils sont conçus exclusivement pour la **formation, la démonstration conceptuelle et l'aide à la décision architecturale**. Ils ne doivent en aucun cas être utilisés pour du *benchmarking* réel ou pour dimensionner une infrastructure de production sans tests préalables sur l'environnement cible.
+> Ensemble de 5 applications HTML/CSS/JavaScript autonomes, sans dépendance externe et exécutables hors-ligne, destinées à la démonstration pédagogique de mécanismes Oracle Database et d’architectures SIH (Système d’Information Hospitalier) dans un contexte de conformité HDS/RGPD.
 
 ---
 
-## Fichier 1 : Architecture Infrastructure
+# Table des matières
+
+1. [Objectifs et périmètre](#objectifs-et-périmètre)
+2. [Méthodologie et limites](#méthodologie-et-limites)
+3. [Fichier 1 : Architecture Infrastructure](#fichier-1--architecture-infrastructure)
+4. [Fichier 2 : SQL Workbench PUI](#fichier-2--sql-workbench-pui)
+5. [Fichier 3 : Lexique & Quiz Oracle](#fichier-3--lexique--quiz-oracle)
+6. [Fichier 4 : Workflow de Décision](#fichier-4--workflow-de-décision)
+7. [Fichier 5 : Advanced Performance Suite](#fichier-5--advanced-performance-suite)
+8. [Thèmes transversaux](#thèmes-transversaux)
+9. [Prérequis](#prérequis)
+10. [Licence](#licence)
+
+---
+
+# Objectifs et périmètre
+
+Ce projet a pour objectif de fournir des démonstrateurs pédagogiques interactifs permettant d’illustrer :
+
+* certains mécanismes internes d’Oracle Database ;
+* des problématiques de performance et de cohérence transactionnelle ;
+* des stratégies d’architecture SIH ;
+* des notions de sécurité et de conformité réglementaire ;
+* des workflows de décision liés à l’exploitation d’infrastructures critiques.
+
+Les applications ne constituent pas :
+
+* un moteur Oracle réel ;
+* un environnement de benchmark ;
+* un outil de validation de capacité de production ;
+* une simulation exhaustive du comportement du Cost Based Optimizer (CBO).
+
+Les démonstrations privilégient la compréhension des mécanismes conceptuels et des ordres de grandeur observés dans des architectures Oracle modernes.
+
+---
+
+# Méthodologie et limites
+
+## Conception
+
+L’architecture fonctionnelle, les scénarios SIH et la sélection des concepts techniques ont été définis par Stéphane Bertin dans un objectif de vulgarisation avancée des mécanismes Oracle.
+
+Le développement HTML/CSS/JavaScript a été réalisé avec assistance IA, puis relu, corrigé et validé manuellement.
+
+---
+
+## Sources techniques
+
+Les mécanismes représentés reposent principalement sur :
+
+* la documentation officielle Oracle ;
+* les guides Oracle Database Concepts ;
+* les guides Oracle Performance Tuning ;
+* les bonnes pratiques Oracle Cloud Infrastructure ;
+* des comportements couramment observés en exploitation Oracle.
+
+---
+
+## Nature des simulations
+
+Les applications implémentent des modèles pédagogiques simplifiés permettant de représenter :
+
+* des phénomènes de contention ;
+* des mécanismes de cache ;
+* des stratégies de partitionnement ;
+* des cycles de cohérence transactionnelle ;
+* des workflows analytiques distribués.
+
+Les métriques affichées (temps, gains de performance, volumes I/O, ratios de compression, débits Spark) constituent des estimations pédagogiques et non des mesures contractuelles.
+
+Certains phénomènes réels ne peuvent être reproduits fidèlement dans un environnement navigateur hors-ligne, notamment :
+
+* la variabilité réseau ;
+* les effets NUMA ;
+* les comportements exacts du scheduler Oracle ;
+* les mécanismes internes du CBO ;
+* la gestion mémoire JVM ;
+* les contentions concurrentes à forte charge ;
+* les coûts réels de shuffle Spark.
+
+---
+
+# Fichier 1 : Architecture Infrastructure
 
 **Fichier :** `1.oracle-infra-sih-demo.html`
 
-4 modules couvrant les fondations Oracle dans un CHU :
+Démonstrateur des mécanismes fondamentaux d’infrastructure Oracle dans un contexte hospitalier.
 
-| Module | Contenu |
-|---|---|
-| Multitenant CDB/PDB | Topologie `CDB$ROOT` + 4 PDBs, Resource Plan (shares CPU/IO), contention dictionnaire partagé (`row cache objects`, `shared pool`), Data Masking via `DBMS_DATA_MASKING` pour clonage RGPD |
-| SGA / PGA Internals | Buffer Cache LRU + Touch Count (Midpoint Insertion), Latch `cache buffers chains` (contention quadratique O(N²)), PGA Temp Spill (bascule disque ×500-×10000) |
-| I/O & Cohérence | Cycle Undo/Redo, SCN (System Change Number), Read Consistency, Instance Recovery (SMON : Redo Apply + Undo Apply), simulation ORA-01555 Snapshot Too Old |
-| Cloud Souverain & IA | TDE AES-256 / BYOK, OCI France `eu-france-1` certifié HDS, Auto-Tuning (index auto, SPM, stats), IA embarquée vs générative |
+| Module              | Contenu                                                                                                                                                             |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Multitenant CDB/PDB | Topologie `CDB$ROOT` + PDBs, isolation logique, Resource Manager, contention dictionnaire partagé, démonstration de masquage de données pour environnements de test |
+| SGA / PGA Internals | Buffer Cache, politique LRU approximative, Touch Count, contention `cache buffers chains`, spill TEMP lors de saturation PGA                                        |
+| I/O & Cohérence     | Undo/Redo, SCN, Read Consistency, recovery simplifié, illustration pédagogique d’ORA-01555                                                                          |
+| Cloud & Sécurité    | TDE AES-256, BYOK, OCI France (`eu-france-1`), principes d’auto-tuning Oracle, distinction IA embarquée / IA générative                                             |
 
 ---
 
-## Fichier 2 : SQL Workbench PUI
+# Fichier 2 : SQL Workbench PUI
 
 **Fichier :** `2.oracle-workbench-sih-demo.html`
 
-Environnement de développement Oracle simulé pour la gestion des stocks PUI (Pharmacie à Usage Intérieur) :
+Simulation d’un environnement de développement Oracle appliqué à une PUI (Pharmacie à Usage Intérieur).
 
-- **Éditeur SQL/PL/SQL** avec sélecteur de 3 snippets pré-définis :
-  - `[SELECT]` Stocks critiques — jointures multi-tables avec sous-requête
-  - `[PL/SQL]` BULK COLLECT + FORALL — batch nocturne de réapprovisionnement
-  - `[TRIGGER]` `trg_check_peremption` — blocage de dispensation des médicaments expirés
-- **Machine d'états** 5 phases (IDLE → PARSING → EXECUTING → FETCHING → COMPLETED) avec délais simulés
-- **Explain Plan** simulé avec arbre CBO et alertes d'indexation
-- **Data Grid** dynamique, métriques (temps, Logical Reads, Physical Writes, Coût CBO)
-- **Maintenance :** tablespaces, gestion RBAC (Least Privilege), Audit HDS, purge anonymisée RGPD
+Fonctionnalités principales :
+
+* éditeur SQL/PLSQL ;
+* snippets pédagogiques préconfigurés ;
+* simulation d’états d’exécution SQL ;
+* Explain Plan simplifié ;
+* grille de résultats dynamique ;
+* indicateurs de coût et d’activité logique ;
+* démonstration RBAC et audit.
+
+Exemples fournis :
+
+* requêtes SQL multi-tables ;
+* traitements batch PL/SQL (`BULK COLLECT`, `FORALL`) ;
+* triggers de contrôle métier ;
+* maintenance logique et audit.
+
+Les plans d’exécution affichés sont illustratifs et ne reflètent pas un CBO Oracle réel.
 
 ---
 
-## Fichier 3 : Lexique & Quiz Oracle
+# Fichier 3 : Lexique & Quiz Oracle
 
 **Fichier :** `3.oracle-lexical-sih-demo.html`
 
-Base de connaissances Oracle interactive :
+Base de connaissances interactive couvrant des notions Oracle courantes :
 
-- **50 termes** couvrant : index (B-tree, bitmap, fonctionnel), verrous, transactions, SGA/PGA, RMAN, Data Guard, partitionnement, SQL\*Loader, External Tables, V\$ views…
-- **18 exemples de code** exécutables : DDL (CREATE TABLE, contraintes), DML, PL/SQL (triggers, packages), Explain Plan, hints, audit, RMAN, Data Pump
-- **20 questions QCM** avec feedback immédiat
-- **Navigation** par 5 catégories : SQL, PL/SQL, Performance, Sécurité, Sauvegarde
-- **Mode Workflow** 6 étapes : revue lexicale progressive avec shuffle aléatoire
+* index B-tree et bitmap ;
+* transactions et verrous ;
+* SGA/PGA ;
+* RMAN ;
+* Data Guard ;
+* partitionnement ;
+* SQL*Loader ;
+* vues dynamiques `V$`.
+
+Le module comprend :
+
+* un lexique technique ;
+* des exemples SQL/PLSQL ;
+* des QCM interactifs ;
+* un mode de révision progressive.
+
+Les extraits de code sont fournis à des fins pédagogiques et peuvent nécessiter adaptation pour une utilisation réelle.
 
 ---
 
-## Fichier 4 : Workflow de Décision
+# Fichier 4 : Workflow de Décision
 
 **Fichier :** `4.oracle-lifecycle-sih-demo.html`
 
-Guide interactif couvrant le cycle de vie Oracle en contexte HDS :
+Simulation de workflows décisionnels liés à l’exploitation d’un SIH Oracle.
 
-- **6 étapes** : Chiffrement, Haute Disponibilité, Dimensionnement, Upgrade, Stratégie Cloud, Reprise d'Activité
-- **4 choix par étape** (bonne pratique, risqué, risqué++, piège) — mélangés aléatoirement à chaque session
-- **Modale de confirmation** style Oracle avant changement de choix
-- **Feedback uniquement** dans la console `#sim-log` (neutre, sans couleur)
-- **Tableau de bord** : indicateurs de risque, barres de progression, historique
-- **Graphique** : barres colorées par qualité de décision
-- **Écran de complétion** : score final et message de risque (vert/ambre/rouge)
+Thématiques couvertes :
+
+* chiffrement ;
+* haute disponibilité ;
+* PRA/PCA ;
+* upgrade ;
+* stratégie cloud ;
+* dimensionnement.
+
+Le système attribue des scores relatifs de risque selon des heuristiques simplifiées représentant des bonnes pratiques généralement admises.
+
+Il ne constitue pas :
+
+* un outil d’audit ;
+* une certification HDS ;
+* une méthode formelle d’analyse de risque.
 
 ---
 
-## Fichier 5 : Advanced Performance Suite
+# Fichier 5 : Advanced Performance Suite
 
 **Fichier :** `5.oracle-advanced-sih-demo.html`
 
-4 modules d'optimisation avancée sur 5×10⁹ lignes / 2,5 To avec moteur de calcul algorithmique :
+Démonstrateur pédagogique de techniques d’optimisation avancées appliquées à des volumétries importantes.
 
-| Module | Contenu |
-|---|---|
-| Partitionnement Avancé | Simulation Range mensuel (120 partitions / 10 ans), Partition Pruning via métadonnées HIGH_VALUE/LOW_VALUE, PEL, réduction I/O de 95 % |
-| In-Memory Column Store | Transposition Row→Column, compression IMCU (6,7×), scan vectorisé SIMD AVX2, passage de 5243 s à 0,1 s |
-| OCI Data Flow & Spark | Architecture distribuée serverless (1–32 nœuds), shuffle, predicate pushdown Oracle Big Data Connector, coût estimé |
-| Dashboard Comparatif | Score global moyenné par technologie active uniquement, barres avant/après, conformité HDS / ISO 27001 / COFRAC |
+| Module                | Contenu                                                                              |
+| --------------------- | ------------------------------------------------------------------------------------ |
+| Partitionnement       | Range partitioning, pruning logique, réduction d’I/O estimée, illustration PEL       |
+| In-Memory             | Représentation simplifiée d’un stockage colonne, compression logique, scan vectorisé |
+| OCI Data Flow & Spark | Workflow distribué simplifié : map, shuffle, reduce, write                           |
+| Dashboard             | Comparaison relative des optimisations activées                                      |
 
-- **Moteur de calcul :** classe `PerformanceEngine` avec formules réalistes (pruning factor, compression IMCU, débit Spark 20 Go/s par nœud)
-- **Animation interactive :** job Spark simulé en 20 étapes (Map → Shuffle → Reduce → Write) avec barres de progression par exécuteur
-- **3 curseurs de paramétrage :** période d'analyse (1–120 mois), colonnes sélectionnées (2–200), nœuds de calcul (1–32)
-- **Données :** PATIENT_SIMU_XXXX / PRESCRIPTION_HISTORY — NIR fictifs — volumétrie 5×10⁹ lignes
+Fonctionnalités :
 
----
+* moteur de calcul simplifié ;
+* paramètres interactifs ;
+* visualisation de jobs distribués ;
+* simulation de gains analytiques.
 
-## Thèmes Transversaux
-
-- **Données 100 % fictives** (NIR_FICTIF, MED_TEST_XXX, LOT_SIMU_XXX, PATIENT_FICTIF, Dr_DUMMY) — aucune donnée de santé réelle
-- **Conforme RGPD Art. 25** (Privacy by Design) et **HDS** (Hébergement de Données de Santé)
-- **Architecture :** ES6 Classes · Vanilla JS · Zero Dependency · Offline
-- **Design :** Dark theme · grille responsive · police monospace · modales d'aide contextuelle avec focus trap
-- **Cohérence visuelle** : palette CSS variables partagée, composants réutilisables entre les 5 fichiers
+Les accélérations présentées correspondent à des scénarios favorables et ne doivent pas être interprétées comme des garanties de performance réelles.
 
 ---
 
-## Prérequis
+# Thèmes transversaux
 
-Aucun. Ouvrir chaque fichier `.html` dans un navigateur récent (Chrome/Firefox/Edge).
+* données entièrement fictives ;
+* aucune donnée médicale réelle ;
+* architecture Vanilla JS / ES6 ;
+* fonctionnement hors-ligne ;
+* absence de dépendances externes ;
+* design responsive ;
+* composants mutualisés entre les modules.
 
 ---
 
-## Licence
+# Conformité et sécurité
+
+Les démonstrateurs s’inspirent :
+
+* des principes RGPD (« Privacy by Design ») ;
+* des exigences généralement associées aux environnements HDS ;
+* des pratiques de cloisonnement et de chiffrement courantes dans les SIH.
+
+Le projet ne constitue toutefois ni :
+
+* une certification HDS ;
+* une homologation de sécurité ;
+* une validation réglementaire officielle.
+
+---
+
+# Prérequis
+
+Aucun prérequis logiciel spécifique.
+
+Exécution :
+
+* Chrome ;
+* Firefox ;
+* Edge ;
+* tout navigateur moderne compatible ES6.
+
+---
+
+# Licence
 
 Copyright (C) 2025 Stéphane Bertin
 
-Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier selon les termes de la GNU General Public License telle que publiée par la Free Software Foundation ; version 4 de la Licence, ou (à votre discrétion) toute version ultérieure.
+Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier selon les termes de la GNU General Public License telle que publiée par la Free Software Foundation ; version 3 de la licence, ou (à votre discrétion) toute version ultérieure.
 
-Ce programme est distribué dans l'espoir qu'il sera utile, mais SANS AUCUNE GARANTIE ; sans même la garantie implicite de COMMERCIALISATION ou D'ADAPTATION À UN USAGE PARTICULIER. Voir la GNU General Public License pour plus de détails.
+Ce programme est distribué SANS AUCUNE GARANTIE, sans même la garantie implicite de qualité marchande ou d’adéquation à un usage particulier.
 
-Vous devriez avoir reçu une copie de la GNU General Public License avec ce programme ; si ce n'est pas le cas, consultez <https://www.gnu.org/licenses/>.
+Pour plus d’informations :
+[GNU General Public License](https://www.gnu.org/licenses/?utm_source=chatgpt.com)
