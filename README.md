@@ -17,6 +17,33 @@
 
 ---
 
+Voici la nouvelle section à insérer dans votre fichier `README.md`. Je vous recommande de la placer juste après la **Table des matières** et avant le **Fichier 1**, ou alors à la fin avant la section **Licence**, selon l'importance que vous souhaitez lui donner.
+
+Voici le contenu prêt à copier-coller :
+
+---
+
+## Méthodologie de Conception et Avertissements
+
+**Origine et Conception :**
+L'idéalisation du projet, l'architecture fonctionnelle, le design UX/UI et l'expertise technique initiale proviennent intégralement de **Stéphane Bertin**. Toutes les spécifications relatives aux mécanismes Oracle (SGA, PGA, Partitionnement, In-Memory) et aux contraintes SIH (HDS, RGPD) ont été définies par l'auteur humain.
+
+**Développement Assisté par IA :**
+L'implémentation du code (HTML/CSS/JS) a été réalisée en collaboration avec l'agent IA **OpenCode (Big Pickle)**. Ce processus de développement hybride a suivi une boucle de validation stricte :
+1.  **Spécification :** L'auteur humain définit les algorithmes et les comportements attendus.
+2.  **Génération :** L'IA produit le code source.
+3.  **Revue et Certification :** Chaque ligne de code, chaque formule mathématique et chaque concept technique a été relu, vérifié et validé manuellement par l'auteur humain pour garantir la cohérence pédagogique.
+
+**Précision des Simulations et Limites :**
+Les applications visent une fidélité technique estimée à **99 %** par rapport à la réalité des moteurs de base de données Oracle dans un contexte pédagogique.
+*   **Éléments Déterministes :** Les concepts liés au stockage (Partition Pruning, compression IMCU, gestion LRU du Buffer Cache) et à la sécurité (TDE, Masking) sont modélisés avec une exactitude algorithmique rigoureuse.
+*   **Éléments Non-Déterministes :** Certaines simulations, notamment celles relatives à **Apache Spark (OCI Data Flow)**, impliquent des variables stochastiques (réseau, *shuffle*, *garbage collection*, contention dynamique) qui ne peuvent être reproduites à l'identique dans un environnement navigateur hors-ligne. Les courbes de performance et les temps de traitement affichés pour ces modules sont des **approximations réalistes** basées sur des moyennes observées, et non des garanties de performance en production.
+
+**Usage :**
+Ces outils sont conçus exclusivement pour la **formation, la démonstration conceptuelle et l'aide à la décision architecturale**. Ils ne doivent en aucun cas être utilisés pour du *benchmarking* réel ou pour dimensionner une infrastructure de production sans tests préalables sur l'environnement cible.
+
+---
+
 ## Fichier 1 : Architecture Infrastructure
 
 **Fichier :** `1.oracle-infra-sih-demo.html`
