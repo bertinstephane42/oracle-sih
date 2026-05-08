@@ -209,6 +209,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
 .help-modal__section-title--algorithm { color: var(--color-purple); }
 .help-modal__section-title--indicators { color: var(--color-amber); }
 .help-modal__section-title--hds { color: var(--color-green); }
+.help-modal__section-title--lexique { color: var(--color-purple); }
 .help-modal__text { font-size: var(--fs-sm); color: #cbd5e1; line-height: 1.7; margin-bottom: var(--sp-3); }
 .help-modal__text code { font-family: var(--font-mono); font-size: var(--fs-xs); background: var(--color-bg-elevated); padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); color: var(--color-cyan); }
 .help-modal__list { list-style: none; padding: 0; }
@@ -229,6 +230,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
     <div class="app-header__status">
       <span class="status-badge status-badge--online"><span class="status-dot"></span>MOTEUR ACTIF</span>
       <span class="status-badge status-badge--hds">HDS / DONNEES FICTIVES</span>
+      <button class="page-header__help-btn" data-help="lexicon" aria-label="Lexique technique" title="Lexique technique">L</button>
     </div>
   </header>
 
@@ -267,7 +269,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         <h1 class="page-header__title">Partitionnement Avance — Pruning &amp; Gestion</h1>
         <div class="page-header__subtitle-row">
           <p class="page-header__subtitle">Analyse de 10 ans d'historique de prescriptions (5×10⁹ lignes). Reduction du I/O via Partition Pruning.</p>
-          <button class="page-header__help-btn" data-help="partitioning" aria-label="Aide Partitionnement">?</button>
+          <button class="page-header__help-btn" data-help="partitioning" aria-label="Aide Partitionnement" title="Rubrique d'aide">?</button>
         </div>
       </div>
       <div class="card fade-in">
@@ -306,7 +308,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         <h1 class="page-header__title">In-Memory Column Store — Compression &amp; Scan Vectorise</h1>
         <div class="page-header__subtitle-row">
           <p class="page-header__subtitle">Transposition Row→Column, compression IMCU, scan SIMD. Passage de 45s a 0.8s.</p>
-          <button class="page-header__help-btn" data-help="inmemory" aria-label="Aide In-Memory">?</button>
+          <button class="page-header__help-btn" data-help="inmemory" aria-label="Aide In-Memory" title="Rubrique d'aide">?</button>
         </div>
       </div>
       <div class="card fade-in">
@@ -345,7 +347,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         <h1 class="page-header__title">OCI Data Flow &amp; Spark — Architecture Distribuee</h1>
         <div class="page-header__subtitle-row">
           <p class="page-header__subtitle">Delegation du traitement Big Data (logs connectes, genomique fictive) a un cluster Spark ephemer sur OCI.</p>
-          <button class="page-header__help-btn" data-help="dataflow" aria-label="Aide Data Flow">?</button>
+          <button class="page-header__help-btn" data-help="dataflow" aria-label="Aide Data Flow" title="Rubrique d'aide">?</button>
         </div>
       </div>
       <div class="card fade-in">
@@ -390,7 +392,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         <h1 class="page-header__title">Dashboard Comparatif — Score Global d'Optimisation</h1>
         <div class="page-header__subtitle-row">
           <p class="page-header__subtitle">Recapitulatif des gains par technologie. Conformite HDS / ISO 27001 / COFRAC.</p>
-          <button class="page-header__help-btn" data-help="dashboard" aria-label="Aide Dashboard">?</button>
+          <button class="page-header__help-btn" data-help="dashboard" aria-label="Aide Dashboard" title="Rubrique d'aide">?</button>
         </div>
       </div>
       <div class="card fade-in">
@@ -534,6 +536,110 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
             <li><strong>Partitionnement</strong> : Preservation du chiffrement TDE par tablespace. Archivage COFRAC via PEL.</li>
             <li><strong>In-Memory</strong> : Aucune sortie du perimetre HDS. Les donnees restent dans la SGA, chiffrees si TDE actif.</li>
             <li><strong>Data Flow</strong> : Perimetre OCI France certifié HDS. Donnees genomiques fictives. Aucun transfert hors UE.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="help-modal__footer">
+        <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+      </div>
+    </div>
+
+    <!-- MODAL 5: Lexique technique -->
+    <div class="help-modal" id="help-lexicon" role="dialog" aria-modal="true" aria-labelledby="help-lexicon-title" aria-hidden="true">
+      <div class="help-modal__header">
+        <div class="help-modal__title" id="help-lexicon-title">Lexique technique — Advanced Performance SIH</div>
+        <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+      </div>
+      <div class="help-modal__body">
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--lexique">Architecture Oracle Fondamentale</div>
+          <ul class="help-modal__list">
+            <li><strong>Conteneur de Base de Donnees (CDB)</strong> — Base de donnees racine chapeautant l'ensemble des bases de donnees placables dans l'architecture multitenant Oracle 12c et suivantes.</li>
+            <li><strong>Base de Donnees Placable (PDB)</strong> — Base de donnees portable et isolee au sein d'un conteneur, apparaissant aux utilisateurs et aux applications comme une base de donnees classique.</li>
+            <li><strong>Dictionnaire Partage</strong> — Ensemble de metadonnees de definition (structures de schemas, objets, privileges) mutualisees entre toutes les bases placables d'un meme conteneur.</li>
+            <li><strong>Cache de Lignes du Dictionnaire</strong> — Structure memoire logeant dans la memoire partagee les lignes du dictionnaire, protegee par un verrou d'exclusion mutuelle (latch).</li>
+            <li><strong>Masquage de Donnees</strong> — Technique d'obfuscation des donnees sensibles (numero d'inscription au repertoire, identite des patients) lors du clonage d'une base, conforme au Reglement General sur la Protection des Donnees.</li>
+          </ul>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--lexique">Memoire Globale (SGA / PGA)</div>
+          <ul class="help-modal__list">
+            <li><strong>Memoire Globale de Systeme (SGA)</strong> — Zone memoire partagee par l'ensemble des processus Oracle, abritant le cache de tampons, le reservoir partage, le tampon de journalisation et les structures connexes.</li>
+            <li><strong>Cache de Tampons</strong> — Portion de la memoire globale contenant les blocs de donnees lus depuis les fichiers disques, ordonnancee par l'algorithme du moindre recent usage.</li>
+            <li><strong>Memoire Globale de Programme (PGA)</strong> — Zone memoire privee allouee a chaque session d'utilisation pour les operations de tri, de regroupement et de jointure.</li>
+            <li><strong>Debordement Temporaire</strong> — Basculement des operations memoire vers les espaces temporaires sur disque lorsque la memoire globale de programme est insuffisante, entrainant une degradation sensible des temps d'execution.</li>
+            <li><strong>Compteur d'Acces (Touch Count)</strong> — Indicateur du nombre de consultations d'un bloc dans le cache de tampons, determinant son placement dans la chaine du moindre recent usage.</li>
+            <li><strong>Verrou d'Exclusion Mutuelle (Latch)</strong> — Mecanisme de verrouillage leger protegeant l'acces concurrent aux structures partagees de la memoire globale.</li>
+          </ul>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--lexique">Transactions et Coherence</div>
+          <ul class="help-modal__list">
+            <li><strong>Numero de Changement Systeme (SCN)</strong> — Compteur sequentiel global horodatant chaque transaction et garantissant l'ordre causal des modifications dans l'ensemble de la base.</li>
+            <li><strong>Journal de Retablissement (Redo)</strong> — Enregistrement sequentiel de toutes les modifications appliquees a la base, utilise pour la reprise apres incident par application differee.</li>
+            <li><strong>Segment d'Annulation (Undo)</strong> — Blocs conservant l'image anterieure des donnees modifiees, necessaires a la lecture coherente et au retour en arriere des transactions.</li>
+            <li><strong>Reprise apres Incident (Instance Recovery)</strong> — Processus automatique de retablissement de la base apres un arret brutal, combinant l'application du journal de retablissement (avance rapide) et l'application des segments d'annulation (retour arriere).</li>
+            <li><strong>Coherence de Lecture</strong> — Mecanisme garantissant qu'une requete percoit un instantane coherent des donnees a un instant de reference, en utilisant les blocs d'annulation.</li>
+            <li><strong>Erreur d'Instantané Trop Ancien (ORA-01555)</strong> — Erreur survenant lorsque les blocs d'annulation necessaires a la lecture coherente d'une longue requete ont ete ecrases par des transactions plus recentes avant la fin de la consultation.</li>
+          </ul>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--lexique">Optimiseur et Plans d'Execution</div>
+          <ul class="help-modal__list">
+            <li><strong>Optimiseur Base sur les Couts (CBO)</strong> — Moteur d'optimisation d'Oracle analysant les statistiques des objets et les couts d'acces pour determiner le plan d'execution le plus efficace pour chaque requete.</li>
+            <li><strong>Plan d'Execution</strong> — Arbre d'operations (acces tables, jointures, tris) genere par l'optimiseur pour executer une requete SQL, visible via la commande <code>EXPLAIN PLAN</code>.</li>
+            <li><strong>Parcours Integral de Table (Full Table Scan)</strong> — Methode d'acces lisant l'integralite des blocs d'une table, utilisee en l'absence d'index adapte ou lorsque la table est de petite taille.</li>
+            <li><strong>Parcours Unique par Index (Index Unique Scan)</strong> — Methode d'acces retournant au plus une ligne via un index unique, typique des recherches par cle primaire.</li>
+            <li><strong>Jointure par Hash (HASH JOIN) / Boucles Imbriquees (NESTED LOOPS)</strong> — Algorithmes de jointure : le premier convient aux grands volumes sans index, le second aux petites tables indexees.</li>
+          </ul>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--lexique">PL/SQL et Programmation</div>
+          <ul class="help-modal__list">
+            <li><strong>Chargement Massif en Collection (BULK COLLECT)</strong> — Directive PL/SQL chargeant un ensemble de lignes en une seule operation dans une collection memoire (PGA), reduisant les allees-retours entre les moteurs SQL et PL/SQL.</li>
+            <li><strong>Mise a Jour Massive (FORALL)</strong> — Instruction PL/SQL executant une operation DML sur toutes les lignes d'une collection sans commutation de contexte individuelle, accelerant les traitements par lots.</li>
+            <li><strong>Commutation de Contexte (Context Switch)</strong> — Basculement entre le moteur SQL et le moteur PL/SQL, dont le cout cumule peut etre significatif dans les boucles iteratives.</li>
+            <li><strong>Declencheur (Trigger)</strong> — Bloc PL/SQL stocke s'executant automatiquement sur un evenement de modification (INSERT, UPDATE, DELETE) d'une table, utilise pour les regles metier et les contraintes complexes.</li>
+            <li><strong>Collection PL/SQL</strong> — Structure de donnees programmee (table imbriquee, VARRAY, table associative) permettant de manipuler des ensembles de lignes en memoire.</li>
+          </ul>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--lexique">Securite et Gouvernance HDS</div>
+          <ul class="help-modal__list">
+            <li><strong>Chiffrement Transparent (TDE)</strong> — Mecanisme de chiffrement des donnees au repos au sein des fichiers et des espaces de tables, sans aucune modification des applications clientes, utilisant l'algorithme AES a clef de 256 bits.</li>
+            <li><strong>Moindre Privilege (Least Privilege)</strong> — Principe de securite selon lequel un utilisateur ne dispose que des droits strictement necessaires a ses fonctions, reduisant la surface d'attaque et les risques d'erreur.</li>
+            <li><strong>Masquage Dynamique (DBMS_REDACT)</strong> — Paquetage Oracle permettant le masquage a la volee des donnees sensibles dans les resultats de requetes, sans alterer les donnees stockees.</li>
+            <li><strong>Journal d'Activite (Audit HDS)</strong> — Enregistrement chiffre et horodate de l'ensemble des actions effectuees sur le systeme, garantissant la tracabilite requise par la certification Hebergement de Donnees de Sante.</li>
+          </ul>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--lexique">Partitionnement Avance</div>
+          <ul class="help-modal__list">
+            <li><strong>Elagage de Partitions (Partition Pruning)</strong> — Mecanisme interne de l'optimiseur (CBO) qui elimine du plan d'execution les partitions ne repondant pas aux predicats d'une clause de filtrage, reduisant proportionnellement le volume d'entrees-sorties et le temps de reponse.</li>
+            <li><strong>Echange par Chargement de Partition (PEL)</strong> — Operation metadier de chargement consistant a echanger une partition existante avec une table externe par simple mise a jour du dictionnaire de donnees, evitent la reconstruction des index et la journalisation ligne a ligne.</li>
+            <li><strong>Partitionnement par Intervalles (Interval Partitioning)</strong> — Extension du partitionnement par plage (Range) dans laquelle Oracle cree automatiquement de nouvelles partitions lors de l'insertion de donnees depassant la limite haute, sans intervention manuelle de l'administrateur.</li>
+            <li><strong>Facteur d'Elagage (Pruning Factor)</strong> — Rapport entre le nombre total de partitions et le nombre de partitions effectivement parcourues apres application des predicats, mesurant l'efficacite de la reduction du volume d'entrees-sorties par l'elagage.</li>
+            <li><strong>Hierarchisation du Stockage (Storage Tiering)</strong> — Strategie de placement des partitions sur des supports physiques de performances differentes (NVMe, SSD, HDD, stockage froid) selon leur age et leur frequence d'acces, combinee a l'archivage des partitions anciennes.</li>
+          </ul>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--lexique">Stockage Colonnaire et Acceleration Vectorielle</div>
+          <ul class="help-modal__list">
+            <li><strong>Unite de Compression Colonnaire en Memoire (IMCU)</strong> — Unite de stockage interne a la zone In-Memory de la SGA contenant les donnees d'un segment au format colonne, compressees et organisees en blocs de taille fixe pour un acces vectoriel optimise.</li>
+            <li><strong>Unite de Metadonnees de Stockage (SMU)</strong> — Structure de gestion associee a chaque IMCU, contenant les metadonnees d'elagage, les dictionnaires de codage par colonne et les informations necessaires aux acces concurrents et a la coherence transactionnelle.</li>
+            <li><strong>Entrepot au Format Colonnaire (Column Store)</strong> — Mode d'organisation des donnees par colonnes plutot que par lignes, permettant de ne lire que les colonnes referencees par la requete, ce qui reduit le volume d'entrees-sorties et maximise l'efficacite de la compression.</li>
+            <li><strong>Parallelisme Vectoriel (SIMD)</strong> — Technique de parallelisme au niveau du processeur appliquant une meme operation arithmetique ou logique a plusieurs valeurs simultanement via des registres vectoriels larges (256 bits avec AVX2, 512 bits avec AVX-512).</li>
+            <li><strong>Facteur d'Acceleration Vectorielle</strong> — Rapport de performance estime entre l'execution scalaire classique et l'execution vectorielle SIMD, fonction de la largeur des registres du processeur et de la bande passante memoire disponible.</li>
+          </ul>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--lexique">Traitement Distribue et Architecture Polyglotte</div>
+          <ul class="help-modal__list">
+            <li><strong>Apache Spark</strong> — Moteur de traitement unifie pour l'analyse de donnees volumineuses, fonde sur le calcul distribue en memoire (RDD / DataFrame) et l'execution parallelisee sur un ensemble de noeuds de travail ephemeres.</li>
+            <li><strong>Architecture Polyglotte</strong> — Approche combinant plusieurs systemes de gestion de donnees aux modeles differents au sein d'une meme infrastructure, ou Oracle Database assume le transactionnel structure et Spark les traitements massifs non structures (logs, genomique, imagerie).</li>
+            <li><strong>Calcul Sans Serveur (Serverless)</strong> — Modele d'execution ou le fournisseur de cloud provisionne et dimensionne automatiquement l'infrastructure de calcul, liberant l'utilisateur de la gestion des serveurs et de la planification de capacite.</li>
+            <li><strong>Processeur d'Execution Distribue (Executor)</strong> — Processus de travail lance sur un noeud d'un cluster Spark, responsable de l'execution des tâches sur une partition des donnees, dote d'une memoire allouee et d'un nombre defini de coeurs de calcul.</li>
+            <li><strong>Desequilibre des Donnees (Data Skew)</strong> — Distribution inegale des donnees entre les partitions d'un systeme distribue, provoquant la sous-utilisation de certains noeuds et la saturation d'autres par effet de goulet d'etranglement.</li>
           </ul>
         </div>
       </div>
