@@ -503,6 +503,10 @@ a:hover { text-decoration: underline; }
             <li><strong>Parcours Integral de Table (Full Table Scan)</strong> — Methode d'acces lisant l'integralite des blocs d'une table, utilisee en l'absence d'index adapte ou lorsque la table est de petite taille.</li>
             <li><strong>Parcours Unique par Index (Index Unique Scan)</strong> — Methode d'acces retournant au plus une ligne via un index unique, typique des recherches par cle primaire.</li>
             <li><strong>Jointure par Hash (HASH JOIN) / Boucles Imbriquees (NESTED LOOPS)</strong> — Algorithmes de jointure : le premier convient aux grands volumes sans index, le second aux petites tables indexees.</li>
+            <li><strong>Indice d'Optimisation (Hint)</strong> — Directive de contournement integree dans un commentaire special <code>/*+ ... */</code> fournissant a l'optimiseur des instructions contraignantes sur le chemin d'acces, l'ordre ou la methode de jointure. Une directive figee peut devenir contre-productive avec l'evolution des donnees.</li>
+            <li><strong>Parcours par Intervalle d'Index (Index Range Scan)</strong> — Methode d'acces parcourant l'arbre B-tree pour localiser les entrees correspondant a un predicat de recherche, ne lisant que les blocs pertinents de l'index avant d'acceder aux lignes par identifiant physique.</li>
+            <li><strong>Statistiques d'Optimisation</strong> — Metadonnees collectees sur les objets du schema — nombre de lignes, taille des blocs, distribution des valeurs, histogrammes — nourrissant l'estimation des couts par l'optimiseur. Des statistiques obsoletes ou lacunaires degradent la qualite des plans d'execution.</li>
+            <li><strong>Cardinalite Estimee</strong> — Nombre de lignes predites par l'optimiseur pour chaque operation du plan d'execution, influencant le choix de la methode de jointure : boucles imbriquees pour les faibles volumes, jointure par hachage pour les volumes moyens.</li>
           </ul>
         </div>
         <div class="help-modal__section">
@@ -513,6 +517,14 @@ a:hover { text-decoration: underline; }
             <li><strong>Commutation de Contexte (Context Switch)</strong> — Basculement entre le moteur SQL et le moteur PL/SQL, dont le cout cumule peut etre significatif dans les boucles iteratives.</li>
             <li><strong>Declencheur (Trigger)</strong> — Bloc PL/SQL stocke s'executant automatiquement sur un evenement de modification (INSERT, UPDATE, DELETE) d'une table, utilise pour les regles metier et les contraintes complexes.</li>
             <li><strong>Collection PL/SQL</strong> — Structure de donnees programmee (table imbriquee, VARRAY, table associative) permettant de manipuler des ensembles de lignes en memoire.</li>
+            <li><strong>Curseur (Cursor)</strong> — Pointeur sur le contexte d'execution d'une requete SQL, permettant le parcours ligne par ligne de l'ensemble des resultats. Le curseur explicite est declare, ouvert et ferme par le programmeur ; le curseur implicite est automatiquement gere par Oracle.</li>
+            <li><strong>Gestion d'Exceptions (Exception Handling)</strong> — Mecanisme structurel de capture et de traitement des erreurs en PL/SQL organisant le code en blocs EXCEPTION avec des gestionnaires predefinis : NO_DATA_FOUND pour l'absence de resultat, TOO_MANY_ROWS pour les resultats multiples, WHEN OTHERS comme filet de secours universel.</li>
+            <li><strong>Bloc Anonyme (Anonymous Block)</strong> — Bloc PL/SQL non stocke execute immediatement, compose des sections facultatives de declaration, du corps principal obligatoire et du gestionnaire d'exceptions optionnel, utilise pour les scripts ad-hoc et les tests de validation.</li>
+            <li><strong>Typage Dynamique (%TYPE / %ROWTYPE)</strong> — Mecanisme de liaison du type d'une variable a la definition d'une colonne ou d'une table, garantissant l'adaptation automatique aux modifications de structure sans reecriture du code applicatif. %TYPE herite du type d'une colonne, %ROWTYPE cree un record complet.</li>
+            <li><strong>Structure Conditionnelle (IF/THEN/ELSE)</strong> — Branchement conditionnel PL/SQL permettant d'executer des blocs de code selon l'evaluation de predicats booleens, avec chainage multiple par ELSIF et imbrication illimitee des structures decisionnelles.</li>
+            <li><strong>Boucles (LOOP / WHILE / FOR)</strong> — Trois constructions iteratives : la boucle simple LOOP avec condition de sortie explicite EXIT WHEN, la boucle a condition prealable WHILE LOOP et la boucle a compteur FOR LOOP prenant en charge l'ouverture et la fermeture automatique du curseur.</li>
+            <li><strong>Levee d'Exception (RAISE / RAISE_APPLICATION_ERROR)</strong> — Instruction de declenchement explicite d'une exception : RAISE seul dans le gestionnaire pour relancer l'erreur courante, RAISE_APPLICATION_ERROR avec un code compris entre -20001 et -20999 pour les erreurs applicatives personnalisees.</li>
+            <li><strong>Directive de Compilation (PRAGMA)</strong> — Instruction transmise au compilateur PL/SQL lors de la traduction du code source, permettant d'associer un code d'erreur a une exception nommee (PRAGMA EXCEPTION_INIT), de declarer une transaction autonome (PRAGMA AUTONOMOUS_TRANSACTION) ou d'optimiser la memoire des packages.</li>
           </ul>
         </div>
         <div class="help-modal__section">
@@ -522,6 +534,46 @@ a:hover { text-decoration: underline; }
             <li><strong>Moindre Privilege (Least Privilege)</strong> — Principe de securite selon lequel un utilisateur ne dispose que des droits strictement necessaires a ses fonctions, reduisant la surface d'attaque et les risques d'erreur.</li>
             <li><strong>Masquage Dynamique (DBMS_REDACT)</strong> — Paquetage Oracle permettant le masquage a la volee des donnees sensibles dans les resultats de requetes, sans alterer les donnees stockees.</li>
             <li><strong>Journal d'Activite (Audit HDS)</strong> — Enregistrement chiffre et horodate de l'ensemble des actions effectuees sur le systeme, garantissant la tracabilite requise par la certification Hebergement de Donnees de Sante.</li>
+            <li><strong>Controle d'Acces par Roles (RBAC)</strong> — Modele de securite dans lequel les privileges sont accordes a des roles plutot qu'a des utilisateurs individuels, les roles etant ensuite assignes aux comptes, simplifiant la gestion des autorisations et garantissant la coherence des droits.</li>
+            <li><strong>Privileges (GRANT / REVOKE)</strong> — Instructions d'attribution et de retrait des permissions sur les objets et les roles, le principe du moindre privilege imposant de limiter l'octroi aux seules operations necessaires a la fonction de chaque utilisateur.</li>
+            <li><strong>Role Oracle</strong> — Conteneur nomme de privileges systeme et objet, permettant d'organiser les autorisations par groupe fonctionnel. Les roles predefinis DBA, CONNECT et RESOURCE sont completes par des roles applicatifs specifiques a chaque domaine.</li>
+            <li><strong>Profile Utilisateur (User Profile)</strong> — Ensemble de regles limitant l'utilisation des ressources et definissant la politique de securite des acces : duree de vie du mot de passe, nombre de tentatives infructueuses avant verrouillage, temps d'inactivite maximal avant deconnexion.</li>
+            <li><strong>Base de Donnees Privee Virtuelle (VPD / DBMS_RLS)</strong> — Mecanisme de securite au niveau de la ligne ajoutant automatiquement un predicat WHERE a chaque requete, genere par une fonction de politique invoquee par DBMS_RLS.ADD_POLICY, filtrant invisiblement les donnees selon le contexte de session sans modification des requetes applicatives.</li>
+          </ul>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--lexique">Structure et Stockage Logique</div>
+          <ul class="help-modal__list">
+            <li><strong>Table</strong> — Structure relationnelle fondamentale stockant les donnees en lignes et colonnes typees. Les contraintes d'integrite — PRIMARY KEY, FOREIGN KEY, CHECK, NOT NULL, DEFAULT, UNIQUE — garantissent la coherence referentielle et la validite semantique des donnees persistees.</li>
+            <li><strong>Vue (View)</strong> — Table virtuelle issue d'une requete SELECT stockee comme objet du schema, ne contenant aucune donnee propre mais offrant une interface stable, un masquage des colonnes sensibles et une simplification des requetes complexes par abstraction des jointures.</li>
+            <li><strong>Index</strong> — Structure d'acces B-tree accelerant la recherche des lignes par colonne cle, reduisant la complexite d'un parcours integral O(n) a une navigation logarithmique O(log n). Un index composite sur plusieurs colonnes optimise les jointures multi-criteres.</li>
+            <li><strong>Synonyme (Synonym)</strong> — Alias nomme pointant vers un objet d'un autre schema, permettant un acces simplifie sans prefixe de proprietaire. Le synonyme public evite la repetition du nom du schema proprietaire dans les requetes inter-applicatives.</li>
+            <li><strong>Tablespace</strong> — Couche d'abstraction entre le stockage logique et les fichiers physiques sur disque, contenant les segments de donnees et definissant les parametres d'extension automatique, la taille maximale et la politique de compression.</li>
+            <li><strong>Schema (Schema)</strong> — Conteneur logique regroupant l'integralite des objets appartenant a un utilisateur Oracle, chaque utilisateur possedant un schema eponyme constituant la frontiere de visibilite par defaut pour les operations non qualifiees.</li>
+            <li><strong>Partitionnement (Partitioning)</strong> — Technique de division d'une table volumineuse en segments physiques independants selon une cle de partition — intervalle de temps, liste de valeurs ou fonction de dispersion — permettant a l'optimiseur de ne consulter que les segments pertinents par elagage de partition.</li>
+          </ul>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--lexique">Objets Programmables</div>
+          <ul class="help-modal__list">
+            <li><strong>Package</strong> — Conteneur modulaire regroupant des procedures, fonctions, types et variables partageant un domaine metier commun, separe en specification declarant l'interface publique et corps contenant l'implementation privee.</li>
+            <li><strong>Fonction Stockee (Stored Function)</strong> — Bloc PL/SQL nomme retournant une valeur scalaire, appelable depuis les expressions SQL et les blocs PL/SQL. Une fonction utilisee en SQL ne peut retourner un type booleen et ne doit pas modifier l'etat de la base de donnees.</li>
+            <li><strong>Procedure Stockee (Stored Procedure)</strong> — Bloc PL/SQL nomme executant une sequence d'operations sans retour de valeur directe, pouvant communiquer avec l'appelant par parametres de sortie OUT et pointeurs REF CURSOR.</li>
+            <li><strong>Type Objet Oracle (Object Type)</strong> — Definition personnalisee d'une structure composite avec attributs et methodes membres, fondement de l'approche orientee objet dans la base de donnees, les methodes etant definies dans le corps du type.</li>
+            <li><strong>Record</strong> — Structure composite regroupant plusieurs champs de types differents, equivalente en memoire a une ligne de table. Le pseudo-type %ROWTYPE cree automatiquement un record dont les champs correspondent aux colonnes d'une table designee.</li>
+            <li><strong>Objet Volumineux (LOB — Large Object)</strong> — Type de colonne dedie au stockage de donnees de grande taille : CLOB pour le texte long, BLOB pour les donnees binaires, NCLOB pour le texte Unicode, chacun pouvant atteindre 128 teraoctets.</li>
+          </ul>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--lexique">Triggers Approfondis</div>
+          <ul class="help-modal__list">
+            <li><strong>Trigger BEFORE / AFTER</strong> — Temporisation d'execution du trigger : BEFORE valide et modifie les pseudo-enregistrements :NEW avant la persistance des donnees ; AFTER execute les actions post-modification — audit, notification, calculs derives — sans possibilite de modifier les valeurs inserees.</li>
+            <li><strong>Declaration FOR EACH ROW</strong> — Modificateur transformant un trigger au niveau de l'instruction en trigger au niveau de la ligne, s'executant une fois par ligne affectee et donnant acces aux pseudo-enregistrements :OLD et :NEW pour comparer les valeurs avant et apres modification.</li>
+            <li><strong>Pseudo-enregistrements :OLD / :NEW</strong> — Valeurs respectivement anterieure et posterieure a la modification dans un trigger au niveau de la ligne, nulles pour les operations d'insertion (:OLD) et de suppression (:NEW). En trigger BEFORE, les champs de :NEW peuvent etre modifies.</li>
+            <li><strong>Table Mutante (Mutating Table — ORA-04091)</strong> — Erreur levee lorsqu'un trigger au niveau de la ligne tente de lire par SELECT la table en cours de modification par l'instruction declencheuse, Oracle interdisant cet acces pour prevenir les incoherences de lecture entre l'image anterieure et posterieure des donnees.</li>
+            <li><strong>Trigger Compose (Compound Trigger)</strong> — Structure offrant quatre sections temporelles — BEFORE STATEMENT, BEFORE EACH ROW, AFTER EACH ROW, AFTER STATEMENT — partageant des variables de contexte pour accumuler les donnees dans les phases ligne et les traiter dans la phase instruction, resolvant le probleme de la table mutante.</li>
+            <li><strong>Trigger de Substitution (INSTEAD OF)</strong> — Trigger cree sur une vue non modifiable directement, remplacant l'operation DML declencheuse par une sequence personnalisee d'operations sur les tables sous-jacentes, rendant la vue modifiable.</li>
+            <li><strong>Trigger de Definition (DDL Trigger)</strong> — Trigger declenche par les operations de modification de structure — CREATE, ALTER, DROP — utilise pour l'audit du schema et la gouvernance des changements, accedant aux fonctions contextuelles ORA_SYSEVENT et ORA_DICT_OBJ_NAME.</li>
           </ul>
         </div>
       </div>
