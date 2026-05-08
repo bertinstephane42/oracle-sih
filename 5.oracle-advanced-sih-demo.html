@@ -278,7 +278,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         <div class="comp-card" id="part-comp-bars">
           <div class="comp-legend"><span><span class="comp-legend__dot comp-legend__dot--before"></span>SANS partitionnement (Full Table Scan)</span><span><span class="comp-legend__dot comp-legend__dot--after"></span>AVEC partitionnement (Pruning actif)</span></div>
           <div class="comp-bar"><span class="comp-bar__label">Scan</span><div class="comp-bar__track"><div class="comp-bar__fill comp-bar__fill--before" id="part-bar-before" style="width:100%"></div></div><span class="comp-bar__value comp-bar__value--before" id="part-val-before">100%</span></div>
-          <div class="comp-bar"><span class="comp-bar__label">Prune</span><div class="comp-bar__track"><div class="comp-bar__fill comp-bar__fill--after" id="part-bar-after" style="width:0.8%"></div></div><span class="comp-bar__value comp-bar__value--after" id="part-val-after">0.8%</span></div>
+          <div class="comp-bar"><span class="comp-bar__label">Prune</span><div class="comp-bar__track"><div class="comp-bar__fill comp-bar__fill--after" id="part-bar-after" style="width:5%"></div></div><span class="comp-bar__value comp-bar__value--after" id="part-val-after">5%</span></div>
         </div>
         <div class="grid-4" id="part-metrics">
           <div class="stat-block stat-block--red"><div class="stat-block__value" id="part-io-before">100%</div><div class="stat-block__label">I/O Sans Partition</div></div>
@@ -410,7 +410,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
           <div class="stat-block stat-block--cyan"><div class="stat-block__value" id="dash-gain">--</div><div class="stat-block__label">Gain total estime</div></div>
         </div>
         <div class="alert alert--info" style="margin-top:var(--sp-4);">
-          <strong>Conformite HDS / ISO 27001 / COFRAC :</strong> L'optimisation des performances ne doit jamais compromettre la securite ou la tracabilite. Le partitionnement et l'In-Memory preservent le chiffrement TDE. OCI Data Flow s'execute dans le perimetre OCI France certifie HDS. Toutes les donnees manipulees sont fictives et anonymisees.
+          <strong>Conformite HDS / ISO 27001 / COFRAC :</strong> L'optimisation des performances ne doit jamais compromettre la securite ou la tracabilite. Le partitionnement et l'In-Memory preservent le chiffrement TDE. OCI Data Flow peut etre deploye dans une region OCI France integree a un perimetre d'hebergement conforme aux exigences HDS selon l'architecture et les certifications contractuelles retenues. Toutes les donnees manipulees sont fictives et anonymisees.
         </div>
       </div>
     </section>
@@ -435,8 +435,8 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
           <p class="help-modal__text">Avec <code>pruningFactor = totalPartitions / scannedPartitions</code>. Sans partitionnement, <code>pruningFactor = 1</code>. Avec pruning sur 1 mois sur 120, <code>pruningFactor = 120</code>.</p>
           <ul class="help-modal__list">
             <li><strong>Metadonnees de partition</strong> : Oracle consulte les <code>HIGH_VALUE</code>/<code>LOW_VALUE</code> de chaque partition (stockes dans <code>USER_TAB_PARTITIONS</code>) pour elaguer avant tout acces.</li>
-            <li><strong>Partition Exchange Loading (PEL)</strong> : Permet d'echanger une partition avec une table externe en O(1) operation metadata. Critique pour l'archivage COFRAC N+10 ans sans impact OLTP.</li>
-            <li><strong>Maintenance</strong> : TRUNCATE PARTITION et MERGE PARTITION sont des operations metadata only. SPLIT PARTITION peut necessiter un reequilibrage des donnees si la scission ne coincide pas avec l'organisation physique des segments.</li>
+            <li><strong>Partition Exchange Loading (PEL)</strong> : Permet d'echanger une partition avec une table Oracle compatible via une operation essentiellement metadata only. Cette technique est critique pour le chargement massif et l'archivage sans impact significatif sur l'OLTP.</li>
+            <li><strong>Maintenance</strong> : TRUNCATE PARTITION et EXCHANGE PARTITION sont essentiellement des operations metadata only. En revanche, MERGE PARTITION et SPLIT PARTITION peuvent necessiter des mouvements ou reecritures de donnees selon la structure physique et les index locaux/globaux.</li>
           </ul>
         </div>
         <div class="help-modal__section">
@@ -458,7 +458,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       <div class="help-modal__body">
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--objective">Principe</div>
-          <p class="help-modal__text">L'option In-Memory d'Oracle stocke une copie des donnees au format <strong>colonne</strong> (Column Store) dans la SGA, en plus du format ligne (Row Store) dans le Buffer Cache. Les IMCUs (In-Memory Compression Units) sont des segments de ~1 Mo comprimes et indexes par un Snapshot Metadata Unit (SMU).</p>
+          <p class="help-modal__text">L'option Oracle Database In-Memory stocke une copie des donnees au format <strong>colonne</strong> (Column Store) dans l'In-Memory Area de la SGA, en plus du format ligne (Row Store) conserve dans le Buffer Cache. Les IMCUs (In-Memory Compression Units) sont des unites de stockage columnaires comprimees, associees a des SMU (<em>Storage Metadata Units</em>) contenant les metadonnees de pruning et de scan.</p>
         </div>
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--algorithm">Architecture IMCU</div>
@@ -466,13 +466,14 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
             <li><strong>Transposition Row→Column</strong> : Les colonnes selectionnees sont extraites des lignes et stockees consecutivement en memoire. Une requete SELECT SUM(qty) ne lit que les blocs colonne de <code>qty</code>, pas les 199 autres colonnes.</li>
             <li><strong>Compression IMCU</strong> : Chaque IMCU est comprime avec un dictionnaire local (FOR ALL COLUMNS ou MEMCOMPRESS). Ratio typique 8x a 15x pour les donnees alphanumeriques.</li>
             <li><strong>Scan Vectorise SIMD</strong> : Les CPU modernes (AVX2 256-bit) traitent 8 valeurs entieres par instruction (Single Instruction Multiple Data). Oracle vectorise les scans colonne pour atteindre des debits de 10-15 Go/s par socket.</li>
-            <li><strong>Predicate Pushdown</strong> : Les predicats WHERE sont pousses dans le scan column (ex: <code>WHERE service = 'CARDIO'</code>). Seules les IMCUs contenant des lignes pertinentes sont scrutees via les INMEMORY PRECALCULATED expressions.</li>
+            <li><strong>Predicate Pushdown et IMCU Pruning</strong> : Les predicats WHERE sont appliques directement lors du scan colonne (ex: <code>WHERE service = 'CARDIO'</code>). Oracle elimine les IMCUs non pertinentes via les metadonnees de min/max stockees dans les SMU, reduisant fortement le volume scanne.</li>
           </ul>
         </div>
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--indicators">Formules</div>
           <p class="help-modal__text"><code>ScanTime = (rows × rowWidth × colSelectivity) / (imcuBandwidth × vectorFactor)</code></p>
-          <p class="help-modal__text"><code>CompressionRatio = 1 - (selectedCols / totalCols) × (1 - imcuCompressionRate)</code></p>
+          <p class="help-modal__text"><code>EffectiveScanReduction = selectedCols / totalCols</code></p>
+		  <p class="help-modal__text"><code>CompressionRatio ≈ originalSize / compressedIMCUSize</code></p>
           <p class="help-modal__text">Avec <code>vectorFactor = 6</code> (estimation conservative du gain SIMD sur 256-bit AVX2), <code>imcuBandwidth = 12 GB/s</code> (bande passante memoire DDR4-3200 dual channel par socket).</p>
         </div>
       </div>
@@ -490,14 +491,14 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       <div class="help-modal__body">
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--objective">Principe</div>
-          <p class="help-modal__text">OCI Data Flow est un service Spark managé (serverless) sur Oracle Cloud. Il permet d'executer des jobs de traitement Big Data sans provisionner de cluster. L'architecture est <strong>polyglotte</strong> : Oracle SQL pour le transactionnel et l'analytique structure, Spark pour les traitements massifs et non structurés (logs, genomique, imagerie).</p>
+          <p class="help-modal__text">OCI Data Flow est un service Apache Spark managé et serverless sur Oracle Cloud. Le service provisionne automatiquement un cluster Spark ephemere pour l'execution des jobs, sans administration manuelle d'infrastructure par l'utilisateur. L'architecture est <strong>polyglotte</strong> : Oracle SQL pour le transactionnel et l'analytique structure, Spark pour les traitements massifs et non structurés (logs, genomique, imagerie).</p>
         </div>
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--algorithm">Architecture Distribuee</div>
           <ul class="help-modal__list">
             <li><strong>Spark Executor Memory</strong> : Chaque nœud executer alloue une portion de RAM (spark.executor.memory) pour les operations en memoire. Les donnees depassant cette capacite sont <em>spillées</em> sur disque (identique au mécanisme PGA Temp Spill).</li>
             <li><strong>Shuffle Partitions</strong> : Lors d'un <code>GROUP BY</code> ou <code>JOIN</code>, Spark repartitionne les donnees entre les executors (shuffle). Le parametre <code>spark.sql.shuffle.partitions</code> controle le parallelisme. Defaut : 200 partitions.</li>
-            <li><strong>Predicate Pushdown Oracle</strong> : Le Oracle Big Data Connector pour Apache Spark permet de pousser les filtres WHERE dans Oracle (via Oracle SQL), reduisant le volume de donnees transferees sur le reseau. Seules les lignes correspondant aux predicats sont lues.</li>
+            <li><strong>Predicate Pushdown Oracle</strong> : Le connecteur Oracle Database pour Spark (JDBC / Oracle datasource) permet de pousser les filtres WHERE dans Oracle (via Oracle SQL), reduisant le volume de donnees transferees sur le reseau. Seules les lignes correspondant aux predicats sont lues.</li>
             <li><strong>Data Locality</strong> : Spark tente de programmer les tasks sur les nœuds où les donnees resident. En OCI, la localite est optimale quand les donnees Oracle sont dans un Autonomous Database sur la meme region (<code>eu-france-1</code>).</li>
           </ul>
         </div>
@@ -545,7 +546,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       ORACLE_ADVANCED::SUITE - Application de demonstration technique<br>
       DONNEES: 100% FICTIVES - Conforme RGPD Art. 25 (Privacy by Design) - HDS / ISO 27001 / COFRAC<br>
       Architecture: ES6 Classes - Vanilla JS - Zero Dependency - Offline<br>
-      Conception UX/UI et developpement : Stephane Bertin | Assiste par OpenCode, agent Big Pickle
+      Vision, design et validation : Stéphane Bertin | Codage assisté par OpenCode avec supervision et contrôle de l'auteur humain
     </footer>
   </main>
 </div>
@@ -594,12 +595,12 @@ class PerformanceEngine {
     };
     this._constants = {
       totalRows: 5e9,
-      ioBandwidth: 500, // MB/s
+      ioBandwidth: 60, // MB/s
       rowWidth: 500,    // bytes
       dataSize: 2560,   // GB (2.5 TB)
       imcuBandwidth: 12000, // MB/s (12 GB/s)
       vectorFactor: 6,  // SIMD gain
-      imcuCompression: 0.85, // 85% reduction for column
+      imcuCompression: 0.90, // 90% reduction for column
       shuffleEfficiency: 0.6,
       executorMemory: 8, // GB per node
       nodeThroughput: 20, // GB/s per Spark node
