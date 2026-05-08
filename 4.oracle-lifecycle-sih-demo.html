@@ -183,7 +183,7 @@ a:hover { text-decoration: underline; }
 .decision-opt { display: flex; align-items: center; gap: var(--sp-3); width: 100%; padding: var(--sp-4); background: var(--color-bg-elevated); border: 2px solid var(--color-border); border-radius: var(--radius-md); font-size: var(--fs-sm); color: #e2e8f0; cursor: pointer; transition: all var(--transition-fast); text-align: left; font-family: var(--font-mono); }
 .decision-opt:hover:not(:disabled) { border-color: var(--color-blue); background: var(--color-bg-hover); }
 .decision-opt:disabled { cursor: not-allowed; opacity: 0.5; }
-.decision-opt--selected { border-color: #334155; background: #1e293b; }
+.decision-opt--selected { border-color: #475569; background: #334155; }
 .decision-opt--risky { border-color: var(--color-red); background: var(--color-red-dim); }
 .decision-opt--good { border-color: var(--color-green); background: var(--color-green-dim); }
 .decision-opt__letter { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--color-bg-deep); font-weight: 700; font-size: var(--fs-xs); flex-shrink: 0; }
@@ -716,12 +716,6 @@ class WorkflowEngine {
 
     this.history.push({ step: stepId, stepName: step.name, choice, risky: feedback.risky, time: new Date().toLocaleTimeString() });
 
-    if (feedback.risky) {
-      step.status = 'error';
-    } else {
-      step.status = 'done';
-    }
-
     this.ev.emit('decision', { stepId, choice, feedback });
     this.ev.emit('state-change', this.getState());
     return feedback;
@@ -732,9 +726,6 @@ class WorkflowEngine {
     if (!step || step.status === 'done') return;
 
     step.status = 'done';
-    if (!step.feedback || !step.feedback.risky) {
-      this.goodPractices++;
-    }
     this._advance();
     this.ev.emit('state-change', this.getState());
   }
@@ -1023,13 +1014,9 @@ class UIController {
     const resetBtn = stepEl.querySelector('.btn-reset-step');
     if (resetBtn) resetBtn.style.display = 'inline-flex';
 
-    // Show validate button only if good choice or after expert
+    // Show validate button for any choice (user can advance with risk)
     const validateBtn = stepEl.querySelector('.btn-validate-step');
-    if (!fb.risky) {
-      validateBtn.style.display = 'inline-flex';
-    } else {
-      validateBtn.style.display = 'none';
-    }
+    if (validateBtn) validateBtn.style.display = 'inline-flex';
   }
 
   _render(state) {
