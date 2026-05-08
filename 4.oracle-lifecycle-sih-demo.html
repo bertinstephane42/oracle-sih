@@ -159,16 +159,16 @@ a:hover { text-decoration: underline; }
 /* ===== STEP PROGRESS ===== */
 .step-progress { display: flex; align-items: center; gap: 0; margin-bottom: var(--sp-8); padding: var(--sp-4) var(--sp-6); background: var(--color-bg-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow-x: auto; }
 .step-progress__item { display: flex; align-items: center; gap: var(--sp-3); flex-shrink: 0; padding: var(--sp-2) var(--sp-3); border-radius: var(--radius-md); transition: all var(--transition-fast); cursor: pointer; }
-.step-progress__item--active { background: var(--color-blue-dim); }
-.step-progress__item--done { background: var(--color-green-dim); }
+.step-progress__item--active { background: #1e293b; }
+.step-progress__item--done { background: var(--color-blue-dim); }
 .step-progress__item--error { background: var(--color-red-dim); }
 .step-progress__num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: var(--fs-xs); font-weight: 700; background: var(--color-bg-elevated); border: 2px solid var(--color-border); color: #94a3b8; flex-shrink: 0; }
-.step-progress__item--active .step-progress__num { border-color: var(--color-blue); color: var(--color-blue); background: var(--color-blue-dim); }
-.step-progress__item--done .step-progress__num { border-color: var(--color-green); color: var(--color-green); background: var(--color-green-dim); }
+.step-progress__item--active .step-progress__num { border-color: #475569; color: #94a3b8; background: #1e293b; }
+.step-progress__item--done .step-progress__num { border-color: var(--color-blue); color: var(--color-blue); background: var(--color-blue-dim); }
 .step-progress__item--error .step-progress__num { border-color: var(--color-red); color: var(--color-red); background: var(--color-red-dim); }
 .step-progress__label { font-family: var(--font-mono); font-size: var(--fs-xs); font-weight: 600; white-space: nowrap; }
-.step-progress__item--active .step-progress__label { color: var(--color-blue); }
-.step-progress__item--done .step-progress__label { color: var(--color-green); }
+.step-progress__item--active .step-progress__label { color: #94a3b8; }
+.step-progress__item--done .step-progress__label { color: var(--color-blue); }
 .step-progress__item--error .step-progress__label { color: var(--color-red); }
 .step-progress__arrow { color: #475569; font-family: var(--font-mono); font-size: var(--fs-sm); flex-shrink: 0; }
 
@@ -330,7 +330,7 @@ a:hover { text-decoration: underline; }
 
     <!-- Risk Gauge -->
     <div class="card fade-in">
-      <div class="card__title"><span class="card__title-icon">&#9888;</span> Jauge de Risque Projet</div>
+      <div class="card__title"><span class="card__title-icon">&#9888;</span> Jauge de risque projet</div>
       <div class="risk-gauge">
         <span class="risk-gauge__label">Risque</span>
         <div class="risk-gauge__bar-wrap">
