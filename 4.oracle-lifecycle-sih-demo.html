@@ -714,8 +714,6 @@ class WorkflowEngine {
       this.goodPractices++;
     }
 
-    this.history.push({ step: stepId, stepName: step.name, choice, risky: feedback.risky, time: new Date().toLocaleTimeString() });
-
     this.ev.emit('decision', { stepId, choice, feedback });
     this.ev.emit('state-change', this.getState());
     return feedback;
@@ -726,6 +724,7 @@ class WorkflowEngine {
     if (!step || step.status === 'done') return;
 
     step.status = 'done';
+    this.history.push({ step: stepId, stepName: step.name, choice: step.decision, risky: step.feedback ? step.feedback.risky : false, time: new Date().toLocaleTimeString() });
     this._advance();
     this.ev.emit('state-change', this.getState());
   }
