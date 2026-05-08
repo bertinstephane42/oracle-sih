@@ -248,6 +248,7 @@ a:hover { text-decoration: underline; }
       <span class="status-badge status-badge--online"><span class="status-dot"></span>GUIDE ACTIF</span>
       <span class="status-badge status-badge--hds">HDS / DONNEES FICTIVES</span>
       <button class="page-header__help-btn" id="btn-help-lexicon" aria-label="Lexique technique" title="Lexique technique">L</button>
+      <button class="page-header__help-btn" id="btn-help-credit" aria-label="Credits" title="Credits">C</button>
     </div>
   </header>
 
@@ -643,6 +644,24 @@ a:hover { text-decoration: underline; }
         <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
       </div>
     </div>
+    <div class="help-modal" id="help-credit" role="dialog" aria-modal="true" aria-labelledby="help-credit-title" aria-hidden="true">
+      <div class="help-modal__header">
+        <div class="help-modal__title" id="help-credit-title">Credit</div>
+        <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+      </div>
+      <div class="help-modal__body">
+        <div class="help-modal__section">
+          <p class="help-modal__text">
+            <center>Conception fonctionnelle, scenarios, developpement et relecture : Stephane Bertin<br>
+            Assiste par OpenCode, agent Big Pickle<br>
+            2025.</center>
+          </p>
+        </div>
+      </div>
+      <div class="help-modal__footer">
+        <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+      </div>
+    </div>
 
     <!-- Expert Modal Placeholder (dynamic) -->
     <div class="help-modal" id="help-expert" role="dialog" aria-modal="true" aria-labelledby="help-expert-title" aria-hidden="true">
@@ -699,8 +718,7 @@ a:hover { text-decoration: underline; }
     <footer class="app-footer">
       ORACLE_LIFECYCLE::SIH — Guide Interactif de Deploiement Oracle PUI<br>
       DONNEES: 100% FICTIVES — Conforme RGPD Art. 25 — Aucune donnee de sante reelle<br>
-      Architecture: WorkflowEngine — Vanilla JS — Zero Dependency — Offline<br>
-	  Conception fonctionnelle, scénarios, développement et relecture : Stéphane Bertin<br>Assisté par OpenCode, agent Big Pickle 
+      Architecture: WorkflowEngine — Vanilla JS — Zero Dependency — Offline
     </footer>
   </main>
 </div>
@@ -1075,12 +1093,14 @@ class UIController {
     // Help
     document.getElementById('btn-help-overview').addEventListener('click', () => this._openModal('help-overview'));
     document.getElementById('btn-help-lexicon').addEventListener('click', () => this._openModal('help-lexicon'));
+    document.getElementById('btn-help-credit').addEventListener('click', () => this._openModal('help-credit'));
     document.querySelectorAll('.help-modal__close, .help-modal__footer-btn').forEach(el => {
       el.addEventListener('click', () => {
         this._closeModal('help-expert');
         this._closeModal('help-overview');
         this._closeModal('help-confirm');
         this._closeModal('help-lexicon');
+        this._closeModal('help-credit');
         this._closeOverlay();
       });
     });
@@ -1089,6 +1109,7 @@ class UIController {
       this._closeModal('help-overview');
       this._closeModal('help-confirm');
       this._closeModal('help-lexicon');
+      this._closeModal('help-credit');
       this._closeOverlay();
     });
 
