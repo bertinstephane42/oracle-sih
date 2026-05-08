@@ -420,7 +420,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         </div>
         <div class="stat-block stat-block--amber">
           <div class="stat-block__value" id="metric-pw">---</div>
-          <div class="stat-block__label">Physical Writes</div>
+          <div class="stat-block__label">Physical Reads</div>
         </div>
         <div class="stat-block stat-block--purple">
           <div class="stat-block__value" id="metric-cost">---</div>
@@ -509,7 +509,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         <!-- Purge Anonymisee -->
         <div class="card fade-in">
           <div class="card__title"><span class="card__title-icon">&#128274;</span> Purge Anonymisee — RGPD Art. 17</div>
-          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Simulation de la procedure de purge des donnees anciennes (&gt; 90 jours) avec masquage des identifiants patients via <code class="data-mono">DBMS_DATA_MASKING</code>.</p>
+          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Simulation de la procedure de purge des donnees anciennes (&gt; 90 jours) avec masquage des identifiants patients via <code class="data-mono">DBMS_REDACT</code>.</p>
           <div class="slider-group" style="margin-bottom: var(--sp-4);">
             <div class="slider-group__header">
               <span class="slider-group__label">Seuil d anciennete (jours)</span>
@@ -527,7 +527,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       <!-- Audit HDS Log -->
       <div class="card fade-in">
         <div class="card__title"><span class="card__title-icon">&#128270;</span> Audit HDS — Journal d Activite Chiffre</div>
-        <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Toutes les actions (executions, creations users, purges) sont tracees dans ce journal. Les logs sont chiffrees AES-256 au repos (simule). Conforme HDS / ISO 27001.</p>
+        <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Toutes les actions (executions, creations users, purges) sont tracees dans ce journal. Simulation de chiffrement Oracle Transparent Data Encryption (TDE) AES-256 au repos. Conforme HDS / ISO 27001.</p>
         <div class="log-console" id="audit-console" style="max-height: 350px;">
           <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>[AUDIT] Workbench initialise. Logs chiffres AES-256 au repos.</div>
         </div>
@@ -615,14 +615,14 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
           <div class="help-modal__section-title help-modal__section-title--indicators">Indicateurs Cles</div>
           <ul class="help-modal__list">
             <li><strong>Cout CBO</strong> : Unite arbitraire du cout d execution. Un cout &gt; 500 indique une requete potentiellement sous-optimale.</li>
-            <li><strong>Logical Reads</strong> : Nombre de blocs lus en memoire (Buffer Cache). Valeur elevee = nombreuses lectures memoire.</li>
+            <li><strong>Logical Reads</strong> : Nombre de lectures logiques Oracle (consistent gets + db block gets) réalisées via le Buffer Cache. Valeur elevee = nombreuses lectures memoire.</li>
             <li><strong>Physical Writes</strong> : Nombre de blocs ecrits sur disque. Non-zero pour les operations DML (UPDATE/INSERT).</li>
             <li><strong>Ratio LR/PW</strong> : Si Physical Writes &gt; 10% de Logical Reads, verifier la taille du Buffer Cache.</li>
           </ul>
         </div>
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--hds">Contexte HDS / PUI</div>
-          <p class="help-modal__text">Un Full Table Scan sur <code>STOCK_MED</code> (table de plusieurs milliers de lignes) bloque les operations de dispensation pendant plusieurs secondes. Dans une PUI hospitaliere, cela impacte directement la disponibilite des medicaments aux services critiques (Urgences, Reanimation). L optimisation des plans d execution via l indexation appropriee est un enjeu de continuite de soin.</p>
+          <p class="help-modal__text">Un Full Table Scan sur <code>STOCK_MED</code> peut fortement dégrader les performances et augmenter les temps de réponse lors des opérations critiques de dispensation. Dans une PUI hospitaliere, cela impacte directement la disponibilite des medicaments aux services critiques (Urgences, Reanimation). L optimisation des plans d execution via l indexation appropriee est un enjeu de continuite de soin.</p>
         </div>
       </div>
       <div class="help-modal__footer">
@@ -644,7 +644,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
             <li><strong>Tablespaces</strong> : Visualisation de l utilisation de l espace disque pour chaque tablespace. Alertes automatique a 80% (warning) et 90% (critique).</li>
             <li><strong>Gestion RBAC</strong> : Creation d utilisateurs avec attribution selective de roles. Le principe de <em>Least Privilege</em> est applique : le role <code>DBA_PUI</code> declenche une alerte de securite.</li>
             <li><strong>Audit HDS</strong> : Journal chiffre de toutes les actions realisees dans le Workbench. Chaque entree inclut timestamp, utilisateur, action, requete, statut. Conforme aux exigences HDS et ISO 27001.</li>
-            <li><strong>Purge Anonymisee</strong> : Simulation de <code>DBMS_DATA_MASKING</code> sur les donnees anciennes (&gt; seuil configurable). Conforme au RGPD Art. 17 (droit a l effacement) et Art. 25 (privacy by design).</li>
+            <li><strong>Purge Anonymisee</strong> : Simulation de <code>DBMS_REDACT</code> sur les donnees anciennes (&gt; seuil configurable). Conforme au RGPD Art. 17 (droit a l effacement) et Art. 25 (privacy by design).</li>
           </ul>
         </div>
         <div class="help-modal__section">
@@ -666,7 +666,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         </div>
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--hds">Contexte HDS / PUI</div>
-          <p class="help-modal__text">La gouvernance des donnees de sante exige une tracabilite totale (audit), un controle d acces strict (RBAC), et un cycle de vie des donnees conforme au RGPD (purge). Les tablespaces doivent etre monitors en continu : un tablespace plein bloque toutes les operations, y compris la dispensation de medicaments en urgence. La purge anonymisee garantit que les donnees de test/simulation ne persistent pas indefiniment, respectant le principe de minimisation (RGPD Art. 5).</p>
+          <p class="help-modal__text">La gouvernance des donnees de sante exige une tracabilite totale (audit), un controle d acces strict (RBAC), et un cycle de vie des donnees conforme au RGPD (purge). Les tablespaces doivent etre monitors en continu : un tablespace saturé peut empêcher certaines opérations critiques Oracle (INSERT, SORT, UNDO, TEMP) selon le tablespace concerné. La purge anonymisee garantit que les donnees de test/simulation ne persistent pas indefiniment, respectant le principe de minimisation (RGPD Art. 5).</p>
         </div>
       </div>
       <div class="help-modal__footer">
@@ -857,9 +857,17 @@ class SQLExecutor {
     if (snippetType === 'bulk') {
       this._log.log('INFO', '[EXEC] BULK COLLECT: Chargement des lots en PGA (collection PL/SQL)');
       this._ev.emit('log', { level: 'info', msg: '[EXEC] BULK COLLECT: Chargement des lots en PGA (collection PL/SQL)' });
-      this._log.log('INFO', '[EXEC] FORALL: Batch update 18 lignes — 0 context switch individuel');
+      this._log.log('INFO', '[EXEC] FORALL: Batch update 18 lignes — réduction massive des context switches SQL/PLSQL');
       this._ev.emit('log', { level: 'info', msg: '[EXEC] FORALL: Batch update 18 lignes — 0 context switch individuel' });
-      this._sm.stockData = FakeDataGenerator.generate(18).map(r => ({ ...r, qty: Math.max(r.qty + Math.floor(Math.random() * 200), r.seuil + 10), statut: 'REAPPROVISIONNE', criticite: 'OK' }));
+      this._sm.stockData = FakeDataGenerator.generate(18).map(r => ({
+		  ...r,
+		  qty: Math.max(
+			r.qty + Math.floor(Math.random() * 200),
+			r.seuil + 10
+		  ),
+		  statut: 'REAPPROVISIONNE',
+		  criticite: 'OK'
+		}));
       this._sm.addAudit('BULK_UPDATE', 'DBA_PUI_SIMU', `FORALL reapprovisionnement: 18 rows affected, PGA collection`);
     } else if (snippetType === 'trigger') {
       this._log.log('INFO', '[EXEC] TRIGGER trg_check_peremption: Compilation et activation');
@@ -942,7 +950,7 @@ class QueryPlanner {
     const alerts = [];
     plan.forEach(n => {
       if (n.op === 'TABLE ACCESS FULL' && n.card > 1000) {
-        alerts.push({ level: 'warning', table: n.obj, msg: `Full Table Scan sur ${n.obj} (${n.card} rows). Recommandation: CREATE INDEX idx_${n.obj.toLowerCase()}_date ON ${n.obj}(date_peremption);` });
+        alerts.push({ level: 'warning', table: n.obj, msg: `Full Table Scan sur ${n.obj} (${n.card} rows). Recommandation: analyser les predicates WHERE et créer un index sélectif adapté (ex: lot_simu(date_peremption, qty_stock)).` });
       }
     });
     if (alerts.length === 0) alerts.push({ level: 'success', table: '', msg: 'Aucun Full Table Scan sur grande table detecte. Plan optimal.' });
@@ -1092,6 +1100,17 @@ BEGIN
   :NEW.statut := 'VALIDE';
 
 EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+    RAISE_APPLICATION_ERROR(
+      -20002,
+      'LOT INTROUVABLE — Verification impossible'
+    );
+
+  WHEN TOO_MANY_ROWS THEN
+    RAISE_APPLICATION_ERROR(
+      -20003,
+      'INCOHERENCE DONNEES — Plusieurs lots detectes'
+    );
   WHEN e_med_expire THEN
     RAISE_APPLICATION_ERROR(
       -20001,
@@ -1343,8 +1362,8 @@ END trg_check_peremption;
       const days = parseInt(document.getElementById('purge-days-slider').value);
       const masked = Math.floor(Math.random() * 500 + 200);
       const res = document.getElementById('purge-result');
-      res.innerHTML = `<div class="alert alert--success">Purge terminee: ${masked} enregistrements anonymises via DBMS_DATA_MASKING (seuil: ${days} jours). Chiffrement AES-256 applique aux archives.</div>`;
-      this._sm.addAudit('RGPD_PURGE', 'DBA_PUI_SIMU', `Purge ${days}j: ${masked} rows masked, DBMS_DATA_MASKING`);
+      res.innerHTML = `<div class="alert alert--success">Purge terminee: ${masked} enregistrements anonymises via DBMS_REDACT (seuil: ${days} jours). Chiffrement AES-256 applique aux archives.</div>`;
+      this._sm.addAudit('RGPD_PURGE', 'DBA_PUI_SIMU', `Purge ${days}j: ${masked} rows masked, DBMS_REDACT`);
       this._renderAudit();
       this._logToConsole('success', `RGPD Purge: ${masked} rows anonymisees (seuil=${days}j).`);
     });
