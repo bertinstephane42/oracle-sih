@@ -386,10 +386,10 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       </div>
       <div class="card fade-in">
         <div class="card__title"><span class="card__title-icon">&#128274;</span> Data Masking &amp; Clonage PDB - Conformite RGPD</div>
-        <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Lors du clonage d'un PDB de production vers un environnement de test/recherche, les donnees de santé DOIVENT etre masquees (DBMS_DATA_MASKING). Cette demo illustre le processus avec des donnees <strong>entierement fictives</strong>.</p>
+        <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Lors du clonage d'un PDB de production vers un environnement de test/recherche, les donnees de santé DOIVENT etre masquees (Oracle Data Masking). Cette demo illustre le processus avec des donnees <strong>entierement fictives</strong>.</p>
         <div class="grid-3" id="data-masking-demo"></div>
         <div style="margin-top: var(--sp-4);">
-          <button class="btn btn--primary btn--sm" id="btn-run-masking">Executer DBMS_DATA_MASKING</button>
+          <button class="btn btn--primary btn--sm" id="btn-run-masking">Executer Oracle Data Masking</button>
           <button class="btn btn--outline btn--sm" id="btn-verify-masking">Verifier Conformite</button>
         </div>
         <div id="masking-result" style="margin-top: var(--sp-4);"></div>
@@ -615,9 +615,9 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
           <div class="help-modal__section-title help-modal__section-title--objective">Objectif de la Simulation</div>
           <p class="help-modal__text">Ce module modelise l'architecture <code>Multitenant</code> d'Oracle 12c+ dans un contexte CHU. Il demontre trois phenomenes internes critiques :</p>
           <ul class="help-modal__list">
-            <li><strong>Isolation logique CDB/PDB</strong> : Le <code>CDB$ROOT</code> heberge le dictionnaire de donnees partage (SYSTEM, SYSAUX, Undo). Chaque PDB (Pluggable Database) possede ses propres tablespaces utilisateurs mais partage les structures de controle. L'isolation est logique, non physique : une contention sur le dictionnaire partage affecte tous les PDBs.</li>
-            <li><strong>Resource Manager</strong> : Le <code>DEFAULT_CDB_PLAN</code> distribue les ressources CPU/IO via des <em>shares</em> proportionnelles. Les PDBs critiques (Urgences, Bloc operatoire) recoivent des shares eleves garantissant un SLA meme sous contention. Les PDBs de recherche fonctionnent en best-effort.</li>
-            <li><strong>Data Masking RGPD</strong> : Lors du clonage PDB (production vers test/recherche), <code>DBMS_DATA_MASKING</code> anonymise les champs sensibles (NIR, nom, diagnostic) pour conformite RGPD Art. 25 (Privacy by Design).</li>
+            <li><strong>Isolation logique CDB/PDB</strong> : Le <code>CDB$ROOT</code> heberge le dictionnaire de donnees partage (SYSTEM, SYSAUX et metadonnees communes). Chaque PDB (Pluggable Database) possede ses propres tablespaces utilisateurs mais partage les structures de controle. L'isolation est logique, non physique : une contention sur le dictionnaire partage affecte tous les PDBs.</li>
+            <li><strong>Resource Manager</strong> : Le <code>DEFAULT_CDB_PLAN</code> distribue les ressources CPU/IO via des <em>shares</em> proportionnelles. Les PDBs critiques (Urgences, Bloc operatoire) recoivent des shares eleves priorisant les workloads critiques sous contention. Les PDBs de recherche fonctionnent en best-effort.</li>
+            <li><strong>Data Masking RGPD</strong> : Lors du clonage PDB (production vers test/recherche), <code>Oracle Data Masking</code> anonymise les champs sensibles (NIR, nom, diagnostic) pour conformite RGPD Art. 25 (Privacy by Design).</li>
           </ul>
         </div>
 
@@ -628,7 +628,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
             <li><strong>Appliquer le Plan</strong> : Valide la repartition et affiche un diagnostic de conformite SLA (les PDBs critiques doivent avoir &gt;= 50% du total).</li>
             <li><strong>Reset Defaut</strong> : Restaure les shares par defaut (Urgences:4, Bloc:3, PMSI:2, Recherche:1).</li>
             <li><strong>Simuler Pic de Charge</strong> : Genere une sequence temporelle simulant la contention sur les latches <code>row cache objects</code> et <code>shared pool</code> quand 4 PDBs accedent simultanement au dictionnaire partage du <code>CDB$ROOT</code>.</li>
-            <li><strong>Executer DBMS_DATA_MASKING</strong> : Applique le masque sur les champs NIR et nom dans le PDB cible, demontrant le processus de clonage conforme RGPD.</li>
+            <li><strong>Executer Oracle Data Masking</strong> : Applique le masque sur les champs NIR et nom dans le PDB cible, demontrant le processus de clonage conforme RGPD.</li>
           </ul>
         </div>
 
@@ -717,7 +717,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
           <ul class="help-modal__list">
             <li><strong>Cycle Redo/Undo</strong> : Chaque DML genere deux traces : les <em>Undo blocks</em> (avant-image, pour le rollback et la read consistency) dans le tablespace UNDO, et les <em>Redo entries</em> (apres-image, pour la recovery) dans le <code>Redo Log Buffer</code>. Au commit, <code>LGWR</code> force l'ecriture synchrone des redo entries sur disque. Les dirty blocks sont ecrits asynchronement par <code>DBWR</code> (lazy write).</li>
             <li><strong>SCN (System Change Number)</strong> : Horloge logique d'Oracle, incrementee a chaque commit. Le SCN garantit la <em>read consistency</em> : une requete voit les donnees telles qu'elles etaient a son SCN de depart, reconstruites via l'Undo si necessaire.</li>
-            <li><strong>Instance Recovery</strong> : Apres un crash (<code>SHUTDOWN ABORT</code>), <code>SMON</code> execute deux phases : <em>Redo Apply</em> (roll-forward, rejoue tous les redo records depuis le dernier checkpoint) puis <em>Undo Apply</em> (rollback des transactions non commitrees). La base est alors ouverte et coherente.</li>
+            <li><strong>Instance Recovery</strong> : Apres un crash (<code>SHUTDOWN ABORT</code>), Le mecanisme de recovery Oracle execute deux phases : <em>Redo Apply</em> (roll-forward, rejoue tous les redo records depuis le dernier checkpoint) puis <em>Undo Apply</em> (rollback des transactions non commitrees). La base est alors ouverte et coherente.</li>
             <li><strong>ORA-01555 Snapshot Too Old</strong> : Erreur critique survenant quand les donnees Undo necessaires a la read consistency d'une longue requete ont ete ecrasees par des DMLs concurrents. Le risque depend de <code>UNDO_RETENTION</code>, de la duree de la requete, et du taux de rotation Undo.</li>
           </ul>
         </div>
@@ -738,7 +738,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--indicators">Indicateurs Cles</div>
           <ul class="help-modal__list">
-            <li><strong>Compteur SCN</strong> : S'auto-incremente toutes les 2 secondes (simulation d'activite background). Chaque commit avance le SCN.</li>
+            <li><strong>Compteur SCN</strong> : Progresse en fonction de l'activite transactionnelle simulee (simulation d'activite background). Chaque commit avance le SCN.</li>
             <li><strong>Marqueurs de flux</strong> : 5 etapes colorees (gris = en attente, bleu = en cours, vert = complete, rouge = erreur). Permettent de suivre visuellement la progression de la transaction.</li>
             <li><strong>Retention effective</strong> : Valeur calculee = UNDO_RETENTION * (1 - DML_load / 200). Si la duree de requete excede cette valeur, ORA-01555 se produit.</li>
             <li><strong>Log console ORA-01555</strong> : Affiche la progression de la requete longue et le moment ou les Undo blocks sont ecrases.</li>
@@ -789,7 +789,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
           <div class="help-modal__section-title help-modal__section-title--indicators">Indicateurs Cles</div>
           <ul class="help-modal__list">
             <li><strong>Statut TDE</strong> : <code>V$ENCRYPTED_TABLESPACES: ENCRYPTED</code> confirme le chiffrement actif. Overhead CPU : ~3-5%.</li>
-            <li><strong>Revoquer Cle</strong> : <code>ORA-28365: wallet is not open</code> confirme que la revocation rend les donnees inaccesibles. C'est le comportement attendu et desire.</li>
+            <li><strong>Revoquer Cle</strong> : <code>ORA-28365: wallet is not open</code> illustre un keystore TDE inaccessible ou non ouvert, empechant l'acces aux donnees chiffrees. C'est le comportement attendu et desire.</li>
             <li><strong>Auto-Tuning</strong> : <code>V$SQL_AUTO_INDEX: INDEX CREATED</code> et <code>SQL_PLAN_BASELINE: ACCEPTED</code> confirment les optimisations appliquees automatiquement.</li>
             <li><strong>Tableau comparatif IA</strong> : Compare IA embarquee vs generative externe sur 5 criteres : localisation des donnees, conformite RGPD, certification HDS, controle humain, et cas d'usage.</li>
           </ul>
@@ -934,7 +934,7 @@ class DatabaseEngine {
     return dataset.map(row => ({
       id: row.id, nir: 'XXXX-XXX-XXX-' + row.nir.slice(-4), nom: 'PATIENT_MASQUE',
       medecin: row.medecin, service: row.service, montant_t2a: row.montant_t2a,
-      sejour_id: row.sejour_id, _meta: 'MASQUE - DBMS_DATA_MASKING applique', _masked_fields: ['nir', 'nom']
+      sejour_id: row.sejour_id, _meta: 'MASQUE - Oracle Data Masking applique', _masked_fields: ['nir', 'nom']
     }));
   }
   tdeEncrypt(plaintext) {
@@ -1035,7 +1035,7 @@ class MultitenantModule {
       { l: 'warn', t: 'LATCH: shared pool - contention sur CDB$ROOT (shared dictionary miss)' },
       { l: 'info', t: 'PDB_URGENCES: dict cache hit ratio chute a 87.3%' },
       { l: 'error', t: 'Session hang sur PDB_RECHERCHE (full parse storm)' },
-      { l: 'info', t: 'Auto-resolution: Oracle augmente _shared_pool_reserved_pct' },
+      { l: 'info', t: 'Auto-resolution: diminution progressive de la contention apres eviction et reallocation memoire Shared Pool' },
       { l: 'success', t: 'Contention resolue apres 2.3s - Hit ratio restaure a 99.1%' }
     ];
     var idx = 0;
@@ -1055,7 +1055,7 @@ class MultitenantModule {
     var masked = this._engine.applyDataMasking(data);
     var target = document.getElementById('masking-target');
     if (target) target.innerHTML = masked.map(function(d) { return '<tr><td>' + d.id + '</td><td class="masked">' + d.nir + '</td><td class="masked">' + d.nom + '</td></tr>'; }).join('');
-    document.getElementById('masking-result').innerHTML = '<div class="alert alert--success">DBMS_DATA_MASKING execute avec succes. Champs sensibles (NIR, Nom) masques. Clonage PDB conforme RGPD.</div>';
+    document.getElementById('masking-result').innerHTML = '<div class="alert alert--success">Oracle Data Masking execute avec succes. Champs sensibles (NIR, Nom) masques. Clonage PDB conforme RGPD.</div>';
     Logger.info('Data Masking applique');
   }
 
@@ -1155,7 +1155,8 @@ class MemoryModule {
   _simulateLatch() {
     var sessions = parseInt(document.getElementById('latch-sessions-slider').value);
     var log = document.getElementById('latch-log'); var resultDiv = document.getElementById('latch-result');
-    var totalWaitTime = sessions * sessions * 0.5;
+	var concurrencyFactor = Math.pow(sessions, 1.35);
+	var totalWaitTime = concurrencyFactor * 2.5;
     var spins = Math.min(sessions * 3, 64);
     var sleeps = Math.max(sessions - 4, 0);
     var entries = [];
@@ -1189,7 +1190,7 @@ class MemoryModule {
     var sc = spills ? 'red' : 'green'; var tc2 = totalTime > 1000 ? 'red' : 'cyan';
     var html = '<div class="grid-2" style="margin-bottom:var(--sp-4);"><div class="stat-block stat-block--' + sc + '"><div class="stat-block__value">' + (spills ? 'TEMP SPILL' : 'OPTIMAL') + '</div><div class="stat-block__label">Mode execution</div></div><div class="stat-block stat-block--' + tc2 + '"><div class="stat-block__value">' + totalTime.toFixed(0) + 'ms</div><div class="stat-block__label">Temps estime</div></div></div>';
     html += '<div class="alert alert--' + (spills ? 'error' : 'success') + '">';
-    if (spills) { html += '<strong>TEMP SPILL DETECTE:</strong> Sort de ' + sortSize + 'MB excede work area (' + workAreaSize + 'MB). ' + spillMB + 'MB bascules en TEMP. Impact: +' + diskTime.toFixed(0) + 'ms I/O disque.<br><span class="data-mono">V$SQL_WORKAREA_ACTIVE: PASSIVE -&gt; ACTIVE -&gt; SPILLED</span>'; }
+    if (spills) { html += '<strong>TEMP SPILL DETECTE:</strong> Sort de ' + sortSize + 'MB excede work area (' + workAreaSize + 'MB). ' + spillMB + 'MB bascules en TEMP. Estimation pédagogique: +' + diskTime.toFixed(0) + 'ms I/O disque.<br><span class="data-mono">V$SQL_WORKAREA_ACTIVE: PASSIVE -&gt; ACTIVE -&gt; SPILLED</span>'; }
     else { html += '<strong>Execution OPTIMALE:</strong> Sort de ' + sortSize + 'MB tient en memoire (work area: ' + workAreaSize + 'MB). Pas d I/O disque.<br><span class="data-mono">V$SQL_WORKAREA_ACTIVE: OPTIMAL</span>'; }
     html += '</div>';
     if (spills) html += '<div class="alert alert--warning">Impact PMSI/T2A: Les requetes volumineuses avec TEMP SPILL peuvent bloquer la production T2A. Solution: augmenter PGA_AGGREGATE_TARGET ou optimiser la requete.</div>';
@@ -1379,7 +1380,7 @@ class CloudModule {
     var ct = document.getElementById('tde-ciphertext');
     var chars = '0123456789ABCDEF';
     function fakeEnc(len) { var s = 'TDE$AES256$'; for (var i = 0; i < len; i++) s += chars[Math.floor(Math.random() * 16)]; return s; }
-    if (ct) ct.innerHTML = '<div>NIR: <span class="encrypted">' + fakeEnc(20) + '</span></div><div>Nom: <span class="encrypted">' + fakeEnc(20) + '</span></div><div>Montant: <span class="encrypted">' + fakeEnc(20) + '</span></div><div>Diag: <span class="encrypted">' + fakeEnc(20) + '</span></div><div style="margin-top:var(--sp-2);color:var(--color-purple);font-size:var(--fs-xs);">Key ID: TDE_KEY_HSM_CHU_DEMO_001 | Algo: AES-256-CBC | Mode: Tablespace Encryption</div>';
+    if (ct) ct.innerHTML = '<div>NIR: <span class="encrypted">' + fakeEnc(20) + '</span></div><div>Nom: <span class="encrypted">' + fakeEnc(20) + '</span></div><div>Montant: <span class="encrypted">' + fakeEnc(20) + '</span></div><div>Diag: <span class="encrypted">' + fakeEnc(20) + '</span></div><div style="margin-top:var(--sp-2);color:var(--color-purple);font-size:var(--fs-xs);">Key ID: TDE_KEY_HSM_CHU_DEMO_001 | Algo: AES-256 | Mode: Tablespace Encryption</div>';
     document.getElementById('tde-result').innerHTML = '<div class="alert alert--success"><strong>TDE AES-256 active</strong> - Donnees chiffrees au repos (data-at-rest).<br><span class="data-mono">V$ENCRYPTED_TABLESPACES: ENCRYPTED</span><br><span class="data-mono">Cle maitresse stockee dans HSM OCI Vault (BYOK)</span></div>';
     Logger.info('TDE Encrypt simule - AES-256');
   }
