@@ -416,15 +416,15 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
           <div class="stat-block__value" id="metric-time">---</div>
           <div class="stat-block__label">Temps Execution (ms)</div>
         </div>
-        <div class="stat-block stat-block--blue">
+        <div class="stat-block stat-block--blue" data-help="lexicon">
           <div class="stat-block__value" id="metric-lr">---</div>
           <div class="stat-block__label">Logical Reads</div>
         </div>
-        <div class="stat-block stat-block--amber">
+        <div class="stat-block stat-block--amber" data-help="lexicon">
           <div class="stat-block__value" id="metric-pw">---</div>
           <div class="stat-block__label">Physical Reads</div>
         </div>
-        <div class="stat-block stat-block--purple">
+        <div class="stat-block stat-block--purple" data-help="lexicon">
           <div class="stat-block__value" id="metric-cost">---</div>
           <div class="stat-block__label">Cout CBO</div>
         </div>
@@ -445,7 +445,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
 
       <!-- Explain Plan -->
       <div class="card fade-in">
-        <div class="card__title"><span class="card__title-icon">&#127794;</span> Explain Plan — Plan d Execution Simule</div>
+        <div class="card__title" data-help="lexicon"><span class="card__title-icon">&#127794;</span> Explain Plan — Plan d Execution Simule</div>
         <div id="plan-placeholder" class="alert alert--info">Le plan d execution sera genere automatiquement apres execution d une requete.</div>
         <div id="plan-tree-container" style="display: none;">
           <div class="plan-tree" id="plan-tree"></div>
@@ -476,7 +476,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
 
       <!-- Tablespaces -->
       <div class="card fade-in">
-        <div class="card__title"><span class="card__title-icon">&#128190;</span> Tablespaces — Espace Disque</div>
+        <div class="card__title" data-help="lexicon"><span class="card__title-icon">&#128190;</span> Tablespaces — Espace Disque</div>
         <div id="tablespaces-container"></div>
         <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
           <button class="btn btn--outline btn--sm" id="btn-refresh-ts">Actualiser</button>
@@ -487,7 +487,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       <div class="grid-2">
         <!-- User Management -->
         <div class="card fade-in">
-          <div class="card__title"><span class="card__title-icon">&#128100;</span> Gestion Utilisateurs — RBAC</div>
+          <div class="card__title" data-help="lexicon"><span class="card__title-icon">&#128100;</span> Gestion Utilisateurs — RBAC</div>
           <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Creation d utilisateur avec attribution de roles. Principe de Least Privilege applique.</p>
           <div class="user-form">
             <div class="user-form__field">
@@ -510,7 +510,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
 
         <!-- Purge Anonymisee -->
         <div class="card fade-in">
-          <div class="card__title"><span class="card__title-icon">&#128274;</span> Purge Anonymisee — RGPD Art. 17</div>
+          <div class="card__title" data-help="lexicon"><span class="card__title-icon">&#128274;</span> Purge Anonymisee — RGPD Art. 17</div>
           <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Simulation de la procedure de purge des donnees anciennes (&gt; 90 jours) avec masquage des identifiants patients via <code class="data-mono">DBMS_REDACT</code>.</p>
           <div class="slider-group" style="margin-bottom: var(--sp-4);">
             <div class="slider-group__header">
@@ -733,6 +733,12 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
             <li><strong>Commutation de Contexte (Context Switch)</strong> — Basculement entre le moteur SQL et le moteur PL/SQL, dont le cout cumule peut etre significatif dans les boucles iteratives.</li>
             <li><strong>Declencheur (Trigger)</strong> — Bloc PL/SQL stocke s'executant automatiquement sur un evenement de modification (INSERT, UPDATE, DELETE) d'une table, utilise pour les regles metier et les contraintes complexes.</li>
             <li><strong>Collection PL/SQL</strong> — Structure de donnees programmee (table imbriquee, VARRAY, table associative) permettant de manipuler des ensembles de lignes en memoire.</li>
+            <li><strong>Curseur</strong> — Zone memoire privee allouee dans la memoire globale de programme contenant le resultat d'une requete SQL, parcourue ligne par ligne par les instructions de chargement (<code>FETCH</code>), d'ouverture (<code>OPEN</code>) et de fermeture (<code>CLOSE</code>).</li>
+            <li><strong>Gestion d'Exceptions</strong> — Mecanisme PL/SQL permettant de traiter les erreurs d'execution par des blocs de capture (<code>WHEN</code>) et de propagation (<code>RAISE</code>), separant le chemin nominal du chemin d'erreur.</li>
+            <li><strong>RAISE / RAISE_APPLICATION_ERROR</strong> — Instructions de declenchement explicite d'une exception : <code>RAISE</code> propage une exception definie ou systeme ; <code>RAISE_APPLICATION_ERROR</code> emet une exception personnalisee avec un code compris entre -20000 et -20999 et un message libre.</li>
+            <li><strong>Bloc Anonyme</strong> — Unite d'execution PL/SQL non stockee en base, structuree en trois parties : section declarative (<code>DECLARE</code>), section executable (<code>BEGIN</code>), section de gestion d'erreurs (<code>EXCEPTION</code>).</li>
+            <li><strong>:NEW (pseudo-enregistrement)</strong> — Reference au nouvel etat d'une ligne dans un declencheur, donnant acces aux valeurs modifiees avant ecriture effective dans la table, notee <code>:NEW.colonne</code>.</li>
+            <li><strong>Enregistrement PL/SQL (Record)</strong> — Structure de donnees composite definie par le programmeur, pouvant contenir plusieurs champs de types differents, utilisee pour representer une ligne de table ou un sous-ensemble de colonnes.</li>
           </ul>
         </div>
         <div class="help-modal__section">
@@ -742,6 +748,29 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
             <li><strong>Moindre Privilege (Least Privilege)</strong> — Principe de securite selon lequel un utilisateur ne dispose que des droits strictement necessaires a ses fonctions, reduisant la surface d'attaque et les risques d'erreur.</li>
             <li><strong>Masquage Dynamique (DBMS_REDACT)</strong> — Paquetage Oracle permettant le masquage a la volee des donnees sensibles dans les resultats de requetes, sans alterer les donnees stockees.</li>
             <li><strong>Journal d'Activite (Audit HDS)</strong> — Enregistrement chiffre et horodate de l'ensemble des actions effectuees sur le systeme, garantissant la tracabilite requise par la certification Hebergement de Donnees de Sante.</li>
+            <li><strong>Controle d'Acces RBAC</strong> — Modele de securite fonde sur les roles plutot que sur les utilisateurs individuels, facilitant l'administration des privileges par l'attribution de roles predefinis (Role-Based Access Control).</li>
+            <li><strong>Role Oracle</strong> — Conteneur de privileges nomme, attribuable aux utilisateurs ou a d'autres roles, permettant de gerer collectivement les droits d'acces aux objets et aux operations du systeme.</li>
+            <li><strong>Validation / Annulation (COMMIT / ROLLBACK)</strong> — Instructions de terminaison de transaction : <code>COMMIT</code> rend les modifications definitives et visibles par les autres sessions ; <code>ROLLBACK</code> annule toutes les modifications de la transaction courante en restaurant les segments d'annulation.</li>
+          </ul>
+        </div>
+
+        <!-- Stockage et Espace Disque -->
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--lexique">Stockage et Espace Disque</div>
+          <ul class="help-modal__list">
+            <li><strong>Espace de Tables (Tablespace)</strong> — Conteneur logique de stockage regroupant un ou plusieurs fichiers disques, dans lequel sont organises les segments (tables, index, segments d'annulation, tables temporaires).</li>
+            <li><strong>Lecture Logique</strong> — Consultation d'un bloc de donnees depuis le cache de tampons sans acces au disque, comptabilisee comme <em>consistent get</em> ou <em>db block get</em> dans les statistiques d'execution.</li>
+            <li><strong>Ecriture Physique</strong> — Transfert effectif d'un bloc de donnees depuis le cache de tampons vers le fichier disque, declenche par le processus d'ecriture differee (<em>DBWR</em>) ou par un vidage explicite.</li>
+          </ul>
+        </div>
+
+        <!-- Metriques de Performance -->
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--lexique">Metriques de Performance</div>
+          <ul class="help-modal__list">
+            <li><strong>Declencheur AVANT / APRES (BEFORE / AFTER)</strong> — Moment d'execution d'un declencheur par rapport a l'evenement declencheur : <code>BEFORE</code> s'execute avant la modification de la ligne, permettant la validation prealable ; <code>AFTER</code> s'execute apres la modification, utilise pour les actions post-validation.</li>
+            <li><strong>POUR CHAQUE LIGNE (FOR EACH ROW)</strong> — Directive specifiant qu'un declencheur s'execute une fois par ligne modifiee, donnant acces aux pseudo-enregistrements <code>:NEW</code> et <code>:OLD</code>.</li>
+            <li><strong>Taux de Succes du Cache de Tampons (Buffer Cache Hit Ratio)</strong> — Indicateur de performance mesurant la proportion de demandes de blocs satisfaites par le cache de tampons sans recours a une lecture physique, essentiel au dimensionnement de la memoire globale.</li>
           </ul>
         </div>
       </div>
