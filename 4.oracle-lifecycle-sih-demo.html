@@ -367,7 +367,6 @@ a:hover { text-decoration: underline; }
             <span class="decision-opt__badge tag--neutral tag">Sans Resource Plan</span>
           </div>
         </div>
-        <div id="step1-feedback" style="margin-top: var(--sp-4);"></div>
         <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
           <button class="btn btn--outline btn--sm btn-expert" data-step="1">Voir la Bonne Pratique</button>
           <button class="btn btn--outline btn--sm btn-reset-step" data-step="1" style="display:none;">Reinitialiser le choix</button>
@@ -403,7 +402,6 @@ a:hover { text-decoration: underline; }
             <span class="decision-opt__badge tag--neutral tag">Audit partiel</span>
           </div>
         </div>
-        <div id="step2-feedback" style="margin-top: var(--sp-4);"></div>
         <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
           <button class="btn btn--outline btn--sm btn-expert" data-step="2">Voir la Bonne Pratique</button>
           <button class="btn btn--outline btn--sm btn-reset-step" data-step="2" style="display:none;">Reinitialiser le choix</button>
@@ -439,7 +437,6 @@ a:hover { text-decoration: underline; }
             <span class="decision-opt__badge tag--neutral tag">Parcours ligne/ligne</span>
           </div>
         </div>
-        <div id="step3-feedback" style="margin-top: var(--sp-4);"></div>
         <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
           <button class="btn btn--outline btn--sm btn-expert" data-step="3">Voir la Bonne Pratique</button>
           <button class="btn btn--outline btn--sm btn-reset-step" data-step="3" style="display:none;">Reinitialiser le choix</button>
@@ -475,7 +472,6 @@ a:hover { text-decoration: underline; }
             <span class="decision-opt__badge tag--neutral tag">SGA sur-dimensionnee</span>
           </div>
         </div>
-        <div id="step4-feedback" style="margin-top: var(--sp-4);"></div>
         <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
           <button class="btn btn--outline btn--sm btn-expert" data-step="4">Voir la Bonne Pratique</button>
           <button class="btn btn--outline btn--sm btn-reset-step" data-step="4" style="display:none;">Reinitialiser le choix</button>
@@ -511,7 +507,6 @@ a:hover { text-decoration: underline; }
             <span class="decision-opt__badge tag--neutral tag">Rebuild index</span>
           </div>
         </div>
-        <div id="step5-feedback" style="margin-top: var(--sp-4);"></div>
         <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
           <button class="btn btn--outline btn--sm btn-expert" data-step="5">Voir la Bonne Pratique</button>
           <button class="btn btn--outline btn--sm btn-reset-step" data-step="5" style="display:none;">Reinitialiser le choix</button>
@@ -547,7 +542,6 @@ a:hover { text-decoration: underline; }
             <span class="decision-opt__badge tag--neutral tag">Export logique</span>
           </div>
         </div>
-        <div id="step6-feedback" style="margin-top: var(--sp-4);"></div>
         <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
           <button class="btn btn--outline btn--sm btn-expert" data-step="6">Voir la Bonne Pratique</button>
           <button class="btn btn--outline btn--sm btn-reset-step" data-step="6" style="display:none;">Reinitialiser le choix</button>
@@ -615,7 +609,6 @@ a:hover { text-decoration: underline; }
         <div class="help-modal__text">Contenu dynamique charge selon l'etape.</div>
       </div>
       <div class="help-modal__footer">
-        <button class="btn btn--primary btn--sm" id="btn-expert-apply">Appliquer la Bonne Pratique</button>
         <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
       </div>
     </div>
@@ -950,20 +943,10 @@ class UIController {
           opt.disabled = false;
           opt.classList.remove('decision-opt--selected');
         });
-        document.getElementById('step' + stepId + '-feedback').innerHTML = '';
         stepEl.querySelector('.btn-reset-step').style.display = 'none';
         stepEl.querySelector('.btn-validate-step').style.display = 'none';
         this._log('info', '[Etape ' + stepId + '] Choix reinitialise. Vous pouvez choisir a nouveau.');
       });
-    });
-
-    // Expert modal apply
-    document.getElementById('btn-expert-apply').addEventListener('click', () => {
-      const step = parseInt(document.getElementById('help-expert').dataset.engineStep);
-      if (!step) return;
-      this.engine.applyExpert(step);
-      this._closeModal('help-expert');
-      this._closeModal('help-overlay');
     });
 
     // Help
@@ -1008,7 +991,6 @@ class UIController {
 
   _onDecision(d) {
     const stepEl = document.getElementById('step-' + d.stepId);
-    const feedbackEl = document.getElementById('step' + d.stepId + '-feedback');
     const step = this.engine.steps[d.stepId];
     const fb = d.feedback;
 
@@ -1024,25 +1006,15 @@ class UIController {
       }
     });
 
-    // Show feedback — severity-aware
-    let alertClass = 'alert--success';
-    let icon = '&#10004;';
+    // Log — severity-aware (feedback visible in console only, like production monitoring)
     let logLevel = 'success';
     let prefix = 'Bonne pratique : ';
     if (d.choice === 'risky') {
-      alertClass = 'alert--error'; icon = '&#9888;'; logLevel = 'error'; prefix = 'Choix risque (critique) : ';
+      logLevel = 'error'; prefix = 'Choix risque (critique) : ';
     } else if (d.choice === 'risky2') {
-      alertClass = 'alert--warning'; icon = '&#9888;'; logLevel = 'warn'; prefix = 'Choix risque (modere) : ';
+      logLevel = 'warn'; prefix = 'Choix risque (modere) : ';
     }
-    feedbackEl.innerHTML = '<div class="alert ' + alertClass + '"><strong>' + icon + ' </strong>' + fb.msg + '</div>';
-
-    // Log
     this._log(logLevel, '[Etape ' + d.stepId + '] ' + prefix + fb.msg);
-
-    // Show detail if risky
-    if (fb.risky && fb.detail) {
-      feedbackEl.innerHTML += '<div style="margin-top: var(--sp-2); font-size: var(--fs-xs); color: #94a3b8; font-family: var(--font-mono); background: var(--color-bg-deep); padding: var(--sp-3); border-radius: var(--radius-sm);">' + fb.detail + '</div>';
-    }
 
     // Disable options
     stepEl.querySelectorAll('.decision-opt').forEach(el => el.disabled = true);
