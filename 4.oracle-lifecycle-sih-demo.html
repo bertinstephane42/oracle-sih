@@ -352,26 +352,6 @@ a:hover { text-decoration: underline; }
           Ces decisions sont <strong>irreversibles</strong> apres creation de la base. Impact direct sur l'internationalisation et l'isolation des ressources.
         </div>
         <div class="decision-zone" id="step1-decisions">
-          <div class="decision-opt" data-choice="risky" data-step="1">
-            <span class="decision-opt__letter">A</span>
-            <span class="decision-opt__label">WE8MSWIN1252 + Resource Plan par defaut</span>
-            <span class="decision-opt__badge tag--neutral tag">Encodage 8-bit</span>
-          </div>
-          <div class="decision-opt" data-choice="good" data-step="1">
-            <span class="decision-opt__letter">B</span>
-            <span class="decision-opt__label">AL32UTF8 + Resource Plan CDB avec shares PUI dedies</span>
-            <span class="decision-opt__badge tag--neutral tag">Encodage Unicode</span>
-          </div>
-          <div class="decision-opt" data-choice="risky2" data-step="1">
-            <span class="decision-opt__letter">C</span>
-            <span class="decision-opt__label">AL32UTF8 mais SANS Resource Plan actif</span>
-            <span class="decision-opt__badge tag--neutral tag">Sans Resource Plan</span>
-          </div>
-          <div class="decision-opt" data-choice="risky3" data-step="1">
-            <span class="decision-opt__letter">D</span>
-            <span class="decision-opt__label">AL32UTF8 + Resource Plan CDB avec shares=20 pour la PUI</span>
-            <span class="decision-opt__badge tag--neutral tag">Sur-allocation</span>
-          </div>
         </div>
         <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
           <button class="btn btn--outline btn--sm btn-expert" data-step="1">Voir la Bonne Pratique</button>
@@ -392,26 +372,6 @@ a:hover { text-decoration: underline; }
           En environnement hospitalier, la non-conformite expose a des sanctions juridiques et a la suspension de l'habilitation HDS.
         </div>
         <div class="decision-zone" id="step2-decisions">
-          <div class="decision-opt" data-choice="risky" data-step="2">
-            <span class="decision-opt__letter">A</span>
-            <span class="decision-opt__label">Pas de TDE, Audit desactive (gain perf estime 5%)</span>
-            <span class="decision-opt__badge tag--neutral tag">Audit desactive</span>
-          </div>
-          <div class="decision-opt" data-choice="good" data-step="2">
-            <span class="decision-opt__letter">B</span>
-            <span class="decision-opt__label">TDE AES-256 + Audit HDS standard + Profil SECURE_PUI</span>
-            <span class="decision-opt__badge tag--neutral tag">Audit complet</span>
-          </div>
-          <div class="decision-opt" data-choice="risky2" data-step="2">
-            <span class="decision-opt__letter">C</span>
-            <span class="decision-opt__label">Audit partiel (echecs seulement), TDE sur TS DATA seulement</span>
-            <span class="decision-opt__badge tag--neutral tag">Audit partiel</span>
-          </div>
-          <div class="decision-opt" data-choice="risky3" data-step="2">
-            <span class="decision-opt__letter">D</span>
-            <span class="decision-opt__label">TDE + Audit HDS complet MAIS sans profil SECURE_PUI</span>
-            <span class="decision-opt__badge tag--neutral tag">Idle illimite</span>
-          </div>
         </div>
         <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
           <button class="btn btn--outline btn--sm btn-expert" data-step="2">Voir la Bonne Pratique</button>
@@ -432,26 +392,6 @@ a:hover { text-decoration: underline; }
           les performances de la PUI et la charge sur le serveur de base de donnees.
         </div>
         <div class="decision-zone" id="step3-decisions">
-          <div class="decision-opt" data-choice="risky" data-step="3">
-            <span class="decision-opt__letter">A</span>
-            <span class="decision-opt__label">SELECT * FROM stock_med s JOIN ligne_disp l ON s.med_id = l.med_id</span>
-            <span class="decision-opt__badge tag--neutral tag">Colonnes implicites</span>
-          </div>
-          <div class="decision-opt" data-choice="good" data-step="3">
-            <span class="decision-opt__letter">B</span>
-            <span class="decision-opt__label">SELECT s.med_id, s.molecule, l.qte FROM stock_med s JOIN ligne_disp l ON s.med_id = l.med_id</span>
-            <span class="decision-opt__badge tag--neutral tag">Colonnes explicites</span>
-          </div>
-          <div class="decision-opt" data-choice="risky2" data-step="3">
-            <span class="decision-opt__letter">C</span>
-            <span class="decision-opt__label">Curseur PL/SQL ligne a ligne sans BULK COLLECT</span>
-            <span class="decision-opt__badge tag--neutral tag">Parcours ligne/ligne</span>
-          </div>
-          <div class="decision-opt" data-choice="risky3" data-step="3">
-            <span class="decision-opt__letter">D</span>
-            <span class="decision-opt__label">Colonnes explicites + index adaptes MAIS pas de BULK COLLECT</span>
-            <span class="decision-opt__badge tag--neutral tag">Batch sans bulk</span>
-          </div>
         </div>
         <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
           <button class="btn btn--outline btn--sm btn-expert" data-step="3">Voir la Bonne Pratique</button>
@@ -472,26 +412,6 @@ a:hover { text-decoration: underline; }
           Un mauvais dimensionnement entraine des ORA-01555 et des temps de reponse degradés.
         </div>
         <div class="decision-zone" id="step4-decisions">
-          <div class="decision-opt" data-choice="risky" data-step="4">
-            <span class="decision-opt__letter">A</span>
-            <span class="decision-opt__label">UNDO_RETENTION=900s, SGA=2G, pas de tuning</span>
-            <span class="decision-opt__badge tag--neutral tag">UNDO par defaut</span>
-          </div>
-          <div class="decision-opt" data-choice="good" data-step="4">
-            <span class="decision-opt__letter">B</span>
-            <span class="decision-opt__label">UNDO_RETENTION=1800s, SGA=4G, PGA=1G, undo tablespace 4G</span>
-            <span class="decision-opt__badge tag--neutral tag">UNDO dimensionne</span>
-          </div>
-          <div class="decision-opt" data-choice="risky2" data-step="4">
-            <span class="decision-opt__letter">C</span>
-            <span class="decision-opt__label">SGA=8G mais UNDO_RETENTION=600s, pas de monitoring</span>
-            <span class="decision-opt__badge tag--neutral tag">SGA sur-dimensionnee</span>
-          </div>
-          <div class="decision-opt" data-choice="risky3" data-step="4">
-            <span class="decision-opt__letter">D</span>
-            <span class="decision-opt__label">UNDO_RETENTION=3600s MAIS undo tablespace toujours a 2G</span>
-            <span class="decision-opt__badge tag--neutral tag">Undo sous-dimensionne</span>
-          </div>
         </div>
         <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
           <button class="btn btn--outline btn--sm btn-expert" data-step="4">Voir la Bonne Pratique</button>
@@ -512,26 +432,6 @@ a:hover { text-decoration: underline; }
           A vous d'identifier la cause a travers les Wait Events et de proposer la correction.
         </div>
         <div class="decision-zone" id="step5-decisions">
-          <div class="decision-opt" data-choice="risky" data-step="5">
-            <span class="decision-opt__letter">A</span>
-            <span class="decision-opt__label">Ignorer les Wait Events, augmenter la memoire</span>
-            <span class="decision-opt__badge tag--neutral tag">Correction memoire</span>
-          </div>
-          <div class="decision-opt" data-choice="good" data-step="5">
-            <span class="decision-opt__letter">B</span>
-            <span class="decision-opt__label">Analyser enq: TX - row lock contention, corriger le CACHE de sequence</span>
-            <span class="decision-opt__badge tag--neutral tag">Diagnostic Wait Event</span>
-          </div>
-          <div class="decision-opt" data-choice="risky2" data-step="5">
-            <span class="decision-opt__letter">C</span>
-            <span class="decision-opt__label">Rebuild de tous les index</span>
-            <span class="decision-opt__badge tag--neutral tag">Rebuild index</span>
-          </div>
-          <div class="decision-opt" data-choice="risky3" data-step="5">
-            <span class="decision-opt__letter">D</span>
-            <span class="decision-opt__label">Cache sequence=10000 MAIS avec option ORDER activee</span>
-            <span class="decision-opt__badge tag--neutral tag">Contention ORDER</span>
-          </div>
         </div>
         <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
           <button class="btn btn--outline btn--sm btn-expert" data-step="5">Voir la Bonne Pratique</button>
@@ -552,26 +452,6 @@ a:hover { text-decoration: underline; }
           La capacite a restaurer les donnees est la seule verite en cas de sinistre.
         </div>
         <div class="decision-zone" id="step6-decisions">
-          <div class="decision-opt" data-choice="risky" data-step="6">
-            <span class="decision-opt__letter">A</span>
-            <span class="decision-opt__label">Valider sans test de restauration, backup journalier seulement</span>
-            <span class="decision-opt__badge tag--neutral tag">Backup simple</span>
-          </div>
-          <div class="decision-opt" data-choice="good" data-step="6">
-            <span class="decision-opt__letter">B</span>
-            <span class="decision-opt__label">RMAN validate + Data Guard Physical Standby + test trimestriel</span>
-            <span class="decision-opt__badge tag--neutral tag">Backup + Standby</span>
-          </div>
-          <div class="decision-opt" data-choice="risky2" data-step="6">
-            <span class="decision-opt__letter">C</span>
-            <span class="decision-opt__label">Export logique expdp seulement (pas de RMAN ni standby)</span>
-            <span class="decision-opt__badge tag--neutral tag">Export logique</span>
-          </div>
-          <div class="decision-opt" data-choice="risky3" data-step="6">
-            <span class="decision-opt__letter">D</span>
-            <span class="decision-opt__label">RMAN + Data Guard en mode ASYNC</span>
-            <span class="decision-opt__badge tag--neutral tag">RPO non nul</span>
-          </div>
         </div>
         <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
           <button class="btn btn--outline btn--sm btn-expert" data-step="6">Voir la Bonne Pratique</button>
@@ -927,6 +807,56 @@ class WorkflowEngine {
 }
 
 // ============================================================
+// CHOICES CONFIGURATION
+// ============================================================
+const CHOICES_DATA = {
+  1: [
+    { choice: 'risky',  label: 'WE8MSWIN1252 + Resource Plan par defaut',                              badge: 'Encodage 8-bit' },
+    { choice: 'good',   label: 'AL32UTF8 + Resource Plan CDB avec shares PUI dedies',                  badge: 'Encodage Unicode' },
+    { choice: 'risky2', label: 'AL32UTF8 mais SANS Resource Plan actif',                               badge: 'Sans Resource Plan' },
+    { choice: 'risky3', label: 'AL32UTF8 + Resource Plan CDB avec shares=20 pour la PUI',              badge: 'Sur-allocation' }
+  ],
+  2: [
+    { choice: 'risky',  label: 'Pas de TDE, Audit desactive (gain perf estime 5%)',                    badge: 'Audit desactive' },
+    { choice: 'good',   label: 'TDE AES-256 + Audit HDS standard + Profil SECURE_PUI',                 badge: 'Audit complet' },
+    { choice: 'risky2', label: 'Audit partiel (echecs seulement), TDE sur TS DATA seulement',          badge: 'Audit partiel' },
+    { choice: 'risky3', label: 'TDE + Audit HDS complet MAIS sans profil SECURE_PUI',                  badge: 'Idle illimite' }
+  ],
+  3: [
+    { choice: 'risky',  label: 'SELECT * FROM stock_med s JOIN ligne_disp l ON s.med_id = l.med_id',                     badge: 'Colonnes implicites' },
+    { choice: 'good',   label: 'SELECT s.med_id, s.molecule, l.qte FROM stock_med s JOIN ligne_disp l ON s.med_id = l.med_id',  badge: 'Colonnes explicites' },
+    { choice: 'risky2', label: 'Curseur PL/SQL ligne a ligne sans BULK COLLECT',                                        badge: 'Parcours ligne/ligne' },
+    { choice: 'risky3', label: 'Colonnes explicites + index adaptes MAIS pas de BULK COLLECT',                          badge: 'Batch sans bulk' }
+  ],
+  4: [
+    { choice: 'risky',  label: 'UNDO_RETENTION=900s, SGA=2G, pas de tuning',                            badge: 'UNDO par defaut' },
+    { choice: 'good',   label: 'UNDO_RETENTION=1800s, SGA=4G, PGA=1G, undo tablespace 4G',              badge: 'UNDO dimensionne' },
+    { choice: 'risky2', label: 'SGA=8G mais UNDO_RETENTION=600s, pas de monitoring',                    badge: 'SGA sur-dimensionnee' },
+    { choice: 'risky3', label: 'UNDO_RETENTION=3600s MAIS undo tablespace toujours a 2G',               badge: 'Undo sous-dimensionne' }
+  ],
+  5: [
+    { choice: 'risky',  label: 'Ignorer les Wait Events, augmenter la memoire',                         badge: 'Correction memoire' },
+    { choice: 'good',   label: 'Analyser enq: TX - row lock contention, corriger le CACHE de sequence', badge: 'Diagnostic Wait Event' },
+    { choice: 'risky2', label: 'Rebuild de tous les index',                                             badge: 'Rebuild index' },
+    { choice: 'risky3', label: 'Cache sequence=10000 MAIS avec option ORDER activee',                   badge: 'Contention ORDER' }
+  ],
+  6: [
+    { choice: 'risky',  label: 'Valider sans test de restauration, backup journalier seulement',        badge: 'Backup simple' },
+    { choice: 'good',   label: 'RMAN validate + Data Guard Physical Standby + test trimestriel',        badge: 'Backup + Standby' },
+    { choice: 'risky2', label: 'Export logique expdp seulement (pas de RMAN ni standby)',               badge: 'Export logique' },
+    { choice: 'risky3', label: 'RMAN + Data Guard en mode ASYNC',                                       badge: 'RPO non nul' }
+  ]
+};
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// ============================================================
 // UI CONTROLLER
 // ============================================================
 class UIController {
@@ -935,7 +865,12 @@ class UIController {
     this.simLog = document.getElementById('sim-log');
     this._pendingExpertStep = null;
     this._pendingChangeStep = null;
+    this._shuffled = {};
     this._bind();
+    for (let i = 1; i <= 6; i++) {
+      this._shuffled[i] = shuffle([...CHOICES_DATA[i]]);
+      this._renderChoices(i);
+    }
     engine.ev.on('state-change', state => this._render(state));
     engine.ev.on('decision', d => this._onDecision(d));
     engine._advance = this._patchedAdvance.bind(engine);
@@ -944,13 +879,15 @@ class UIController {
   }
 
   _bind() {
-    // Decision options
-    document.querySelectorAll('.decision-opt').forEach(el => {
-      el.addEventListener('click', () => {
+    // Decision options (delegation — DOM dynamique)
+    document.querySelectorAll('.decision-zone').forEach(zone => {
+      zone.addEventListener('click', (e) => {
+        const el = e.target.closest('.decision-opt');
+        if (!el) return;
         const step = parseInt(el.dataset.step);
         const choice = el.dataset.choice;
         const stepData = this.engine.steps[step];
-        if (stepData.status === 'done') return;
+        if (!stepData || stepData.status === 'done') return;
         if (stepData.decision && stepData.decision !== choice) {
           this._pendingChangeStep = { step, choice };
           this._openModal('change-confirm-modal');
@@ -1043,6 +980,13 @@ class UIController {
     document.getElementById('btn-restart').addEventListener('click', () => {
       this.simLog.innerHTML = '';
       this.engine.restart();
+      for (let i = 1; i <= 6; i++) {
+        this._shuffled[i] = shuffle([...CHOICES_DATA[i]]);
+        this._renderChoices(i);
+      }
+      document.querySelectorAll('.btn-reset-step, .btn-validate-step').forEach(btn => {
+        btn.style.display = 'none';
+      });
       this._closeOverlay();
       this._log('info', 'Projet reinitialise. Retour a l\'etape 1.');
     });
@@ -1092,6 +1036,26 @@ class UIController {
     // Show validate button for any choice (user can advance with risk)
     const validateBtn = stepEl.querySelector('.btn-validate-step');
     if (validateBtn) validateBtn.style.display = 'inline-flex';
+  }
+
+  _renderChoices(stepId) {
+    const zone = document.getElementById('step' + stepId + '-decisions');
+    if (!zone) return;
+    const choices = this._shuffled[stepId];
+    if (!choices) return;
+    zone.innerHTML = '';
+    const letters = ['A', 'B', 'C', 'D'];
+    choices.forEach((c, i) => {
+      const opt = document.createElement('div');
+      opt.className = 'decision-opt';
+      opt.dataset.choice = c.choice;
+      opt.dataset.step = stepId;
+      opt.innerHTML =
+        '<span class="decision-opt__letter">' + letters[i] + '</span>' +
+        '<span class="decision-opt__label">' + c.label + '</span>' +
+        '<span class="decision-opt__badge tag--neutral tag">' + c.badge + '</span>';
+      zone.appendChild(opt);
+    });
   }
 
   _render(state) {
