@@ -217,12 +217,6 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
   border-color: var(--color-blue); color: var(--color-blue);
   background: var(--color-blue-dim);
 }
-.page-header__actions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-}
 .help-overlay {
   display: none; position: fixed; inset: 0;
   background: rgba(0,0,0,0.6);
@@ -315,6 +309,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
     <div class="app-header__status">
       <span class="status-badge status-badge--online"><span class="status-dot"></span>SIMULATION ACTIVE</span>
       <span class="status-badge status-badge--rgpd">DONNEES FICTIVES / RGPD</span>
+	  <button class="page-header__help-btn" data-help="lexicon" aria-label="Lexique technique" title="Lexique technique">L</button>
     </div>
   </header>
 
@@ -350,10 +345,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         <h1 class="page-header__title">Module 1 - Architecture Multitenant (CDB/PDB)</h1>
         <div class="page-header__subtitle-row">
           <p class="page-header__subtitle">Isolation logique, contention dictionnaire partage, Resource Plans, Data Masking RGPD</p>
-		  <div class="page-header__actions">
-          <button class="page-header__help-btn" data-help="multitenant" aria-label="Aide module Multitenant">?</button>
-		  <button class="page-header__help-btn" data-help="lexicon" aria-label="Lexique technique" title="Lexique technique">L</button>
-		  </div>
+          <button class="page-header__help-btn" data-help="multitenant" aria-label="Aide module Multitenant" title="Rubrique d'aide" title="Rubrique d'aide">?</button>
         </div>
       </div>
       <div class="card fade-in">
@@ -412,7 +404,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         <h1 class="page-header__title">Module 2 - SGA / PGA &amp; Algorithmes de Memoire</h1>
         <div class="page-header__subtitle-row">
           <p class="page-header__subtitle">Buffer Cache LRU/Touch Count, Latch/Mutex contention, PGA Temp Spill, impact PMSI/T2A</p>
-          <button class="page-header__help-btn" data-help="memory" aria-label="Aide module SGA/PGA">?</button>
+          <button class="page-header__help-btn" data-help="memory" aria-label="Aide module SGA/PGA" title="Rubrique d'aide">?</button>
         </div>
       </div>
       <div class="card fade-in">
@@ -482,7 +474,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         <h1 class="page-header__title">Module 3 - Flux de Donnees &amp; Coherence (I/O Internals)</h1>
         <div class="page-header__subtitle-row">
           <p class="page-header__subtitle">Cycle Redo/Undo, SCN, Instance Recovery, ORA-01555 Snapshot Too Old</p>
-          <button class="page-header__help-btn" data-help="io" aria-label="Aide module I/O">?</button>
+          <button class="page-header__help-btn" data-help="io" aria-label="Aide module I/O" title="Rubrique d'aide">?</button>
         </div>
       </div>
       <div class="card fade-in">
@@ -553,7 +545,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         <h1 class="page-header__title">Module 4 - Cloud Souverain &amp; IA Controlee</h1>
         <div class="page-header__subtitle-row">
           <p class="page-header__subtitle">TDE/BYOK, Autonomous Database OCI France (HDS), Auto-Tuning, IA embarquee vs IA generative</p>
-          <button class="page-header__help-btn" data-help="cloud" aria-label="Aide module Cloud/IA">?</button>
+          <button class="page-header__help-btn" data-help="cloud" aria-label="Aide module Cloud/IA" title="Rubrique d'aide">?</button>
         </div>
       </div>
       <div class="card fade-in">
