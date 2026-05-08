@@ -570,7 +570,7 @@ a:hover { text-decoration: underline; }
         <div class="perf-chart__bar"><div class="perf-chart__col" id="pc-recette" style="height: 20%; background: var(--color-border);"></div><span class="perf-chart__label">Recette</span></div>
         <div class="perf-chart__bar"><div class="perf-chart__col" id="pc-prod" style="height: 20%; background: var(--color-border);"></div><span class="perf-chart__label">Prod</span></div>
       </div>
-      <div style="font-size: var(--fs-xs); color: #64748b; font-family: var(--font-mono); text-align: center; margin-top: var(--sp-2);">Sante par domaine: vert (bonne pratique) / rouge (risque) / gris (en attente)</div>
+      <div style="font-size: var(--fs-xs); color: #64748b; font-family: var(--font-mono); text-align: center; margin-top: var(--sp-2);">Sante par domaine: bleu (en attente), orange (risque modere), rouge (risque severe), vert (bonne pratique)</div>
     </div>
 
     <!-- Completion Modal -->
@@ -938,7 +938,7 @@ class UIController {
         });
         stepEl.querySelector('.btn-reset-step').style.display = 'none';
         stepEl.querySelector('.btn-validate-step').style.display = 'none';
-        this._log('info', '[Etape ' + stepId + '] Choix reinitialise. Vous pouvez choisir a nouveau.');
+        this._log('info', '[Etape ' + stepId + '] Choix reinitialise. Vous pouvez choisir a nouveau.', stepId);
       });
     });
 
@@ -1002,7 +1002,8 @@ class UIController {
     });
 
     // Log — neutral feedback, user must read the message text
-    this._log('neutral', '[Etape ' + d.stepId + '] ' + fb.msg);
+    this.simLog.querySelectorAll('[data-step="' + d.stepId + '"]').forEach(el => el.remove());
+    this._log('neutral', '[Etape ' + d.stepId + '] ' + fb.msg, d.stepId);
 
     // Disable options
     stepEl.querySelectorAll('.decision-opt').forEach(el => el.disabled = true);
@@ -1125,11 +1126,14 @@ class UIController {
       if (!bar) continue;
       const s = state.steps[i];
       if (s.status === 'done') {
-        bar.style.background = 'var(--color-green)';
+        if (s.decision === 'risky') {
+          bar.style.background = 'var(--color-red)';
+        } else if (s.decision === 'risky2') {
+          bar.style.background = 'var(--color-amber)';
+        } else {
+          bar.style.background = 'var(--color-green)';
+        }
         bar.style.height = '80%';
-      } else if (s.status === 'error') {
-        bar.style.background = 'var(--color-red)';
-        bar.style.height = '60%';
       } else if (s.status === 'active') {
         bar.style.background = 'var(--color-blue)';
         bar.style.height = '30%';
@@ -1182,11 +1186,12 @@ class UIController {
     document.getElementById('help-overlay').classList.remove('help-overlay--active');
   }
 
-  _log(level, msg) {
+  _log(level, msg, stepId) {
     const entry = this.engine.logger.log(level, msg);
     const div = document.createElement('div');
     div.className = 'log-console__entry log-console__entry--' + level;
     div.innerHTML = '<span class="log-console__timestamp">[' + entry.ts + ']</span>' + msg;
+    if (stepId !== undefined) div.dataset.step = stepId;
     this.simLog.appendChild(div);
     this.simLog.scrollTop = this.simLog.scrollHeight;
     // Keep max 50 lines
