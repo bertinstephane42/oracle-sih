@@ -791,14 +791,16 @@ class WorkflowEngine {
   resetDecision(stepId) {
     const step = this.steps[stepId];
     if (!step || !step.feedback) return;
-    if (step.feedback.risky) {
-      this.riskLevel = Math.max(0, this.riskLevel - step.feedback.riskDelta);
-      this.alertCount = Math.max(0, this.alertCount - 1);
-    } else {
-      this.goodPractices = Math.max(0, this.goodPractices - 1);
+    if (step.status === 'done') {
+      if (step.feedback.risky) {
+        this.riskLevel = Math.max(0, this.riskLevel - step.feedback.riskDelta);
+        this.alertCount = Math.max(0, this.alertCount - 1);
+      } else {
+        this.goodPractices = Math.max(0, this.goodPractices - 1);
+      }
+      const idx = this.history.map(h => h.step).lastIndexOf(stepId);
+      if (idx !== -1) this.history.splice(idx, 1);
     }
-    const idx = this.history.map(h => h.step).lastIndexOf(stepId);
-    if (idx !== -1) this.history.splice(idx, 1);
     step.status = 'active';
     step.decision = null;
     step.feedback = null;
