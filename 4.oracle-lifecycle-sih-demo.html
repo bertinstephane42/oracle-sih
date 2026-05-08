@@ -494,7 +494,7 @@ a:hover { text-decoration: underline; }
         <div class="decision-zone" id="step5-decisions">
           <div class="decision-opt" data-choice="risky" data-step="5">
             <span class="decision-opt__letter">A</span>
-            <span class="decision-opt__label">Ignorer les Wait Events, augmenter la memoire (solution palliative)</span>
+            <span class="decision-opt__label">Ignorer les Wait Events, augmenter la memoire</span>
             <span class="decision-opt__badge tag--neutral tag">Correction memoire</span>
           </div>
           <div class="decision-opt" data-choice="good" data-step="5">
@@ -504,7 +504,7 @@ a:hover { text-decoration: underline; }
           </div>
           <div class="decision-opt" data-choice="risky2" data-step="5">
             <span class="decision-opt__letter">C</span>
-            <span class="decision-opt__label">Rebuild de tous les index (couteux, sans diagnostic)</span>
+            <span class="decision-opt__label">Rebuild de tous les index</span>
             <span class="decision-opt__badge tag--neutral tag">Rebuild index</span>
           </div>
         </div>
@@ -573,14 +573,18 @@ a:hover { text-decoration: underline; }
       <div style="font-size: var(--fs-xs); color: #64748b; font-family: var(--font-mono); text-align: center; margin-top: var(--sp-2);">Sante par domaine: vert (bonne pratique) / rouge (risque) / gris (en attente)</div>
     </div>
 
-    <!-- Completion Banner -->
-    <div id="completion-banner" class="card fade-in" style="display: none;">
-      <div class="card__title" style="color: var(--color-green);"><span class="card__title-icon">&#10004;</span> Projet PUI Termine !</div>
-      <div id="completion-msg" class="alert alert--success" style="margin-bottom: 0;">
-        Felicitations ! Vous avez complete le cycle de deploiement.
+    <!-- Completion Modal -->
+    <div class="help-modal" id="completion-modal" role="dialog" aria-modal="true" aria-hidden="true">
+      <div class="help-modal__header">
+        <div class="help-modal__title" id="completion-modal-title">&#10004; Projet PUI Termine !</div>
       </div>
-      <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
-        <button class="btn btn--outline btn--sm" id="btn-restart">Recommencer le Projet</button>
+      <div class="help-modal__body" style="text-align: center; padding: var(--sp-8) var(--sp-6);">
+        <div id="completion-msg" class="alert alert--success" style="margin-bottom: var(--sp-6);">
+          Felicitations ! Vous avez complete le cycle de deploiement.
+        </div>
+        <div style="display: flex; gap: var(--sp-4); justify-content: center;">
+          <button class="btn btn--primary btn--sm" id="btn-restart">Recommencer le Projet</button>
+        </div>
       </div>
     </div>
 
@@ -957,7 +961,9 @@ class UIController {
 
     // Restart
     document.getElementById('btn-restart').addEventListener('click', () => {
+      this.simLog.innerHTML = '';
       this.engine.restart();
+      this._closeOverlay();
       this._log('info', 'Projet reinitialise. Retour a l\'etape 1.');
     });
 
@@ -1084,24 +1090,32 @@ class UIController {
     }
 
     // Completion
-    const banner = document.getElementById('completion-banner');
     if (state.completed) {
-      banner.style.display = 'block';
       const totalRisk = state.riskLevel;
       let completionMsg = '';
+      let alertClass = 'alert--success';
+      let titleColor = 'var(--color-green)';
       if (totalRisk === 0) {
         completionMsg = 'Parfait ! Aucun risque pris. Vous maîtrisez parfaitement le cycle de vie Oracle. Projet certifiable HDS.';
       } else if (totalRisk <= 20) {
         completionMsg = 'Tres bien ! Risque minimal. Quelques points d\'attention identifies, mais le projet est solide.';
       } else if (totalRisk <= 50) {
+        alertClass = 'alert--warning';
+        titleColor = 'var(--color-amber)';
         completionMsg = 'Projet livre avec des risques moderes. Pensez a revoir les etapes concernees avant l\'audit HDS.';
       } else {
+        alertClass = 'alert--error';
+        titleColor = 'var(--color-red)';
         completionMsg = 'Projet livre avec un niveau de risque eleve ! Non conforme HDS. Recommandez le projet avec les bonnes pratiques.';
       }
-      document.getElementById('completion-msg').textContent = completionMsg;
+      const msgEl = document.getElementById('completion-msg');
+      msgEl.textContent = completionMsg;
+      msgEl.className = 'alert ' + alertClass;
+      document.getElementById('completion-modal-title').style.color = titleColor;
+      this._openModal('completion-modal');
       this._log('success', 'PROJET TERMINE. Risque final: ' + totalRisk + '%.');
     } else {
-      banner.style.display = 'none';
+      this._closeModal('completion-modal');
     }
   }
 
