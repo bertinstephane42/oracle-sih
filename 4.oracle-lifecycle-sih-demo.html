@@ -268,7 +268,7 @@ a:hover { text-decoration: underline; }
 
   <main class="app-main" id="app-main">
     <div class="page-header">
-      <h1 class="page-header__title">Cycle de Vie Projet Oracle PUI</h1>
+      <h1 class="page-header__title">Cycle de vie projet Oracle PUI</h1>
       <div class="page-header__subtitle-row">
         <p class="page-header__subtitle">Guide Interactif de Deploiement — Experimentez les consequences de vos choix techniques</p>
         <button class="page-header__help-btn" id="btn-help-overview" aria-label="Aide vue d ensemble">?</button>
@@ -346,7 +346,7 @@ a:hover { text-decoration: underline; }
          ================================================================ -->
     <div class="step-content step-content--active" id="step-1">
       <div class="card fade-in">
-        <div class="card__title"><span class="card__title-icon">&#9733;</span> Etape 1 — Installation &amp; Architecture</div>
+        <div class="card__title"><span class="card__title-icon">&#9733;</span> Etape 1 — Installation &amp; architecture</div>
         <div class="step-desc">
           Fondations du projet PUI. Choix du Character Set et configuration du Resource Plan CDB/PDB.
           Ces decisions sont <strong>irreversibles</strong> apres creation de la base. Impact direct sur l'internationalisation et l'isolation des ressources.
@@ -386,7 +386,7 @@ a:hover { text-decoration: underline; }
          ================================================================ -->
     <div class="step-content" id="step-2">
       <div class="card fade-in">
-        <div class="card__title"><span class="card__title-icon">&#128274;</span> Etape 2 — Securite &amp; Conformite HDS/RGPD</div>
+        <div class="card__title"><span class="card__title-icon">&#128274;</span> Etape 2 — Securite &amp; conformite HDS/RGPD</div>
         <div class="step-desc">
           Configuration du chiffrement TDE, de l'audit HDS et des profils de securite.
           En environnement hospitalier, la non-conformite expose a des sanctions juridiques et a la suspension de l'habilitation HDS.
@@ -426,7 +426,7 @@ a:hover { text-decoration: underline; }
          ================================================================ -->
     <div class="step-content" id="step-3">
       <div class="card fade-in">
-        <div class="card__title"><span class="card__title-icon">&#128187;</span> Etape 3 — Developpement &amp; Requetage</div>
+        <div class="card__title"><span class="card__title-icon">&#128187;</span> Etape 3 — Developpement &amp; requetage</div>
         <div class="step-desc">
           Revue de code PL/SQL avant mise en production. Les choix d'ecriture SQL impactent directement
           les performances de la PUI et la charge sur le serveur de base de donnees.
@@ -466,7 +466,7 @@ a:hover { text-decoration: underline; }
          ================================================================ -->
     <div class="step-content" id="step-4">
       <div class="card fade-in">
-        <div class="card__title"><span class="card__title-icon">&#9881;</span> Etape 4 — Tuning Systeme (SGA/PGA/Undo)</div>
+        <div class="card__title"><span class="card__title-icon">&#9881;</span> Etape 4 — Tuning systeme (SGA/PGA/Undo)</div>
         <div class="step-desc">
           Ajustement des parametres memoire face a une charge simulee de reporting PMSI/T2A.
           Un mauvais dimensionnement entraine des ORA-01555 et des temps de reponse degradés.
@@ -506,7 +506,7 @@ a:hover { text-decoration: underline; }
          ================================================================ -->
     <div class="step-content" id="step-5">
       <div class="card fade-in">
-        <div class="card__title"><span class="card__title-icon">&#128202;</span> Etape 5 — Tests de Charge &amp; Recette</div>
+        <div class="card__title"><span class="card__title-icon">&#128202;</span> Etape 5 — Tests de charge &amp; Recette</div>
         <div class="step-desc">
           Simulation de 500 utilisateurs concurrents. Un ralentissement est detecte.
           A vous d'identifier la cause a travers les Wait Events et de proposer la correction.
@@ -546,7 +546,7 @@ a:hover { text-decoration: underline; }
          ================================================================ -->
     <div class="step-content" id="step-6">
       <div class="card fade-in">
-        <div class="card__title"><span class="card__title-icon">&#127758;</span> Etape 6 — Mise en Production &amp; Maintenance</div>
+        <div class="card__title"><span class="card__title-icon">&#127758;</span> Etape 6 — Mise en production &amp; Maintenance</div>
         <div class="step-desc">
           Validation de la strategie de Backup/PRA avant le Go-Live.
           La capacite a restaurer les donnees est la seule verite en cas de sinistre.
@@ -583,7 +583,7 @@ a:hover { text-decoration: underline; }
 
     <!-- Log Console -->
     <div class="card fade-in">
-      <div class="card__title"><span class="card__title-icon">&#128203;</span> Console de Simulation — Logs Temps Reel</div>
+      <div class="card__title"><span class="card__title-icon">&#128203;</span> Console de simulation — Logs temps reel</div>
       <div class="log-console" id="sim-log" style="max-height: 280px;">
         <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Guide de deploiement initialise. Etape 1 active.</div>
       </div>
@@ -591,7 +591,7 @@ a:hover { text-decoration: underline; }
 
     <!-- Performance Chart -->
     <div class="card fade-in">
-      <div class="card__title"><span class="card__title-icon">&#128200;</span> Performance Projet — Indicateurs d Impact</div>
+      <div class="card__title"><span class="card__title-icon">&#128200;</span> Performance projet — Indicateurs d impact</div>
       <div class="perf-chart" id="perf-chart">
         <div class="perf-chart__bar"><div class="perf-chart__col" id="pc-install" style="height: 20%; background: var(--color-green);"></div><span class="perf-chart__label">Install</span></div>
         <div class="perf-chart__bar"><div class="perf-chart__col" id="pc-securite" style="height: 20%; background: var(--color-border);"></div><span class="perf-chart__label">Securite</span></div>
