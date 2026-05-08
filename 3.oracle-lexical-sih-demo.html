@@ -1166,7 +1166,6 @@ class LexiqueApp {
     this._sm.on('change', () => this._updateSessionUI());
     if (this._sm.lastExample) {
       const sel = document.getElementById('example-select');
-      if (sel) sel.value = this._sm.lastExample;
     }
   }
   _updateSessionUI() {
