@@ -231,6 +231,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       <span class="status-badge status-badge--online"><span class="status-dot"></span>MOTEUR ACTIF</span>
       <span class="status-badge status-badge--hds">HDS / DONNEES FICTIVES</span>
       <button class="page-header__help-btn" data-help="lexicon" aria-label="Lexique technique" title="Lexique technique">L</button>
+      <button class="page-header__help-btn" data-help="credit" aria-label="Credits" title="Credits">C</button>
     </div>
   </header>
 
@@ -647,12 +648,28 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
       </div>
     </div>
-
+    <div class="help-modal" id="help-credit" role="dialog" aria-modal="true" aria-labelledby="help-credit-title" aria-hidden="true">
+      <div class="help-modal__header">
+        <div class="help-modal__title" id="help-credit-title">Credit</div>
+        <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+      </div>
+      <div class="help-modal__body">
+        <div class="help-modal__section">
+          <p class="help-modal__text">
+            <center>Conception fonctionnelle, scenarios, developpement et relecture : Stephane Bertin<br>
+            Assiste par OpenCode, agent Big Pickle<br>
+            2025.</center>
+          </p>
+        </div>
+      </div>
+      <div class="help-modal__footer">
+        <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+      </div>
+    </div>
     <footer class="app-footer">
       ORACLE_ADVANCED::SUITE - Application de demonstration technique<br>
       DONNEES: 100% FICTIVES - Conforme RGPD Art. 25 (Privacy by Design) - HDS / ISO 27001 / COFRAC<br>
-      Architecture: ES6 Classes - Vanilla JS - Zero Dependency - Offline<br>
-      Conception fonctionnelle, scénarios, développement et relecture : Stéphane Bertin<br>Assisté par OpenCode, agent Big Pickle
+      Architecture: ES6 Classes - Vanilla JS - Zero Dependency - Offline
     </footer>
   </main>
 </div>
