@@ -233,28 +233,28 @@ Le projet ne constitue toutefois ni :
 
 # Aide intégrée et Lexiques contextuels
 
-Chaque application HTML incluse dans ce projet dispose de sa propre documentation interne, accessible directement depuis l'interface utilisateur. Aucune documentation externe n'est nécessaire pour comprendre les démonstrations.
+Chaque application HTML incluse dans ce projet dispose de sa propre documentation interne, accessible directement depuis l'interface utilisateur via deux boutons dédiés situés dans l'en-tête de page. Aucune documentation externe n'est nécessaire pour exploiter les démonstrateurs.
 
-## Fonctionnalités d'aide par onglet
+## 1. Aide contextuelle par onglet (Bouton « ? »)
 
-Chaque onglet ou module au sein des 5 applications contient une section d'aide dédiée, généralement accessible via un bouton « ? » ou un panneau « Aide » en haut de l'interface. Ces sections fournissent :
+Chaque onglet ou module dispose d'un bouton d'aide spécifique, identifié par un point d'interrogation (**?**) dans l'en-tête. En le cliquant, l'utilisateur accède à une rubrique détaillée couvrant exclusivement le module actif.
 
-*   **Le contexte fonctionnel** : Explication du scénario hospitalier (SIH) simulé.
-*   **Les objectifs pédagogiques** : Ce que la démo vise à illustrer (ex: contention, plan d'exécution, workflow).
-*   **Le mode d'emploi** : Instructions pas à pas pour interagir avec les simulateurs.
-*   **Les limites de la simulation** : Rappel des différences entre le modèle pédagogique et le comportement réel d'une base de production.
+**Cette aide fournit :**
+*   **Le contexte fonctionnel** : Explication du scénario hospitalier (SIH) simulé dans l'onglet.
+*   **Les objectifs pédagogiques** : Ce que la démo vise à illustrer (ex: mécanisme de contention, lecture de plan d'exécution, workflow de décision).
+*   **Le mode d'emploi** : Instructions pas à pas pour interagir avec les simulateurs et interpréter les résultats.
+*   **Les limites de la simulation** : Rappel précis des différences entre le modèle pédagogique et le comportement réel d'une base de production.
 
-## Lexiques techniques spécifiques
+## 2. Lexique technique global (Bouton « L »)
 
-En plus du glossaire général présent dans ce fichier `README.md`, chaque fichier HTML intègre un **lexique technique contextuel** exhaustif.
+Un bouton distinct, identifié par la lettre **« L »**, est présent en permanence dans l'en-tête de chaque page. Il ouvre un lexique technique exhaustif propre à l'application en cours d'exécution.
 
-Contrairement à un glossaire statique, ces lexiques internes :
+**Caractéristiques de ce lexique interne :**
+*   **Exhaustivité ciblée** : Il recense l'intégralité des termes techniques, acronymes et concepts spécifiques utilisés dans le fichier HTML ouvert (de l'architecture CDB/PDB aux concepts Big Data comme le *Shuffle*).
+*   **Accessibilité immédiate** : Consultable à tout moment sans quitter la démo, il permet une compréhension « *just-in-time* » des concepts affichés à l'écran.
+*   **Autonomie totale** : Chaque fichier contient son propre glossaire intégré, fonctionnant parfaitement hors-ligne, sans dépendre du présent fichier `README.md`.
 
-1.  **Sont filtrés par pertinence** : Ils ne listent que les termes techniques effectivement utilisés dans l'onglet ou la démo en cours.
-2.  **Sont interactifs** : Les définitions sont souvent accessibles au survol ou au clic sur les termes techniques dans l'interface.
-3.  **Couvrent le spectre complet** : De l'architecture infrastructure (CDB/PDB, SGA) aux concepts Big Data (Spark, Shuffle), en passant par la sécurité (TDE, RBAC) et le développement (PL/SQL, Explain Plan).
-
-Cette approche « *just-in-time*» permet à l'utilisateur de comprendre le jargon technique exactement au moment où il est confronté au concept, sans avoir à quitter l'application pour chercher une définition.
+Cette double approche (aide ciblée par onglet + lexique global) permet à l'utilisateur de maîtriser le jargon technique exactement au moment où il est confronté au concept, fluidifiant ainsi l'apprentissage des mécanismes Oracle et SIH.
 
 ---
 
