@@ -9,13 +9,15 @@
 1. [Objectifs et périmètre](#objectifs-et-périmètre)
 2. [Méthodologie et limites](#méthodologie-et-limites)
 3. [Fichier 1 : Architecture Infrastructure](#fichier-1--architecture-infrastructure)
-4. [Fichier 2 : SQL Workbench PUI](#fichier-2--sql-workbench-pui)
-5. [Fichier 3 : Lexique & Quiz Oracle](#fichier-3--lexique--quiz-oracle)
-6. [Fichier 4 : Workflow de Décision](#fichier-4--workflow-de-décision)
-7. [Fichier 5 : Advanced Performance Suite](#fichier-5--advanced-performance-suite)
+4. [Fichier 2 : Atelier SQL PUI](#fichier-2--atelier-sql-pui)
+5. [Fichier 3 : Lexique et Quiz Oracle](#fichier-3--lexique-et-quiz-oracle)
+6. [Fichier 4 : Flux de Décision](#fichier-4--flux-de-décision)
+7. [Fichier 5 : Suite Performance Avancée](#fichier-5--suite-performance-avancee)
 8. [Thèmes transversaux](#thèmes-transversaux)
-9. [Prérequis](#prérequis)
-10. [Licence](#licence)
+9. [Conformité et sécurité](#conformité-et-sécurité)
+10. [Aide intégrée et Lexiques contextuels](#aide-intégrée-et-lexiques-contextuels)
+11. [Prérequis](#prérequis)
+12. [Licence](#licence)
 
 ---
 
@@ -27,14 +29,14 @@ Ce projet a pour objectif de fournir des démonstrateurs pédagogiques interacti
 * des problématiques de performance et de cohérence transactionnelle ;
 * des stratégies d’architecture SIH ;
 * des notions de sécurité et de conformité réglementaire ;
-* des workflows de décision liés à l’exploitation d’infrastructures critiques.
+* des flux de décision liés à l’exploitation d’infrastructures critiques.
 
 Les applications ne constituent pas :
 
 * un moteur Oracle réel ;
-* un environnement de benchmark ;
+* un environnement de test de performance (benchmark) ;
 * un outil de validation de capacité de production ;
-* une simulation exhaustive du comportement du Cost Based Optimizer (CBO).
+* une simulation exhaustive du comportement de l'Optimiseur Coût-Based (CBO).
 
 Les démonstrations privilégient la compréhension des mécanismes conceptuels et des ordres de grandeur observés dans des architectures Oracle modernes.
 
@@ -55,8 +57,8 @@ Le développement HTML/CSS/JavaScript a été réalisé avec assistance IA, puis
 Les mécanismes représentés reposent principalement sur :
 
 * la documentation officielle Oracle ;
-* les guides Oracle Database Concepts ;
-* les guides Oracle Performance Tuning ;
+* les guides *Oracle Database Concepts* ;
+* les guides *Oracle Performance Tuning* ;
 * les bonnes pratiques Oracle Cloud Infrastructure ;
 * des comportements couramment observés en exploitation Oracle.
 
@@ -67,22 +69,22 @@ Les mécanismes représentés reposent principalement sur :
 Les applications implémentent des modèles pédagogiques simplifiés permettant de représenter :
 
 * des phénomènes de contention ;
-* des mécanismes de cache ;
+* des mécanismes de mise en cache (cache) ;
 * des stratégies de partitionnement ;
 * des cycles de cohérence transactionnelle ;
-* des workflows analytiques distribués.
+* des flux analytiques distribués.
 
-Les métriques affichées (temps, gains de performance, volumes I/O, ratios de compression, débits Spark) constituent des estimations pédagogiques et non des mesures contractuelles.
+Les métriques affichées (temps, gains en performance, volumes d'E/S, ratios de compression, débits Spark) constituent des estimations pédagogiques et non des mesures contractuelles.
 
 Certains phénomènes réels ne peuvent être reproduits fidèlement dans un environnement navigateur hors-ligne, notamment :
 
 * la variabilité réseau ;
 * les effets NUMA ;
-* les comportements exacts du scheduler Oracle ;
+* les comportements exacts de l'ordonnanceur (scheduler) Oracle ;
 * les mécanismes internes du CBO ;
-* la gestion mémoire JVM ;
+* la gestion mémoire de la JVM ;
 * les contentions concurrentes à forte charge ;
-* les coûts réels de shuffle Spark.
+* les coûts réels de brassage de données (shuffle) dans Spark.
 
 ---
 
@@ -94,14 +96,14 @@ Démonstrateur des mécanismes fondamentaux d’infrastructure Oracle dans un co
 
 | Module              | Contenu                                                                                                                                                             |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Multitenant CDB/PDB | Topologie `CDB$ROOT` + PDBs, isolation logique, Resource Manager, contention dictionnaire partagé, démonstration de masquage de données pour environnements de test |
-| SGA / PGA Internals | Buffer Cache, politique LRU approximative, Touch Count, contention `cache buffers chains`, spill TEMP lors de saturation PGA                                        |
-| I/O & Cohérence     | Undo/Redo, SCN, Read Consistency, recovery simplifié, illustration pédagogique d’ORA-01555                                                                          |
-| Cloud & Sécurité    | TDE AES-256, BYOK, OCI France (`eu-france-1`), principes d’auto-tuning Oracle, distinction IA embarquée / IA générative                                             |
+| Multitenant CDB/PDB | Topologie `CDB$ROOT` + PDBs, isolation logique, Gestionnaire de Ressources (Resource Manager), contention du dictionnaire partagé, démonstration de masquage de données pour environnements de test |
+| Internes SGA / PGA  | Cache de tampons (Buffer Cache), politique LRU approximative, comptage d'accès (Touch Count), contention des chaînes de tampons en cache (`cache buffers chains`), débordement TEMP (spill) lors de saturation PGA                                        |
+| E/S et Cohérence    | Undo/Redo, SCN, Cohérence en lecture (Read Consistency), récupération (recovery) simplifié, illustration pédagogique d’ORA-01555                                                                          |
+| Cloud et Sécurité    | TDE AES-256, BYOK, OCI France (`eu-france-1`), principes d’auto-ajustement (auto-tuning) Oracle, distinction IA embarquée / IA générative                                             |
 
 ---
 
-# Fichier 2 : SQL Workbench PUI
+# Fichier 2 : Atelier SQL PUI
 
 **Fichier :** `2.oracle-workbench-sih-demo.html`
 
@@ -110,9 +112,9 @@ Simulation d’un environnement de développement Oracle appliqué à une PUI (P
 Fonctionnalités principales :
 
 * éditeur SQL/PLSQL ;
-* snippets pédagogiques préconfigurés ;
+* extraits de code (snippets) pédagogiques préconfigurés ;
 * simulation d’états d’exécution SQL ;
-* Explain Plan simplifié ;
+* Plan d'explication (Explain Plan) simplifié ;
 * grille de résultats dynamique ;
 * indicateurs de coût et d’activité logique ;
 * démonstration RBAC et audit.
@@ -120,15 +122,15 @@ Fonctionnalités principales :
 Exemples fournis :
 
 * requêtes SQL multi-tables ;
-* traitements batch PL/SQL (`BULK COLLECT`, `FORALL`) ;
-* triggers de contrôle métier ;
+* traitements par lots (batch) en PL/SQL (`BULK COLLECT`, `FORALL`) ;
+* déclencheurs (triggers) de contrôle métier ;
 * maintenance logique et audit.
 
 Les plans d’exécution affichés sont illustratifs et ne reflètent pas un CBO Oracle réel.
 
 ---
 
-# Fichier 3 : Lexique & Quiz Oracle
+# Fichier 3 : Lexique et Quiz Oracle
 
 **Fichier :** `3.oracle-lexical-sih-demo.html`
 
@@ -154,22 +156,22 @@ Les extraits de code sont fournis à des fins pédagogiques et peuvent nécessit
 
 ---
 
-# Fichier 4 : Workflow de Décision
+# Fichier 4 : Flux de Décision
 
 **Fichier :** `4.oracle-lifecycle-sih-demo.html`
 
-Simulation de workflows décisionnels liés à l’exploitation d’un SIH Oracle.
+Simulation de flux décisionnels liés à l’exploitation d’un SIH Oracle.
 
 Thématiques couvertes :
 
 * chiffrement ;
 * haute disponibilité ;
 * PRA/PCA ;
-* upgrade ;
+* mise à niveau (upgrade) ;
 * stratégie cloud ;
 * dimensionnement.
 
-Le système attribue des scores relatifs de risque selon des heuristiques simplifiées représentant des bonnes pratiques généralement admises.
+Le système attribue des scores de risque relatifs selon des heuristiques simplifiées représentant des bonnes pratiques généralement admises.
 
 Il ne constitue pas :
 
@@ -179,7 +181,7 @@ Il ne constitue pas :
 
 ---
 
-# Fichier 5 : Advanced Performance Suite
+# Fichier 5 : Suite Performance Avancée
 
 **Fichier :** `5.oracle-advanced-sih-demo.html`
 
@@ -187,16 +189,16 @@ Démonstrateur pédagogique de techniques d’optimisation avancées appliquées
 
 | Module                | Contenu                                                                              |
 | --------------------- | ------------------------------------------------------------------------------------ |
-| Partitionnement       | Range partitioning, pruning logique, réduction d’I/O estimée, illustration PEL       |
-| In-Memory             | Représentation simplifiée d’un stockage colonne, compression logique, scan vectorisé |
-| OCI Data Flow & Spark | Workflow distribué simplifié : map, shuffle, reduce, write                           |
-| Dashboard             | Comparaison relative des optimisations activées                                      |
+| Partitionnement       | Partitionnement par intervalle (Range), élagage logique (pruning), réduction des E/S estimée, illustration PEL       |
+| En mémoire (In-Memory)             | Représentation simplifiée d’un stockage colonnaire, compression logique, balayage vectorisé (vector scan) |
+| OCI Data Flow et Spark | Flux distribué simplifié : mappage (map), brassage (shuffle), réduction (reduce), écriture                           |
+| Tableau de bord             | Comparaison relative des optimisations activées                                      |
 
 Fonctionnalités :
 
 * moteur de calcul simplifié ;
 * paramètres interactifs ;
-* visualisation de jobs distribués ;
+* visualisation de tâches (jobs) distribuées ;
 * simulation de gains analytiques.
 
 Les accélérations présentées correspondent à des scénarios favorables et ne doivent pas être interprétées comme des garanties de performance réelles.
@@ -207,10 +209,10 @@ Les accélérations présentées correspondent à des scénarios favorables et n
 
 * données entièrement fictives ;
 * aucune donnée médicale réelle ;
-* architecture Vanilla JS / ES6 ;
+* architecture JavaScript natif (Vanilla JS) / ES6 ;
 * fonctionnement hors-ligne ;
 * absence de dépendances externes ;
-* design responsive ;
+* conception adaptative (responsive design) ;
 * composants mutualisés entre les modules.
 
 ---
@@ -219,7 +221,7 @@ Les accélérations présentées correspondent à des scénarios favorables et n
 
 Les démonstrateurs s’inspirent :
 
-* des principes RGPD (« Privacy by Design ») ;
+* des principes RGPD (« Confidentialité dès la conception » / *Privacy by Design*) ;
 * des exigences généralement associées aux environnements HDS ;
 * des pratiques de cloisonnement et de chiffrement courantes dans les SIH.
 
@@ -241,7 +243,7 @@ Chaque onglet ou module dispose d'un bouton d'aide spécifique, identifié par u
 
 **Cette aide fournit :**
 *   **Le contexte fonctionnel** : Explication du scénario hospitalier (SIH) simulé dans l'onglet.
-*   **Les objectifs pédagogiques** : Ce que la démo vise à illustrer (ex: mécanisme de contention, lecture de plan d'exécution, workflow de décision).
+*   **Les objectifs pédagogiques** : Ce que la démo vise à illustrer (ex: mécanisme de contention, lecture de plan d'exécution, flux de décision).
 *   **Le mode d'emploi** : Instructions pas à pas pour interagir avec les simulateurs et interpréter les résultats.
 *   **Les limites de la simulation** : Rappel précis des différences entre le modèle pédagogique et le comportement réel d'une base de production.
 
@@ -250,8 +252,8 @@ Chaque onglet ou module dispose d'un bouton d'aide spécifique, identifié par u
 Un bouton distinct, identifié par la lettre **« L »**, est présent en permanence dans l'en-tête de chaque page. Il ouvre un lexique technique exhaustif propre à l'application en cours d'exécution.
 
 **Caractéristiques de ce lexique interne :**
-*   **Exhaustivité ciblée** : Il recense l'intégralité des termes techniques, acronymes et concepts spécifiques utilisés dans le fichier HTML ouvert (de l'architecture CDB/PDB aux concepts Big Data comme le *Shuffle*).
-*   **Accessibilité immédiate** : Consultable à tout moment sans quitter la démo, il permet une compréhension « *just-in-time* » des concepts affichés à l'écran.
+*   **Exhaustivité ciblée** : Il recense l'intégralité des termes techniques, acronymes et concepts spécifiques utilisés dans le fichier HTML ouvert (de l'architecture CDB/PDB aux concepts Big Data comme le *brassage de données*).
+*   **Accessibilité immédiate** : Consultable à tout moment sans quitter la démo, il permet une compréhension « à la demande » des concepts affichés à l'écran.
 *   **Autonomie totale** : Chaque fichier contient son propre glossaire intégré, fonctionnant parfaitement hors-ligne, sans dépendre du présent fichier `README.md`.
 
 Cette double approche (aide ciblée par onglet + lexique global) permet à l'utilisateur de maîtriser le jargon technique exactement au moment où il est confronté au concept, fluidifiant ainsi l'apprentissage des mécanismes Oracle et SIH.
@@ -280,4 +282,4 @@ Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le modifi
 Ce programme est distribué SANS AUCUNE GARANTIE, sans même la garantie implicite de qualité marchande ou d’adéquation à un usage particulier.
 
 Pour plus d’informations :
-[GNU General Public License](https://www.gnu.org/licenses/?utm_source=chatgpt.com)
+[GNU General Public License](https://www.gnu.org/licenses/)
