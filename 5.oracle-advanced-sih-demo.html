@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Oracle Advanced Performance Suite SIH - Partitionnement, In-Memory, OCI Data Flow">
+<title>Oracle Advanced Performance - SIH Big Data</title>
+<style>
+:root {
+  --color-bg-deep: #0a0e17;
+  --color-bg-surface: #131a2a;
+  --color-bg-elevated: #1a2340;
+  --color-bg-hover: #243052;
+  --color-border: #1e2d4a;
+  --color-border-active: #3b82f6;
+  --color-blue: #3b82f6;
+  --color-blue-dim: #1e3a6e;
+  --color-red: #ef4444;
+  --color-red-dim: #7f1d1d;
+  --color-green: #22c55e;
+  --color-green-dim: #166534;
+  --color-amber: #f59e0b;
+  --color-amber-dim: #78350f;
+  --color-cyan: #06b6d4;
+  --color-purple: #a855f7;
+  --font-ui: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+  --fs-xs: 0.6875rem;
+  --fs-sm: 0.8125rem;
+  --fs-base: 0.9375rem;
+  --fs-md: 1.0625rem;
+  --fs-lg: 1.25rem;
+  --fs-xl: 1.5rem;
+  --fs-2xl: 2rem;
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-6: 1.5rem;
+  --sp-8: 2rem;
+  --sp-12: 3rem;
+  --nav-width: 260px;
+  --header-height: 56px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --transition-fast: 150ms ease;
+  --transition-normal: 300ms ease;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+body { font-family: var(--font-ui); font-size: var(--fs-base); color: #e2e8f0; background: var(--color-bg-deep); line-height: 1.6; overflow-x: hidden; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input, select, textarea { font-family: inherit; font-size: inherit; }
+pre, code { font-family: var(--font-mono); }
+table { border-collapse: collapse; width: 100%; }
+a { color: var(--color-cyan); text-decoration: none; }
+a:hover { text-decoration: underline; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--color-bg-deep); }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: var(--radius-sm); }
+::-webkit-scrollbar-thumb:hover { background: var(--color-blue); }
+.app-layout { display: grid; grid-template-columns: var(--nav-width) 1fr; grid-template-rows: var(--header-height) 1fr; grid-template-areas: "header header" "nav main"; min-height: 100vh; }
+.app-header { grid-area: header; display: flex; align-items: center; justify-content: space-between; padding: 0 var(--sp-6); background: var(--color-bg-surface); border-bottom: 1px solid var(--color-border); z-index: 100; }
+.app-header__brand { display: flex; align-items: center; gap: var(--sp-3); font-family: var(--font-mono); font-size: var(--fs-md); font-weight: 700; letter-spacing: -0.02em; }
+.app-header__brand-icon { width: 28px; height: 28px; background: var(--color-blue); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: var(--fs-sm); font-weight: 900; color: #fff; }
+.app-header__status { display: flex; align-items: center; gap: var(--sp-4); font-size: var(--fs-xs); font-family: var(--font-mono); }
+.status-badge { display: inline-flex; align-items: center; gap: var(--sp-2); padding: var(--sp-1) var(--sp-3); border-radius: var(--radius-sm); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.status-badge--online { background: var(--color-green-dim); color: var(--color-green); }
+.status-badge--hds { background: var(--color-blue-dim); color: var(--color-blue); }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: pulse-dot 2s infinite; }
+@keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+.app-nav { grid-area: nav; background: var(--color-bg-surface); border-right: 1px solid var(--color-border); padding: var(--sp-6) 0; overflow-y: auto; }
+.app-nav__section { padding: 0 var(--sp-4); margin-bottom: var(--sp-6); }
+.app-nav__section-title { font-size: var(--fs-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-blue); margin-bottom: var(--sp-3); font-family: var(--font-mono); }
+.app-nav__item { display: flex; align-items: center; gap: var(--sp-3); width: 100%; padding: var(--sp-3) var(--sp-4); border-radius: var(--radius-md); font-size: var(--fs-sm); font-weight: 500; color: #94a3b8; transition: all var(--transition-fast); text-align: left; }
+.app-nav__item:hover { background: var(--color-bg-hover); color: #e2e8f0; }
+.app-nav__item--active { background: var(--color-blue-dim); color: var(--color-blue); font-weight: 600; }
+.app-nav__item-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700; border-radius: var(--radius-sm); background: var(--color-bg-elevated); flex-shrink: 0; }
+.app-nav__item--active .app-nav__item-icon { background: var(--color-blue); color: #fff; }
+.app-nav__rgpd-notice { margin: var(--sp-6) var(--sp-4); padding: var(--sp-3); background: var(--color-blue-dim); border: 1px solid var(--color-blue); border-radius: var(--radius-md); font-size: var(--fs-xs); color: var(--color-blue); font-family: var(--font-mono); line-height: 1.5; }
+.app-main { grid-area: main; padding: var(--sp-8); overflow-y: auto; background: var(--color-bg-deep); }
+.page-header { margin-bottom: var(--sp-8); padding-bottom: var(--sp-4); border-bottom: 1px solid var(--color-border); }
+.page-header__title { font-size: var(--fs-xl); font-weight: 700; letter-spacing: -0.02em; margin-bottom: var(--sp-2); }
+.page-header__subtitle { font-size: var(--fs-sm); color: #94a3b8; font-family: var(--font-mono); }
+.page-header__subtitle-row { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); }
+.page-header__help-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 1px solid var(--color-border); border-radius: 50%; background: var(--color-bg-elevated); color: #94a3b8; font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700; cursor: pointer; transition: all var(--transition-fast); flex-shrink: 0; vertical-align: middle; }
+.page-header__help-btn:hover { border-color: var(--color-blue); color: var(--color-blue); background: var(--color-blue-dim); }
+.card { background: var(--color-bg-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--sp-6); margin-bottom: var(--sp-6); }
+.card__title { font-size: var(--fs-md); font-weight: 700; margin-bottom: var(--sp-4); display: flex; align-items: center; gap: var(--sp-3); font-family: var(--font-mono); }
+.card__title-icon { color: var(--color-blue); }
+.card__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--sp-4); flex-wrap: wrap; gap: var(--sp-3); }
+.card__header-title { font-size: var(--fs-md); font-weight: 700; font-family: var(--font-mono); display: flex; align-items: center; gap: var(--sp-3); }
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-6); }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-6); }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-6); }
+@media (max-width: 1200px) { .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+.data-mono { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--color-cyan); background: var(--color-bg-elevated); padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); display: inline-block; }
+.data-label { font-size: var(--fs-xs); color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+.stat-block { background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--sp-4); text-align: center; }
+.stat-block__value { font-family: var(--font-mono); font-size: var(--fs-xl); font-weight: 700; margin-bottom: var(--sp-1); }
+.stat-block__label { font-size: var(--fs-xs); color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+.stat-block--blue .stat-block__value { color: var(--color-blue); }
+.stat-block--green .stat-block__value { color: var(--color-green); }
+.stat-block--red .stat-block__value { color: var(--color-red); }
+.stat-block--amber .stat-block__value { color: var(--color-amber); }
+.stat-block--cyan .stat-block__value { color: var(--color-cyan); }
+.stat-block--purple .stat-block__value { color: var(--color-purple); }
+.progress-bar { width: 100%; height: 8px; background: var(--color-bg-elevated); border-radius: var(--radius-sm); overflow: hidden; margin: var(--sp-2) 0; }
+.progress-bar__fill { height: 100%; border-radius: var(--radius-sm); transition: width var(--transition-normal); }
+.progress-bar__fill--blue { background: var(--color-blue); }
+.progress-bar__fill--green { background: var(--color-green); }
+.progress-bar__fill--red { background: var(--color-red); }
+.progress-bar__fill--amber { background: var(--color-amber); }
+.tag { display: inline-flex; align-items: center; padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); font-size: var(--fs-xs); font-weight: 600; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.03em; }
+.tag--blue { background: var(--color-blue-dim); color: var(--color-blue); }
+.tag--green { background: var(--color-green-dim); color: var(--color-green); }
+.tag--red { background: var(--color-red-dim); color: var(--color-red); }
+.tag--amber { background: var(--color-amber-dim); color: var(--color-amber); }
+.tag--cyan { background: #164e63; color: var(--color-cyan); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2); padding: var(--sp-3) var(--sp-6); border-radius: var(--radius-md); font-size: var(--fs-sm); font-weight: 600; transition: all var(--transition-fast); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.03em; }
+.btn--primary { background: var(--color-blue); color: #fff; }
+.btn--primary:hover { background: #2563eb; }
+.btn--success { background: var(--color-green); color: #fff; }
+.btn--success:hover { background: #16a34a; }
+.btn--danger { background: var(--color-red); color: #fff; }
+.btn--danger:hover { background: #dc2626; }
+.btn--outline { border: 1px solid var(--color-border); color: #e2e8f0; }
+.btn--outline:hover { border-color: var(--color-blue); color: var(--color-blue); }
+.btn--sm { padding: var(--sp-2) var(--sp-4); font-size: var(--fs-xs); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.alert { padding: var(--sp-4); border-radius: var(--radius-md); border-left: 4px solid; margin-bottom: var(--sp-4); font-size: var(--fs-sm); font-family: var(--font-mono); }
+.alert--info { background: var(--color-blue-dim); border-color: var(--color-blue); color: #93c5fd; }
+.alert--success { background: var(--color-green-dim); border-color: var(--color-green); color: #86efac; }
+.alert--warning { background: var(--color-amber-dim); border-color: var(--color-amber); color: #fcd34d; }
+.alert--error { background: var(--color-red-dim); border-color: var(--color-red); color: #fca5a5; }
+.log-console { background: #000; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--sp-4); font-family: var(--font-mono); font-size: var(--fs-xs); max-height: 200px; overflow-y: auto; line-height: 1.8; }
+.log-console__entry { color: #94a3b8; }
+.log-console__entry--info { color: var(--color-blue); }
+.log-console__entry--success { color: var(--color-green); }
+.log-console__entry--error { color: var(--color-red); }
+.log-console__entry--warn { color: var(--color-amber); }
+.log-console__timestamp { color: #475569; margin-right: var(--sp-2); }
+.slider-group { display: flex; flex-direction: column; gap: var(--sp-2); }
+.slider-group__header { display: flex; justify-content: space-between; align-items: center; }
+.slider-group__label { font-size: var(--fs-sm); font-weight: 600; font-family: var(--font-mono); }
+.slider-group__value { font-size: var(--fs-sm); font-family: var(--font-mono); color: var(--color-cyan); font-weight: 700; }
+input[type="range"] { -webkit-appearance: none; width: 100%; height: 6px; background: var(--color-bg-elevated); border-radius: var(--radius-sm); outline: none; }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--color-blue); border-radius: 50%; cursor: pointer; border: 2px solid var(--color-bg-surface); }
+.data-table { width: 100%; font-size: var(--fs-sm); }
+.data-table th { text-align: left; padding: var(--sp-3) var(--sp-4); background: var(--color-bg-elevated); font-family: var(--font-mono); font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; font-weight: 600; border-bottom: 1px solid var(--color-border); }
+.data-table td { padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--color-border); font-family: var(--font-mono); font-size: var(--fs-xs); }
+.data-table tr:hover td { background: var(--color-bg-hover); }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn var(--transition-normal) ease; }
+.module-section { display: none; }
+.module-section--active { display: block; animation: fadeIn var(--transition-normal) ease; }
+.app-footer { margin-top: var(--sp-12); padding-top: var(--sp-6); border-top: 1px solid var(--color-border); font-size: var(--fs-xs); color: #475569; font-family: var(--font-mono); text-align: center; line-height: 1.8; }
+/* Comparison Bars */
+.comp-card { margin-bottom: var(--sp-4); }
+.comp-bar { display: flex; align-items: center; gap: var(--sp-3); margin-bottom: var(--sp-2); }
+.comp-bar__label { width: 90px; font-family: var(--font-mono); font-size: var(--fs-xs); color: #94a3b8; flex-shrink: 0; }
+.comp-bar__track { flex: 1; height: 28px; background: var(--color-bg-elevated); border-radius: var(--radius-sm); overflow: hidden; position: relative; }
+.comp-bar__fill { height: 100%; border-radius: var(--radius-sm); transition: width 1s ease; }
+.comp-bar__fill--before { background: linear-gradient(90deg, var(--color-red-dim), var(--color-red)); }
+.comp-bar__fill--after { background: linear-gradient(90deg, var(--color-green-dim), var(--color-green)); }
+.comp-bar__value { width: 110px; font-family: var(--font-mono); font-size: var(--fs-xs); text-align: right; flex-shrink: 0; }
+.comp-bar__value--before { color: var(--color-red); }
+.comp-bar__value--after { color: var(--color-green); }
+.comp-legend { display: flex; justify-content: flex-end; gap: var(--sp-6); font-size: var(--fs-xs); font-family: var(--font-mono); color: #64748b; margin-bottom: var(--sp-3); }
+.comp-legend span { display: flex; align-items: center; gap: var(--sp-2); }
+.comp-legend__dot { width: 10px; height: 10px; border-radius: 2px; }
+.comp-legend__dot--before { background: var(--color-red); }
+.comp-legend__dot--after { background: var(--color-green); }
+/* Spark node bars */
+.spark-node { margin-bottom: var(--sp-2); }
+.spark-node__header { display: flex; justify-content: space-between; font-size: var(--fs-xs); font-family: var(--font-mono); color: #94a3b8; margin-bottom: var(--sp-1); }
+.spark-node__bar { height: 16px; background: var(--color-bg-elevated); border-radius: var(--radius-sm); overflow: hidden; }
+.spark-node__fill { height: 100%; border-radius: var(--radius-sm); transition: width 0.5s ease; background: linear-gradient(90deg, var(--color-blue-dim), var(--color-cyan)); }
+/* DataFlow log */
+.df-console { background: #000; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--sp-4); font-family: var(--font-mono); font-size: var(--fs-xs); max-height: 250px; overflow-y: auto; line-height: 1.8; margin-top: var(--sp-4); }
+.df-console__entry { color: #94a3b8; }
+.df-console__entry--info { color: var(--color-cyan); }
+.df-console__entry--success { color: var(--color-green); }
+.df-console__entry--warn { color: var(--color-amber); }
+.df-console__entry--error { color: var(--color-red); }
+.df-console__timestamp { color: #475569; margin-right: var(--sp-2); }
+/* IMCU visualization */
+.imcu-grid { display: flex; gap: var(--sp-2); margin: var(--sp-4) 0; overflow-x: auto; padding: var(--sp-2) 0; }
+.imcu-block { min-width: 80px; padding: var(--sp-3); background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-sm); text-align: center; font-family: var(--font-mono); font-size: var(--fs-xs); }
+.imcu-block--active { border-color: var(--color-cyan); background: #164e63; }
+.imcu-block__label { color: var(--color-cyan); font-weight: 600; margin-bottom: var(--sp-1); }
+.imcu-block__detail { color: #64748b; }
+.help-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 999; animation: fadeIn 0.2s ease; }
+.help-overlay--active { display: block; }
+.help-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%) translateY(16px); width: 90%; max-width: 720px; max-height: 85vh; background: var(--color-bg-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); z-index: 1000; overflow: hidden; animation: fadeSlideUp 0.3s ease forwards; box-shadow: 0 24px 48px rgba(0,0,0,0.4); }
+.help-modal--active { display: flex; flex-direction: column; }
+@keyframes fadeSlideUp { from { opacity:0; transform: translate(-50%,-50%) translateY(16px); } to { opacity:1; transform: translate(-50%,-50%) translateY(0); } }
+.help-modal__header { display: flex; align-items: center; justify-content: space-between; padding: var(--sp-4) var(--sp-6); border-bottom: 1px solid var(--color-border); background: var(--color-bg-elevated); }
+.help-modal__title { font-family: var(--font-mono); font-size: var(--fs-md); font-weight: 700; color: var(--color-blue); }
+.help-modal__close { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-bg-deep); color: #94a3b8; font-size: var(--fs-md); cursor: pointer; transition: all var(--transition-fast); font-weight: 700; }
+.help-modal__close:hover { border-color: var(--color-red); color: var(--color-red); background: var(--color-red-dim); }
+.help-modal__body { padding: var(--sp-6); overflow-y: auto; flex: 1; }
+.help-modal__section { margin-bottom: var(--sp-6); }
+.help-modal__section:last-child { margin-bottom: 0; }
+.help-modal__section-title { font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: var(--sp-3); padding-bottom: var(--sp-2); border-bottom: 1px solid var(--color-border); }
+.help-modal__section-title--objective { color: var(--color-blue); }
+.help-modal__section-title--algorithm { color: var(--color-purple); }
+.help-modal__section-title--indicators { color: var(--color-amber); }
+.help-modal__section-title--hds { color: var(--color-green); }
+.help-modal__text { font-size: var(--fs-sm); color: #cbd5e1; line-height: 1.7; margin-bottom: var(--sp-3); }
+.help-modal__text code { font-family: var(--font-mono); font-size: var(--fs-xs); background: var(--color-bg-elevated); padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); color: var(--color-cyan); }
+.help-modal__list { list-style: none; padding: 0; }
+.help-modal__list li { position: relative; padding: var(--sp-2) 0 var(--sp-2) var(--sp-6); font-size: var(--fs-sm); color: #94a3b8; line-height: 1.6; border-left: 2px solid var(--color-border); }
+.help-modal__list li::before { content: ''; position: absolute; left: -1px; top: 50%; width: 8px; height: 2px; background: var(--color-blue); transform: translateY(-50%); }
+.help-modal__list li:last-child { border-left-color: transparent; }
+.help-modal__footer { padding: var(--sp-4) var(--sp-6); border-top: 1px solid var(--color-border); display: flex; justify-content: flex-end; background: var(--color-bg-elevated); }
+</style>
+</head>
+<body>
+
+<div class="app-layout">
+  <header class="app-header">
+    <div class="app-header__brand">
+      <div class="app-header__brand-icon">A</div>
+      <span>ORACLE<span style="color: var(--color-cyan);">_ADVANCED</span>::SUITE</span>
+    </div>
+    <div class="app-header__status">
+      <span class="status-badge status-badge--online"><span class="status-dot"></span>MOTEUR ACTIF</span>
+      <span class="status-badge status-badge--hds">HDS / DONNEES FICTIVES</span>
+    </div>
+  </header>
+
+  <nav class="app-nav">
+    <div class="app-nav__section">
+      <div class="app-nav__section-title">Advanced Performance</div>
+      <button class="app-nav__item app-nav__item--active" data-tab="partitioning"><span class="app-nav__item-icon">P</span>Partitionnement Avance</button>
+      <button class="app-nav__item" data-tab="inmemory"><span class="app-nav__item-icon">M</span>In-Memory Column Store</button>
+      <button class="app-nav__item" data-tab="dataflow"><span class="app-nav__item-icon">F</span>OCI Data Flow &amp; Spark</button>
+      <button class="app-nav__item" data-tab="dashboard"><span class="app-nav__item-icon">D</span>Dashboard Comparatif</button>
+    </div>
+    <div class="app-nav__section">
+      <div class="app-nav__section-title">Contexte Session</div>
+      <div style="padding: 0 var(--sp-4); font-size: var(--fs-xs); font-family: var(--font-mono); line-height: 2;">
+        <div style="color: #64748b;">USER</div>
+        <div style="color: var(--color-cyan);">DBA_PERF_SIMU</div>
+        <div style="color: #64748b; margin-top: var(--sp-2);">VOLUME DONNEES</div>
+        <div class="data-mono" id="session-volume">5×10⁹ lignes / 2.5 To</div>
+        <div style="color: #64748b; margin-top: var(--sp-2);">SCORE OPTIMISATION</div>
+        <div id="session-score" style="color: var(--color-green);">0%</div>
+      </div>
+    </div>
+    <div class="app-nav__rgpd-notice">
+      DONNEES 100% FICTIVES<br>
+      PATIENT_SIMU_XXXX / PRESCRIPTION_HISTORY<br>
+      Donnees genomiques simulees<br>
+      Conforme RGPD Art. 25
+    </div>
+  </nav>
+
+  <main class="app-main" id="app-main">
+
+    <!-- TAB 1: Partitionnement -->
+    <section class="module-section module-section--active" id="tab-partitioning">
+      <div class="page-header">
+        <h1 class="page-header__title">Partitionnement Avance — Pruning &amp; Gestion</h1>
+        <div class="page-header__subtitle-row">
+          <p class="page-header__subtitle">Analyse de 10 ans d'historique de prescriptions (5×10⁹ lignes). Reduction du I/O via Partition Pruning.</p>
+          <button class="page-header__help-btn" data-help="partitioning" aria-label="Aide Partitionnement">?</button>
+        </div>
+      </div>
+      <div class="card fade-in">
+        <div class="card__header">
+          <div class="card__header-title"><span class="card__title-icon">&#9632;</span> Simulation Partitionnement Range (Date)</div>
+          <div><span class="tag tag--red" id="part-status-tag">INACTIF</span></div>
+        </div>
+        <div class="comp-card" id="part-comp-bars">
+          <div class="comp-legend"><span><span class="comp-legend__dot comp-legend__dot--before"></span>SANS partitionnement (Full Table Scan)</span><span><span class="comp-legend__dot comp-legend__dot--after"></span>AVEC partitionnement (Pruning actif)</span></div>
+          <div class="comp-bar"><span class="comp-bar__label">Scan</span><div class="comp-bar__track"><div class="comp-bar__fill comp-bar__fill--before" id="part-bar-before" style="width:100%"></div></div><span class="comp-bar__value comp-bar__value--before" id="part-val-before">100%</span></div>
+          <div class="comp-bar"><span class="comp-bar__label">Prune</span><div class="comp-bar__track"><div class="comp-bar__fill comp-bar__fill--after" id="part-bar-after" style="width:0.8%"></div></div><span class="comp-bar__value comp-bar__value--after" id="part-val-after">0.8%</span></div>
+        </div>
+        <div class="grid-4" id="part-metrics">
+          <div class="stat-block stat-block--red"><div class="stat-block__value" id="part-io-before">100%</div><div class="stat-block__label">I/O Sans Partition</div></div>
+          <div class="stat-block stat-block--green"><div class="stat-block__value" id="part-io-after">0.8%</div><div class="stat-block__label">I/O Avec Partition</div></div>
+          <div class="stat-block stat-block--cyan"><div class="stat-block__value" id="part-time-before">2700s</div><div class="stat-block__label">Temps Sans</div></div>
+          <div class="stat-block stat-block--green"><div class="stat-block__value" id="part-time-after">30s</div><div class="stat-block__label">Temps Avec</div></div>
+        </div>
+        <div class="slider-group" style="max-width:400px;margin-bottom:var(--sp-4);">
+          <div class="slider-group__header"><span class="slider-group__label">Periode analysee</span><span class="slider-group__value" id="part-period-val">6 mois</span></div>
+          <input type="range" id="part-period-slider" min="1" max="120" step="1" value="6">
+        </div>
+        <div style="display:flex;gap:var(--sp-3);margin-bottom:var(--sp-4);">
+          <button class="btn btn--primary btn--sm" id="btn-part-enable">Activer Partitionnement</button>
+          <button class="btn btn--outline btn--sm" id="btn-part-expert">Detail Algorithmique</button>
+        </div>
+        <div class="log-console" id="part-console">
+          <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Simulateur partitionnement pret. 120 partitions mensuelles.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: In-Memory -->
+    <section class="module-section" id="tab-inmemory">
+      <div class="page-header">
+        <h1 class="page-header__title">In-Memory Column Store — Compression &amp; Scan Vectorise</h1>
+        <div class="page-header__subtitle-row">
+          <p class="page-header__subtitle">Transposition Row→Column, compression IMCU, scan SIMD. Passage de 45s a 0.8s.</p>
+          <button class="page-header__help-btn" data-help="inmemory" aria-label="Aide In-Memory">?</button>
+        </div>
+      </div>
+      <div class="card fade-in">
+        <div class="card__header">
+          <div class="card__header-title"><span class="card__title-icon">&#9632;</span> Simulation In-Memory Column Store</div>
+          <div><span class="tag tag--red" id="im-status-tag">INACTIF</span></div>
+        </div>
+        <div class="comp-card" id="im-comp-bars">
+          <div class="comp-legend"><span><span class="comp-legend__dot comp-legend__dot--before"></span>Row Store (Buffer Cache)</span><span><span class="comp-legend__dot comp-legend__dot--after"></span>Column Store (IMCU)</span></div>
+          <div class="comp-bar"><span class="comp-bar__label">Scan</span><div class="comp-bar__track"><div class="comp-bar__fill comp-bar__fill--before" id="im-bar-before" style="width:100%"></div></div><span class="comp-bar__value comp-bar__value--before" id="im-val-before">45s</span></div>
+          <div class="comp-bar"><span class="comp-bar__label">IMCU</span><div class="comp-bar__track"><div class="comp-bar__fill comp-bar__fill--after" id="im-bar-after" style="width:1.8%"></div></div><span class="comp-bar__value comp-bar__value--after" id="im-val-after">0.8s</span></div>
+        </div>
+        <div class="grid-4" id="im-metrics">
+          <div class="stat-block stat-block--purple"><div class="stat-block__value" id="im-compression">1.0x</div><div class="stat-block__label">Compression</div></div>
+          <div class="stat-block stat-block--cyan"><div class="stat-block__value" id="im-throughput">0.2 Go/s</div><div class="stat-block__label">Debit Scan</div></div>
+          <div class="stat-block stat-block--red"><div class="stat-block__value" id="im-cpu-before">100%</div><div class="stat-block__label">CPU Row Store</div></div>
+          <div class="stat-block stat-block--green"><div class="stat-block__value" id="im-cpu-after">12%</div><div class="stat-block__label">CPU Column Store</div></div>
+        </div>
+        <div class="slider-group" style="max-width:400px;margin-bottom:var(--sp-4);">
+          <div class="slider-group__header"><span class="slider-group__label">Colonnes selectionnees (sur 200)</span><span class="slider-group__value" id="im-columns-val">5</span></div>
+          <input type="range" id="im-columns-slider" min="2" max="200" step="1" value="5">
+        </div>
+        <div style="display:flex;gap:var(--sp-3);margin-bottom:var(--sp-4);">
+          <button class="btn btn--primary btn--sm" id="btn-im-enable">Activer In-Memory</button>
+          <button class="btn btn--outline btn--sm" id="btn-im-expert">Detail Algorithmique</button>
+        </div>
+        <div class="log-console" id="im-console">
+          <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Simulateur In-Memory pret. IMCU population en attente.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: Data Flow -->
+    <section class="module-section" id="tab-dataflow">
+      <div class="page-header">
+        <h1 class="page-header__title">OCI Data Flow &amp; Spark — Architecture Distribuee</h1>
+        <div class="page-header__subtitle-row">
+          <p class="page-header__subtitle">Delegation du traitement Big Data (logs connectes, genomique fictive) a un cluster Spark ephemer sur OCI.</p>
+          <button class="page-header__help-btn" data-help="dataflow" aria-label="Aide Data Flow">?</button>
+        </div>
+      </div>
+      <div class="card fade-in">
+        <div class="card__header">
+          <div class="card__header-title"><span class="card__title-icon">&#9632;</span> Simulation OCI Data Flow (Spark Manage)</div>
+          <div><span class="tag tag--red" id="df-status-tag">INACTIF</span></div>
+        </div>
+        <div class="grid-2" style="margin-bottom:var(--sp-4);">
+          <div class="comp-card">
+            <div class="comp-legend"><span><span class="comp-legend__dot comp-legend__dot--before"></span>Base seule (CPU sature)</span></div>
+            <div class="comp-bar"><span class="comp-bar__label">Traitement</span><div class="comp-bar__track"><div class="comp-bar__fill comp-bar__fill--before" id="df-bar-before" style="width:100%"></div></div><span class="comp-bar__value comp-bar__value--before" id="df-val-before">480s</span></div>
+          </div>
+          <div class="comp-card">
+            <div class="comp-legend"><span><span class="comp-legend__dot comp-legend__dot--after"></span>Spark OCI Data Flow (4 nœuds)</span></div>
+            <div class="comp-bar"><span class="comp-bar__label">Traitement</span><div class="comp-bar__track"><div class="comp-bar__fill comp-bar__fill--after" id="df-bar-after" style="width:6.7%"></div></div><span class="comp-bar__value comp-bar__value--after" id="df-val-after">32s</span></div>
+          </div>
+        </div>
+        <div class="grid-4" id="df-metrics">
+          <div class="stat-block stat-block--cyan"><div class="stat-block__value" id="df-nodes">4</div><div class="stat-block__label">Nœuds Spark</div></div>
+          <div class="stat-block stat-block--green"><div class="stat-block__value" id="df-time">32s</div><div class="stat-block__label">Temps Spark</div></div>
+          <div class="stat-block stat-block--amber"><div class="stat-block__value" id="df-cost">$0.03</div><div class="stat-block__label">Cout estime</div></div>
+          <div class="stat-block stat-block--purple"><div class="stat-block__value" id="df-shuffle">1.2 Go</div><div class="stat-block__label">Shuffle Volume</div></div>
+        </div>
+        <div class="slider-group" style="max-width:400px;margin-bottom:var(--sp-4);">
+          <div class="slider-group__header"><span class="slider-group__label">Nœuds de calcul Spark</span><span class="slider-group__value" id="df-nodes-val">4</span></div>
+          <input type="range" id="df-nodes-slider" min="1" max="32" step="1" value="4">
+        </div>
+        <div style="display:flex;gap:var(--sp-3);margin-bottom:var(--sp-4);">
+          <button class="btn btn--primary btn--sm" id="btn-df-enable">Lancer Job Spark</button>
+          <button class="btn btn--outline btn--sm" id="btn-df-expert">Detail Algorithmique</button>
+        </div>
+        <div id="df-node-bars" style="margin-bottom:var(--sp-4);"></div>
+        <div class="df-console" id="df-console">
+          <div class="df-console__entry df-console__entry--info"><span class="df-console__timestamp">[00:00:00]</span>OCI Data Flow ready. Cluster echeancier.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: Dashboard -->
+    <section class="module-section" id="tab-dashboard">
+      <div class="page-header">
+        <h1 class="page-header__title">Dashboard Comparatif — Score Global d'Optimisation</h1>
+        <div class="page-header__subtitle-row">
+          <p class="page-header__subtitle">Recapitulatif des gains par technologie. Conformite HDS / ISO 27001 / COFRAC.</p>
+          <button class="page-header__help-btn" data-help="dashboard" aria-label="Aide Dashboard">?</button>
+        </div>
+      </div>
+      <div class="card fade-in">
+        <div class="card__header">
+          <div class="card__header-title"><span class="card__title-icon">&#128202;</span> Performance Comparee</div>
+          <div><span class="tag tag--cyan" id="dashboard-score-tag">SCORE: 0%</span></div>
+        </div>
+        <div class="comp-card" id="dash-comp-bars">
+          <div class="comp-legend"><span><span class="comp-legend__dot comp-legend__dot--before"></span>Avant</span><span><span class="comp-legend__dot comp-legend__dot--after"></span>Apres</span></div>
+          <div class="comp-bar"><span class="comp-bar__label">Partition.</span><div class="comp-bar__track"><div class="comp-bar__fill comp-bar__fill--before" id="dash-bar-part-before" style="width:100%"></div><div class="comp-bar__fill comp-bar__fill--after" id="dash-bar-part-after" style="width:0%"></div></div><span class="comp-bar__value" id="dash-val-part">--</span></div>
+          <div class="comp-bar"><span class="comp-bar__label">In-Memory</span><div class="comp-bar__track"><div class="comp-bar__fill comp-bar__fill--before" id="dash-bar-im-before" style="width:100%"></div><div class="comp-bar__fill comp-bar__fill--after" id="dash-bar-im-after" style="width:0%"></div></div><span class="comp-bar__value" id="dash-val-im">--</span></div>
+          <div class="comp-bar"><span class="comp-bar__label">Data Flow</span><div class="comp-bar__track"><div class="comp-bar__fill comp-bar__fill--before" id="dash-bar-df-before" style="width:100%"></div><div class="comp-bar__fill comp-bar__fill--after" id="dash-bar-df-after" style="width:0%"></div></div><span class="comp-bar__value" id="dash-val-df">--</span></div>
+        </div>
+        <div class="grid-3" id="dash-summary">
+          <div class="stat-block stat-block--green"><div class="stat-block__value" id="dash-score">0%</div><div class="stat-block__label">Score global</div></div>
+          <div class="stat-block stat-block--blue"><div class="stat-block__value" id="dash-techs">0/3</div><div class="stat-block__label">Technologies actives</div></div>
+          <div class="stat-block stat-block--cyan"><div class="stat-block__value" id="dash-gain">--</div><div class="stat-block__label">Gain total estime</div></div>
+        </div>
+        <div class="alert alert--info" style="margin-top:var(--sp-4);">
+          <strong>Conformite HDS / ISO 27001 / COFRAC :</strong> L'optimisation des performances ne doit jamais compromettre la securite ou la tracabilite. Le partitionnement et l'In-Memory preservent le chiffrement TDE. OCI Data Flow s'execute dans le perimetre OCI France certifie HDS. Toutes les donnees manipulees sont fictives et anonymisees.
+        </div>
+      </div>
+    </section>
+
+    <!-- HELP MODALS -->
+    <div class="help-overlay" id="help-overlay" aria-hidden="true"></div>
+
+    <!-- Modal Partitionnement -->
+    <div class="help-modal" id="help-partitioning" role="dialog" aria-modal="true" aria-labelledby="help-part-title" aria-hidden="true">
+      <div class="help-modal__header">
+        <div class="help-modal__title" id="help-part-title">Partitionnement Avance — Algorithme de Pruning</div>
+        <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+      </div>
+      <div class="help-modal__body">
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--objective">Principe</div>
+          <p class="help-modal__text">Le <strong>Partition Pruning</strong> est un mecanisme interne du CBO qui elimine les partitions non necessaires a la resolution d'un predicat. Avec un partitionnement Range par mois sur 120 partitions (10 ans), une requete filtrant sur les 6 derniers mois ne scanne que 6 partitions au lieu de 120.</p>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--algorithm">Complexite Algorithmique</div>
+          <p class="help-modal__text"><code>ScanTime(rows) = rows / (ioBandwidth × pruningFactor)</code></p>
+          <p class="help-modal__text">Avec <code>pruningFactor = totalPartitions / scannedPartitions</code>. Sans partitionnement, <code>pruningFactor = 1</code>. Avec pruning sur 1 mois sur 120, <code>pruningFactor = 120</code>.</p>
+          <ul class="help-modal__list">
+            <li><strong>Metadonnees de partition</strong> : Oracle consulte les <code>HIGH_VALUE</code>/<code>LOW_VALUE</code> de chaque partition (stockes dans <code>USER_TAB_PARTITIONS</code>) pour elaguer avant tout acces.</li>
+            <li><strong>Partition Exchange Loading (PEL)</strong> : Permet d'echanger une partition avec une table externe en O(1) operation metadata. Critique pour l'archivage COFRAC N+10 ans sans impact OLTP.</li>
+            <li><strong>Maintenance</strong> : TRUNCATE PARTITION et MERGE PARTITION sont des operations metadata only. SPLIT PARTITION peut necessiter un reequilibrage des donnees si la scission ne coincide pas avec l'organisation physique des segments.</li>
+          </ul>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--hds">Contexte HDS / COFRAC</div>
+          <p class="help-modal__text">La conservation des historiques de prescriptions sur 10+ ans est requise par la reglementation COFRAC. Le partitionnement permet de conserver l'acces aux donnees archivees sans impacter les requetes OLTP courantes. Le PEL permet d'archiver les partitions les plus anciennes sur un stockage a froid (<code>TABLESPACE_ARCHIVE</code>) tout en preservant la capacite de requetage.</p>
+        </div>
+      </div>
+      <div class="help-modal__footer">
+        <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+      </div>
+    </div>
+
+    <!-- Modal In-Memory -->
+    <div class="help-modal" id="help-inmemory" role="dialog" aria-modal="true" aria-labelledby="help-im-title" aria-hidden="true">
+      <div class="help-modal__header">
+        <div class="help-modal__title" id="help-im-title">In-Memory Column Store — IMCU &amp; Scan SIMD</div>
+        <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+      </div>
+      <div class="help-modal__body">
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--objective">Principe</div>
+          <p class="help-modal__text">L'option In-Memory d'Oracle stocke une copie des donnees au format <strong>colonne</strong> (Column Store) dans la SGA, en plus du format ligne (Row Store) dans le Buffer Cache. Les IMCUs (In-Memory Compression Units) sont des segments de ~1 Mo comprimes et indexes par un Snapshot Metadata Unit (SMU).</p>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--algorithm">Architecture IMCU</div>
+          <ul class="help-modal__list">
+            <li><strong>Transposition Row→Column</strong> : Les colonnes selectionnees sont extraites des lignes et stockees consecutivement en memoire. Une requete SELECT SUM(qty) ne lit que les blocs colonne de <code>qty</code>, pas les 199 autres colonnes.</li>
+            <li><strong>Compression IMCU</strong> : Chaque IMCU est comprime avec un dictionnaire local (FOR ALL COLUMNS ou MEMCOMPRESS). Ratio typique 8x a 15x pour les donnees alphanumeriques.</li>
+            <li><strong>Scan Vectorise SIMD</strong> : Les CPU modernes (AVX2 256-bit) traitent 8 valeurs entieres par instruction (Single Instruction Multiple Data). Oracle vectorise les scans colonne pour atteindre des debits de 10-15 Go/s par socket.</li>
+            <li><strong>Predicate Pushdown</strong> : Les predicats WHERE sont pousses dans le scan column (ex: <code>WHERE service = 'CARDIO'</code>). Seules les IMCUs contenant des lignes pertinentes sont scrutees via les INMEMORY PRECALCULATED expressions.</li>
+          </ul>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--indicators">Formules</div>
+          <p class="help-modal__text"><code>ScanTime = (rows × rowWidth × colSelectivity) / (imcuBandwidth × vectorFactor)</code></p>
+          <p class="help-modal__text"><code>CompressionRatio = 1 - (selectedCols / totalCols) × (1 - imcuCompressionRate)</code></p>
+          <p class="help-modal__text">Avec <code>vectorFactor = 6</code> (estimation conservative du gain SIMD sur 256-bit AVX2), <code>imcuBandwidth = 12 GB/s</code> (bande passante memoire DDR4-3200 dual channel par socket).</p>
+        </div>
+      </div>
+      <div class="help-modal__footer">
+        <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+      </div>
+    </div>
+
+    <!-- Modal Data Flow -->
+    <div class="help-modal" id="help-dataflow" role="dialog" aria-modal="true" aria-labelledby="help-df-title" aria-hidden="true">
+      <div class="help-modal__header">
+        <div class="help-modal__title" id="help-df-title">OCI Data Flow — Spark &amp; Architecture Polyglotte</div>
+        <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+      </div>
+      <div class="help-modal__body">
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--objective">Principe</div>
+          <p class="help-modal__text">OCI Data Flow est un service Spark managé (serverless) sur Oracle Cloud. Il permet d'executer des jobs de traitement Big Data sans provisionner de cluster. L'architecture est <strong>polyglotte</strong> : Oracle SQL pour le transactionnel et l'analytique structure, Spark pour les traitements massifs et non structurés (logs, genomique, imagerie).</p>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--algorithm">Architecture Distribuee</div>
+          <ul class="help-modal__list">
+            <li><strong>Spark Executor Memory</strong> : Chaque nœud executer alloue une portion de RAM (spark.executor.memory) pour les operations en memoire. Les donnees depassant cette capacite sont <em>spillées</em> sur disque (identique au mécanisme PGA Temp Spill).</li>
+            <li><strong>Shuffle Partitions</strong> : Lors d'un <code>GROUP BY</code> ou <code>JOIN</code>, Spark repartitionne les donnees entre les executors (shuffle). Le parametre <code>spark.sql.shuffle.partitions</code> controle le parallelisme. Defaut : 200 partitions.</li>
+            <li><strong>Predicate Pushdown Oracle</strong> : Le Oracle Big Data Connector pour Apache Spark permet de pousser les filtres WHERE dans Oracle (via Oracle SQL), reduisant le volume de donnees transferees sur le reseau. Seules les lignes correspondant aux predicats sont lues.</li>
+            <li><strong>Data Locality</strong> : Spark tente de programmer les tasks sur les nœuds où les donnees resident. En OCI, la localite est optimale quand les donnees Oracle sont dans un Autonomous Database sur la meme region (<code>eu-france-1</code>).</li>
+          </ul>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--hds">Contexte HDS / Génomique</div>
+          <p class="help-modal__text">Le sequencage genomique produit des fichiers FASTQ de 50-200 Go par patient. Leur analyse (alignement, variant calling) depasse la capacite d'une base Oracle unique sans cout prohibitif. L'architecture polyglotte (Oracle pour le master data patient + Spark pour le calcul distribué) est la seule approche viable certifiable HDS. OCI Data Flow s'execute dans le perimetre OCI France certifié HDS, ISO 27001. Aucune donnee de santé ne quitte la région <code>eu-france-1</code>.</p>
+        </div>
+      </div>
+      <div class="help-modal__footer">
+        <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+      </div>
+    </div>
+
+    <!-- Modal Dashboard -->
+    <div class="help-modal" id="help-dashboard" role="dialog" aria-modal="true" aria-labelledby="help-dash-title" aria-hidden="true">
+      <div class="help-modal__header">
+        <div class="help-modal__title" id="help-dash-title">Dashboard Comparatif — Metriques &amp; Conformite</div>
+        <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+      </div>
+      <div class="help-modal__body">
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--objective">Interpretation</div>
+          <p class="help-modal__text">Le dashboard synthetise les gains des 3 technologies activees independamment. Le score global est calcule par la moyenne des ratios d'amelioration ponderes par l'impact metier estimé.</p>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--indicators">Formule du Score</div>
+          <p class="help-modal__text"><code>Score = (1 - TpsApres / TpsAvant) × 100</code> pour chaque technologie, puis moyenne arithmétique.</p>
+          <p class="help-modal__text">Un score > 90% indique un passage réussi du Big Data au Fast Data pour les 5 milliards de lignes.</p>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--hds">Conformite HDS / ISO 27001 / COFRAC</div>
+          <ul class="help-modal__list">
+            <li><strong>Partitionnement</strong> : Preservation du chiffrement TDE par tablespace. Archivage COFRAC via PEL.</li>
+            <li><strong>In-Memory</strong> : Aucune sortie du perimetre HDS. Les donnees restent dans la SGA, chiffrees si TDE actif.</li>
+            <li><strong>Data Flow</strong> : Perimetre OCI France certifié HDS. Donnees genomiques fictives. Aucun transfert hors UE.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="help-modal__footer">
+        <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+      </div>
+    </div>
+
+    <footer class="app-footer">
+      ORACLE_ADVANCED::SUITE - Application de demonstration technique<br>
+      DONNEES: 100% FICTIVES - Conforme RGPD Art. 25 (Privacy by Design) - HDS / ISO 27001 / COFRAC<br>
+      Architecture: ES6 Classes - Vanilla JS - Zero Dependency - Offline<br>
+      Conception UX/UI et developpement : Stephane Bertin | Assiste par OpenCode, agent Big Pickle
+    </footer>
+  </main>
+</div>
+
+<script>
+'use strict';
+
+/* ============================================================
+   CORE INFRASTRUCTURE
+   ============================================================ */
+
+const Logger = (() => {
+  const LEVELS = { DEBUG: 0, INFO: 1, WARN: 2, ERROR: 3 };
+  const COLORS = { DEBUG: '#64748b', INFO: '#3b82f6', WARN: '#f59e0b', ERROR: '#ef4444' };
+  const prefix = '[OracleAdvanced]';
+  function _log(level, ...args) {
+    const ts = new Date().toISOString().slice(11, 19);
+    console.log('%c' + prefix + ' [' + ts + '] [' + level + ']', 'color: ' + (COLORS[level]||'#fff') + '; font-weight: bold;', ...args);
+  }
+  return { debug: (...a) => _log('DEBUG', ...a), info: (...a) => _log('INFO', ...a), warn: (...a) => _log('WARN', ...a), error: (...a) => _log('ERROR', ...a) };
+})();
+
+class EventDispatcher {
+  constructor() { this._listeners = new Map(); }
+  on(event, callback) {
+    if (!this._listeners.has(event)) this._listeners.set(event, []);
+    this._listeners.get(event).push(callback);
+  }
+  emit(event, payload) {
+    const cbs = this._listeners.get(event) || [];
+    cbs.forEach(cb => { try { cb(payload); } catch(e) { Logger.error('Listener error:', e); } });
+  }
+}
+
+/* ============================================================
+   PERFORMANCE ENGINE — Moteur de Calcul
+   ============================================================ */
+
+class PerformanceEngine {
+  constructor() {
+    this._ev = new EventDispatcher();
+    this._state = {
+      partitioning: { enabled: false, months: 6, totalMonths: 120 },
+      inmemory: { enabled: false, columns: 5, totalColumns: 200 },
+      dataflow: { enabled: false, nodes: 4 }
+    };
+    this._constants = {
+      totalRows: 5e9,
+      ioBandwidth: 500, // MB/s
+      rowWidth: 500,    // bytes
+      dataSize: 2560,   // GB (2.5 TB)
+      imcuBandwidth: 12000, // MB/s (12 GB/s)
+      vectorFactor: 6,  // SIMD gain
+      imcuCompression: 0.85, // 85% reduction for column
+      shuffleEfficiency: 0.6,
+      executorMemory: 8, // GB per node
+      nodeThroughput: 20, // GB/s per Spark node
+      costPerNodeMin: 0.025 // USD
+    };
+  }
+
+  on(evt, cb) { this._ev.on(evt, cb); }
+
+  setState(module, key, value) {
+    if (this._state[module] && key in this._state[module]) {
+      this._state[module][key] = value;
+      if (key === 'enabled' || key === 'months' || key === 'columns' || key === 'nodes') {
+        this._ev.emit('change', { module, key, value });
+      }
+    }
+  }
+
+  getState(module) { return { ...this._state[module] }; }
+  getConstants() { return { ...this._constants }; }
+
+  computePartitionMetrics() {
+    const s = this._state.partitioning;
+    const c = this._constants;
+    const pruningFactor = s.enabled ? Math.max(1, s.totalMonths / Math.max(1, s.months)) : 1;
+    const scannedRows = c.totalRows / pruningFactor;
+    const ioBefore = c.dataSize * 1024 / c.ioBandwidth; // seconds
+    const ioAfter = (c.dataSize / pruningFactor) * 1024 / c.ioBandwidth;
+    const ioReduction = (1 - 1 / pruningFactor) * 100;
+    return {
+      timeBefore: Math.round(ioBefore),
+      timeAfter: Math.max(1, Math.round(ioAfter)),
+      rowsBefore: c.totalRows,
+      rowsAfter: Math.round(scannedRows),
+      ioPctBefore: 100,
+      ioPctAfter: Math.max(0.1, Math.round((1 / pruningFactor) * 1000) / 10),
+      pruningFactor,
+      ioReduction: Math.round(ioReduction * 10) / 10
+    };
+  }
+
+  computeInMemoryMetrics() {
+    const s = this._state.inmemory;
+    const c = this._constants;
+    const colSelectivity = s.columns / s.totalColumns;
+    const compressionRatio = s.enabled ? c.imcuCompression : 0;
+    const effectiveDataSize = s.enabled
+      ? (c.dataSize * colSelectivity * (1 - c.imcuCompression))
+      : c.dataSize;
+    const timeBefore = c.dataSize * 1024 / c.ioBandwidth; // seconds
+    const timeAfterRaw = s.enabled
+      ? Math.max(0.1, effectiveDataSize / (c.imcuBandwidth * c.vectorFactor / 1000))
+      : Math.round(timeBefore);
+    const throughput = s.enabled
+      ? (c.imcuBandwidth * c.vectorFactor / 1000) / (colSelectivity * (1 - c.imcuCompression) || 1)
+      : c.ioBandwidth / 1000;
+    return {
+      timeBefore: Math.round(timeBefore),
+      timeAfter: Math.round(timeAfterRaw * 10) / 10,
+      compressionRatio: +compressionRatio.toFixed(2),
+      throughput: Math.round(throughput * 10) / 10,
+      cpuBefore: 100,
+      cpuAfter: s.enabled ? Math.max(5, Math.round(100 * colSelectivity * 0.12)) : 100,
+      colSelectivity
+    };
+  }
+
+  computeDataFlowMetrics() {
+    const s = this._state.dataflow;
+    const c = this._constants;
+    const nodes = s.enabled ? s.nodes : 1;
+    const timeBefore = c.dataSize * 1024 / c.ioBandwidth; // seconds, ~5243s
+    const totalMemory = nodes * c.executorMemory;
+    const shuffle = s.enabled
+      ? Math.round(c.dataSize * 0.3 / nodes * (1 + (1 - c.shuffleEfficiency)) * 100) / 100
+      : 0;
+    const timeAfter = s.enabled
+      ? Math.max(1, Math.round(c.dataSize / (nodes * c.nodeThroughput)))
+      : Math.round(timeBefore);
+    const cost = s.enabled
+      ? Math.round(timeAfter / 60 * nodes * c.costPerNodeMin * 10000) / 10000
+      : 0;
+    return {
+      timeBefore: Math.round(timeBefore),
+      timeAfter,
+      nodes,
+      shuffle: Math.max(0.1, shuffle),
+      cost: Math.max(0.001, cost),
+      totalMemory
+    };
+  }
+
+  computeDashboard() {
+    const p = this.computePartitionMetrics();
+    const im = this.computeInMemoryMetrics();
+    const df = this.computeDataFlowMetrics();
+    const partScore = p.timeBefore > 0 ? (1 - p.timeAfter / p.timeBefore) * 100 : 0;
+    const imScore = im.timeBefore > 0 ? (1 - im.timeAfter / im.timeBefore) * 100 : 0;
+    const dfScore = df.timeBefore > 0 ? (1 - df.timeAfter / df.timeBefore) * 100 : 0;
+    const activeTechs = [this._state.partitioning.enabled, this._state.inmemory.enabled, this._state.dataflow.enabled];
+    const countActive = activeTechs.filter(Boolean).length;
+    const scores = [];
+    if (this._state.partitioning.enabled) scores.push(partScore);
+    if (this._state.inmemory.enabled) scores.push(imScore);
+    if (this._state.dataflow.enabled) scores.push(dfScore);
+    const totalScore = scores.length > 0
+      ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length * 10) / 10
+      : 0;
+    return { partScore, imScore, dfScore, totalScore, countActive };
+  }
+}
+
+/* ============================================================
+   HELP MANAGER
+   ============================================================ */
+
+class HelpManager {
+  constructor() {
+    this._overlay = document.getElementById('help-overlay');
+    this._active = null;
+    this._boundKey = this._onKey.bind(this);
+    this._overlay.addEventListener('click', () => this.close());
+  }
+  open(id) {
+    const modal = document.getElementById('help-' + id);
+    if (!modal) return;
+    this._active = modal;
+    this._overlay.classList.add('help-overlay--active');
+    this._overlay.setAttribute('aria-hidden', 'false');
+    modal.classList.add('help-modal--active');
+    modal.setAttribute('aria-hidden', 'false');
+    document.addEventListener('keydown', this._boundKey);
+    const closeBtn = modal.querySelector('.help-modal__close');
+    if (closeBtn) closeBtn.focus();
+  }
+  close() {
+    if (!this._active) return;
+    this._active.classList.remove('help-modal--active');
+    this._active.setAttribute('aria-hidden', 'true');
+    this._overlay.classList.remove('help-overlay--active');
+    this._overlay.setAttribute('aria-hidden', 'true');
+    document.removeEventListener('keydown', this._boundKey);
+    this._active = null;
+  }
+  _onKey(e) {
+    if (e.key === 'Escape') { this.close(); return; }
+    if (e.key !== 'Tab' || !this._active) return;
+    const focusable = this._active.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    const first = focusable[0], last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
+}
+
+/* ============================================================
+   APPLICATIONS MODULES
+   ============================================================ */
+
+class PartitioningModule {
+  constructor(engine) { this._engine = engine; this._enabled = false; }
+  init() {
+    this._bindEvents();
+    this._engine.on('change', data => {
+      if (data.module === 'partitioning') {
+        this._enabled = data.value;
+        this._updateUI();
+      }
+    });
+    this._updateUI();
+  }
+  _bindEvents() {
+    const self = this;
+    document.getElementById('btn-part-enable').addEventListener('click', function() {
+      self._enabled = !self._enabled;
+      self._engine.setState('partitioning', 'enabled', self._enabled);
+    });
+    document.getElementById('btn-part-expert').addEventListener('click', function() {
+      window._helpMgr.open('partitioning');
+    });
+    const slider = document.getElementById('part-period-slider');
+    const val = document.getElementById('part-period-val');
+    slider.addEventListener('input', function() {
+      const months = parseInt(slider.value);
+      val.textContent = months + (months > 1 ? ' mois' : ' mois');
+      self._engine.setState('partitioning', 'months', months);
+    });
+  }
+  _updateUI() {
+    const m = this._engine.computePartitionMetrics();
+    const tag = document.getElementById('part-status-tag');
+    tag.textContent = this._enabled ? 'ACTIF' : 'INACTIF';
+    tag.className = 'tag tag--' + (this._enabled ? 'green' : 'red');
+    document.getElementById('part-bar-before').style.width = '100%';
+    document.getElementById('part-bar-after').style.width = m.ioPctAfter + '%';
+    document.getElementById('part-val-before').textContent = m.timeBefore + 's';
+    document.getElementById('part-val-after').textContent = m.timeAfter + 's';
+    document.getElementById('part-io-before').textContent = this._formatRows(m.rowsBefore);
+    document.getElementById('part-io-after').textContent = this._formatRows(m.rowsAfter);
+    document.getElementById('part-time-before').textContent = m.timeBefore + 's';
+    document.getElementById('part-time-after').textContent = m.timeAfter + 's';
+    const log = document.getElementById('part-console');
+    const ts = new Date().toISOString().slice(11, 19);
+    log.innerHTML += '<div class="log-console__entry log-console__entry--' + (this._enabled ? 'success' : 'warn') + '"><span class="log-console__timestamp">[' + ts + ']</span>' + (this._enabled ? 'PARTITION PRUNING ACTIF - Pruning factor: ' + m.pruningFactor + 'x - I/O reduit de ' + m.ioReduction + '%' : 'Partitionnement desactive - Full Table Scan sur ' + this._formatRows(m.rowsBefore) + ' lignes') + '</div>';
+    log.scrollTop = log.scrollHeight;
+    this._engine._ev.emit('dashboard', {});
+  }
+  _formatRows(n) {
+    if (n >= 1e9) return (n / 1e9).toFixed(1) + 'B';
+    if (n >= 1e6) return (n / 1e6).toFixed(0) + 'M';
+    return n.toLocaleString();
+  }
+}
+
+class InMemoryModule {
+  constructor(engine) { this._engine = engine; this._enabled = false; }
+  init() {
+    this._bindEvents();
+    this._engine.on('change', data => {
+      if (data.module === 'inmemory') {
+        this._enabled = data.value;
+        this._updateUI();
+      }
+    });
+    this._updateUI();
+  }
+  _bindEvents() {
+    const self = this;
+    document.getElementById('btn-im-enable').addEventListener('click', function() {
+      self._enabled = !self._enabled;
+      self._engine.setState('inmemory', 'enabled', self._enabled);
+    });
+    document.getElementById('btn-im-expert').addEventListener('click', function() {
+      window._helpMgr.open('inmemory');
+    });
+    const slider = document.getElementById('im-columns-slider');
+    const val = document.getElementById('im-columns-val');
+    slider.addEventListener('input', function() {
+      val.textContent = slider.value;
+      self._engine.setState('inmemory', 'columns', parseInt(slider.value));
+    });
+  }
+  _updateUI() {
+    const m = this._engine.computeInMemoryMetrics();
+    const tag = document.getElementById('im-status-tag');
+    tag.textContent = this._enabled ? 'ACTIF' : 'INACTIF';
+    tag.className = 'tag tag--' + (this._enabled ? 'green' : 'red');
+    const pctBefore = 100;
+    const pctAfter = Math.max(0.5, Math.round((m.timeAfter / m.timeBefore) * 1000) / 10);
+    document.getElementById('im-bar-before').style.width = pctBefore + '%';
+    document.getElementById('im-bar-after').style.width = pctAfter + '%';
+    document.getElementById('im-val-before').textContent = m.timeBefore + 's';
+    document.getElementById('im-val-after').textContent = m.timeAfter + 's';
+    document.getElementById('im-compression').textContent = this._enabled ? Math.round(1 / (1 - m.compressionRatio) * 10) / 10 + 'x' : '1.0x';
+    document.getElementById('im-throughput').textContent = this._enabled ? m.throughput + ' Go/s' : '0.2 Go/s';
+    document.getElementById('im-cpu-before').textContent = m.cpuBefore + '%';
+    document.getElementById('im-cpu-after').textContent = m.cpuAfter + '%';
+    const log = document.getElementById('im-console');
+    const ts = new Date().toISOString().slice(11, 19);
+    log.innerHTML += '<div class="log-console__entry log-console__entry--' + (this._enabled ? 'success' : 'warn') + '"><span class="log-console__timestamp">[' + ts + ']</span>' + (this._enabled ? 'IN-MEMORY ACTIF - ' + Math.round(1 / (1 - m.compressionRatio) * 10) / 10 + 'x compression - Debit ' + m.throughput + ' Go/s - Scan vectorise SIMD' : 'In-Memory desactive - Row Store scan - ' + m.timeBefore + 's estimes') + '</div>';
+    log.scrollTop = log.scrollHeight;
+    this._engine._ev.emit('dashboard', {});
+  }
+}
+
+class DataFlowModule {
+  constructor(engine) { this._engine = engine; this._enabled = false; }
+  init() {
+    this._bindEvents();
+    this._engine.on('change', data => {
+      if (data.module === 'dataflow') {
+        this._enabled = data.value;
+        if (!data.value) this._renderNodeBars(this._engine.getState('dataflow').nodes);
+        this._updateUI();
+      }
+    });
+    this._updateUI();
+    this._renderNodeBars(4);
+  }
+  _bindEvents() {
+    const self = this;
+    document.getElementById('btn-df-enable').addEventListener('click', function() {
+      if (self._enabled) {
+        self._enabled = false;
+        self._engine.setState('dataflow', 'enabled', false);
+        return;
+      }
+      self._enabled = true;
+      self._engine.setState('dataflow', 'enabled', true);
+      self._animateSpark();
+    });
+    document.getElementById('btn-df-expert').addEventListener('click', function() {
+      window._helpMgr.open('dataflow');
+    });
+    const slider = document.getElementById('df-nodes-slider');
+    const val = document.getElementById('df-nodes-val');
+    slider.addEventListener('input', function() {
+      const n = parseInt(slider.value);
+      val.textContent = n;
+      self._engine.setState('dataflow', 'nodes', n);
+      self._renderNodeBars(n);
+    });
+  }
+  _renderNodeBars(n) {
+    const c = document.getElementById('df-node-bars');
+    let html = '';
+    for (let i = 0; i < n; i++) {
+      html += '<div class="spark-node"><div class="spark-node__header"><span>Executor ' + (i + 1) + '</span><span>8 GB</span></div><div class="spark-node__bar"><div class="spark-node__fill" id="df-node-fill-' + i + '" style="width:0%"></div></div></div>';
+    }
+    c.innerHTML = html;
+  }
+  _animateSpark() {
+    const n = this._engine.getState('dataflow').nodes;
+    this._renderNodeBars(n);
+    const dfLog = document.getElementById('df-console');
+    const ts = function() { return new Date().toISOString().slice(11, 19); };
+    dfLog.innerHTML = '';
+    const addDF = (level, msg) => {
+      dfLog.innerHTML += '<div class="df-console__entry df-console__entry--' + level + '"><span class="df-console__timestamp">[' + ts() + ']</span>' + msg + '</div>';
+      dfLog.scrollTop = dfLog.scrollHeight;
+    };
+    addDF('info', 'Job Spark soumis - OCI Data Flow - Regions: eu-france-1');
+    addDF('info', 'Stage 0: Map - Lecture Oracle (Big Data Connector) - Predicate pushdown actif');
+    let step = 0;
+    const totalSteps = 20;
+    const iv = setInterval(() => {
+      step++;
+      const pct = Math.round((step / totalSteps) * 100);
+      for (let i = 0; i < n; i++) {
+        const fill = document.getElementById('df-node-fill-' + i);
+        if (fill) fill.style.width = Math.min(100, pct + Math.floor(Math.random() * 10 - 5)) + '%';
+      }
+      if (step === 3) addDF('info', 'Shuffle: ' + Math.round(Math.random() * 500 + 500) + ' MB echanges entre executors');
+      if (step === 7) addDF('info', 'Stage 1: Reduce - Aggregation des resultats');
+      if (step === 12) addDF('warn', 'GC pause: 120ms sur Executor 2');
+      if (step === 15) addDF('info', 'Stage 2: Write - Resultats vers Object Storage OCI');
+      if (step >= totalSteps) {
+        clearInterval(iv);
+        for (let i = 0; i < n; i++) {
+          const fill = document.getElementById('df-node-fill-' + i);
+          if (fill) fill.style.width = '100%';
+        }
+        addDF('success', 'Job termine - ' + n + ' executors - Duree: ' + this._engine.computeDataFlowMetrics().timeAfter + 's');
+        addDF('info', 'Cout estime: $' + this._engine.computeDataFlowMetrics().cost.toFixed(4));
+        this._updateUI();
+      }
+    }, 200);
+  }
+  _updateUI() {
+    const m = this._engine.computeDataFlowMetrics();
+    const tag = document.getElementById('df-status-tag');
+    tag.textContent = this._enabled ? 'ACTIF' : 'INACTIF';
+    tag.className = 'tag tag--' + (this._enabled ? 'green' : 'red');
+    document.getElementById('df-bar-before').style.width = '100%';
+    const pct = Math.max(0.5, Math.round((m.timeAfter / m.timeBefore) * 1000) / 10);
+    document.getElementById('df-bar-after').style.width = pct + '%';
+    document.getElementById('df-val-before').textContent = Math.round(m.timeBefore) + 's';
+    document.getElementById('df-val-after').textContent = m.timeAfter + 's';
+    document.getElementById('df-nodes').textContent = this._enabled ? m.nodes : 1;
+    document.getElementById('df-time').textContent = (this._enabled ? m.timeAfter : Math.round(m.timeBefore)) + 's';
+    document.getElementById('df-cost').textContent = this._enabled ? '$' + m.cost.toFixed(4) : '$0';
+    document.getElementById('df-shuffle').textContent = this._enabled ? m.shuffle + ' Go' : '--';
+    this._engine._ev.emit('dashboard', {});
+  }
+}
+
+class DashboardModule {
+  constructor(engine) { this._engine = engine; }
+  init() {
+    this._engine.on('dashboard', () => this._updateUI());
+    this._updateUI();
+  }
+  _updateUI() {
+    const p = this._engine.computePartitionMetrics();
+    const im = this._engine.computeInMemoryMetrics();
+    const df = this._engine.computeDataFlowMetrics();
+    const dash = this._engine.computeDashboard();
+
+    document.getElementById('dash-score').textContent = dash.totalScore + '%';
+    document.getElementById('dash-techs').textContent = dash.countActive + '/3';
+    document.getElementById('dashboard-score-tag').textContent = 'SCORE: ' + dash.totalScore + '%';
+
+    const pActive = this._engine.getState('partitioning').enabled;
+    const imActive = this._engine.getState('inmemory').enabled;
+    const dfActive = this._engine.getState('dataflow').enabled;
+
+    const pGain = pActive && p.timeBefore > 0 ? Math.round((1 - p.timeAfter / p.timeBefore) * 100) : 0;
+    const imGain = imActive && im.timeBefore > 0 ? Math.round((1 - im.timeAfter / im.timeBefore) * 100) : 0;
+    const dfGain = dfActive && df.timeBefore > 0 ? Math.round((1 - df.timeAfter / df.timeBefore) * 100) : 0;
+
+    document.getElementById('dash-bar-part-before').style.width = '100%';
+    document.getElementById('dash-bar-part-after').style.width = pActive ? (100 - pGain) + '%' : '0%';
+    document.getElementById('dash-val-part').textContent = pActive ? p.timeBefore + 's → ' + p.timeAfter + 's (-' + pGain + '%)' : 'INACTIF';
+
+    document.getElementById('dash-bar-im-before').style.width = '100%';
+    document.getElementById('dash-bar-im-after').style.width = imActive ? (100 - imGain) + '%' : '0%';
+    document.getElementById('dash-val-im').textContent = imActive ? im.timeBefore + 's → ' + im.timeAfter + 's (-' + imGain + '%)' : 'INACTIF';
+
+    document.getElementById('dash-bar-df-before').style.width = '100%';
+    document.getElementById('dash-bar-df-after').style.width = dfActive ? (100 - dfGain) + '%' : '0%';
+    document.getElementById('dash-val-df').textContent = dfActive ? Math.round(df.timeBefore) + 's → ' + df.timeAfter + 's (-' + dfGain + '%)' : 'INACTIF';
+
+    const gains = [pGain, imGain, dfGain].filter(g => g > 0);
+    const avgGain = gains.length > 0 ? Math.round(gains.reduce((a, b) => a + b, 0) / gains.length) : 0;
+    document.getElementById('dash-gain').textContent = avgGain > 0 ? '-' + avgGain + '%' : '--';
+
+    const scoreEl = document.getElementById('session-score');
+    if (scoreEl) scoreEl.textContent = dash.totalScore + '%';
+  }
+}
+
+/* ============================================================
+   APPLICATION - Router & Bootstrapper
+   ============================================================ */
+
+class Application {
+  constructor() {
+    this._engine = new PerformanceEngine();
+    this._modules = {};
+    this._currentTab = 'partitioning';
+  }
+
+  init() {
+    Logger.info('=== Oracle Advanced Performance Suite - Initialisation ===');
+    this._modules.partitioning = new PartitioningModule(this._engine);
+    this._modules.inmemory = new InMemoryModule(this._engine);
+    this._modules.dataflow = new DataFlowModule(this._engine);
+    this._modules.dashboard = new DashboardModule(this._engine);
+    Object.values(this._modules).forEach(m => m.init());
+    this._bindNav();
+    window._helpMgr = new HelpManager();
+    this._bindHelp();
+    Logger.info('=== Oracle Advanced Performance Suite - Ready ===');
+  }
+
+  _bindNav() {
+    document.querySelectorAll('.app-nav__item[data-tab]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+        document.querySelectorAll('.app-nav__item').forEach(b => b.classList.remove('app-nav__item--active'));
+        btn.classList.add('app-nav__item--active');
+        document.querySelectorAll('.module-section').forEach(s => s.classList.remove('module-section--active'));
+        document.getElementById('tab-' + tab).classList.add('module-section--active');
+        this._currentTab = tab;
+      });
+    });
+  }
+
+  _bindHelp() {
+    document.querySelectorAll('[data-help]').forEach(btn => {
+      btn.addEventListener('click', () => window._helpMgr.open(btn.dataset.help));
+    });
+    document.querySelectorAll('.help-modal__close').forEach(btn => {
+      btn.addEventListener('click', () => window._helpMgr.close());
+    });
+    document.querySelectorAll('.help-modal__footer-btn').forEach(btn => {
+      btn.addEventListener('click', () => window._helpMgr.close());
+    });
+  }
+}
+
+/* ============================================================
+   BOOTSTRAP
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', function() {
+  try {
+    const app = new Application();
+    app.init();
+  } catch (e) {
+    Logger.error('Application bootstrap error:', e);
+  }
+});
+</script>
+</body>
+</html>
