@@ -311,8 +311,8 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
   <nav class="app-nav">
     <div class="app-nav__section">
       <div class="app-nav__section-title">SQL Workbench PUI</div>
-      <button class="app-nav__item app-nav__item--active" data-tab="queries"><span class="app-nav__item-icon">Q</span>Requetes &amp; Logique Metier</button>
-      <button class="app-nav__item" data-tab="results"><span class="app-nav__item-icon">R</span>Resultats &amp; Performance</button>
+      <button class="app-nav__item app-nav__item--active" data-tab="queries"><span class="app-nav__item-icon">Q</span>Requêtes &amp; Logique Métier</button>
+      <button class="app-nav__item" data-tab="results"><span class="app-nav__item-icon">R</span>Résultats &amp; Performance</button>
       <button class="app-nav__item" data-tab="maintenance"><span class="app-nav__item-icon">M</span>Maintenance &amp; Gouvernance</button>
     </div>
     <div class="app-nav__section">
@@ -336,24 +336,24 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
 
   <main class="app-main" id="app-main">
     <!-- ============================================================
-         TAB 1: REQUETES & LOGIQUE METIER
+         TAB 1: REQUÊTES & LOGIQUE MÉTIER
          ============================================================ -->
     <section class="module-section module-section--active" id="tab-queries">
       <div class="page-header">
-        <h1 class="page-header__title">Requetes &amp; Logique Metier</h1>
+        <h1 class="page-header__title">Requêtes &amp; Logique Métier</h1>
         <div class="page-header__subtitle-row">
-          <p class="page-header__subtitle">Editeur PL/SQL, snippets predefinis, execution simulee avec machine d'etats</p>
-          <button class="page-header__help-btn" data-help="queries" aria-label="Aide Requetes" title="Rubrique d'aide" title="Rubrique d'aide">?</button>
+          <p class="page-header__subtitle">Éditeur PL/SQL, snippets prédéfinis, exécution simulée avec machine d'états</p>
+          <button class="page-header__help-btn" data-help="queries" aria-label="Aide Requêtes" title="Rubrique d'aide">?</button>
         </div>
       </div>
 
       <!-- Snippet Selector -->
       <div class="snippet-selector">
-        <label class="data-label" style="margin-bottom: var(--sp-2); display: block;">Snippet PL/SQL predefini</label>
+        <label class="data-label" style="margin-bottom: var(--sp-2); display: block;">Snippet PL/SQL prédéfini</label>
         <select id="snippet-select">
           <option value="select">[SELECT] Stocks critiques — Jointures multi-tables (Lot, Peremption, Service)</option>
           <option value="bulk">[PL/SQL] BULK COLLECT + FORALL — Batch nocturne reapprovisionnement</option>
-          <option value="trigger">[TRIGGER] trg_check_peremption — Regle metier anti-medicament expire</option>
+          <option value="trigger">[TRIGGER] trg_check_peremption — Règle métier anti-médicament expiré</option>
         </select>
       </div>
 
@@ -368,14 +368,14 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
           <textarea class="code-editor__textarea" id="code-editor" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
         </div>
         <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
-          <button class="btn btn--success btn--sm" id="btn-execute">&#9658; Executer</button>
-          <button class="btn btn--outline btn--sm" id="btn-reset-editor">Reset</button>
+          <button class="btn btn--success btn--sm" id="btn-execute">&#9658; Exécuter</button>
+          <button class="btn btn--outline btn--sm" id="btn-reset-editor">Réinitialiser</button>
         </div>
       </div>
 
       <!-- State Machine -->
       <div class="card fade-in">
-        <div class="card__title"><span class="card__title-icon">&#9202;</span> Machine d'Etats — Execution Pipeline</div>
+        <div class="card__title"><span class="card__title-icon">&#9202;</span> Machine d'Etats — Exécution Pipeline</div>
         <div class="state-machine" id="state-machine">
           <div class="state-step state-step--active" id="state-idle"><span class="state-step__dot"></span>IDLE</div>
           <span class="state-arrow">&rarr;</span>
@@ -394,20 +394,20 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       <div class="card fade-in">
         <div class="card__title"><span class="card__title-icon">&#128203;</span> Console de Sortie</div>
         <div class="log-console" id="exec-console" style="max-height: 250px;">
-          <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Workbench initialise. En attente d execution.</div>
+          <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Workbench initialisé. En attente d'exécution.</div>
         </div>
       </div>
     </section>
 
     <!-- ============================================================
-         TAB 2: RESULTATS & ANALYSE DE PERFORMANCE
+         TAB 2: RÉSULTATS & ANALYSE DE PERFORMANCE
          ============================================================ -->
     <section class="module-section" id="tab-results">
       <div class="page-header">
-        <h1 class="page-header__title">Resultats &amp; Analyse de Performance</h1>
+        <h1 class="page-header__title">Résultats &amp; Analyse de Performance</h1>
         <div class="page-header__subtitle-row">
-          <p class="page-header__subtitle">Data Grid dynamique, Explain Plan simule, metriques CBO, alertes d indexation</p>
-          <button class="page-header__help-btn" data-help="results" aria-label="Aide Resultats" title="Rubrique d'aide" title="Rubrique d'aide">?</button>
+          <p class="page-header__subtitle">Data Grid dynamique, Explain Plan simulé, métriques CBO, alertes d'indexation</p>
+          <button class="page-header__help-btn" data-help="results" aria-label="Aide Résultats" title="Rubrique d'aide">?</button>
         </div>
       </div>
 
@@ -415,7 +415,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       <div class="grid-4" id="metrics-cards">
         <div class="stat-block stat-block--cyan">
           <div class="stat-block__value" id="metric-time">---</div>
-          <div class="stat-block__label">Temps Execution (ms)</div>
+          <div class="stat-block__label">Temps Exécution (ms)</div>
         </div>
         <div class="stat-block stat-block--blue" data-help="lexicon">
           <div class="stat-block__value" id="metric-lr">---</div>
@@ -427,14 +427,14 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         </div>
         <div class="stat-block stat-block--purple" data-help="lexicon">
           <div class="stat-block__value" id="metric-cost">---</div>
-          <div class="stat-block__label">Cout CBO</div>
+          <div class="stat-block__label">Coût CBO</div>
         </div>
       </div>
 
       <!-- Data Grid -->
       <div class="card fade-in">
-        <div class="card__title"><span class="card__title-icon">&#128202;</span> Data Grid — Resultats de la Requete</div>
-        <div id="data-grid-placeholder" class="alert alert--info">Aucune requete executee. Naviguez vers l onglet "Requetes &amp; Logique Metier" pour executer un snippet.</div>
+        <div class="card__title"><span class="card__title-icon">&#128202;</span> Data Grid — Résultats de la Requête</div>
+        <div id="data-grid-placeholder" class="alert alert--info">Aucune requête exécutée. Naviguez vers l'onglet "Requêtes &amp; Logique Métier" pour exécuter un snippet.</div>
         <div class="data-grid-wrapper" id="data-grid-wrapper" style="display: none;">
           <table class="data-table" id="data-grid-table">
             <thead id="data-grid-head"></thead>
@@ -446,12 +446,12 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
 
       <!-- Explain Plan -->
       <div class="card fade-in">
-        <div class="card__title" data-help="lexicon"><span class="card__title-icon">&#127794;</span> Explain Plan — Plan d Execution Simule</div>
-        <div id="plan-placeholder" class="alert alert--info">Le plan d execution sera genere automatiquement apres execution d une requete.</div>
+        <div class="card__title" data-help="lexicon"><span class="card__title-icon">&#127794;</span> Explain Plan — Plan d'Exécution Simulé</div>
+        <div id="plan-placeholder" class="alert alert--info">Le plan d'exécution sera généré automatiquement après exécution d'une requête.</div>
         <div id="plan-tree-container" style="display: none;">
           <div class="plan-tree" id="plan-tree"></div>
           <div style="margin-top: var(--sp-4); font-size: var(--fs-xs); color: #64748b; font-family: var(--font-mono);">
-            Plan genere par le Cost Based Optimizer simule — Coût total, cardinalite estimee, operations
+            Plan généré par le Cost Based Optimizer simulé — Coût total, cardinalité estimée, opérations
           </div>
         </div>
       </div>
@@ -470,7 +470,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       <div class="page-header">
         <h1 class="page-header__title">Maintenance &amp; Gouvernance</h1>
         <div class="page-header__subtitle-row">
-          <p class="page-header__subtitle">Tablespaces, gestion RBAC utilisateurs, audit HDS chiffre, purge anonymisee RGPD</p>
+          <p class="page-header__subtitle">Tablespaces, gestion RBAC utilisateurs, audit HDS chiffré, purge anonymisée RGPD</p>
           <button class="page-header__help-btn" data-help="maintenance" aria-label="Aide Maintenance" title="Rubrique d'aide">?</button>
         </div>
       </div>
@@ -489,14 +489,14 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         <!-- User Management -->
         <div class="card fade-in">
           <div class="card__title" data-help="lexicon"><span class="card__title-icon">&#128100;</span> Gestion Utilisateurs — RBAC</div>
-          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Creation d utilisateur avec attribution de roles. Principe de Least Privilege applique.</p>
+          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Création d'utilisateur avec attribution de rôles. Principe de Least Privilege appliqué.</p>
           <div class="user-form">
             <div class="user-form__field">
               <label for="user-username">Username</label>
               <input type="text" id="user-username" placeholder="USER_SIMU_XXX" value="">
             </div>
             <div>
-              <label class="data-label" style="margin-bottom: var(--sp-2); display: block;">Roles</label>
+              <label class="data-label" style="margin-bottom: var(--sp-2); display: block;">Rôles</label>
               <div class="role-checkboxes">
                 <label class="role-checkbox"><input type="checkbox" id="role-dba"> DBA_PUI</label>
                 <label class="role-checkbox"><input type="checkbox" id="role-lecture"> LECTURE_STOCK</label>
@@ -512,10 +512,10 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         <!-- Purge Anonymisee -->
         <div class="card fade-in">
           <div class="card__title" data-help="lexicon"><span class="card__title-icon">&#128274;</span> Purge Anonymisee — RGPD Art. 17</div>
-          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Simulation de la procedure de purge des donnees anciennes (&gt; 90 jours) avec masquage des identifiants patients via <code class="data-mono">DBMS_REDACT</code>.</p>
+          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Simulation de la procedure de purge des donnees anciennes (&gt; 90 jours) avec masquage des identifiants des patients via <code class="data-mono">DBMS_REDACT</code>.</p>
           <div class="slider-group" style="margin-bottom: var(--sp-4);">
             <div class="slider-group__header">
-              <span class="slider-group__label">Seuil d anciennete (jours)</span>
+              <span class="slider-group__label">Seuil d'ancienneté (jours)</span>
               <span class="slider-group__value" id="purge-days-val">90</span>
             </div>
             <input type="range" id="purge-days-slider" min="30" max="365" step="30" value="90">
@@ -529,13 +529,13 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
 
       <!-- Audit HDS Log -->
       <div class="card fade-in">
-        <div class="card__title"><span class="card__title-icon">&#128270;</span> Audit HDS — Journal d Activite Chiffre</div>
-        <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Toutes les actions (executions, creations users, purges) sont tracees dans ce journal. Simulation de chiffrement Oracle Transparent Data Encryption (TDE) AES-256 au repos. Conforme HDS / ISO 27001.</p>
+        <div class="card__title"><span class="card__title-icon">&#128270;</span> Audit HDS — Journal d'Activité Chiffré</div>
+        <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Toutes les actions (exécutions, créations d'utilisateurs, purges) sont tracées dans ce journal. Simulation de chiffrement Oracle Transparent Data Encryption (TDE) AES-256 au repos. Conforme HDS / ISO 27001.</p>
         <div class="log-console" id="audit-console" style="max-height: 350px;">
-          <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>[AUDIT] Workbench initialise. Logs chiffres AES-256 au repos.</div>
+          <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>[AUDIT] Workbench initialisé. Logs chiffrés AES-256 au repos.</div>
         </div>
         <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
-          <button class="btn btn--outline btn--sm" id="btn-export-audit">Exporter Audit (CSV simule)</button>
+          <button class="btn btn--outline btn--sm" id="btn-export-audit">Exporter Audit (CSV simulé)</button>
           <button class="btn btn--outline btn--sm" id="btn-clear-audit">Purger Audit</button>
         </div>
         <div id="audit-result" style="margin-top: var(--sp-4);"></div>
@@ -547,41 +547,41 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
          ============================================================ -->
     <div class="help-overlay" id="help-overlay" aria-hidden="true"></div>
 
-    <!-- MODAL 1: Requetes -->
+    <!-- MODAL 1: Requêtes -->
     <div class="help-modal" id="help-queries" role="dialog" aria-modal="true" aria-labelledby="help-queries-title" aria-hidden="true">
       <div class="help-modal__header">
-        <div class="help-modal__title" id="help-queries-title">Requetes &amp; Logique Metier</div>
+        <div class="help-modal__title" id="help-queries-title">Requêtes &amp; Logique Métier</div>
         <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
       </div>
       <div class="help-modal__body">
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--objective">Objectif</div>
-          <p class="help-modal__text">Cet onglet simule un environnement de developpement Oracle pour la gestion des stocks PUI. Il demonstre trois aspects du langage Oracle :</p>
+          <p class="help-modal__text">Cet onglet simule un environnement de développement Oracle pour la gestion des stocks PUI. Il démontre trois aspects du langage Oracle :</p>
           <ul class="help-modal__list">
-            <li><strong>Requete SQL complexe</strong> : Jointures multiples entre <code>STOCK_MED</code>, <code>LOT_SIMU</code>, <code>SERVICE_SIMU</code> avec filtres sur les dates de peremption. Simule l extraction des stocks critiques necessitant un reapprovisionnement urgent.</li>
-            <li><strong>PL/SQL BULK COLLECT + FORALL</strong> : Bloc procedural utilisant les collections Oracle pour mettre a jour massivement les niveaux de stock. Le <code>BULK COLLECT INTO</code> charge les resultats en memoire (PGA), puis le <code>FORALL</code> execute les updates en batch, reduisant les <em>context switches</em> entre le moteur SQL et PL/SQL.</li>
-            <li><strong>TRIGGER trg_check_peremption</strong> : Trigger <code>BEFORE INSERT OR UPDATE</code> sur <code>SORTIE_STOCK</code> qui verifie que la date de peremption du lot n est pas depassee. Regle metier critique : empeche la dispensation de medicaments expires aux services cliniques.</li>
+            <li><strong>Requête SQL complexe</strong> : Jointures multiples entre <code>STOCK_MED</code>, <code>LOT_SIMU</code>, <code>SERVICE_SIMU</code> avec filtres sur les dates de peremption. Simule l'extraction des stocks critiques nécessitant un réapprovisionnement urgent.</li>
+            <li><strong>PL/SQL BULK COLLECT + FORALL</strong> : Bloc procedural utilisant les collections Oracle pour mettre à jour en masse les niveaux de stock. Le <code>BULK COLLECT INTO</code> charge les résultats en mémoire (PGA), puis le <code>FORALL</code> exécute les updates en batch, réduisant les <em>context switches</em> entre le moteur SQL et PL/SQL.</li>
+            <li><strong>TRIGGER trg_check_peremption</strong> : Trigger <code>BEFORE INSERT OR UPDATE</code> sur <code>SORTIE_STOCK</code> qui vérifie que la date de péremption du lot n'est pas dépassée. Règle métier critique : empêche la dispensation de médicaments expirés aux services cliniques.</li>
           </ul>
         </div>
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--controls">Controles</div>
           <ul class="help-modal__list">
-            <li><strong>Snippet Selector</strong> : Choisit le type de requete a charger dans l editeur. Chaque snippet est pre-ecrit avec syntaxe Oracle valide.</li>
-            <li><strong>Editeur</strong> : Zone de saisie avec coloration syntaxique basique (keywords, strings, comments). Le texte est modifiable avant execution.</li>
-            <li><strong>Executer</strong> : Lance la machine d etats (PARSING -> EXECUTING -> FETCHING -> COMPLETED) avec delais artificiels simulant la latence disque/reseau.</li>
-            <li><strong>Reset</strong> : Recharge le snippet d origine dans l editeur.</li>
+            <li><strong>Snippet Selector</strong> : Choisit le type de requête à charger dans l'éditeur. Chaque snippet est pré-écrit avec une syntaxe Oracle valide.</li>
+            <li><strong>Editeur</strong> : Zone de saisie avec coloration syntaxique simple (keywords, strings, comments). Le texte est modifiable avant exécution.</li>
+<li><strong>Exécuter</strong> : Lance la machine d'états (PARSING -> EXECUTING -> FETCHING -> COMPLETED) avec délais artificiels simulant la latence disque/réseau.</li>
+<li><strong>Réinitialiser</strong> : Recharge le snippet d'origine dans l'éditeur.</li>
           </ul>
         </div>
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--indicators">Indicateurs</div>
           <ul class="help-modal__list">
-            <li><strong>Machine d etats</strong> : 5 etapes colorees (gris=inactif, bleu=en cours, vert=termine, rouge=erreur). Chaque etape a un delai simule : PARSING=800ms, EXECUTING=1500ms, FETCHING=600ms.</li>
-            <li><strong>Console de sortie</strong> : Logs structures avec timestamps et niveaux. Affiche les resultats du parsing, les erreurs ORA-xxxxx simulees, et les statistiques d execution.</li>
+            <li><strong>Machine d'états</strong> : 5 étapes colorées (gris=inactif, bleu=en cours, vert=terminé, rouge=erreur). Chaque étape a un délai simulé : PARSING=800ms, EXECUTING=1500ms, FETCHING=600ms.</li>
+            <li><strong>Console de sortie</strong> : Logs structurés avec timestamps et niveaux. Affiche les résultats du parsing, les erreurs ORA-xxxxx simulées, et les statistiques d'exécution.</li>
           </ul>
         </div>
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--hds">Contexte HDS / PUI</div>
-          <p class="help-modal__text">Dans une PUI, les requetes de stock doivent garantir l integrite des donnees : un medicament expire ne doit jamais etre dispense (d ou le trigger). Les batchs nocturnes de reapprovisionnement utilisent <code>BULK COLLECT</code> pour minimiser l impact sur la production. Toutes les donnees affichees sont fictives (<code>MED_TEST_XXX</code>, <code>LOT_SIMU_XXX</code>). Aucune donnee patient reelle n est utilisee.</p>
+          <p class="help-modal__text">Dans une PUI, les requêtes de stock doivent garantir l'intégrité des données : un médicament expiré ne doit jamais être dispensé (d'où le trigger). Les batchs nocturnes de reapprovisionnement utilisent <code>BULK COLLECT</code> pour minimiser l'impact sur la production. Toutes les données affichées sont fictives (<code>MED_TEST_XXX</code>, <code>LOT_SIMU_XXX</code>). Aucune donnee patient réelle n'est utilisée.</p>
         </div>
       </div>
       <div class="help-modal__footer">
@@ -589,43 +589,43 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       </div>
     </div>
 
-    <!-- MODAL 2: Resultats -->
+    <!-- MODAL 2: Résultats -->
     <div class="help-modal" id="help-results" role="dialog" aria-modal="true" aria-labelledby="help-results-title" aria-hidden="true">
       <div class="help-modal__header">
-        <div class="help-modal__title" id="help-results-title">Resultats &amp; Analyse de Performance</div>
+        <div class="help-modal__title" id="help-results-title">Résultats &amp; Analyse de Performance</div>
         <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
       </div>
       <div class="help-modal__body">
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--objective">Objectif</div>
-          <p class="help-modal__text">Cet onglet analyse les performances des requetes executees via le simulateur Cost Based Optimizer (CBO) d Oracle :</p>
+          <p class="help-modal__text">Cet onglet analyse les performances des requêtes exécutées via le simulateur Cost Based Optimizer (CBO) d'Oracle :</p>
           <ul class="help-modal__list">
-            <li><strong>Explain Plan</strong> : Arbre d operations simule montrant comment Oracle accede aux donnees. Les operations incluent <code>TABLE ACCESS FULL</code>, <code>INDEX UNIQUE SCAN</code>, <code>HASH JOIN</code>, <code>SORT GROUP BY</code>, <code>NESTED LOOPS</code>.</li>
-            <li><strong>Metriques CBO</strong> : Cout total, cardinalite estimee, nombre de lignes, temps d execution simule.</li>
-            <li><strong>Alertes d indexation</strong> : Detection automatique des <code>TABLE ACCESS FULL</code> sur des tables volumineuses, avec recommandation de creation d index.</li>
+            <li><strong>Explain Plan</strong> : Arbre d'opérations simulé montrant comment Oracle accède aux données. Les opérations incluent <code>TABLE ACCESS FULL</code>, <code>INDEX UNIQUE SCAN</code>, <code>HASH JOIN</code>, <code>SORT GROUP BY</code>, <code>NESTED LOOPS</code>.</li>
+            <li><strong>Metriques CBO</strong> : Coût total, cardinalité estimée, nombre de lignes, temps d'exécution simulé.</li>
+            <li><strong>Alertes d'indexation</strong> : Detection automatique des <code>TABLE ACCESS FULL</code> sur des tables volumineuses, avec recommandation de création d'index.</li>
           </ul>
         </div>
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--controls">Controles</div>
           <ul class="help-modal__list">
-            <li><strong>Metriques</strong> : 4 cartes KPI mises a jour automatiquement apres chaque execution (Temps ms, Logical Reads, Physical Writes, Cout CBO).</li>
-            <li><strong>Data Grid</strong> : Tableau de resultats peuple dynamiquement avec les donnees fictives retournees par le simulateur. Les colonnes dependent de la requete executee.</li>
-            <li><strong>Explain Plan</strong> : Arbre visuel avec indentation, operations colorees, cout et cardinalite par noeud.</li>
-            <li><strong>Alertes CBO</strong> : Apparaissent automatiquement si un Full Table Scan est detecte sur une grande table.</li>
+            <li><strong>Metriques</strong> : 4 cartes KPI mises à jour automatiquement après chaque exécution (Temps ms, Logical Reads, Physical Writes, Coût CBO).</li>
+            <li><strong>Data Grid</strong> : Tableau de résultats peuplé dynamiquement avec les données fictives retournées par le simulateur. Les colonnes dépendent de la requête exécutée.</li>
+            <li><strong>Explain Plan</strong> : Arbre visuel avec indentation, opérations colorées, coût et cardinalité par noeud.</li>
+            <li><strong>Alertes CBO</strong> : Apparaissent automatiquement si un Full Table Scan est détecté sur une grande table.</li>
           </ul>
         </div>
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--indicators">Indicateurs Cles</div>
           <ul class="help-modal__list">
-            <li><strong>Cout CBO</strong> : Unite arbitraire du cout d execution. Un cout &gt; 500 indique une requete potentiellement sous-optimale.</li>
-            <li><strong>Logical Reads</strong> : Nombre de lectures logiques Oracle (consistent gets + db block gets) réalisées via le Buffer Cache. Valeur elevee = nombreuses lectures memoire.</li>
-            <li><strong>Physical Writes</strong> : Nombre de blocs ecrits sur disque. Non-zero pour les operations DML (UPDATE/INSERT).</li>
-            <li><strong>Ratio LR/PW</strong> : Si Physical Writes &gt; 10% de Logical Reads, verifier la taille du Buffer Cache.</li>
+            <li><strong>Coût CBO</strong> : Unité arbitraire du coût d'exécution. Un coût &gt; 500 indique une requête potentiellement sous-optimale.</li>
+            <li><strong>Logical Reads</strong> : Nombre de lectures logiques Oracle (consistent gets + db block gets) réalisées via le Buffer Cache. Valeur élevée = nombreuses lectures mémoire.</li>
+            <li><strong>Physical Writes</strong> : Nombre de blocs écrits sur disque. Non-zero pour les opérations DML (UPDATE/INSERT).</li>
+            <li><strong>Ratio LR/PW</strong> : Si Physical Writes &gt; 10% de Logical Reads, vérifier la taille du Buffer Cache.</li>
           </ul>
         </div>
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--hds">Contexte HDS / PUI</div>
-          <p class="help-modal__text">Un Full Table Scan sur <code>STOCK_MED</code> peut fortement dégrader les performances et augmenter les temps de réponse lors des opérations critiques de dispensation. Dans une PUI hospitaliere, cela impacte directement la disponibilite des medicaments aux services critiques (Urgences, Reanimation). L optimisation des plans d execution via l indexation appropriee est un enjeu de continuite de soin.</p>
+          <p class="help-modal__text">Un Full Table Scan sur <code>STOCK_MED</code> peut fortement dégrader les performances et augmenter les temps de réponse lors des opérations critiques de dispensation. Dans une PUI hospitaliere, cela impacte directement la disponibilité des médicaments aux services critiques (Urgences, Réanimation). L'optimisation des plans d'exécution via l'indexation appropriée est un enjeu de continuité de soin.</p>
         </div>
       </div>
       <div class="help-modal__footer">
@@ -642,34 +642,34 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       <div class="help-modal__body">
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--objective">Objectif</div>
-          <p class="help-modal__text">Cet onglet simule les operations DBA et de gouvernance des donnees dans un contexte HDS :</p>
+          <p class="help-modal__text">Cet onglet simule les opérations DBA et de gouvernance des données dans un contexte HDS :</p>
           <ul class="help-modal__list">
-            <li><strong>Tablespaces</strong> : Visualisation de l utilisation de l espace disque pour chaque tablespace. Alertes automatique a 80% (warning) et 90% (critique).</li>
-            <li><strong>Gestion RBAC</strong> : Creation d utilisateurs avec attribution selective de roles. Le principe de <em>Least Privilege</em> est applique : le role <code>DBA_PUI</code> declenche une alerte de securite.</li>
-            <li><strong>Audit HDS</strong> : Journal chiffre de toutes les actions realisees dans le Workbench. Chaque entree inclut timestamp, utilisateur, action, requete, statut. Conforme aux exigences HDS et ISO 27001.</li>
-            <li><strong>Purge Anonymisee</strong> : Simulation de <code>DBMS_REDACT</code> sur les donnees anciennes (&gt; seuil configurable). Conforme au RGPD Art. 17 (droit a l effacement) et Art. 25 (privacy by design).</li>
+            <li><strong>Tablespaces</strong> : Visualisation de l'utilisation de l'espace disque pour chaque tablespace. Alertes automatiques à 80% (warning) et 90% (critique).</li>
+            <li><strong>Gestion RBAC</strong> : Création d'utilisateurs avec attribution sélective de rôles. Le principe de <em>Least Privilege</em> est appliqué : le rôle <code>DBA_PUI</code> déclenche une alerte de sécurité.</li>
+            <li><strong>Audit HDS</strong> : Journal chiffré de toutes les actions réalisées dans le Workbench. Chaque entrée inclut timestamp, utilisateur, action, requête, statut. Conforme aux exigences HDS et ISO 27001.</li>
+            <li><strong>Purge Anonymisée</strong> : Simulation de <code>DBMS_REDACT</code> sur les données anciennes (&gt; seuil configurable). Conforme au RGPD Art. 17 (droit à l'effacement) et Art. 25 (privacy by design).</li>
           </ul>
         </div>
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--controls">Controles</div>
           <ul class="help-modal__list">
-            <li><strong>Simuler Charge TS</strong> : Augmente l utilisation des tablespaces pour demontrer les seuils d alerte.</li>
-            <li><strong>Creer Utilisateur</strong> : Formulaire avec username et selection de roles. Validation des regles de securite.</li>
-            <li><strong>Seuil purge</strong> : Slider de 30 a 365 jours pour definir l anciennete des donnees a purger.</li>
-            <li><strong>Exporter Audit</strong> : Simulation d export CSV du journal d audit.</li>
+            <li><strong>Simuler Charge TS</strong> : Augmente l'utilisation des tablespaces pour démontrer les seuils d'alerte.</li>
+            <li><strong>Creer Utilisateur</strong> : Formulaire avec username et sélection de rôles. Validation des règles de sécurité.</li>
+            <li><strong>Seuil purge</strong> : Slider de 30 à 365 jours pour définir l'ancienneté des données à purger.</li>
+            <li><strong>Exporter Audit</strong> : Simulation d'export CSV du journal d'audit.</li>
           </ul>
         </div>
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--indicators">Indicateurs</div>
           <ul class="help-modal__list">
-            <li><strong>% utilisation TS</strong> : Barre colorisee (vert &lt; 80%, amber 80-90%, rouge &gt; 90%).</li>
-            <li><strong>Count audit</strong> : Nombre d entrees dans le journal. Croit avec chaque action du Workbench.</li>
-            <li><strong>Records anonymises</strong> : Nombre de lignes masquee par la purge.</li>
+            <li><strong>% utilisation TS</strong> : Barre colorisée (vert &lt; 80%, amber 80-90%, rouge &gt; 90%).</li>
+            <li><strong>Count audit</strong> : Nombre d'entrées dans le journal. Croit avec chaque action du Workbench.</li>
+            <li><strong>Records anonymisés</strong> : Nombre de lignes masquées par la purge.</li>
           </ul>
         </div>
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--hds">Contexte HDS / PUI</div>
-          <p class="help-modal__text">La gouvernance des donnees de sante exige une tracabilite totale (audit), un controle d acces strict (RBAC), et un cycle de vie des donnees conforme au RGPD (purge). Les tablespaces doivent etre monitors en continu : un tablespace saturé peut empêcher certaines opérations critiques Oracle (INSERT, SORT, UNDO, TEMP) selon le tablespace concerné. La purge anonymisee garantit que les donnees de test/simulation ne persistent pas indefiniment, respectant le principe de minimisation (RGPD Art. 5).</p>
+          <p class="help-modal__text">La gouvernance des données de santé exige une traçabilité totale (audit), un contrôle d'accès strict (RBAC), et un cycle de vie des données conforme au RGPD (purge). Les tablespaces doivent être surveillés en continu : un tablespace saturé peut empêcher certaines opérations critiques Oracle (INSERT, SORT, UNDO, TEMP) selon le tablespace concerné. La purge anonymisée garantit que les données de test/simulation ne persistent pas indéfiniment, respectant le principe de minimisation (RGPD Art. 5).</p>
         </div>
       </div>
       <div class="help-modal__footer">
@@ -687,71 +687,71 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--lexique">Architecture Oracle et Multitenant</div>
           <ul class="help-modal__list">
-            <li><strong>Conteneur de Base de Donnees (CDB)</strong> — Base de donnees racine chapeautant l'ensemble des bases de donnees placables dans l'architecture multitenant Oracle 12c et suivantes.</li>
-            <li><strong>Base de Donnees Placable (PDB)</strong> — Base de donnees portable et isolee au sein d'un conteneur, apparaissant aux utilisateurs et aux applications comme une base de donnees classique.</li>
-            <li><strong>Dictionnaire Partage</strong> — Ensemble de metadonnees de definition (structures de schemas, objets, privileges) mutualisees entre toutes les bases placables d'un meme conteneur.</li>
-            <li><strong>Cache de Lignes du Dictionnaire</strong> — Structure memoire logeant dans la memoire partagee les lignes du dictionnaire, protegee par un verrou d'exclusion mutuelle (latch).</li>
-            <li><strong>Masquage de Donnees</strong> — Technique d'obfuscation des donnees sensibles (numero d'inscription au repertoire, identite des patients) lors du clonage d'une base, conforme au Reglement General sur la Protection des Donnees.</li>
+            <li><strong>Conteneur de Base de Données (CDB)</strong> — Base de données racine chapeautant l'ensemble des bases de données placables dans l'architecture multitenant Oracle 12c et suivantes.</li>
+            <li><strong>Base de Données Placable (PDB)</strong> — Base de données portable et isolée au sein d'un conteneur, apparaissant aux utilisateurs et aux applications comme une base de données classique.</li>
+            <li><strong>Dictionnaire Partage</strong> — Ensemble de métadonnées de définition (structures de schémas, objets, privilèges) mutualisées entre toutes les bases placables d'un même conteneur.</li>
+            <li><strong>Cache de Lignes du Dictionnaire</strong> — Structure mémoire logeant dans la mémoire partagée les lignes du dictionnaire, protégée par un verrou d'exclusion mutuelle (latch).</li>
+            <li><strong>Masquage de Données</strong> — Technique d'obfuscation des données sensibles (numéro d'inscription au répertoire, identité des patients) lors du clonage d'une base, conforme au Règlement Général sur la Protection des Données.</li>
           </ul>
         </div>
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--lexique">Memoire Globale (SGA / PGA)</div>
           <ul class="help-modal__list">
-            <li><strong>Memoire Globale de Systeme (SGA)</strong> — Zone memoire partagee par l'ensemble des processus Oracle, abritant le cache de tampons, le reservoir partage, le tampon de journalisation et les structures connexes.</li>
-            <li><strong>Cache de Tampons</strong> — Portion de la memoire globale contenant les blocs de donnees lus depuis les fichiers disques, ordonnancee par l'algorithme du moindre recent usage.</li>
-            <li><strong>Memoire Globale de Programme (PGA)</strong> — Zone memoire privee allouee a chaque session d'utilisation pour les operations de tri, de regroupement et de jointure.</li>
-            <li><strong>Debordement Temporaire</strong> — Basculement des operations memoire vers les espaces temporaires sur disque lorsque la memoire globale de programme est insuffisante, entrainant une degradation sensible des temps d'execution.</li>
-            <li><strong>Compteur d'Acces (Touch Count)</strong> — Indicateur du nombre de consultations d'un bloc dans le cache de tampons, determinant son placement dans la chaine du moindre recent usage.</li>
-            <li><strong>Verrou d'Exclusion Mutuelle (Latch)</strong> — Mecanisme de verrouillage leger protegeant l'acces concurrent aux structures partagees de la memoire globale.</li>
+            <li><strong>Mémoire Globale de Système (SGA)</strong> — Zone mémoire partagée par l'ensemble des processus Oracle, abritant le cache de tampons, le réservoir partagé, le tampon de journalisation et les structures connexes.</li>
+            <li><strong>Cache de Tampons</strong> — Portion de la mémoire globale contenant les blocs de données lus depuis les fichiers disques, ordonnancée par l'algorithme du moindre récent usage.</li>
+            <li><strong>Mémoire Globale de Programme (PGA)</strong> — Zone mémoire privée allouée à chaque session d'utilisation pour les opérations de tri, de regroupement et de jointure.</li>
+            <li><strong>Débordement Temporaire</strong> — Basculement des opérations mémoire vers les espaces temporaires sur disque lorsque la mémoire globale de programme est insuffisante, entraînant une dégradation sensible des temps d'exécution.</li>
+            <li><strong>Compteur d'Accès (Touch Count)</strong> — Indicateur du nombre de consultations d'un bloc dans le cache de tampons, déterminant son placement dans la chaine du moindre récent usage.</li>
+            <li><strong>Verrou d'Exclusion Mutuelle (Latch)</strong> — Mécanisme de verrouillage léger protégeant l'accès concurrent aux structures partagées de la mémoire globale.</li>
           </ul>
         </div>
         <div class="help-modal__section">
-          <div class="help-modal__section-title help-modal__section-title--lexique">Transactions et Coherence</div>
+          <div class="help-modal__section-title help-modal__section-title--lexique">Transactions et Cohérence</div>
           <ul class="help-modal__list">
-            <li><strong>Numero de Changement Systeme (SCN)</strong> — Compteur sequentiel global horodatant chaque transaction et garantissant l'ordre causal des modifications dans l'ensemble de la base.</li>
-            <li><strong>Journal de Retablissement (Redo)</strong> — Enregistrement sequentiel de toutes les modifications appliquees a la base, utilise pour la reprise apres incident par application differee.</li>
-            <li><strong>Segment d'Annulation (Undo)</strong> — Blocs conservant l'image anterieure des donnees modifiees, necessaires a la lecture coherente et au retour en arriere des transactions.</li>
-            <li><strong>Reprise apres Incident (Instance Recovery)</strong> — Processus automatique de retablissement de la base apres un arret brutal, combinant l'application du journal de retablissement (avance rapide) et l'application des segments d'annulation (retour arriere).</li>
-            <li><strong>Coherence de Lecture</strong> — Mecanisme garantissant qu'une requete percoit un instantane coherent des donnees a un instant de reference, en utilisant les blocs d'annulation.</li>
-            <li><strong>Erreur d'Instantané Trop Ancien (ORA-01555)</strong> — Erreur survenant lorsque les blocs d'annulation necessaires a la lecture coherente d'une longue requete ont ete ecrases par des transactions plus recentes avant la fin de la consultation.</li>
+            <li><strong>Numéro de Changement Système (SCN)</strong> — Compteur séquentiel global horodatant chaque transaction et garantissant l'ordre causal des modifications dans l'ensemble de la base.</li>
+            <li><strong>Journal de Rétablissement (Redo)</strong> — Enregistrement séquentiel de toutes les modifications appliquées à la base, utilisé pour la reprise après incident par application différée.</li>
+            <li><strong>Segment d'Annulation (Undo)</strong> — Blocs conservant l'image antérieure des données modifiées, nécessaires à la lecture cohérente et au retour en arrière des transactions.</li>
+            <li><strong>Reprise après Incident (Instance Recovery)</strong> — Processus automatique de rétablissement de la base après un arrêt brutal, combinant l'application du journal de rétablissement (avance rapide) et l'application des segments d'annulation (retour arrière).</li>
+            <li><strong>Cohérence de Lecture</strong> — Mécanisme garantissant qu'une requête perçoit un instantané cohérent des données à un instant de référence, en utilisant les blocs d'annulation.</li>
+            <li><strong>Erreur d'Instantané Trop Ancien (ORA-01555)</strong> — Erreur survenant lorsque les blocs d'annulation nécessaires à la lecture cohérente d'une longue requête ont été écrasés par des transactions plus récentes avant la fin de la consultation.</li>
           </ul>
         </div>
         <div class="help-modal__section">
-          <div class="help-modal__section-title help-modal__section-title--lexique">Optimiseur et Plans d'Execution</div>
+          <div class="help-modal__section-title help-modal__section-title--lexique">Optimiseur et Plans d'Exécution</div>
           <ul class="help-modal__list">
-            <li><strong>Optimiseur Base sur les Couts (CBO)</strong> — Moteur d'optimisation d'Oracle analysant les statistiques des objets et les couts d'acces pour determiner le plan d'execution le plus efficace pour chaque requete.</li>
-            <li><strong>Plan d'Execution</strong> — Arbre d'operations (acces tables, jointures, tris) genere par l'optimiseur pour executer une requete SQL, visible via la commande <code>EXPLAIN PLAN</code>.</li>
-            <li><strong>Parcours Integral de Table (Full Table Scan)</strong> — Methode d'acces lisant l'integralite des blocs d'une table, utilisee en l'absence d'index adapte ou lorsque la table est de petite taille.</li>
-            <li><strong>Parcours Unique par Index (Index Unique Scan)</strong> — Methode d'acces retournant au plus une ligne via un index unique, typique des recherches par cle primaire.</li>
-            <li><strong>Jointure par Hash (HASH JOIN) / Boucles Imbriquees (NESTED LOOPS)</strong> — Algorithmes de jointure : le premier convient aux grands volumes sans index, le second aux petites tables indexees.</li>
+            <li><strong>Optimiseur Basé sur les Coûts (CBO)</strong> — Moteur d'optimisation d'Oracle analysant les statistiques des objets et les coûts d'accès pour déterminer le plan d'exécution le plus efficace pour chaque requête.</li>
+            <li><strong>Plan d'Exécution</strong> — Arbre d'opérations (accès tables, jointures, tris) généré par l'optimiseur pour exécuter une requête SQL, visible via la commande <code>EXPLAIN PLAN</code>.</li>
+            <li><strong>Parcours Intégral de Table (Full Table Scan)</strong> — Méthode d'accès lisant l'intégralité des blocs d'une table, utilisée en l'absence d'index adapté ou lorsque la table est de petite taille.</li>
+            <li><strong>Parcours Unique par Index (Index Unique Scan)</strong> — Méthode d'accès retournant au plus une ligne via un index unique, typique des recherches par clé primaire.</li>
+            <li><strong>Jointure par Hash (HASH JOIN) / Boucles Imbriquées (NESTED LOOPS)</strong> — Algorithmes de jointure : le premier convient aux grands volumes sans index, le second aux petites tables indexées.</li>
           </ul>
         </div>
         <div class="help-modal__section">
-          <div class="help-modal__section-title help-modal__section-title--lexique">PL/SQL et Procedural</div>
+          <div class="help-modal__section-title help-modal__section-title--lexique">PL/SQL et Procédural</div>
           <ul class="help-modal__list">
-            <li><strong>Chargement Massif en Collection (BULK COLLECT)</strong> — Directive PL/SQL chargeant un ensemble de lignes en une seule operation dans une collection memoire (PGA), reduisant les allees-retours entre les moteurs SQL et PL/SQL.</li>
-            <li><strong>Mise a Jour Massive (FORALL)</strong> — Instruction PL/SQL executant une operation DML sur toutes les lignes d'une collection sans commutation de contexte individuelle, accelerant les traitements par lots.</li>
-            <li><strong>Commutation de Contexte (Context Switch)</strong> — Basculement entre le moteur SQL et le moteur PL/SQL, dont le cout cumule peut etre significatif dans les boucles iteratives.</li>
-            <li><strong>Declencheur (Trigger)</strong> — Bloc PL/SQL stocke s'executant automatiquement sur un evenement de modification (INSERT, UPDATE, DELETE) d'une table, utilise pour les regles metier et les contraintes complexes.</li>
-            <li><strong>Collection PL/SQL</strong> — Structure de donnees programmee (table imbriquee, VARRAY, table associative) permettant de manipuler des ensembles de lignes en memoire.</li>
-            <li><strong>Curseur</strong> — Zone memoire privee allouee dans la memoire globale de programme contenant le resultat d'une requete SQL, parcourue ligne par ligne par les instructions de chargement (<code>FETCH</code>), d'ouverture (<code>OPEN</code>) et de fermeture (<code>CLOSE</code>).</li>
-            <li><strong>Gestion d'Exceptions</strong> — Mecanisme PL/SQL permettant de traiter les erreurs d'execution par des blocs de capture (<code>WHEN</code>) et de propagation (<code>RAISE</code>), separant le chemin nominal du chemin d'erreur.</li>
-            <li><strong>RAISE / RAISE_APPLICATION_ERROR</strong> — Instructions de declenchement explicite d'une exception : <code>RAISE</code> propage une exception definie ou systeme ; <code>RAISE_APPLICATION_ERROR</code> emet une exception personnalisee avec un code compris entre -20000 et -20999 et un message libre.</li>
-            <li><strong>Bloc Anonyme</strong> — Unite d'execution PL/SQL non stockee en base, structuree en trois parties : section declarative (<code>DECLARE</code>), section executable (<code>BEGIN</code>), section de gestion d'erreurs (<code>EXCEPTION</code>).</li>
-            <li><strong>:NEW (pseudo-enregistrement)</strong> — Reference au nouvel etat d'une ligne dans un declencheur, donnant acces aux valeurs modifiees avant ecriture effective dans la table, notee <code>:NEW.colonne</code>.</li>
-            <li><strong>Enregistrement PL/SQL (Record)</strong> — Structure de donnees composite definie par le programmeur, pouvant contenir plusieurs champs de types differents, utilisee pour representer une ligne de table ou un sous-ensemble de colonnes.</li>
+            <li><strong>Chargement Massif en Collection (BULK COLLECT)</strong> — Directive PL/SQL chargeant un ensemble de lignes en une seule opération dans une collection mémoire (PGA), réduisant les allers-retours entre les moteurs SQL et PL/SQL.</li>
+            <li><strong>Mise à Jour Massive (FORALL)</strong> — Instruction PL/SQL exécutant une opération DML sur toutes les lignes d'une collection sans commutation de contexte individuelle, accélérant les traitements par lots.</li>
+            <li><strong>Commutation de Contexte (Context Switch)</strong> — Basculement entre le moteur SQL et le moteur PL/SQL, dont le coût cumulé peut être significatif dans les boucles itératives.</li>
+            <li><strong>Déclencheur (Trigger)</strong> — Bloc PL/SQL stocké s'exécutant automatiquement sur un événement de modification (INSERT, UPDATE, DELETE) d'une table, utilisé pour les règles métier et les contraintes complexes.</li>
+            <li><strong>Collection PL/SQL</strong> — Structure de données programmée (table imbriquée, VARRAY, table associative) permettant de manipuler des ensembles de lignes en mémoire.</li>
+            <li><strong>Curseur</strong> — Zone mémoire privée allouée dans la mémoire globale de programme contenant le résultat d'une requête SQL, parcourue ligne par ligne par les instructions de chargement (<code>FETCH</code>), d'ouverture (<code>OPEN</code>) et de fermeture (<code>CLOSE</code>).</li>
+            <li><strong>Gestion d'Exceptions</strong> — Mécanisme PL/SQL permettant de traiter les erreurs d'exécution par des blocs de capture (<code>WHEN</code>) et de propagation (<code>RAISE</code>), séparant le chemin nominal du chemin d'erreur.</li>
+            <li><strong>RAISE / RAISE_APPLICATION_ERROR</strong> — Instructions de déclenchement explicite d'une exception : <code>RAISE</code> propage une exception définie ou système ; <code>RAISE_APPLICATION_ERROR</code> émet une exception personnalisée avec un code compris entre -20000 et -20999 et un message libre.</li>
+            <li><strong>Bloc Anonyme</strong> — Unité d'exécution PL/SQL non stockée en base, structurée en trois parties : section déclarative (<code>DECLARE</code>), section exécutable (<code>BEGIN</code>), section de gestion d'erreurs (<code>EXCEPTION</code>).</li>
+            <li><strong>:NEW (pseudo-enregistrement)</strong> — Référence au nouvel état d'une ligne dans un déclencheur, donnant accès aux valeurs modifiées avant écriture effective dans la table, notée <code>:NEW.colonne</code>.</li>
+            <li><strong>Enregistrement PL/SQL (Record)</strong> — Structure de données composite définie par le programmeur, pouvant contenir plusieurs champs de types différents, utilisée pour représenter une ligne de table ou un sous-ensemble de colonnes.</li>
           </ul>
         </div>
         <div class="help-modal__section">
-          <div class="help-modal__section-title help-modal__section-title--lexique">Securite et Gouvernance HDS</div>
+          <div class="help-modal__section-title help-modal__section-title--lexique">Sécurité et Gouvernance HDS</div>
           <ul class="help-modal__list">
-            <li><strong>Chiffrement Transparent (TDE)</strong> — Mecanisme de chiffrement des donnees au repos au sein des fichiers et des espaces de tables, sans aucune modification des applications clientes, utilisant l'algorithme AES a clef de 256 bits.</li>
-            <li><strong>Moindre Privilege (Least Privilege)</strong> — Principe de securite selon lequel un utilisateur ne dispose que des droits strictement necessaires a ses fonctions, reduisant la surface d'attaque et les risques d'erreur.</li>
-            <li><strong>Masquage Dynamique (DBMS_REDACT)</strong> — Paquetage Oracle permettant le masquage a la volee des donnees sensibles dans les resultats de requetes, sans alterer les donnees stockees.</li>
-            <li><strong>Journal d'Activite (Audit HDS)</strong> — Enregistrement chiffre et horodate de l'ensemble des actions effectuees sur le systeme, garantissant la tracabilite requise par la certification Hebergement de Donnees de Sante.</li>
-            <li><strong>Controle d'Acces RBAC</strong> — Modele de securite fonde sur les roles plutot que sur les utilisateurs individuels, facilitant l'administration des privileges par l'attribution de roles predefinis (Role-Based Access Control).</li>
-            <li><strong>Role Oracle</strong> — Conteneur de privileges nomme, attribuable aux utilisateurs ou a d'autres roles, permettant de gerer collectivement les droits d'acces aux objets et aux operations du systeme.</li>
-            <li><strong>Validation / Annulation (COMMIT / ROLLBACK)</strong> — Instructions de terminaison de transaction : <code>COMMIT</code> rend les modifications definitives et visibles par les autres sessions ; <code>ROLLBACK</code> annule toutes les modifications de la transaction courante en restaurant les segments d'annulation.</li>
+            <li><strong>Chiffrement Transparent (TDE)</strong> — Mécanisme de chiffrement des données au repos au sein des fichiers et des espaces de tables, sans aucune modification des applications clientes, utilisant l'algorithme AES à clé de 256 bits.</li>
+            <li><strong>Moindre Privilège (Least Privilege)</strong> — Principe de sécurité selon lequel un utilisateur ne dispose que des droits strictement nécessaires à ses fonctions, réduisant la surface d'attaque et les risques d'erreur.</li>
+            <li><strong>Masquage Dynamique (DBMS_REDACT)</strong> — Paquetage Oracle permettant le masquage à la volée des données sensibles dans les résultats de requêtes, sans altérer les données stockées.</li>
+            <li><strong>Journal d'Activité (Audit HDS)</strong> — Enregistrement chiffré et horodaté de l'ensemble des actions effectuées sur le système, garantissant la traçabilité requise par la certification Hébergement de Données de Santé.</li>
+            <li><strong>Contrôle d'Accès RBAC</strong> — Modèle de sécurité fondé sur les rôles plutôt que sur les utilisateurs individuels, facilitant l'administration des privilèges par l'attribution de rôles prédéfinis (Role-Based Access Control).</li>
+            <li><strong>Rôle Oracle</strong> — Conteneur de privilèges nommé, attribuable aux utilisateurs ou à d'autres rôles, permettant de gérer collectivement les droits d'accès aux objets et aux opérations du système.</li>
+            <li><strong>Validation / Annulation (COMMIT / ROLLBACK)</strong> — Instructions de terminaison de transaction : <code>COMMIT</code> rend les modifications définitives et visibles par les autres sessions ; <code>ROLLBACK</code> annule toutes les modifications de la transaction courante en restaurant les segments d'annulation.</li>
           </ul>
         </div>
 
@@ -759,19 +759,19 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--lexique">Stockage et Espace Disque</div>
           <ul class="help-modal__list">
-            <li><strong>Espace de Tables (Tablespace)</strong> — Conteneur logique de stockage regroupant un ou plusieurs fichiers disques, dans lequel sont organises les segments (tables, index, segments d'annulation, tables temporaires).</li>
-            <li><strong>Lecture Logique</strong> — Consultation d'un bloc de donnees depuis le cache de tampons sans acces au disque, comptabilisee comme <em>consistent get</em> ou <em>db block get</em> dans les statistiques d'execution.</li>
-            <li><strong>Ecriture Physique</strong> — Transfert effectif d'un bloc de donnees depuis le cache de tampons vers le fichier disque, declenche par le processus d'ecriture differee (<em>DBWR</em>) ou par un vidage explicite.</li>
+            <li><strong>Espace de Tables (Tablespace)</strong> — Conteneur logique de stockage regroupant un ou plusieurs fichiers disques, dans lequel sont organisés les segments (tables, index, segments d'annulation, tables temporaires).</li>
+            <li><strong>Lecture Logique</strong> — Consultation d'un bloc de données depuis le cache de tampons sans accès au disque, comptabilisée comme <em>consistent get</em> ou <em>db block get</em> dans les statistiques d'exécution.</li>
+            <li><strong>Écriture Physique</strong> — Transfert effectif d'un bloc de données depuis le cache de tampons vers le fichier disque, déclenché par le processus d'écriture différée (<em>DBWR</em>) ou par un vidage explicite.</li>
           </ul>
         </div>
 
         <!-- Metriques de Performance -->
         <div class="help-modal__section">
-          <div class="help-modal__section-title help-modal__section-title--lexique">Metriques de Performance</div>
+<div class="help-modal__section-title help-modal__section-title--lexique">Métriques de Performance</div>
           <ul class="help-modal__list">
-            <li><strong>Declencheur AVANT / APRES (BEFORE / AFTER)</strong> — Moment d'execution d'un declencheur par rapport a l'evenement declencheur : <code>BEFORE</code> s'execute avant la modification de la ligne, permettant la validation prealable ; <code>AFTER</code> s'execute apres la modification, utilise pour les actions post-validation.</li>
-            <li><strong>POUR CHAQUE LIGNE (FOR EACH ROW)</strong> — Directive specifiant qu'un declencheur s'execute une fois par ligne modifiee, donnant acces aux pseudo-enregistrements <code>:NEW</code> et <code>:OLD</code>.</li>
-            <li><strong>Taux de Succes du Cache de Tampons (Buffer Cache Hit Ratio)</strong> — Indicateur de performance mesurant la proportion de demandes de blocs satisfaites par le cache de tampons sans recours a une lecture physique, essentiel au dimensionnement de la memoire globale.</li>
+            <li><strong>Déclencheur AVANT / APRÈS (BEFORE / AFTER)</strong></li>
+            <li><strong>POUR CHAQUE LIGNE (FOR EACH ROW)</strong> — Directive spécifiant qu'un déclencheur s'exécute une fois par ligne modifiée, donnant accès aux pseudo-enregistrements <code>:NEW</code> et <code>:OLD</code>.</li>
+            <li><strong>Taux de Succès du Cache de Tampons (Buffer Cache Hit Ratio)</strong> — Indicateur de performance mesurant la proportion de demandes de blocs satisfaites par le cache de tampons sans recours à une lecture physique, essentiel au dimensionnement de la mémoire globale.</li>
           </ul>
         </div>
       </div>
@@ -787,8 +787,8 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       <div class="help-modal__body">
         <div class="help-modal__section">
           <p class="help-modal__text">
-            <center>Conception fonctionnelle, scenarios, developpement et relecture : Stephane Bertin<br>
-            Assiste par OpenCode, agent Big Pickle<br>
+            <center>Conception fonctionnelle, scénarios, développement et relecture : Stéphane Bertin<br>
+            Assisté par OpenCode, agent Big Pickle<br>
             2025.</center>
           </p>
         </div>
@@ -798,9 +798,9 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       </div>
     </div>
     <footer class="app-footer">
-      ORACLE_WORKBENCH::SIH - Application de demonstration technique<br>
-      DONNEES: 100% FICTIVES - Conforme RGPD Art. 25 (Privacy by Design) - Aucune donnee de sante reelle<br>
-      Architecture: ES6 Classes - Vanilla JS - Zero Dependency - Offline - Coloration syntaxique basique<br>
+      ORACLE_WORKBENCH::SIH - Application de démonstration technique<br>
+      DONNEES: 100% FICTIVES - Conforme RGPD Art. 25 (Privacy by Design) - Aucune donnée de santé réelle<br>
+      Architecture: ES6 Classes - Vanilla JS - Zero Dependency - Offline - Coloration syntaxique simple<br>
       Contexte PUI
     </footer>
   </main>
@@ -971,7 +971,7 @@ class SQLExecutor {
 
     this._log.log('INFO', `[PARSE] OK — ${snippetType.toUpperCase()} reconnu`);
     this._ev.emit('log', { level: 'info', msg: `[PARSE] OK — ${snippetType.toUpperCase()} reconnu` });
-    this._setState('EXECUTING', 'Execution du plan sur le moteur CBO simule...');
+    this._setState('EXECUTING', 'Exécution du plan sur le moteur CBO simulé...');
     this._log.log('INFO', '[EXEC] Lancement execution pipeline...');
     this._ev.emit('log', { level: 'info', msg: '[EXEC] Lancement execution pipeline...' });
     await this._delay(1500);
@@ -1444,7 +1444,7 @@ END trg_check_peremption;
     const c = document.getElementById('audit-console');
     const logs = this._sm.auditLog;
     if (!logs.length) {
-      c.innerHTML = '<div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>[AUDIT] Workbench initialise. Logs chiffres AES-256 au repos.</div>';
+      c.innerHTML = '<div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>[AUDIT] Workbench initialisé. Logs chiffrés AES-256 au repos.</div>';
       return;
     }
     c.innerHTML = logs.map(l => {
@@ -1484,7 +1484,7 @@ END trg_check_peremption;
       const days = parseInt(document.getElementById('purge-days-slider').value);
       const masked = Math.floor(Math.random() * 500 + 200);
       const res = document.getElementById('purge-result');
-      res.innerHTML = `<div class="alert alert--success">Purge terminee: ${masked} enregistrements anonymises via DBMS_REDACT (seuil: ${days} jours). Chiffrement AES-256 applique aux archives.</div>`;
+      res.innerHTML = `<div class="alert alert--success">Purge terminée: ${masked} enregistrements anonymisés via DBMS_REDACT (seuil: ${days} jours). Chiffrement AES-256 appliqué aux archives.</div>`;
       this._sm.addAudit('RGPD_PURGE', 'DBA_PUI_SIMU', `Purge ${days}j: ${masked} rows masked, DBMS_REDACT`);
       this._renderAudit();
       this._logToConsole('success', `RGPD Purge: ${masked} rows anonymisees (seuil=${days}j).`);
@@ -1501,7 +1501,7 @@ END trg_check_peremption;
 
       const res = document.getElementById('user-result');
       if (isDba) {
-        res.innerHTML = `<div class="alert alert--warning">&#9888; ALERTE SECURITE: Attribution du role DBA_PUI — Violation du principe de Least Privilege. Cette action est loguee dans l audit HDS.</div>`;
+        res.innerHTML = `<div class="alert alert--warning">&#9888; ALERTE SECURITE: Attribution du role DBA_PUI — Violation du principe de Least Privilege. Cette action est loguée dans l'audit HDS.</div>`;
       } else if (!roles.length) {
         res.innerHTML = `<div class="alert alert--error">Aucun role selectionne. L utilisateur doit avoir au moins un role.</div>`;
         return;
@@ -1531,7 +1531,7 @@ END trg_check_peremption;
     document.getElementById('btn-clear-audit').addEventListener('click', () => {
       this._sm.auditLog = [];
       this._renderAudit();
-      this._logToConsole('info', 'Journal d audit purge.');
+      this._logToConsole('info', 'Journal d\'audit purgé.');
     });
   }
 
