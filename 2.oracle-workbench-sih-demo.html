@@ -489,7 +489,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         <!-- User Management -->
         <div class="card fade-in">
           <div class="card__title" data-help="lexicon"><span class="card__title-icon">&#128100;</span> Gestion Utilisateurs — RBAC</div>
-          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Création d'utilisateur avec attribution de rôles. Principe de Least Privilege appliqué.</p>
+          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Création d'utilisateur avec attribution de rôles. Principe de moindre privilèges appliqué.</p>
           <div class="user-form">
             <div class="user-form__field">
               <label for="user-username">Username</label>
@@ -645,7 +645,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
           <p class="help-modal__text">Cet onglet simule les opérations DBA et de gouvernance des données dans un contexte HDS :</p>
           <ul class="help-modal__list">
             <li><strong>Tablespaces</strong> : Visualisation de l'utilisation de l'espace disque pour chaque tablespace. Alertes automatiques à 80% (warning) et 90% (critique).</li>
-            <li><strong>Gestion RBAC</strong> : Création d'utilisateurs avec attribution sélective de rôles. Le principe de <em>Least Privilege</em> est appliqué : le rôle <code>DBA_PUI</code> déclenche une alerte de sécurité.</li>
+            <li><strong>Gestion RBAC</strong> : Création d'utilisateurs avec attribution sélective de rôles. Le principe de <em>moindre privilèges</em> est appliqué : le rôle <code>DBA_PUI</code> déclenche une alerte de sécurité.</li>
             <li><strong>Audit HDS</strong> : Journal chiffré de toutes les actions réalisées dans le Workbench. Chaque entrée inclut timestamp, utilisateur, action, requête, statut. Conforme aux exigences HDS et ISO 27001.</li>
             <li><strong>Purge Anonymisée</strong> : Simulation de <code>DBMS_REDACT</code> sur les données anciennes (&gt; seuil configurable). Conforme au RGPD Art. 17 (droit à l'effacement) et Art. 25 (privacy by design).</li>
           </ul>
@@ -1072,7 +1072,7 @@ class QueryPlanner {
     const alerts = [];
     plan.forEach(n => {
       if (n.op === 'TABLE ACCESS FULL' && n.card > 1000) {
-        alerts.push({ level: 'warning', table: n.obj, msg: `Full Table Scan sur ${n.obj} (${n.card} rows). Recommandation: analyser les predicates WHERE et créer un index sélectif adapté (ex: lot_simu(date_peremption, qty_stock)).` });
+        alerts.push({ level: 'warning', table: n.obj, msg: `Full Table Scan sur ${n.obj} (${n.card} rows). Recommandation: analyser les prédicats WHERE et créer un index sélectif adapté (ex: lot_simu(date_peremption, qty_stock)).` });
       }
     });
     if (alerts.length === 0) alerts.push({ level: 'success', table: '', msg: 'Aucun Full Table Scan sur grande table détecté. Plan optimal.' });
@@ -1501,12 +1501,12 @@ END trg_check_peremption;
 
       const res = document.getElementById('user-result');
       if (isDba) {
-        res.innerHTML = `<div class="alert alert--warning">&#9888; ALERTE SECURITE: Attribution du role DBA_PUI — Violation du principe de Least Privilege. Cette action est loguée dans l'audit HDS.</div>`;
+        res.innerHTML = `<div class="alert alert--warning">&#9888; ALERTE SECURITE: Attribution du role DBA_PUI — Violation du principe de moindre privilèges. Cette action est loguée dans l'audit HDS.</div>`;
       } else if (!roles.length) {
         res.innerHTML = `<div class="alert alert--error">Aucun rôle sélectionné. L'utilisateur doit avoir au moins un rôle.</div>`;
         return;
       } else {
-        res.innerHTML = `<div class="alert alert--success">Utilisateur <code>${username}</code> créé avec les rôles: ${roles.join(', ')}. Conformité Least Privilege: OK.</div>`;
+        res.innerHTML = `<div class="alert alert--success">Utilisateur <code>${username}</code> créé avec les rôles: ${roles.join(', ')}. Conformité moindre privilèges: OK.</div>`;
       }
 
       this._sm.users.push({ username, roles, created: new Date().toISOString() });
