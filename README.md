@@ -10,12 +10,12 @@
 2. [Méthodologie et limites](#méthodologie-et-limites)
 3. [Fichier 1 : Architecture Infrastructure](#fichier-1--architecture-infrastructure)
 4. [Fichier 2 : Atelier SQL PUI](#fichier-2--atelier-sql-pui)
-5. [Fichier 3 : Lexique et Quiz Oracle](#fichier-3--lexique-et-quiz-oracle)
+5. [Fichier 3 : Dictionnaire et Quiz Oracle](#fichier-3--lexique-et-quiz-oracle)
 6. [Fichier 4 : Flux de Décision](#fichier-4--flux-de-décision)
 7. [Fichier 5 : Suite Performance Avancée](#fichier-5--suite-performance-avancee)
 8. [Thèmes transversaux](#thèmes-transversaux)
 9. [Conformité et sécurité](#conformité-et-sécurité)
-10. [Aide intégrée et Lexiques contextuels](#aide-intégrée-et-lexiques-contextuels)
+10. [Aide intégrée et lexiques contextuels](#aide-intégrée-et-lexiques-contextuels)
 11. [Prérequis](#prérequis)
 12. [Licence](#licence)
 
@@ -130,7 +130,7 @@ Les plans d’exécution affichés sont illustratifs et ne reflètent pas un CBO
 
 ---
 
-# Fichier 3 : Lexique et Quiz Oracle
+# Fichier 3 : Dictionnaire et Quiz Oracle
 
 **Fichier :** `3.oracle-lexical-sih-demo.html`
 
@@ -147,7 +147,6 @@ Base de connaissances interactive couvrant des notions Oracle courantes :
 
 Le module comprend :
 
-* un lexique technique ;
 * des exemples SQL/PLSQL ;
 * des QCM interactifs ;
 * un mode de révision progressive.
@@ -233,7 +232,7 @@ Le projet ne constitue toutefois ni :
 
 ---
 
-# Aide intégrée et Lexiques contextuels
+# Aide intégrée et lexiques contextuels
 
 Chaque application HTML incluse dans ce projet dispose de sa propre documentation interne, accessible directement depuis l'interface utilisateur via deux boutons dédiés situés dans l'en-tête de page. Aucune documentation externe n'est nécessaire pour exploiter les démonstrateurs.
 
