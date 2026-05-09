@@ -342,7 +342,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       <div class="page-header">
         <h1 class="page-header__title">Requêtes &amp; Logique Métier</h1>
         <div class="page-header__subtitle-row">
-          <p class="page-header__subtitle">Éditeur PL/SQL, snippets prédéfinis, exécution simulée avec machine d'états</p>
+          <p class="page-header__subtitle">Éditeur PL/SQL, snippets prédéfinis, exécution simulée avec machine à états</p>
           <button class="page-header__help-btn" data-help="queries" aria-label="Aide Requêtes" title="Rubrique d'aide">?</button>
         </div>
       </div>
@@ -375,7 +375,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
 
       <!-- State Machine -->
       <div class="card fade-in">
-        <div class="card__title"><span class="card__title-icon">&#9202;</span> Machine d'Etats — Exécution Pipeline</div>
+        <div class="card__title"><span class="card__title-icon">&#9202;</span> Machine d'états — Exécution Pipeline</div>
         <div class="state-machine" id="state-machine">
           <div class="state-step state-step--active" id="state-idle"><span class="state-step__dot"></span>IDLE</div>
           <span class="state-arrow">&rarr;</span>
@@ -423,7 +423,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         </div>
         <div class="stat-block stat-block--amber" data-help="lexicon">
           <div class="stat-block__value" id="metric-pw">---</div>
-          <div class="stat-block__label">Physical Reads</div>
+          <div class="stat-block__label">Physical Writes</div>
         </div>
         <div class="stat-block stat-block--purple" data-help="lexicon">
           <div class="stat-block__value" id="metric-cost">---</div>
@@ -559,23 +559,23 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
           <p class="help-modal__text">Cet onglet simule un environnement de développement Oracle pour la gestion des stocks PUI. Il démontre trois aspects du langage Oracle :</p>
           <ul class="help-modal__list">
             <li><strong>Requête SQL complexe</strong> : Jointures multiples entre <code>STOCK_MED</code>, <code>LOT_SIMU</code>, <code>SERVICE_SIMU</code> avec filtres sur les dates de péremption. Simule l'extraction des stocks critiques nécessitant un réapprovisionnement urgent.</li>
-            <li><strong>PL/SQL BULK COLLECT + FORALL</strong> : Bloc procedural utilisant les collections Oracle pour mettre à jour en masse les niveaux de stock. Le <code>BULK COLLECT INTO</code> charge les résultats en mémoire (PGA), puis le <code>FORALL</code> exécute les updates en batch, réduisant les <em>context switches</em> entre le moteur SQL et PL/SQL.</li>
+            <li><strong>PL/SQL BULK COLLECT + FORALL</strong> : Bloc procedural utilisant les collections Oracle pour mettre à jour en masse les niveaux de stock. Le <code>BULK COLLECT INTO</code> charge les résultats en mémoire (PGA), puis le <code>FORALL</code> exécute les updates en batch, réduisant les <em>changements de contexte</em> entre le moteur SQL et PL/SQL.</li>
             <li><strong>TRIGGER trg_check_peremption</strong> : Trigger <code>BEFORE INSERT OR UPDATE</code> sur <code>SORTIE_STOCK</code> qui vérifie que la date de péremption du lot n'est pas dépassée. Règle métier critique : empêche la dispensation de médicaments expirés aux services cliniques.</li>
           </ul>
         </div>
         <div class="help-modal__section">
-          <div class="help-modal__section-title help-modal__section-title--controls">Controles</div>
+          <div class="help-modal__section-title help-modal__section-title--controls">Contrôles</div>
           <ul class="help-modal__list">
             <li><strong>Snippet Selector</strong> : Choisit le type de requête à charger dans l'éditeur. Chaque snippet est pré-écrit avec une syntaxe Oracle valide.</li>
             <li><strong>Editeur</strong> : Zone de saisie avec coloration syntaxique simple (keywords, strings, comments). Le texte est modifiable avant exécution.</li>
-<li><strong>Exécuter</strong> : Lance la machine d'états (PARSING -> EXECUTING -> FETCHING -> COMPLETED) avec délais artificiels simulant la latence disque/réseau.</li>
+<li><strong>Exécuter</strong> : Lance la machine à états (PARSING -> EXECUTING -> FETCHING -> COMPLETED) avec délais artificiels simulant la latence disque/réseau.</li>
 <li><strong>Réinitialiser</strong> : Recharge le snippet d'origine dans l'éditeur.</li>
           </ul>
         </div>
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--indicators">Indicateurs</div>
           <ul class="help-modal__list">
-            <li><strong>Machine d'états</strong> : 5 étapes colorées (gris=inactif, bleu=en cours, vert=terminé, rouge=erreur). Chaque étape a un délai simulé : PARSING=800ms, EXECUTING=1500ms, FETCHING=600ms.</li>
+            <li><strong>Machine à états</strong> : 5 étapes colorées (gris=inactif, bleu=en cours, vert=terminé, rouge=erreur). Chaque étape a un délai simulé : PARSING=800ms, EXECUTING=1500ms, FETCHING=600ms.</li>
             <li><strong>Console de sortie</strong> : Logs structurés avec timestamps et niveaux. Affiche les résultats du parsing, les erreurs ORA-xxxxx simulées, et les statistiques d'exécution.</li>
           </ul>
         </div>
@@ -606,7 +606,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
           </ul>
         </div>
         <div class="help-modal__section">
-          <div class="help-modal__section-title help-modal__section-title--controls">Controles</div>
+          <div class="help-modal__section-title help-modal__section-title--controls">Contrôles</div>
           <ul class="help-modal__list">
             <li><strong>Métriques</strong> : 4 cartes KPI mises à jour automatiquement après chaque exécution (Temps ms, Logical Reads, Physical Writes, Coût CBO).</li>
             <li><strong>Data Grid</strong> : Tableau de résultats peuplé dynamiquement avec les données fictives retournées par le simulateur. Les colonnes dépendent de la requête exécutée.</li>
@@ -617,10 +617,10 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--indicators">Indicateurs Clés</div>
           <ul class="help-modal__list">
-            <li><strong>Coût CBO</strong> : Unité arbitraire du coût d'exécution. Un coût &gt; 500 indique une requête potentiellement sous-optimale.</li>
+            <li><strong>Coût CBO</strong> : Unité relative du coût d'exécution estimé par l'optimiseur. Un coût élevé par rapport au nombre de lignes retournées peut indiquer une opportunité d'optimisation.</li>
             <li><strong>Logical Reads</strong> : Nombre de lectures logiques Oracle (consistent gets + db block gets) réalisées via le Buffer Cache. Valeur élevée = nombreuses lectures mémoire.</li>
-            <li><strong>Physical Writes</strong> : Nombre de blocs écrits sur disque. Non-zero pour les opérations DML (UPDATE/INSERT).</li>
-            <li><strong>Ratio LR/PW</strong> : Si Physical Writes &gt; 10% de Logical Reads, vérifier la taille du Buffer Cache.</li>
+            <li><strong>Physical Writes</strong> : Nombre de blocs écrits sur disque. Non nul pour les opérations DML (UPDATE/INSERT) — normal et attendu.</li>
+            <li><strong>Ratio LR/PW</strong> : Ratio Lectures Logiques / Écritures Physiques. Un nombre élevé de Physical Writes est normal pour les opérations DML. Pour le cache, surveiller plutôt le Buffer Cache Hit Ratio : 1 − (physical reads / logical reads).</li>
           </ul>
         </div>
         <div class="help-modal__section">
@@ -651,7 +651,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
           </ul>
         </div>
         <div class="help-modal__section">
-          <div class="help-modal__section-title help-modal__section-title--controls">Controles</div>
+          <div class="help-modal__section-title help-modal__section-title--controls">Contrôles</div>
           <ul class="help-modal__list">
             <li><strong>Simuler Charge TS</strong> : Augmente l'utilisation des tablespaces pour démontrer les seuils d'alerte.</li>
             <li><strong>Créer Utilisateur</strong> : Formulaire avec username et sélection de rôles. Validation des règles de sécurité.</li>
@@ -689,7 +689,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
           <ul class="help-modal__list">
             <li><strong>Conteneur de Base de Données (CDB)</strong> — Base de données racine chapeautant l'ensemble des bases de données enfichables dans l'architecture multitenant Oracle 12c et suivantes.</li>
             <li><strong>Base de Données Enfichable (PDB)</strong> — Base de données portable et isolée au sein d'un conteneur, apparaissant aux utilisateurs et aux applications comme une base de données classique.</li>
-            <li><strong>Dictionnaire Partage</strong> — Ensemble de métadonnées de définition (structures de schémas, objets, privilèges) mutualisées entre toutes les bases enfichables d'un même conteneur.</li>
+            <li><strong>Dictionnaire Partagé</strong> — Ensemble de métadonnées de définition (structures de schémas, objets, privilèges) mutualisées entre toutes les bases enfichables d'un même conteneur.</li>
             <li><strong>Cache de Lignes du Dictionnaire</strong> — Structure mémoire logeant dans la mémoire partagée les lignes du dictionnaire, protégée par un verrou d'exclusion mutuelle (latch).</li>
             <li><strong>Masquage de Données</strong> — Technique d'obfuscation des données sensibles (numéro d'inscription au répertoire, identité des patients) lors du clonage d'une base, conforme au Règlement Général sur la Protection des Données.</li>
           </ul>
@@ -711,7 +711,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
             <li><strong>Numéro de Changement Système (SCN)</strong> — Compteur séquentiel global horodatant chaque transaction et garantissant l'ordre causal des modifications dans l'ensemble de la base.</li>
             <li><strong>Journal de Rétablissement (Redo)</strong> — Enregistrement séquentiel de toutes les modifications appliquées à la base, utilisé pour la reprise après incident par application différée.</li>
             <li><strong>Segment d'Annulation (Undo)</strong> — Blocs conservant l'image antérieure des données modifiées, nécessaires à la lecture cohérente et au retour en arrière des transactions.</li>
-            <li><strong>Reprise après Incident (Instance Recovery)</strong> — Processus automatique de rétablissement de la base après un arrêt brutal, combinant l'application du journal de rétablissement (avance rapide) et l'application des segments d'annulation (retour arrière).</li>
+            <li><strong>Reprise après Incident (Instance Recovery)</strong> — Processus automatique de rétablissement de la base après un arrêt brutal, combinant l'application du journal de rétablissement (Roll Forward) et l'application des segments d'annulation (Roll Back).</li>
             <li><strong>Cohérence de Lecture</strong> — Mécanisme garantissant qu'une requête perçoit un instantané cohérent des données à un instant de référence, en utilisant les blocs d'annulation.</li>
             <li><strong>Erreur d'Instantané Trop Ancien (ORA-01555)</strong> — Erreur survenant lorsque les blocs d'annulation nécessaires à la lecture cohérente d'une longue requête ont été écrasés par des transactions plus récentes avant la fin de la consultation.</li>
           </ul>
@@ -781,7 +781,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
     </div>
     <div class="help-modal" id="help-credit" role="dialog" aria-modal="true" aria-labelledby="help-credit-title" aria-hidden="true">
       <div class="help-modal__header">
-        <div class="help-modal__title" id="help-credit-title">Credit</div>
+        <div class="help-modal__title" id="help-credit-title">Crédit</div>
         <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
       </div>
       <div class="help-modal__body">
@@ -789,7 +789,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
           <p class="help-modal__text">
             <center>Conception fonctionnelle, scénarios, développement et relecture : Stéphane Bertin<br>
             Assisté par OpenCode, agent Big Pickle<br>
-            2025.</center>
+            2026.</center>
           </p>
         </div>
       </div>
@@ -799,7 +799,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
     </div>
     <footer class="app-footer">
       ORACLE_WORKBENCH::SIH - Application de démonstration technique<br>
-      DONNEES: 100% FICTIVES - Conforme RGPD Art. 25 (Privacy by Design) - Aucune donnée de santé réelle<br>
+      DONNÉES: 100% FICTIVES - Conforme RGPD Art. 25 (Privacy by Design) - Aucune donnée de santé réelle<br>
       Architecture: ES6 Classes - Vanilla JS - Zero Dependency - Offline - Coloration syntaxique simple<br>
       Contexte PUI
     </footer>
@@ -1011,7 +1011,7 @@ class SQLExecutor {
     const metrics = this._genMetrics(snippetType);
     const plan = QueryPlanner.generate(snippetType);
     const results = this._genResults(snippetType);
-    this._setState('COMPLETED', `Termine — ${metrics.rows} lignes, ${metrics.timeMs}ms`);
+    this._setState('COMPLETED', `Terminé — ${metrics.rows} lignes, ${metrics.timeMs}ms`);
     this._log.log('SUCCESS', `[DONE] ${metrics.rows} rows in ${metrics.timeMs}ms | Cost=${metrics.cost} | LR=${metrics.logicalReads}`);
     this._ev.emit('log', { level: 'success', msg: `[DONE] ${metrics.rows} rows in ${metrics.timeMs}ms | Cost=${metrics.cost} | LR=${metrics.logicalReads}` });
 
@@ -1075,7 +1075,7 @@ class QueryPlanner {
         alerts.push({ level: 'warning', table: n.obj, msg: `Full Table Scan sur ${n.obj} (${n.card} rows). Recommandation: analyser les predicates WHERE et créer un index sélectif adapté (ex: lot_simu(date_peremption, qty_stock)).` });
       }
     });
-    if (alerts.length === 0) alerts.push({ level: 'success', table: '', msg: 'Aucun Full Table Scan sur grande table detecte. Plan optimal.' });
+    if (alerts.length === 0) alerts.push({ level: 'success', table: '', msg: 'Aucun Full Table Scan sur grande table détecté. Plan optimal.' });
     return alerts;
   }
 }
@@ -1158,7 +1158,7 @@ WHERE l.qty_stock < (
 )
 AND l.date_peremption > SYSDATE
 ORDER BY l.qty_stock ASC, l.date_peremption ASC;`,
-      bulk: `-- Batch nocturne de reapprovisionnement PUI
+      bulk: `-- Batch nocturne de réapprovisionnement PUI
 -- BULK COLLECT + FORALL: minimise les context switches
 DECLARE
   TYPE t_reappro_rec IS RECORD (
@@ -1178,7 +1178,7 @@ BEGIN
       AND date_peremption > SYSDATE + 30;
 
   v_count := v_reappro.COUNT;
-  DBMS_OUTPUT.PUT_LINE('Lots a reapprovisionner: ' || v_count);
+  DBMS_OUTPUT.PUT_LINE('Lots à réapprovisionner: ' || v_count);
 
   -- FORALL: batch update en un seul appel SQL
   IF v_count > 0 THEN
@@ -1189,7 +1189,7 @@ BEGIN
        WHERE lot_id = v_reappro(i).lot_id;
 
     COMMIT;
-    DBMS_OUTPUT.PUT_LINE(v_count || ' lots mis a jour. COMMIT OK.');
+    DBMS_OUTPUT.PUT_LINE(v_count || ' lots mis à jour. COMMIT OK.');
   END IF;
 
 EXCEPTION
@@ -1199,7 +1199,7 @@ EXCEPTION
     RAISE;
 END;`,
       trigger: `-- TRIGGER: Contrôle péremption avant dispensation
--- Regle metier: empeche la sortie de medicaments expires
+-- Règle métier : empêche la sortie de médicaments expirés
 CREATE OR REPLACE TRIGGER trg_check_peremption
 BEFORE INSERT OR UPDATE OF lot_id ON sortie_stock
 FOR EACH ROW
@@ -1231,7 +1231,7 @@ EXCEPTION
   WHEN TOO_MANY_ROWS THEN
     RAISE_APPLICATION_ERROR(
       -20003,
-      'INCOHERENCE DONNEES — Plusieurs lots detectes'
+      'INCOHÉRENCE DONNÉES — Plusieurs lots détectés'
     );
   WHEN e_med_expire THEN
     RAISE_APPLICATION_ERROR(
@@ -1239,7 +1239,7 @@ EXCEPTION
       'MEDICAMENT EXPIRE DETECTE — Lot: ' || :NEW.lot_id
       || ' | Molecule: ' || v_molecule
       || ' | Peremption: ' || TO_CHAR(v_peremption, 'DD/MM/YYYY')
-      || ' — Dispensation refusee (PUI Safety Gate)'
+      || ' — Dispensation refusée (PUI Safety Gate)'
     );
 END trg_check_peremption;
 /`
@@ -1295,7 +1295,7 @@ END trg_check_peremption;
       this._executor.reset();
       this._resetStateMachine();
       this._clearConsole();
-      this._logToConsole('info', 'Editeur reinitialise.');
+      this._logToConsole('info', 'Éditeur réinitialisé.');
     });
   }
 
@@ -1328,7 +1328,7 @@ END trg_check_peremption;
       el.className = 'state-step';
     });
     document.getElementById('state-idle').classList.add('state-step--active');
-    document.getElementById('state-info').textContent = 'Pret.';
+    document.getElementById('state-info').textContent = 'Prêt.';
   }
 
   _updateStateMachine(state, info) {
@@ -1397,7 +1397,7 @@ END trg_check_peremption;
       }
       return `<td>${v}</td>`;
     }).join('') + '</tr>').join('');
-    info.textContent = `${results.length} ligne(s) retournee(s) — Type: ${type.toUpperCase()}`;
+    info.textContent = `${results.length} ligne(s) retournée(s) — Type: ${type.toUpperCase()}`;
   }
 
   _renderPlan(plan, type) {
@@ -1462,7 +1462,7 @@ END trg_check_peremption;
         used: Math.min(t.max - 1, Math.max(10, t.used + Math.floor(Math.random() * 40 - 20)))
       }));
       this._renderTablespaces();
-      this._logToConsole('info', 'Tablespaces actualises.');
+      this._logToConsole('info', 'Tablespaces actualisés.');
     });
 
     document.getElementById('btn-add-ts-data').addEventListener('click', () => {
@@ -1473,7 +1473,7 @@ END trg_check_peremption;
       this._renderTablespaces();
       this._sm.addAudit('TS_LOAD_SIM', 'DBA_PUI_SIMU', 'Simulation charge tablespaces');
       this._renderAudit();
-      this._logToConsole('warn', 'Charge TS simulee — Verifier les seuils.');
+      this._logToConsole('warn', 'Charge TS simulée — Vérifier les seuils.');
     });
 
     document.getElementById('purge-days-slider').addEventListener('input', e => {
@@ -1484,10 +1484,10 @@ END trg_check_peremption;
       const days = parseInt(document.getElementById('purge-days-slider').value);
       const masked = Math.floor(Math.random() * 500 + 200);
       const res = document.getElementById('purge-result');
-      res.innerHTML = `<div class="alert alert--success">Purge terminée: ${masked} enregistrements anonymisés via DBMS_REDACT (seuil: ${days} jours). Chiffrement AES-256 appliqué aux archives.</div>`;
+      res.innerHTML = `<div class="alert alert--success">Purge terminée: ${masked} enregistrements masqués via DBMS_REDACT (seuil: ${days} jours). Chiffrement AES-256 appliqué aux archives.</div>`;
       this._sm.addAudit('RGPD_PURGE', 'DBA_PUI_SIMU', `Purge ${days}j: ${masked} rows masked, DBMS_REDACT`);
       this._renderAudit();
-      this._logToConsole('success', `RGPD Purge: ${masked} rows anonymisees (seuil=${days}j).`);
+      this._logToConsole('success', `RGPD Purge: ${masked} rows anonymisées (seuil=${days}j).`);
     });
 
     document.getElementById('btn-create-user').addEventListener('click', () => {
@@ -1503,10 +1503,10 @@ END trg_check_peremption;
       if (isDba) {
         res.innerHTML = `<div class="alert alert--warning">&#9888; ALERTE SECURITE: Attribution du role DBA_PUI — Violation du principe de Least Privilege. Cette action est loguée dans l'audit HDS.</div>`;
       } else if (!roles.length) {
-        res.innerHTML = `<div class="alert alert--error">Aucun role selectionne. L utilisateur doit avoir au moins un role.</div>`;
+        res.innerHTML = `<div class="alert alert--error">Aucun rôle sélectionné. L'utilisateur doit avoir au moins un rôle.</div>`;
         return;
       } else {
-        res.innerHTML = `<div class="alert alert--success">Utilisateur <code>${username}</code> cree avec les roles: ${roles.join(', ')}. Conformite Least Privilege: OK.</div>`;
+        res.innerHTML = `<div class="alert alert--success">Utilisateur <code>${username}</code> créé avec les rôles: ${roles.join(', ')}. Conformité Least Privilege: OK.</div>`;
       }
 
       this._sm.users.push({ username, roles, created: new Date().toISOString() });
