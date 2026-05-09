@@ -284,7 +284,7 @@ a:hover { text-decoration: underline; }
     <div class="app-nav__section">
       <div class="app-nav__section-title">Lexique Oracle PUI</div>
       <button class="app-nav__item app-nav__item--active" data-tab="dictionary"><span class="app-nav__item-icon">D</span>Dictionnaire Interactif</button>
-      <button class="app-nav__item" data-tab="examples"><span class="app-nav__item-icon">E</span>Laboratoire d'Exemples</button>
+      <button class="app-nav__item" data-tab="examples"><span class="app-nav__item-icon">L</span>Laboratoire d'exemples</button>
       <button class="app-nav__item" data-tab="quiz"><span class="app-nav__item-icon">Q</span>Quiz &amp; Validation</button>
     </div>
     <div class="app-nav__section">
@@ -332,7 +332,7 @@ a:hover { text-decoration: underline; }
     <!-- TAB 2: LABORATOIRE -->
     <section class="module-section" id="tab-examples">
       <div class="page-header">
-        <h1 class="page-header__title">Laboratoire d'Exemples</h1>
+        <h1 class="page-header__title">Laboratoire d'exemples</h1>
         <div class="page-header__subtitle-row">
           <p class="page-header__subtitle">Exemples pédagogiques 100% nouveaux, exécution simulée avec erreurs ORA</p>
           <button class="page-header__help-btn" data-help="examples" aria-label="Aide Exemples" title="Rubrique d'aide">?</button>
@@ -400,7 +400,7 @@ a:hover { text-decoration: underline; }
         <div class="stat-block stat-block--cyan"><div class="stat-block__value" id="quiz-score">0</div><div class="stat-block__label">Score</div></div>
         <div class="stat-block stat-block--blue"><div class="stat-block__value" id="quiz-total">0/20</div><div class="stat-block__label">Questions</div></div>
         <div class="stat-block stat-block--green"><div class="stat-block__value" id="quiz-streak">0</div><div class="stat-block__label">Série</div></div>
-        <div class="stat-block stat-block--amber"><div class="stat-block__value" id="quiz-pct">0%</div><div class="stat-block__label">Precision</div></div>
+        <div class="stat-block stat-block--amber"><div class="stat-block__value" id="quiz-pct">0%</div><div class="stat-block__label">Précision</div></div>
       </div>
       <div class="card fade-in">
         <div class="card__title"><span class="card__title-icon">&#10067;</span> Question</div>
@@ -433,7 +433,7 @@ a:hover { text-decoration: underline; }
       <div class="help-modal__footer"><button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button></div>
     </div>
     <div class="help-modal" id="help-examples" role="dialog" aria-modal="true" aria-labelledby="help-examples-title" aria-hidden="true">
-      <div class="help-modal__header"><div class="help-modal__title" id="help-examples-title">Laboratoire d'Exemples</div><button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button></div>
+      <div class="help-modal__header"><div class="help-modal__title" id="help-examples-title">Laboratoire d'exemples</div><button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button></div>
       <div class="help-modal__body">
         <div class="help-modal__section"><div class="help-modal__section-title help-modal__section-title--objective">Objectif</div><p class="help-modal__text">Exemples de code pédagogiques pour illustrer les concepts Oracle les plus importants en contexte PUI.</p>
         <ul class="help-modal__list"><li><strong>Erreur ORA-04091</strong> : Table mutante avec code erreur puis solution Compound Trigger.</li><li><strong>BULK COLLECT vs curseur</strong> : Comparaison de performance simulée.</li><li><strong>Hints et Explain Plan</strong> : Analyse et optimisation de plans d'exécution.</li><li><strong>VPD et Audit</strong> : Politiques de sécurité par service.</li></ul></div>
@@ -748,40 +748,40 @@ const QUIZ_QUESTIONS = [
     {text:'Une table qui change de structure automatiquement',correct:false}
   ],explanation:'Une table mutante est en cours de modification. Oracle interdit la lecture via SELECT (ORA-04091) pour protéger l\'intégrité.',termRef:'table_mutante'},
   {id:2,question:'Quel est l\'avantage principal de <code>BULK COLLECT</code> ?',options:[
-    {text:'Il créé des tables temporaires automatiquement',correct:false},
-    {text:'Il reduit les context switches entre SQL et PL/SQL',correct:true},
+    {text:'Il crée des tables temporaires automatiquement',correct:false},
+    {text:'Il réduit les commutations de contexte entre SQL et PL/SQL',correct:true},
     {text:'Il chiffre les données en mémoire',correct:false}
   ],explanation:'BULK COLLECT charge toutes les lignes en 1 transition PGA/SGA au lieu de N. Gain de 10x à 50x.',termRef:'bulk_collect'},
   {id:3,question:'Quel code d\'erreur signale une table mutante ?',options:[
     {text:'ORA-04091',correct:true},
     {text:'ORA-00001 (contrainte unique)',correct:false},
     {text:'ORA-01403 (NO_DATA_FOUND)',correct:false}
-  ],explanation:'ORA-04091 : "La table X est en train de muter, un déclenchleur et/ou une fonction peut ne pas la voir".',termRef:'table_mutante'},
+  ],explanation:'ORA-04091 : "La table X est en train de muter, un déclencheur et/ou une fonction peut ne pas la voir".',termRef:'table_mutante'},
   {id:4,question:'Que fait un déclencheur <code>BEFORE INSERT</code> ?',options:[
     {text:'Il s\'exécute après l\'insertion',correct:false},
     {text:'Il empêche toute insertion',correct:false},
     {text:'Il s\'exécute avant l\'insertion, permettant validation et modification de :NEW',correct:true}
   ],explanation:'Un déclencheur BEFORE INSERT s\'exécute avant la persistance. Il peut valider et modifier :NEW.',termRef:'trigger_before'},
-  {id:5,question:'Difference entre <code>%TYPE</code> et <code>%ROWTYPE</code> ?',options:[
-    {text:'%TYPE pour les nombres, %ROWTYPE pour les chaines',correct:false},
+  {id:5,question:'Différence entre <code>%TYPE</code> et <code>%ROWTYPE</code> ?',options:[
+    {text:'%TYPE pour les nombres, %ROWTYPE pour les chaînes',correct:false},
     {text:'%TYPE hérite le type d\'une colonne, %ROWTYPE la structure d\'une ligne',correct:true},
     {text:'Aucune différence, ce sont des synonymes',correct:false}
   ],explanation:'%TYPE = type d\'une colonne spécifique. %ROWTYPE = enregistrement avec un champ par colonne.',termRef:'pct_type'},
-  {id:6,question:'Comment resoudre une table mutante (ORA-04091) ?',options:[
-    {text:'Supprimer et recreer la table',correct:false},
+  {id:6,question:'Comment résoudre une table mutante (ORA-04091) ?',options:[
+    {text:'Supprimer et recréer la table',correct:false},
     {text:'Ajouter un index',correct:false},
     {text:'Utiliser un Compound Trigger avec variables de contexte',correct:true}
   ],explanation:'Le Compound Trigger accumule en mémoire (AFTER EACH ROW) puis traite (AFTER STATEMENT) ou la table n\'est plus mutante.',termRef:'compound_trigger'},
   {id:7,question:'Que retourne <code>CURRVAL</code> d\'une séquence ?',options:[
     {text:'La prochaine valeur',correct:false},
     {text:'La dernière valeur générée par NEXTVAL dans la session',correct:true},
-    {text:'Le total de valeurs generées',correct:false}
-  ],explanation:'CURRVAL = dernière valeur de NEXTVAL dans la session courante. NEXTVAL doit être appele au moins une fois avant.',termRef:'séquence'},
-  {id:8,question:'Que se passe-t-il si on supprime une ligne referencee par une FK sans CASCADE ?',options:[
+    {text:'Le total de valeurs générées',correct:false}
+  ],explanation:'CURRVAL = dernière valeur de NEXTVAL dans la session courante. NEXTVAL doit être appelé au moins une fois avant.',termRef:'séquence'},
+  {id:8,question:'Que se passe-t-il si on supprime une ligne référencée par une FK sans CASCADE ?',options:[
     {text:'Oracle supprime les enfants automatiquement',correct:false},
     {text:'Oracle bloque et lève ORA-02292',correct:true},
     {text:'Oracle supprime la FK',correct:false}
-  ],explanation:'Sans ON DELETE CASCADE, Oracle protege l\'intégrité référentielle en bloquant la suppression (ORA-02292).',termRef:'table'},
+  ],explanation:'Sans ON DELETE CASCADE, Oracle protège l\'intégrité référentielle en bloquant la suppression (ORA-02292).',termRef:'table'},
   {id:9,question:'Qu\'est-ce qu\'un <code>Compound Trigger</code> ?',options:[
     {text:'Un déclencheur combinant plusieurs tables',correct:false},
     {text:'Un déclencheur avec 4 sections temporelles partageant des variables',correct:true},
@@ -790,18 +790,18 @@ const QUIZ_QUESTIONS = [
   {id:10,question:'Quel indicateur mesure le coût d\'un plan d\'exécution ?',options:[
     {text:'Le nombre de lignes',correct:false},
     {text:'Le temps en millisecondes',correct:false},
-    {text:'Le coût CBO estime en unites de coût',correct:true}
+    {text:'Le coût CBO estimé en unités de coût',correct:true}
   ],explanation:'Le CBO calcule un coût relatif pour chaque plan et choisit le minimum. Ce n\'est pas un temps réel.',termRef:'cbo'},
   {id:11,question:'Que signifie <code>VPD</code> ?',options:[
     {text:'Virtual Private Database',correct:true},
     {text:'Very Protected Data',correct:false},
-    {text:'Variable Privilege Définition',correct:false}
-  ],explanation:'VPD = Virtual Private Database (aussi appele RLS = Row Level Security). Filtre automatique des lignes.',termRef:'vpd'},
+    {text:'Variable Privilege Definition',correct:false}
+  ],explanation:'VPD = Virtual Private Database (aussi appelé RLS = Row Level Security). Filtre automatique des lignes.',termRef:'vpd'},
   {id:12,question:'Meilleure pratique pour l\'attribution de privilèges ?',options:[
     {text:'Donner DBA à tous pour simplifier',correct:false},
     {text:'Least Privilege : minimum nécessaire',correct:true},
-    {text:'Aucun privilege, tout faire via le schéma admin',correct:false}
-  ],explanation:'Le Least Privilege est exige en contexte HDS/RGPD. Chaque utilisateur n\'a que le strict nécessaire.',termRef:'least_privilege'},
+    {text:'Aucun privilège, tout faire via le schéma admin',correct:false}
+  ],explanation:'Le Least Privilege est exigé en contexte HDS/RGPD. Chaque utilisateur n\'a que le strict nécessaire.',termRef:'least_privilege'},
   {id:13,question:'Quel scan est le plus coûteux sur une grande table ?',options:[
     {text:'Index Range Scan',correct:false},
     {text:'Index Unique Scan',correct:false},
@@ -809,34 +809,34 @@ const QUIZ_QUESTIONS = [
   ],explanation:'Le Full Table Scan lit TOUS les blocs. Sur une table de milliers de lignes, c\'est l\'opération la plus coûteuse.',termRef:'fts'},
   {id:14,question:'Que fait <code>DBMS_RLS.ADD_POLICY</code> ?',options:[
     {text:'Applique une politique VPD',correct:true},
-    {text:'Créé un nouveau rôle',correct:false},
+    {text:'Crée un nouveau rôle',correct:false},
     {text:'Active l\'audit sur une table',correct:false}
   ],explanation:'DBMS_RLS.ADD_POLICY attache une fonction de politique VPD à une table, filtrant automatiquement les requêtes.',termRef:'vpd'},
   {id:15,question:'Quelle section d\'un compound trigger s\'exécute une seule fois ?',options:[
     {text:'BEFORE EACH ROW et AFTER EACH ROW',correct:false},
     {text:'BEFORE STATEMENT et AFTER STATEMENT',correct:true},
-    {text:'Toutes les sections s\'executent N fois',correct:false}
-  ],explanation:'BEFORE/AFTER STATEMENT s\'executent 1 fois (avant/après l\'opération). BEFORE/AFTER EACH ROW s\'executent par ligne.',termRef:'compound_trigger'},
+    {text:'Toutes les sections s\'exécutent N fois',correct:false}
+  ],explanation:'BEFORE/AFTER STATEMENT s\'exécutent 1 fois (avant/après l\'opération). BEFORE/AFTER EACH ROW s\'exécutent par ligne.',termRef:'compound_trigger'},
   {id:16,question:'Que fait <code>FORALL</code> en PL/SQL ?',options:[
-    {text:'Créé une boucle FOR classique',correct:false},
-    {text:'Exécute un DML en batch sur une collection',correct:true},
+    {text:'Crée une boucle FOR classique',correct:false},
+    {text:'Exécute une opération DML en lot sur une collection',correct:true},
     {text:'Définit une collection PL/SQL',correct:false}
-  ],explanation:'FORALL exécute un DML pour chaque élément d\'une collection en un seul appel SQL. Combine avec BULK COLLECT = modèle ETL optimal.',termRef:'forall'},
-  {id:17,question:'Qu\'est-ce qu\'une vue materialisée ?',options:[
+  ],explanation:'FORALL exécute un DML pour chaque élément d\'une collection en un seul appel SQL. Combiné avec BULK COLLECT = modèle ETL optimal.',termRef:'forall'},
+  {id:17,question:'Qu\'est-ce qu\'une vue matérialisée ?',options:[
     {text:'Une vue avec un déclencheur AFTER',correct:false},
     {text:'Une vue sur une table partitionnee',correct:false},
-    {text:'Une vue dont les résultats sont stockes physiquement',correct:true}
-  ],explanation:'Une vue materialisée stocke les résultats de la requête physiquement. Actualisee par refresh (COMPLETE/FAST, ON DEMAND/COMMIT).',termRef:'vue'},
+    {text:'Une vue dont les résultats sont stockés physiquement',correct:true}
+  ],explanation:'Une vue materialisée stocke les résultats de la requête physiquement. Actualisée par refresh (COMPLETE/FAST, ON DEMAND/COMMIT).',termRef:'vue'},
   {id:18,question:'Quel privilege permet de créer des tables ?',options:[
     {text:'SELECT ANY TABLE',correct:false},
     {text:'CREATE TABLE (privil. système)',correct:true},
     {text:'CONNECT (rôle par défaut)',correct:false}
-  ],explanation:'CREATE TABLE est un privilège système. CONNECT permet uniquement la connexion, pas la creation d\'objets.',termRef:'grant_revoke'},
-  {id:19,question:'LIKE \'%xxx\' (avec % au debut) peut-il utiliser un index ?',options:[
+  ],explanation:'CREATE TABLE est un privilège système. CONNECT permet uniquement la connexion, pas la création d\'objets.',termRef:'grant_revoke'},
+  {id:19,question:'LIKE \'%xxx\' (avec % au début) peut-il utiliser un index ?',options:[
     {text:'Oui, toujours',correct:false},
     {text:'Oui, si l\'index est composite',correct:false},
 {text:'Non, pas en Index Range Scan',correct:true}
-],explanation:'Un LIKE avec % au debut empêche l\'Index Range Scan car le préfixe est inconnu. Oracle peut utiliser un Index Full Scan mais c\'est rarement optimal.',termRef:'hint'},
+],explanation:'Un LIKE avec % au début empêche l\'Index Range Scan car le préfixe est inconnu. Oracle peut utiliser un Index Full Scan mais c\'est rarement optimal.',termRef:'hint'},
   {id:20,question:'Que fait <code>AUDIT ... BY ACCESS</code> ?',options:[
     {text:'Logue une fois par session',correct:false},
     {text:'Logue chaque accès individuellement',correct:true},
@@ -1281,7 +1281,7 @@ class LexiqueApp {
     document.getElementById('btn-restart-quiz').addEventListener('click', () => this._quiz.restart());
     // Handle "finished" state
     this._quiz.on('finished', () => {
-      document.getElementById('quiz-question').textContent = 'Quiz termine ! Score final: ' + this._quiz.progress.score + '/' + this._quiz.progress.total;
+      document.getElementById('quiz-question').textContent = 'Quiz terminé ! Score final: ' + this._quiz.progress.score + '/' + this._quiz.progress.total;
       document.getElementById('quiz-options').innerHTML = '';
       document.getElementById('quiz-feedback').style.display = 'none';
       document.getElementById('btn-next-question').style.display = 'none';
