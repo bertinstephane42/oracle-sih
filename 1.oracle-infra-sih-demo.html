@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Oracle Database HDS Demo - Architecture Multitenant, SGA/PGA, I/O Internals, Cloud Souverain">
-<title>Oracle HDS Demo - Architecture Systems CHU</title>
+<meta name="description" content="Oraclé Database HDS démo - Architecture Multitenant, SGA/PGA, I/O Internals, Cloud Souverain">
+<title>Oraclé HDS démo - Architecture Systèmes CHU</title>
 <style>
 /* ============================================================
    DESIGN SYSTEM - INSTRUMENTATION SCIENTIFIQUE
@@ -308,7 +308,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
     </div>
     <div class="app-header__status">
       <span class="status-badge status-badge--online"><span class="status-dot"></span>SIMULATION ACTIVE</span>
-      <span class="status-badge status-badge--rgpd">DONNEES FICTIVES / RGPD</span>
+      <span class="status-badge status-badge--rgpd">donnéeS FICTIVES / RGPD</span>
 	  <button class="page-header__help-btn" data-help="lexicon" aria-label="Lexique technique" title="Lexique technique">L</button>
 	  <button class="page-header__help-btn" data-help="credit" aria-label="Credits" title="Credits">C</button>
     </div>
@@ -319,11 +319,11 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       <div class="app-nav__section-title">Architecture</div>
       <button class="app-nav__item app-nav__item--active" data-module="multitenant"><span class="app-nav__item-icon">M</span>Multitenant CDB/PDB</button>
       <button class="app-nav__item" data-module="memory"><span class="app-nav__item-icon">S</span>SGA / PGA Internals</button>
-      <button class="app-nav__item" data-module="io"><span class="app-nav__item-icon">I</span>I/O &amp; Coherence</button>
+      <button class="app-nav__item" data-module="io"><span class="app-nav__item-icon">I</span>I/O &amp; cohérence</button>
       <button class="app-nav__item" data-module="cloud"><span class="app-nav__item-icon">C</span>Cloud Souverain &amp; IA</button>
     </div>
     <div class="app-nav__section">
-      <div class="app-nav__section-title">Etat Systeme</div>
+      <div class="app-nav__section-title">Etat système</div>
       <div id="system-status-panel" style="padding: 0 var(--sp-4);">
         <div style="font-size: var(--fs-xs); color: #64748b; font-family: var(--font-mono); margin-bottom: var(--sp-2);">SCN GLOBAL</div>
         <div id="global-scn" class="data-mono" style="width: 100%; text-align: center;">0</div>
@@ -332,7 +332,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       </div>
     </div>
     <div class="app-nav__rgpd-notice">
-      &#9888; DONNEES 100% FICTIVES<br>
+      &#9888; données 100% FICTIVES<br>
       Patients_TEST_XXX / Dr_DUMMY_XX<br>
       NIR_FICTIF / Sejour_SIMU_XXX<br>
       Conforme RGPD Art. 25 - Privacy by Design
@@ -343,10 +343,10 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
     <!-- MODULE 1: MULTITENANT -->
     <section class="module-section module-section--active" id="mod-multitenant">
       <div class="page-header">
-        <h1 class="page-header__title">Module 1 - Architecture Multitenant (CDB/PDB)</h1>
+        <h1 class="page-header__title">Module 1 — Architecture Multitenant (CDB/PDB)</h1>
         <div class="page-header__subtitle-row">
-          <p class="page-header__subtitle">Isolation logique, contention dictionnaire partage, Resource Plans, Data Masking RGPD</p>
-          <button class="page-header__help-btn" data-help="multitenant" aria-label="Aide module Multitenant" title="Rubrique d'aide" title="Rubrique d'aide">?</button>
+          <p class="page-header__subtitle">Isolation logique, contention dictionnaire partagé, Resource plans, Data Masking RGPD</p>
+          <button class="page-header__help-btn" data-help="multitenant" aria-label="Aide module Multitenant" title="Rubrique d'aide">?</button>
         </div>
       </div>
       <div class="card fade-in">
@@ -354,8 +354,8 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         <div class="grid-3" style="margin-bottom: var(--sp-6);">
           <div class="diagram-node diagram-node--root" style="grid-column: 1 / -1; max-width: 600px; margin: 0 auto;">
             <div class="diagram-node__title">CDB$ROOT</div>
-            <div class="diagram-node__detail">Dictionnaire partage - Undo/Tablespace SYSTEM partages</div>
-            <div class="diagram-node__detail">Resource Plan: DEFAULT_CDB_PLAN</div>
+            <div class="diagram-node__detail">Dictionnaire partagé - Undo/Tablespace SYSTEM partagés</div>
+            <div class="diagram-node__detail">Resource plan: DEFAULT_CDB_PLAN</div>
           </div>
         </div>
         <div class="diagram-connector">&#8659;</div>
@@ -363,37 +363,37 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       </div>
       <div class="grid-2">
         <div class="card fade-in">
-          <div class="card__title" data-help="lexicon"><span class="card__title-icon">&#9881;</span> Resource Plan Simulator</div>
-          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Allouez les parts CPU/IO entre PDBs. Les PDB critiques (Urgences/Bloc) necessitent un share minimum garanti.</p>
+          <div class="card__title" data-help="lexicon"><span class="card__title-icon">&#9881;</span> Resource plan Simulator</div>
+          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Allouez les parts CPU/IO entre PDBs. Les PDB critiques (Urgences/Bloc) necessitent une part minimum garanti.</p>
           <div id="resource-plan-controls"></div>
           <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
-            <button class="btn btn--primary btn--sm" id="btn-apply-plan">Appliquer le Plan</button>
-            <button class="btn btn--outline btn--sm" id="btn-reset-plan">Reset Defaut</button>
+            <button class="btn btn--primary btn--sm" id="btn-apply-plan">Appliquer le plan</button>
+            <button class="btn btn--outline btn--sm" id="btn-reset-plan">Réinitialiser</button>
           </div>
           <div id="resource-plan-result" style="margin-top: var(--sp-4);"></div>
         </div>
         <div class="card fade-in">
-          <div class="card__title" data-help="lexicon"><span class="card__title-icon">&#9889;</span> Moniteur de Contention Dictionnaire</div>
-          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Le CDB$ROOT partage le dictionnaire de donnees. Simulez la contention sur les latches <code class="data-mono">row cache objects</code> et <code class="data-mono">shared pool</code>.</p>
+          <div class="card__title" data-help="lexicon"><span class="card__title-icon">&#9889;</span> Moniteur de contention dictionnaire</div>
+          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Le CDB$ROOT partage le dictionnaire de données. Simule la contention sur les latches <code class="data-mono">row cache objects</code> et <code class="data-mono">shared pool</code>.</p>
           <div id="contention-monitor">
             <div class="grid-2" style="margin-bottom: var(--sp-4);">
               <div class="stat-block"><div class="stat-block__value" id="latch-waits">0</div><div class="stat-block__label">Latch Waits / sec</div></div>
               <div class="stat-block"><div class="stat-block__value" id="dict-cache-hit">99.8%</div><div class="stat-block__label">Dict Cache Hit Ratio</div></div>
             </div>
-            <button class="btn btn--danger btn--sm" id="btn-sim-contention">Simuler Pic de Charge</button>
+            <button class="btn btn--danger btn--sm" id="btn-sim-contention">Simuler pic de charge</button>
             <div class="log-console" id="contention-log" style="margin-top: var(--sp-4);">
-              <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Moniteur contention initialise.</div>
+              <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Moniteur de contention initialisé.</div>
             </div>
           </div>
         </div>
       </div>
       <div class="card fade-in">
         <div class="card__title"><span class="card__title-icon">&#128274;</span> Data Masking &amp; Clonage PDB - Conformite RGPD</div>
-        <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Lors du clonage d'un PDB de production vers un environnement de test/recherche, les donnees de santé DOIVENT etre masquees (Oracle Data Masking). Cette demo illustre le processus avec des donnees <strong>entierement fictives</strong>.</p>
+        <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Lors du clonage d'un PDB de production vers un environnement de test/recherche, les données de santé DOIVENT être masquées (Oraclé Data Masking). Cette démo illustre le processus avec des données <strong>entièrement fictives</strong>.</p>
         <div class="grid-3" id="data-masking-demo"></div>
         <div style="margin-top: var(--sp-4);">
-          <button class="btn btn--primary btn--sm" id="btn-run-masking">Executer Oracle Data Masking</button>
-          <button class="btn btn--outline btn--sm" id="btn-verify-masking">Verifier Conformite</button>
+          <button class="btn btn--primary btn--sm" id="btn-run-masking">Exécuter Oraclé Data Masking</button>
+          <button class="btn btn--outline btn--sm" id="btn-verify-masking">Vérifier conformité</button>
         </div>
         <div id="masking-result" style="margin-top: var(--sp-4);"></div>
       </div>
@@ -402,14 +402,14 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
     <!-- MODULE 2: SGA/PGA -->
     <section class="module-section" id="mod-memory">
       <div class="page-header">
-        <h1 class="page-header__title">Module 2 - SGA / PGA &amp; Algorithmes de Memoire</h1>
+        <h1 class="page-header__title">Module 2 — SGA / PGA &amp; Algorithmes de mémoire</h1>
         <div class="page-header__subtitle-row">
           <p class="page-header__subtitle">Buffer Cache LRU/Touch Count, Latch/Mutex contention, PGA Temp Spill, impact PMSI/T2A</p>
           <button class="page-header__help-btn" data-help="memory" aria-label="Aide module SGA/PGA" title="Rubrique d'aide">?</button>
         </div>
       </div>
       <div class="card fade-in">
-        <div class="card__title"><span class="card__title-icon">&#9632;</span> System Global Area (SGA) - Layout</div>
+        <div class="card__title"><span class="card__title-icon">&#9632;</span> System Global Area (SGA) - Disposition</div>
         <div class="grid-4" id="sga-layout"></div>
         <div style="margin-top: var(--sp-6);">
           <div class="slider-group" style="max-width: 600px;">
@@ -426,10 +426,10 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       <div class="grid-2">
         <div class="card fade-in">
           <div class="card__title" data-help="lexicon"><span class="card__title-icon">&#128260;</span> Algorithme LRU - Buffer Cache</div>
-          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Oracle maintient une liste LRU pour les blocs du buffer cache. Depuis 10g, l'algorithme <strong>Touch Count</strong> (Midpoint Insertion) empeche les full table scans de polluer le cache.</p>
+          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Oraclé maintient une liste LRU pour les blocs du buffer cache. Depuis 10g, l'algorithme <strong>Touch Count</strong> (Midpoint Insertion) empêche les full table scans de polluer le cache.</p>
           <div id="lru-visualization"></div>
           <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
-            <button class="btn btn--primary btn--sm" id="btn-lru-access">Acces Bloc (Touch)</button>
+            <button class="btn btn--primary btn--sm" id="btn-lru-access">Accès Bloc (Touch)</button>
             <button class="btn btn--outline btn--sm" id="btn-lru-full-scan">Full Table Scan</button>
             <button class="btn btn--danger btn--sm" id="btn-lru-flush">Checkpoint / Flush</button>
           </div>
@@ -437,7 +437,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         </div>
         <div class="card fade-in">
           <div class="card__title" data-help="lexicon"><span class="card__title-icon">&#9889;</span> Latch &amp; Mutex - Cache Buffers Chains</div>
-          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Les latches protegent les structures memoire critiques. Le latch <code class="data-mono">cache buffers chains</code> est un point de contention classique (hot block).</p>
+          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Les latches protègent les structures mémoire critiques. Le latch <code class="data-mono">cache buffers chains</code> est un point de contention classique (hot block).</p>
           <div class="slider-group" style="margin-bottom: var(--sp-4);">
             <div class="slider-group__header"><span class="slider-group__label">Sessions Concurrentes</span><span class="slider-group__value" id="latch-sessions-val">4</span></div>
             <input type="range" id="latch-sessions-slider" min="1" max="32" step="1" value="4">
@@ -450,8 +450,8 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         </div>
       </div>
       <div class="card fade-in">
-        <div class="card__title" data-help="lexicon"><span class="card__title-icon">&#128190;</span> PGA Memory &amp; Temp Spill - Impact Requetes PMSI/T2A</div>
-        <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Quand une operation (sort/hash join) excede la memoire PGA allouee, Oracle bascule sur des <strong>Temp Segments</strong> (I/O disque). Impact: latence x1000 a x10000.</p>
+        <div class="card__title" data-help="lexicon"><span class="card__title-icon">&#128190;</span> PGA Mémoire &amp; Temp Spill - Impact requêtes PMSI/T2A</div>
+        <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Quand une opération (sort/hash join) excède la mémoire PGA allouée, Oraclé bascule sur des <strong>segments temporaires</strong> (I/O disque). Impact: latence ×1000 à ×10000.</p>
         <div class="grid-2">
           <div>
             <div class="slider-group" style="margin-bottom: var(--sp-4);">
@@ -462,28 +462,28 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
               <div class="slider-group__header"><span class="slider-group__label">PGA_AGGREGATE_LIMIT (MB)</span><span class="slider-group__value" id="pga-limit-val">256</span></div>
               <input type="range" id="pga-limit-slider" min="64" max="2048" step="64" value="256">
             </div>
-            <button class="btn btn--primary btn--sm" id="btn-sim-sql">Executer Requete PMSI</button>
+            <button class="btn btn--primary btn--sm" id="btn-sim-sql">Exécuter requête PMSI</button>
           </div>
           <div id="pga-result"></div>
         </div>
       </div>
     </section>
 
-    <!-- MODULE 3: I/O & COHERENCE -->
+    <!-- MODULE 3: I/O & cohérence -->
     <section class="module-section" id="mod-io">
       <div class="page-header">
-        <h1 class="page-header__title">Module 3 - Flux de Donnees &amp; Coherence (I/O Internals)</h1>
+        <h1 class="page-header__title">Module 3 — Flux de données &amp; cohérence (I/O Internals)</h1>
         <div class="page-header__subtitle-row">
           <p class="page-header__subtitle">Cycle Redo/Undo, SCN, Instance Recovery, ORA-01555 Snapshot Too Old</p>
           <button class="page-header__help-btn" data-help="io" aria-label="Aide module I/O" title="Rubrique d'aide">?</button>
         </div>
       </div>
       <div class="card fade-in">
-        <div class="card__title" data-help="lexicon"><span class="card__title-icon">&#128260;</span> Cycle de Vie d'une Transaction - PMSI_FACTURATION</div>
-        <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Chaque transaction suit un cycle strict: Undo (rollback) -&gt; Redo (recovery) -&gt; Commit -&gt; LGWR write -&gt; DBWR write. Le SCN (System Change Number) garantit la coherence de lecture.</p>
+        <div class="card__title" data-help="lexicon"><span class="card__title-icon">&#128260;</span> Cycle de vie d'une transaction - PMSI_FACTURATION</div>
+        <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Chaque transaction suit un cycle strict: Undo (rollback) -&gt; Redo (recovery) -&gt; Commit -&gt; LGWR write -&gt; DBWR write. Le SCN (System Change Number) garantit la cohérence de lecture.</p>
         <div id="txn-lifecycle"></div>
         <div style="margin-top: var(--sp-4);">
-          <button class="btn btn--primary btn--sm" id="btn-run-txn">Executer Transaction Complete</button>
+          <button class="btn btn--primary btn--sm" id="btn-run-txn">Exécuter Transaction Complete</button>
           <button class="btn btn--danger btn--sm" id="btn-sim-crash">Simuler Crash (SHUTDOWN ABORT)</button>
           <button class="btn btn--success btn--sm" id="btn-recovery">Instance Recovery</button>
         </div>
@@ -492,20 +492,20 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       <div class="grid-2">
         <div class="card fade-in">
           <div class="card__title" data-help="lexicon"><span class="card__title-icon">&#9201;</span> SCN - System Change Number</div>
-          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Le SCN est l'horloge logique d'Oracle. Il avance a chaque commit. Il garantit la coherence de lecture.</p>
+          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Le SCN est l'horloge logique d'Oracle. Il avance à chaque commit. Il garantit la cohérence de lecture.</p>
           <div style="text-align: center; margin: var(--sp-6) 0;">
             <div style="font-family: var(--font-mono); font-size: 3rem; font-weight: 900; color: var(--color-cyan); letter-spacing: 0.05em;" id="scn-display">0</div>
             <div style="font-size: var(--fs-xs); color: #64748b; font-family: var(--font-mono); margin-top: var(--sp-2);">SCN courant</div>
           </div>
           <div style="display: flex; gap: var(--sp-3); justify-content: center;">
             <button class="btn btn--primary btn--sm" id="btn-increment-scn">Commit (SCN++)</button>
-            <button class="btn btn--outline btn--sm" id="btn-query-scn">Query a SCN donne</button>
+            <button class="btn btn--outline btn--sm" id="btn-query-scn">Query à SCN donné</button>
           </div>
           <div id="scn-result" style="margin-top: var(--sp-4);"></div>
         </div>
         <div class="card fade-in">
-          <div class="card__title" data-help="lexicon"><span class="card__title-icon">&#128270;</span> Coherence de Lecture - Facturation T2A</div>
-          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">La facturation T2A exige une coherence absolue: la requete de facturation doit voir un etat stable des donnees.</p>
+          <div class="card__title" data-help="lexicon"><span class="card__title-icon">&#128270;</span> cohérence de lecture - Facturation T2A</div>
+          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">La facturation T2A exige une cohérence absolue: la requête de facturation doit voir un état stable des données.</p>
           <div id="read-consistency-demo"></div>
           <div style="margin-top: var(--sp-4);">
             <button class="btn btn--primary btn--sm" id="btn-sim-read-consistency">Simuler Lecture Coherente</button>
@@ -515,7 +515,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       </div>
       <div class="card fade-in">
         <div class="card__title" data-help="lexicon"><span class="card__title-icon">&#9888;</span> Simulation ORA-01555 - Snapshot Too Old</div>
-        <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">L'erreur <code class="data-mono">ORA-01555: snapshot too old</code> survient quand les donnees Undo necessaires a la coherence de lecture ont ete ecrasees.</p>
+        <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">L'erreur <code class="data-mono">ORA-01555: snapshot too old</code> survient quand les données Undo nécessaires à la cohérence de lecture ont été écrasées.</p>
         <div class="grid-2">
           <div>
             <div class="slider-group" style="margin-bottom: var(--sp-4);">
@@ -523,19 +523,19 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
               <input type="range" id="undo-retention-slider" min="60" max="3600" step="60" value="900">
             </div>
             <div class="slider-group" style="margin-bottom: var(--sp-4);">
-              <div class="slider-group__header"><span class="slider-group__label">Duree de la requete (secondes simulees)</span><span class="slider-group__value" id="query-duration-val">120</span></div>
+              <div class="slider-group__header"><span class="slider-group__label">Durée de la requête (secondes simulées)</span><span class="slider-group__value" id="query-duration-val">120</span></div>
               <input type="range" id="query-duration-slider" min="10" max="600" step="10" value="120">
             </div>
             <div class="slider-group" style="margin-bottom: var(--sp-4);">
-              <div class="slider-group__header"><span class="slider-group__label">Charge DML concurrente (% taux rotation Undo)</span><span class="slider-group__value" id="dml-load-val">30</span></div>
+              <div class="slider-group__header"><span class="slider-group__label">Charge DML concurrente (% taux de rotation Undo)</span><span class="slider-group__value" id="dml-load-val">30</span></div>
               <input type="range" id="dml-load-slider" min="5" max="100" step="5" value="30">
             </div>
-            <button class="btn btn--primary btn--sm" id="btn-run-long-query">Lancer Requete Longue</button>
+            <button class="btn btn--primary btn--sm" id="btn-run-long-query">Lancer requête longue</button>
           </div>
           <div id="ora-1555-result"></div>
         </div>
         <div class="log-console" id="ora-1555-log" style="margin-top: var(--sp-4); max-height: 250px;">
-          <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Simulateur ORA-01555 pret.</div>
+          <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Simulateur ORA-01555 prêt.</div>
         </div>
       </div>
     </section>
@@ -543,30 +543,30 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
     <!-- MODULE 4: CLOUD SOUVERAIN & IA -->
     <section class="module-section" id="mod-cloud">
       <div class="page-header">
-        <h1 class="page-header__title">Module 4 - Cloud Souverain &amp; IA Controlee</h1>
+        <h1 class="page-header__title">Module 4 — Cloud Souverain &amp; IA Controlee</h1>
         <div class="page-header__subtitle-row">
-          <p class="page-header__subtitle">TDE/BYOK, Autonomous Database OCI France (HDS), Auto-Tuning, IA embarquee vs IA generative</p>
+          <p class="page-header__subtitle">TDE/BYOK, Autonomous Database OCI France (HDS), Auto-Tuning, IA embarquée vs IA générative</p>
           <button class="page-header__help-btn" data-help="cloud" aria-label="Aide module Cloud/IA" title="Rubrique d'aide">?</button>
         </div>
       </div>
       <div class="card fade-in">
         <div class="card__title" data-help="lexicon"><span class="card__title-icon">&#128274;</span> Transparent Data Encryption (TDE) - BYOK</div>
-        <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Le TDE chiffre les donnees au repos (data-at-rest) avec AES-256. En mode BYOK, le CHU garde le controle des cles maitresses dans un HSM souverain. <strong>Aucune donnee reelle n'est utilisee dans cette simulation.</strong></p>
+        <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Le TDE chiffre les données au repos (data-at-rest) avec AES-256. En mode BYOK, le CHU garde le controle des clés maiîtresses dans un HSM souverain. <strong>Aucune donnée réelle n'est utilisée dans cette simulation.</strong></p>
         <div class="grid-3" id="tde-demo"></div>
         <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
           <button class="btn btn--primary btn--sm" id="btn-tde-encrypt">Chiffrer (TDE AES-256)</button>
-          <button class="btn btn--success btn--sm" id="btn-tde-decrypt">Dechiffrer (Cle HSM)</button>
-          <button class="btn btn--danger btn--sm" id="btn-tde-revoke">Revoquer Cle (BYOK)</button>
+          <button class="btn btn--success btn--sm" id="btn-tde-decrypt">déchiffrer (Clé HSM)</button>
+          <button class="btn btn--danger btn--sm" id="btn-tde-revoke">révoquer la clé (BYOK)</button>
         </div>
         <div id="tde-result" style="margin-top: var(--sp-4);"></div>
       </div>
       <div class="grid-2">
         <div class="card fade-in">
-          <div class="card__title" data-help="lexicon"><span class="card__title-icon">&#9881;</span> SQL Auto-Tuning - IA Embarquee</div>
-          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">L'Autonomous Database inclut un moteur d'auto-tuning local: analyse des plans d'execution, creation automatique d'index, SQL Plan Management.</p>
+          <div class="card__title" data-help="lexicon"><span class="card__title-icon">&#9881;</span> SQL Auto-Tuning - IA embarquée</div>
+          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">L'Autonomous Database inclut un moteur d'auto-tuning local: analyse des plans d'exécution, création automatique d'index, SQL Plan Management.</p>
           <div id="autotune-demo">
             <div style="margin-bottom: var(--sp-4);">
-              <div class="data-label">Requete soumise</div>
+              <div class="data-label">requête soumise</div>
               <div class="data-mono" style="width: 100%; white-space: pre-wrap; padding: var(--sp-3);">SELECT p.nir_fictif, SUM(f.montant_t2a)
   FROM sejour_simu s
   JOIN patient_test p ON s.patient_id = p.id
@@ -581,10 +581,10 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         </div>
         <div class="card fade-in">
           <div class="card__title"><span class="card__title-icon">&#129504;</span> IA Controlee - Human-in-the-Loop</div>
-          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Distinction methodologique entre l'IA embarquee (auto-tuning local) et l'IA generative externe (LLM cloud). En contexte HDS/RGPD, seule l'IA embarquee est acceptable pour les donnees de sante.</p>
+          <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Distinction méthodologique entre l'IA embarquée (auto-tuning local) et l'IA générative externe (LLM cloud). En contexte HDS/RGPD, seule l'IA embarquée est acceptable pour les données de sante.</p>
           <div id="ia-comparison"></div>
           <div class="alert alert--info" style="margin-top: var(--sp-4);">
-            <strong>Note methodologique:</strong> Ce module de demonstration a ete concu avec l'assistance d'IA generative pour la structuration du contenu pedagogique. Cependant, <strong>toute la logique metier Oracle, l'architecture logicielle, et les validations techniques ont ete realisees par un ingenieur expert</strong> (approche Human-in-the-Loop). Aucune donnee de sante n'a ete utilisee, transmise ou traitee par un systeme d'IA externe.
+            <strong>Note méthodologique:</strong> Ce module de démonstration a été conçu avec l'assistance d'IA générative pour la structuration du contenu pedagogique. Cependant, <strong>toute la logique métier Oracle, l'architecture logicielle, et les validations techniques ont été réalisées par un ingenieur expert</strong> (approche Human-in-the-Loop). Aucune donnée de sante n'a été utilisée, transmise ou traitée par un systeme d'IA externe.
           </div>
         </div>
       </div>
@@ -592,8 +592,8 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         <div class="card__title" data-help="lexicon"><span class="card__title-icon">&#127758;</span> Architecture Cloud Souverain - OCI France (HDS)</div>
         <div class="grid-4" id="sovereign-arch"></div>
         <div class="alert alert--success" style="margin-top: var(--sp-4);">
-          <strong>Conformite:</strong> OCI Region France (Paris) certifiee HDS, ISO 27001, ISO 27018, SOC 1/2. Chiffrement TDE active par defaut. BYOK supporte via OCI Vault.
-          <br><span class="data-mono">Region: eu-france-1 | Data Residency: France | Certification HDS: ANS</span>
+          <strong>Conformite:</strong> OCI Region France (Paris) certifiée HDS, ISO 27001, ISO 27018, SOC 1/2. Chiffrement TDE activé par défaut. BYOK supporte via OCI Vault.
+          <br><span class="data-mono">Region: eu-france-1 | Résidence des données : France | Certification HDS: ANS</span>
         </div>
       </div>
     </section>
@@ -616,37 +616,37 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
 
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--objective">Objectif de la Simulation</div>
-          <p class="help-modal__text">Ce module modelise l'architecture <code>Multitenant</code> d'Oracle 12c+ dans un contexte CHU. Il demontre trois phenomenes internes critiques :</p>
+          <p class="help-modal__text">Ce module modélise l'architecture <code>Multitenant</code> d'Oraclé 12c+ dans un contexte CHU. Il démontre trois phenomenes internes critiques :</p>
           <ul class="help-modal__list">
-            <li><strong>Isolation logique CDB/PDB</strong> : Le <code>CDB$ROOT</code> heberge le dictionnaire de donnees partage (SYSTEM, SYSAUX et metadonnees communes). Chaque PDB (Pluggable Database) possede ses propres tablespaces utilisateurs mais partage les structures de controle. L'isolation est logique, non physique : une contention sur le dictionnaire partage affecte tous les PDBs.</li>
-            <li><strong>Resource Manager</strong> : Le <code>DEFAULT_CDB_PLAN</code> distribue les ressources CPU/IO via des <em>shares</em> proportionnelles. Les PDBs critiques (Urgences, Bloc operatoire) recoivent des shares eleves priorisant les workloads critiques sous contention. Les PDBs de recherche fonctionnent en best-effort.</li>
-            <li><strong>Data Masking RGPD</strong> : Lors du clonage PDB (production vers test/recherche), <code>Oracle Data Masking</code> anonymise les champs sensibles (NIR, nom, diagnostic) pour conformite RGPD Art. 25 (Privacy by Design).</li>
+            <li><strong>Isolation logique CDB/PDB</strong> : Le <code>CDB$ROOT</code> heberge le dictionnaire de données partagé (SYSTEM, SYSAUX et métadonnées communes). Chaque PDB (Pluggable Database) possede ses propres tablespaces utilisateurs mais partage les structures de controle. L'isolation est logique, non physique : une contention sur le Dictionnaire partagé affecte tous les PDBs.</li>
+            <li><strong>Resource Manager</strong> : Le <code>DEFAULT_CDB_PLAN</code> distribue les ressources CPU/IO via des <em>shares</em> proportionnelles. Les PDBs critiques (Urgences, Bloc operatoire) reçoivent des shares eleves priorisant les workloads critiques sous contention. Les PDBs de recherche fonctionnent en best-effort.</li>
+            <li><strong>Data Masking RGPD</strong> : Lors du clonage PDB (production vers test/recherche), <code>Oraclé Data Masking</code> anonymise les champs sensibles (NIR, nom, diagnostic) pour conformité RGPD Art. 25 (Privacy by Design).</li>
           </ul>
         </div>
 
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--controls">Controles Disponibles</div>
           <ul class="help-modal__list">
-            <li><strong>Sliders de shares</strong> : Ajustez les parts CPU/IO pour chaque PDB (0 a 10). Le pourcentage alloue est calcule proportionnellement au total des shares. Un PDB avec 0 share ne recoit aucune ressource garantie.</li>
-            <li><strong>Appliquer le Plan</strong> : Valide la repartition et affiche un diagnostic de conformite SLA (les PDBs critiques doivent avoir &gt;= 50% du total).</li>
-            <li><strong>Reset Defaut</strong> : Restaure les shares par defaut (Urgences:4, Bloc:3, PMSI:2, Recherche:1).</li>
-            <li><strong>Simuler Pic de Charge</strong> : Genere une sequence temporelle simulant la contention sur les latches <code>row cache objects</code> et <code>shared pool</code> quand 4 PDBs accedent simultanement au dictionnaire partage du <code>CDB$ROOT</code>.</li>
-            <li><strong>Executer Oracle Data Masking</strong> : Applique le masque sur les champs NIR et nom dans le PDB cible, demontrant le processus de clonage conforme RGPD.</li>
+            <li><strong>Sliders de shares</strong> : Ajuste les parts CPU/IO pour chaque PDB (0 à 10). Le pourcentage alloué est calculé proportionnellement au total des shares. Un PDB avec 0 share ne recoit aucune ressource garantie.</li>
+            <li><strong>Appliquer le plan</strong> : Valide la Répartition et affiche un diagnostic de conformité SLA (les PDBs critiques doivent avoir &gt;= 50% du total).</li>
+            <li><strong>Réinitialiser</strong> : Restaure les shares par défaut (Urgences:4, Bloc:3, PMSI:2, Recherche:1).</li>
+            <li><strong>Simuler pic de charge</strong> : génère une séquence temporelle simulant la contention sur les latches <code>row cache objects</code> et <code>shared pool</code> quand 4 PDBs accèdent simultanement au Dictionnaire partagé du <code>CDB$ROOT</code>.</li>
+            <li><strong>Exécuter Oraclé Data Masking</strong> : Applique le masque sur les champs NIR et nom dans le PDB cible, demontrant le processus de clonage conforme RGPD.</li>
           </ul>
         </div>
 
         <div class="help-modal__section">
-          <div class="help-modal__section-title help-modal__section-title--indicators">Indicateurs Cles</div>
+          <div class="help-modal__section-title help-modal__section-title--indicators">Indicateurs Clés</div>
           <ul class="help-modal__list">
-            <li><strong>Latch Waits/sec</strong> : Nombre d'attentes sur les latches du dictionnaire. Un pic indique une contention qui degrade le temps de reponse de tous les PDBs.</li>
-            <li><strong>Dict Cache Hit Ratio</strong> : Taux de hit du dictionnaire de donnees en memoire. En dessous de 95%, les hard parses augmentent, degradant les performances.</li>
-            <li><strong>CPU % par PDB</strong> : Repartition proportionnelle issue des shares. Verifiez que les PDBs critiques (Urgences, Bloc) totalisent au moins 50%.</li>
+            <li><strong>Latch Waits/sec</strong> : Nombre d'attentes sur les latches du dictionnaire. Un pic indique une contention qui degrade le temps de réponse de tous les PDBs.</li>
+            <li><strong>Dict Cache Hit Ratio</strong> : Taux de hit du dictionnaire de données en mémoire. En dessous de 95%, les hard parses augmentent, degradant les performances.</li>
+            <li><strong>CPU % par PDB</strong> : Répartition proportionnelle issue des shares. Vérifiez que les PDBs critiques (Urgences, Bloc) totalisent au moins 50%.</li>
           </ul>
         </div>
 
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--hds">Contexte HDS / CHU</div>
-          <p class="help-modal__text">Dans un CHU, l'isolation multitenant permet de separer les environnements (production, recherche, test) sur une seule instance Oracle, reduisant les couts de licence et d'administration. Le <strong>Data Masking</strong> est obligatoire pour tout clonage vers un environnement non-production contenant des donnees de santé. Les <strong>Resource Plans</strong> garantissent que les processus critiques (Urgences, Bloc operatoire) ne sont jamais affames par des requetes de recherche ou des batchs PMSI/T2A.</p>
+          <p class="help-modal__text">Dans un CHU, l'isolation multitenant permet de séparer les environnements (production, recherche, test) sur une seule instance Oracle, réduisant les coûts de licence et d'administration. Le <strong>Data Masking</strong> est obligatoire pour tout clonage vers un environnement non-production contenant des données de santé. Les <strong>Resource plans</strong> garantissent que les processus critiques (Urgences, Bloc operatoire) ne sont jamais affamés par des requêtes de recherche ou des batchs PMSI/T2A.</p>
         </div>
 
       </div>
@@ -658,46 +658,46 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
     <!-- MODAL 2: SGA/PGA -->
     <div class="help-modal" id="help-memory" role="dialog" aria-modal="true" aria-labelledby="help-memory-title" aria-hidden="true">
       <div class="help-modal__header">
-        <div class="help-modal__title" id="help-memory-title">Module 2 - SGA / PGA Internals</div>
+        <div class="help-modal__title" id="help-memory-title">Module 2 — SGA / PGA Internals</div>
         <button class="help-modal__close" aria-label="Fermer l'aide" tabindex="0">&times;</button>
       </div>
       <div class="help-modal__body">
 
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--objective">Objectif de la Simulation</div>
-          <p class="help-modal__text">Ce module modelise la gestion memoire interne d'Oracle, couvrant trois mecanismes algorithmiques fondamentaux :</p>
+          <p class="help-modal__text">Ce module modélise la gestion mémoire interne d'Oracle, couvrant trois mécanismes algorithmiques fondamentaux :</p>
           <ul class="help-modal__list">
-            <li><strong>Buffer Cache LRU / Touch Count</strong> : Oracle utilise un algorithme de remplacement de blocs base sur le <em>Touch Count</em> (introduit en 10g). Les blocs accedes frequemment migrent vers la "hot end" de la liste LRU. Les full table scans inserent les blocs au "midpoint" avec TC=0, evitant de polluer le cache avec des donnees a usage unique.</li>
-            <li><strong>Latch Cache Buffers Chains (CBC)</strong> : Les latches protegent les chaines de hash du buffer cache. Quand N sessions accedent concurrentiellement au meme block (hot block), la contention est <em>quadratique</em> : le temps total d'attente croit comme O(N^2). Le mecanisme de spin/sleep determine la gravite de la contention.</li>
-            <li><strong>PGA Work Areas &amp; Temp Spill</strong> : Chaque session dispose d'une zone memoire privee (PGA) pour les operations de tri, hash join, et bitmap merge. Quand l'operation excede la memoire allouee (<code>PGA_AGGREGATE_TARGET</code>), Oracle bascule sur des <em>Temp Segments</em> en disque, multipliant la latence par 500 a 10000.</li>
+            <li><strong>Buffer Cache LRU / Touch Count</strong> : Oraclé utilise un algorithme de remplacement de blocs basé sur le <em>Touch Count</em> (introduit en 10g). Les blocs accédés fréquemment migrent vers la "hot end" de la liste LRU. Les full table scans insèrent les blocs au "midpoint" avec TC=0, évitant de polluer le cache avec des données à usage unique.</li>
+            <li><strong>Latch Cache Buffers Chains (CBC)</strong> : Les latches protègent les chaines de hash du buffer cache. Quand N sessions accèdent simultanément au même block (hot block), la contention est <em>quadratique</em> : le temps total d'attente croît comme O(N^2). Le mécanisme de spin/sleep détermine la gravité de la contention.</li>
+            <li><strong>PGA Work Areas &amp; Temp Spill</strong> : Chaque session dispose d'une zone mémoire privée (PGA) pour les opérations de tri, hash join, et bitmap merge. Quand l'opération excède la mémoire allouée (<code>PGA_AGGREGATE_TARGET</code>), Oraclé bascule sur des <em>Temp Segments</em> en disque, multipliant la latence par 500 à 10000.</li>
           </ul>
         </div>
 
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--controls">Controles Disponibles</div>
           <ul class="help-modal__list">
-            <li><strong>SGA_TARGET slider</strong> : Redimensionne la taille totale de la SGA (1024 a 16384 MB). Le <em>Auto-Tune</em> (AMM) analyse les advisors internes et propose une valeur optimale.</li>
-            <li><strong>Acces Bloc (Touch)</strong> : Incremente le Touch Count d'un bloc aleatoire, simulant un acces recurrent. Observez la migration vers la HOT END.</li>
-            <li><strong>Full Table Scan</strong> : Simule un parcours sequentiel complet : les blocs touches recoivent TC=0 et restent a la COLD END grace au Midpoint Insertion.</li>
-            <li><strong>Checkpoint / Flush</strong> : Declenche un checkpoint : tous les dirty blocks sont marques pour ecriture par DBWR, les TC sont decrementes.</li>
-            <li><strong>Sessions Concurrentes (latch)</strong> : Definit le nombre de sessions accedant au meme hot block (1 a 32). La contention croit de maniere quadratique.</li>
-            <li><strong>Taille du Tri / PGA Limit</strong> : Definit la taille de l'operation de sort et le plafond PGA. Si le tri excede 20% du PGA (work area), un Temp Spill se produit.</li>
+            <li><strong>SGA_TARGET slider</strong> : Redimensionne la taille totale de la SGA (1024 à 16384 MB). Le <em>Auto-Tune</em> (AMM) analyse les advisors internes et propose une valeur optimale.</li>
+            <li><strong>Accès Bloc (Touch)</strong> : Incrémente le Touch Count d'un bloc aléatoire, simulant un accès récurrent. Observe la migration vers la HOT END.</li>
+            <li><strong>Full Table Scan</strong> : Simule un parcours séquentiel complet : les blocs touches reçoivent TC=0 et restent à la COLD END grace au Midpoint Insertion.</li>
+            <li><strong>Checkpoint / Flush</strong> : Déclenche un checkpoint : tous les dirty blocks sont marqués pour écriture par DBWR, les TC sont décrementés.</li>
+            <li><strong>Sessions Concurrentes (latch)</strong> : Définit le nombre de sessions accédant au même hot block (1 à 32). La contention croît de manière quadratique.</li>
+            <li><strong>Taille du Tri / PGA Limit</strong> : Définit la taille de l'opération de sort et le plafond PGA. Si le tri excède 20% du PGA (work area), un Temp Spill se produit.</li>
           </ul>
         </div>
 
         <div class="help-modal__section">
-          <div class="help-modal__section-title help-modal__section-title--indicators">Indicateurs Cles</div>
+          <div class="help-modal__section-title help-modal__section-title--indicators">Indicateurs Clés</div>
           <ul class="help-modal__list">
-            <li><strong>Touch Count (TC)</strong> : Blocs avec TC >= 3 migrent vers la HOT END. TC = 0 signifie bloc froid (FTS ou jamais accede).</li>
-            <li><strong>DIRTY / PINNED</strong> : Un bloc DIRTY a ete modifie en memoire mais pas encore ecrit sur disque. Un bloc PINNED est en cours d'utilisation par une session.</li>
-            <li><strong>Wait Time Total (latch)</strong> : Temps cumule d'attente sur le latch CBC. Comparez les valeurs entre 4 et 32 sessions pour observer la croissance quadratique.</li>
-            <li><strong>Mode execution (PGA)</strong> : OPTIMAL (tout en memoire) vs SPILLED (bascule disque). Le temps total en mode SPILLED inclut la penalite I/O disque (50ms/MB vs 0.1ms/MB en memoire).</li>
+            <li><strong>Touch Count (TC)</strong> : Blocs avec TC >= 3 migrent vers la HOT END. TC = 0 signifie bloc froid (FTS ou jamais accédé).</li>
+            <li><strong>DIRTY / PINNED</strong> : Un bloc DIRTY a été modifié en mémoire mais pas encore écrit sur disque. Un bloc PINNED est en cours d'utilisation par une session.</li>
+            <li><strong>Wait Time Total (latch)</strong> : Temps cumulé d'attente sur le latch CBC. Comparez les valeurs entre 4 et 32 sessions pour observer la croissance quadratique.</li>
+            <li><strong>Mode exécution (PGA)</strong> : OPTIMAL (tout en mémoire) vs SPILLED (bascule disque). Le temps total en mode SPILLED inclut la pénalité I/O disque (50ms/MB vs 0.1ms/MB en mémoire).</li>
           </ul>
         </div>
 
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--hds">Contexte HDS / CHU</div>
-          <p class="help-modal__text">Les requetes PMSI/T2A de facturation impliquent des aggregations sur des millions de sejours (RSA). Un Temp Spill sur ces requetes peut bloquer la production T2A pendant plusieurs minutes, impactant la facturation mensuelle du CHU. La contention sur les latches CBC peut survenir quand plusieurs sessions accedent aux memes blocs de reference (tables de parametres, nomenclatures). Le dimensionnement correct du SGA (via AMM) et du PGA garantit des temps de reponse stables pour les workflows critiques.</p>
+          <p class="help-modal__text">Les requêtes PMSI/T2A de facturation impliquent des agrégations sur des millions de séjours (RSA). Un Temp Spill sur ces requêtes peut bloquer la production T2A pendant plusieurs minutes, impactant la facturation mensuelle du CHU. La contention sur les latches CBC peut survenir quand plusieurs sessions accèdent aux mêmes blocs de référence (tables de paramêtres, nomenclatures). Le dimensionnement correct du SGA (via AMM) et du PGA garantit des temps de réponse stables pour les workflows critiques.</p>
         </div>
 
       </div>
@@ -706,51 +706,51 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       </div>
     </div>
 
-    <!-- MODAL 3: I/O & Coherence -->
+    <!-- MODAL 3: I/O & cohérence -->
     <div class="help-modal" id="help-io" role="dialog" aria-modal="true" aria-labelledby="help-io-title" aria-hidden="true">
       <div class="help-modal__header">
-        <div class="help-modal__title" id="help-io-title">Module 3 - I/O &amp; Coherence</div>
+        <div class="help-modal__title" id="help-io-title">Module 3 - I/O &amp; cohérence</div>
         <button class="help-modal__close" aria-label="Fermer l'aide" tabindex="0">&times;</button>
       </div>
       <div class="help-modal__body">
 
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--objective">Objectif de la Simulation</div>
-          <p class="help-modal__text">Ce module modelise le cycle de vie complet d'une transaction Oracle et les mecanismes de garantie de coherence, couvrant quatre concepts fondamentaux :</p>
+          <p class="help-modal__text">Ce module modélise le cycle de vie complet d'une transaction Oraclé et les mécanismes de garantie de coherence, couvrant quatre concepts fondamentaux :</p>
           <ul class="help-modal__list">
-            <li><strong>Cycle Redo/Undo</strong> : Chaque DML genere deux traces : les <em>Undo blocks</em> (avant-image, pour le rollback et la read consistency) dans le tablespace UNDO, et les <em>Redo entries</em> (apres-image, pour la recovery) dans le <code>Redo Log Buffer</code>. Au commit, <code>LGWR</code> force l'ecriture synchrone des redo entries sur disque. Les dirty blocks sont ecrits asynchronement par <code>DBWR</code> (lazy write).</li>
-            <li><strong>SCN (System Change Number)</strong> : Horloge logique d'Oracle, incrementee a chaque commit. Le SCN garantit la <em>read consistency</em> : une requete voit les donnees telles qu'elles etaient a son SCN de depart, reconstruites via l'Undo si necessaire.</li>
-            <li><strong>Instance Recovery</strong> : Apres un crash (<code>SHUTDOWN ABORT</code>), Le mecanisme de recovery Oracle execute deux phases : <em>Redo Apply</em> (roll-forward, rejoue tous les redo records depuis le dernier checkpoint) puis <em>Undo Apply</em> (rollback des transactions non commitrees). La base est alors ouverte et coherente.</li>
-            <li><strong>ORA-01555 Snapshot Too Old</strong> : Erreur critique survenant quand les donnees Undo necessaires a la read consistency d'une longue requete ont ete ecrasees par des DMLs concurrents. Le risque depend de <code>UNDO_RETENTION</code>, de la duree de la requete, et du taux de rotation Undo.</li>
+            <li><strong>Cycle Redo/Undo</strong> : Chaque DML génère deux traces : les <em>blocs d'annulation</em> (avant-image, pour le rollback et la read consistency) dans le tablespace UNDO, et les <em>Redo entries</em> (après-image, pour la recovery) dans le <code>Redo Log Buffer</code>. Au commit, <code>LGWR</code> force l'écriture synchrone des redo entries sur disque. Les dirty blocks sont écrits asynchronement par <code>DBWR</code> (lazy write).</li>
+            <li><strong>SCN (System Change Number)</strong> : Horloge logique d'Oracle, Incrémentée à chaque commit. Le SCN garantit la <em>read consistency</em> : une requête voit les données telles qu'elles étaient à son SCN de départ, reconstruites via l'Undo si nécessaire.</li>
+            <li><strong>Instance Recovery</strong> : Après un crash (<code>SHUTDOWN ABORT</code>), le mécanisme de reprise Oraclé exécute deux phases : <em>Redo Apply</em> (roll-forward, rejoue tous les redo records depuis le dernier checkpoint) puis <em>Undo Apply</em> (rollback des transactions non commitrees). La base est alors ouverte et coherente.</li>
+            <li><strong>ORA-01555 Snapshot Too Old</strong> : Erreur critique survenant quand les données Undo nécessaires à la read consistency d'une longue requête ont été écrasées par des DMLs concurrents. Le risque dépend de <code>UNDO_RETENTION</code>, de la durée de la requête, et du taux de rotation Undo.</li>
           </ul>
         </div>
 
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--controls">Controles Disponibles</div>
           <ul class="help-modal__list">
-            <li><strong>Executer Transaction Complete</strong> : Anime le cycle BEGIN -&gt; DML (Undo) -&gt; Redo -&gt; COMMIT (LGWR) -&gt; DBWR, avec changement de couleur des marqueurs a chaque etape.</li>
+            <li><strong>Exécuter Transaction Complete</strong> : Anime le cyclé BEGIN -&gt; DML (Undo) -&gt; Redo -&gt; COMMIT (LGWR) -&gt; DBWR, avec changement de couleur des marqueurs à chaque étape.</li>
             <li><strong>Simuler Crash (SHUTDOWN ABORT)</strong> : Simule un crash instance : les dirty blocks en Buffer Cache sont perdus. Les marqueurs passent en rouge (erreur).</li>
-            <li><strong>Instance Recovery</strong> : Execute la sequence de recovery SMON : Redo Apply puis Undo Apply. Les marqueurs repassent au vert.</li>
-            <li><strong>Commit (SCN++)</strong> : Incremente le SCN, simulant un commit. Le compteur SCN central s'actualise.</li>
-            <li><strong>Query a SCN donne</strong> : Simule une Flashback Query (<code>AS OF SCN</code>), reconstruisant l'image des donnees a un SCN historique via l'Undo.</li>
-            <li><strong>Simuler Lecture Coherente</strong> : Affiche deux sessions paralleles : Session A voit les donnees a son SCN de depart (reconstruites via Undo), Session B voit les modifications courantes. Demontre que Session A n'est pas affectee par les modifications de Session B.</li>
-            <li><strong>UNDO_RETENTION slider</strong> : Definit la duree de conservation des Undo blocks (60 a 3600 secondes). Combine avec la duree de requete et la charge DML, determine le risque d'ORA-01555.</li>
+            <li><strong>Instance Recovery</strong> : Exécute la séquence de recovery SMON : Redo Apply puis Undo Apply. Les marqueurs repassent au vert.</li>
+            <li><strong>Commit (SCN++)</strong> : Incrémente le SCN, simulant un commit. Le compteur SCN central s'actualise.</li>
+            <li><strong>Query à SCN donné</strong> : Simule une Flashback Query (<code>AS OF SCN</code>), reconstruisant l'image des données à un SCN historique via l'Undo.</li>
+            <li><strong>Simuler Lecture Coherente</strong> : Affiche deux sessions parallèles : Session A voit les données à son SCN de depart (reconstruites via Undo), Session B voit les modifications courantes. Demontre que Session A n'est pas affectée par les modifications de Session B.</li>
+            <li><strong>UNDO_RETENTION slider</strong> : Définit la durée de conservation des blocs d'annulation (60 à 3600 secondes). Combine avec la durée de requête et la charge DML, détermine le risque d'ORA-01555.</li>
           </ul>
         </div>
 
         <div class="help-modal__section">
-          <div class="help-modal__section-title help-modal__section-title--indicators">Indicateurs Cles</div>
+          <div class="help-modal__section-title help-modal__section-title--indicators">Indicateurs Clés</div>
           <ul class="help-modal__list">
-            <li><strong>Compteur SCN</strong> : Progresse en fonction de l'activite transactionnelle simulee (simulation d'activite background). Chaque commit avance le SCN.</li>
-            <li><strong>Marqueurs de flux</strong> : 5 etapes colorees (gris = en attente, bleu = en cours, vert = complete, rouge = erreur). Permettent de suivre visuellement la progression de la transaction.</li>
-            <li><strong>Retention effective</strong> : Valeur calculee = UNDO_RETENTION * (1 - DML_load / 200). Si la duree de requete excede cette valeur, ORA-01555 se produit.</li>
-            <li><strong>Log console ORA-01555</strong> : Affiche la progression de la requete longue et le moment ou les Undo blocks sont ecrases.</li>
+            <li><strong>Compteur SCN</strong> : Progresse en fonction de l'activité transactionnelle simulée (simulation d'activite background). Chaque commit avance le SCN.</li>
+            <li><strong>Marqueurs de flux</strong> : 5 étapes colorées (gris = en attente, bleu = en cours, vert = complété, rouge = erreur). Permettent de suivre visuellement la progression de la transaction.</li>
+            <li><strong>Retention effective</strong> : Valeur calculée = UNDO_RETENTION * (1 - DML_load / 200). Si la durée de requête excède cette valeur, ORA-01555 se produit.</li>
+            <li><strong>Log console ORA-01555</strong> : Affiche la progression de la requête longue et le moment où les blocs d'annulation sont écrasés.</li>
           </ul>
         </div>
 
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--hds">Contexte HDS / CHU</div>
-          <p class="help-modal__text">La <strong>coherence de lecture</strong> est vitale pour la facturation T2A : une requete de facturation lancée a 23h doit produire le meme resultat qu'une requete identique lancée a 23h05, meme si des modifications sont en cours. Le <strong>SCN</strong> garantit cette propriete. L'<strong>Instance Recovery</strong> assure qu'aucune donnee n'est corrompue apres un crash, meme pendant un pic d'activite aux Urgences. L'<strong>ORA-01555</strong> peut faire echouer les batchs de facturation nocturnes : un <code>UNDO_RETENTION</code> mal calibre (ou un tablespace UNDO sous-dimensionne) provoque l'echec de requetes de plusieurs heures.</p>
+          <p class="help-modal__text">La <strong>coherence de lecture</strong> est vitale pour la facturation T2A : une requête de facturation lancée à 23h doit produire le même resultat qu'une requête identique lancée à 23h05, même si des modifications sont en cours. Le <strong>SCN</strong> garantit cette propriété. L'<strong>Instance Recovery</strong> assure qu'aucune donnée n'est corrompue apres un crash, même pendant un pic d'activite aux Urgences. L'<strong>ORA-01555</strong> peut faire echouer les batchs de facturation nocturnes : un <code>UNDO_RETENTION</code> mal calibré (ou un tablespace UNDO sous-dimensionné) provoque l'échec de requêtes de plusieurs heures.</p>
         </div>
 
       </div>
@@ -762,45 +762,45 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
     <!-- MODAL 4: Cloud Souverain & IA -->
     <div class="help-modal" id="help-cloud" role="dialog" aria-modal="true" aria-labelledby="help-cloud-title" aria-hidden="true">
       <div class="help-modal__header">
-        <div class="help-modal__title" id="help-cloud-title">Module 4 - Cloud Souverain &amp; IA Controlee</div>
+        <div class="help-modal__title" id="help-cloud-title">Module 4 — Cloud Souverain &amp; IA Controlee</div>
         <button class="help-modal__close" aria-label="Fermer l'aide" tabindex="0">&times;</button>
       </div>
       <div class="help-modal__body">
 
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--objective">Objectif de la Simulation</div>
-          <p class="help-modal__text">Ce module adresse les enjeux de souverainete des donnees de santé et d'usage de l'IA dans un contexte hospitalier reglemente (HDS, RGPD, ANS) :</p>
+          <p class="help-modal__text">Ce module adresse les enjeux de souveraineté des données de santé et d'usage de l'IA dans un contexte hospitalier réglementé (HDS, RGPD, ANS) :</p>
           <ul class="help-modal__list">
-            <li><strong>TDE (Transparent Data Encryption) AES-256</strong> : Chiffrement des donnees au repos (data-at-rest) au niveau tablespace. La cle maitresse est stockee dans un HSM (Hardware Security Module). En mode <code>BYOK</code> (Bring Your Own Key), le CHU controle ses propres cles, independamment d'Oracle.</li>
-            <li><strong>Auto-Tuning (IA embarquee)</strong> : L'Autonomous Database integre un moteur d'optimisation local : creation automatique d'indexes, <em>SQL Plan Management</em> (SPM), collecte adaptive de statistiques. Aucune donnee ne quitte le perimetre OCI France.</li>
-            <li><strong>IA embarquee vs IA generative externe</strong> : Distinction methodologique critique. L'IA embarquee (Auto-Tuning) s'execute localement sur l'instance, sans transfert de donnees. L'IA generative externe (LLM cloud) implique un transfert de donnees hors du perimetre HDS, soumis au RGPD Art. 44-49 (transferts internationaux).</li>
-            <li><strong>Souverainete OCI France</strong> : Architecture en couches : HSM (cles) -&gt; TDE (chiffrement) -&gt; Autonomous DB (eu-france-1) -&gt; Data CHU. Chaque couche est certifiee HDS par l'ANS.</li>
+            <li><strong>TDE (Transparent Data Encryption) AES-256</strong> : Chiffrement des données au repos (data-at-rest) au niveau tablespace. La clé maiîtresse est stockée dans un HSM (Hardware Security Module). En mode <code>BYOK</code> (Bring Your Own Key), le CHU contrôle ses propres clés, indépendamment d'Oracle.</li>
+            <li><strong>Auto-Tuning (IA embarquée)</strong> : L'Autonomous Database integre un moteur d'optimisation local : création automatique d'indexes, <em>SQL Plan Management</em> (SPM), collecte adaptive de statistiques. Aucune donnée ne quitte le perimêtre OCI France.</li>
+            <li><strong>IA embarquée vs IA générative externe</strong> : Distinction méthodologique critique. L'IA embarquée (Auto-Tuning) s'exécute localement sur l'instance, sans transfert de données. L'IA générative externe (LLM cloud) implique un transfert de données hors du périmètre HDS, soumis au RGPD Art. 44-49 (transferts internationaux).</li>
+            <li><strong>Souverainete OCI France</strong> : Architecture en couches : HSM (cles) -&gt; TDE (chiffrement) -&gt; Autonomous DB (eu-france-1) -&gt; Data CHU. Chaque couche est certifiée HDS par l'ANS.</li>
           </ul>
         </div>
 
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--controls">Controles Disponibles</div>
           <ul class="help-modal__list">
-            <li><strong>Chiffrer (TDE AES-256)</strong> : Simule le chiffrement des champs sensibles (NIR, nom, diagnostic). Affiche les cles hexadecimales simulees avec les metadonnees de chiffrement (Key ID, algorithme, mode).</li>
-            <li><strong>Dechiffrer (Cle HSM)</strong> : Tente de dechiffrer avec la cle HSM. Si la cle a ete revoquee, l'operation echoue (ORA-28365), demontrant que sans la cle, les donnees sont irrecuperables.</li>
-            <li><strong>Revoquer Cle (BYOK)</strong> : Simule la rotation de cle maitresse. Apres revocation, le dechiffrement est impossible jusqu'a la re-importation de la nouvelle cle. En production HDS, une periode de coexistence des cles est necessaire.</li>
-            <li><strong>Lancer Auto-Tuning</strong> : Execute une simulation d'analyse de plan d'execution avec 3 recommandations : creation d'index, SQL Plan Baseline, et ajustement des statistiques. Affiche l'amelioration de performance estimee (x21).</li>
+            <li><strong>Chiffrer (TDE AES-256)</strong> : Simule le chiffrement des champs sensibles (NIR, nom, diagnostic). Affiche les clés hexadecimales simulées avec les métadonnées de chiffrement (Key ID, algorithme, mode).</li>
+            <li><strong>déchiffrer (Clé HSM)</strong> : Tente de déchiffrer avec la clé HSM. Si la clé a été révoquée, l'opération echoue (ORA-28365), demontrant que sans la clé, les données sont irrécupérables.</li>
+            <li><strong>révoquer la clé (BYOK)</strong> : Simule la rotation de clé maiîtresse. Apres revocation, le déchiffrement est impossible jusqu'à la ré-importation de la nouvelle clé. En production HDS, une période de coexistence des clés est nécessaire.</li>
+            <li><strong>Lancer Auto-Tuning</strong> : Exécute une simulation d'analyse de plan d'exécution avec 3 recommandations : création d'index, SQL Plan Baseline, et ajustement des statistiques. Affiche l'amélioration de performance estimee (x21).</li>
           </ul>
         </div>
 
         <div class="help-modal__section">
-          <div class="help-modal__section-title help-modal__section-title--indicators">Indicateurs Cles</div>
+          <div class="help-modal__section-title help-modal__section-title--indicators">Indicateurs Clés</div>
           <ul class="help-modal__list">
             <li><strong>Statut TDE</strong> : <code>V$ENCRYPTED_TABLESPACES: ENCRYPTED</code> confirme le chiffrement actif. Overhead CPU : ~3-5%.</li>
-            <li><strong>Revoquer Cle</strong> : <code>ORA-28365: wallet is not open</code> illustre un keystore TDE inaccessible ou non ouvert, empechant l'acces aux donnees chiffrees. C'est le comportement attendu et desire.</li>
-            <li><strong>Auto-Tuning</strong> : <code>V$SQL_AUTO_INDEX: INDEX CREATED</code> et <code>SQL_PLAN_BASELINE: ACCEPTED</code> confirment les optimisations appliquees automatiquement.</li>
-            <li><strong>Tableau comparatif IA</strong> : Compare IA embarquee vs generative externe sur 5 criteres : localisation des donnees, conformite RGPD, certification HDS, controle humain, et cas d'usage.</li>
+            <li><strong>révoquer clé</strong> : <code>ORA-28365: wallet is not open</code> illustre un keystore TDE inaccessible ou non ouvert, empêchant l'accès aux données chiffrées. C'est le comportement attendu et désiré.</li>
+            <li><strong>Auto-Tuning</strong> : <code>V$SQL_AUTO_INDEX: INDEX CREATED</code> et <code>SQL_PLAN_BASELINE: ACCEPTED</code> confirment les optimisations appliquées automatiquement.</li>
+            <li><strong>Tableau comparatif IA</strong> : Compare IA embarquée vs générative externe sur 5 critères : localisation des données, conformité RGPD, certification HDS, controle humain, et cas d'usage.</li>
           </ul>
         </div>
 
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--hds">Contexte HDS / CHU</div>
-          <p class="help-modal__text">Dans un contexte HDS, le <strong>chiffrement TDE</strong> est une mesure de securite obligatoire (Art. 32 RGPD : securite du traitement). Le mode <strong>BYOK</strong> garantit que le CHU conserve la souverainete sur ses cles de chiffrement, independamment du fournisseur cloud. La distinction entre <strong>IA embarquee</strong> et <strong>IA generative externe</strong> est methodologiquement critique : l'IA embarquee ne pose aucun probleme de transfert de donnees de santé (les donnees restent dans OCI France, region certifiee HDS). L'IA generative externe necessite une analyse d'impact RGPD (DPIA) et potentiellement des clauses contractuelles pour les transferts hors UE. L'<strong>approche Human-in-the-Loop</strong> garantit que toute recommandation d'IA (auto-tuning) est soumise a validation humaine avant application en production.</p>
+          <p class="help-modal__text">Dans un contexte HDS, le <strong>chiffrement TDE</strong> est une mesure de securite obligatoire (Art. 32 RGPD : securite du traitement). Le mode <strong>BYOK</strong> garantit que le CHU conserve la souverainete sur ses clés de chiffrement, indépendamment du fournisseur cloud. La distinction entre <strong>IA embarquée</strong> et <strong>IA générative externe</strong> est méthodologiquement critique : l'IA embarquée ne pose aucun problème de transfert de données de santé (les données restent dans OCI France, region certifiée HDS). L'IA générative externe nécessite une analyse d'impact RGPD (DPIA) et potentiellement des clauses contractuelles pour les transferts hors UE. L'<strong>approche Human-in-the-Loop</strong> garantit que toute recommandation d'IA (auto-tuning) est soumise à validation humaine avant application en production.</p>
         </div>
 
       </div>
@@ -810,75 +810,75 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
     </div>
     <div class="help-modal" id="help-lexicon" role="dialog" aria-modal="true" aria-labelledby="help-lexicon-title" aria-hidden="true">
       <div class="help-modal__header">
-        <div class="help-modal__title" id="help-lexicon-title">Lexique technique — Architecture Oracle SIH</div>
+        <div class="help-modal__title" id="help-lexicon-title">Lexique technique — Architecture Oraclé SIH</div>
         <button class="help-modal__close" aria-label="Fermer l'aide" tabindex="0">&times;</button>
       </div>
       <div class="help-modal__body">
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--lexique">Architecture Multitenant</div>
           <ul class="help-modal__list">
-            <li><strong>Conteneur de Base de Donnees (CDB)</strong> — Base de donnees racine chapeautant l'ensemble des bases de donnees placables dans l'architecture multitenant Oracle 12c et suivantes.</li>
-            <li><strong>Base de Donnees Placable (PDB)</strong> — Base de donnees portable et isolee au sein d'un conteneur, apparaissant aux utilisateurs et aux applications comme une base de donnees classique.</li>
-            <li><strong>Part de Ressources</strong> — Unite de repartition des capacites de calcul et d'entrees-sorties attribuee a chaque base placable par un plan d'allocation.</li>
-            <li><strong>Dictionnaire Partage</strong> — Ensemble de metadonnees de definition (structures de schemas, objets, privileges) mutualisees entre toutes les bases placables d'un meme conteneur.</li>
-            <li><strong>Cache de Lignes du Dictionnaire</strong> — Structure memoire logeant dans la memoire partagee les lignes du dictionnaire, protegee par un verrou d'exclusion mutuelle (latch).</li>
-            <li><strong>Masquage de Donnees</strong> — Technique d'obfuscation des donnees sensibles (numero d'inscription au repertoire, identite des patients) lors du clonage d'une base, conforme au Reglement General sur la Protection des Donnees.</li>
-            <li><strong>Plan d'Allocation de Ressources (Resource Plan)</strong> — Mecanisme de repartition des ressources de calcul et d'entrees-sorties entre les bases de donnees placables d'un meme conteneur, regule par le plan d'allocation par defaut du conteneur et les parts relatives attribuees a chaque base.</li>
+            <li><strong>Conteneur de Base de données (CDB)</strong> — Base de données racine chapeautant l'ensemble des bases de données enfichables dans l'architecture multitenant Oraclé 12c et suivantes.</li>
+            <li><strong>Base de Données Enfichable (PDB)</strong> — Base de données portable et isolée au sein d'un conteneur, apparaissant aux utilisateurs et aux applications comme une base de données classique.</li>
+            <li><strong>Part de Ressources</strong> — Unite de Répartition des capacites de calcul et d'entrees-sorties attribuée à chaque base enfichable par un plan d'allocation.</li>
+            <li><strong>Dictionnaire partagé</strong> — Ensemble de métadonnées de Définition (structures de schemas, objets, privileges) mutualisées entre toutes les bases enfichables d'un même conteneur.</li>
+            <li><strong>Cache de Lignes du Dictionnaire</strong> — Structure mémoire logeant dans la mémoire partagée les lignes du dictionnaire, protégée par un verrou d'exclusion mutuelle (latch).</li>
+            <li><strong>Masquage de données</strong> — Technique d'obfuscation des données sensibles (numero d'inscription au répertoire, identité des patients) lors du clonage d'une base, conforme au Règlement Général sur la Protection des données.</li>
+            <li><strong>Plan d'Allocation de Ressources (Resource plan)</strong> — mécanisme de Répartition des ressources de calcul et d'entrees-sorties entre les bases de données enfichables d'un même conteneur, régulé par le plan d'allocation par defaut du conteneur et les parts relatives attribuées à chaque base.</li>
           </ul>
         </div>
         <div class="help-modal__section">
-          <div class="help-modal__section-title help-modal__section-title--lexique">Memoire Globale (SGA / PGA)</div>
+          <div class="help-modal__section-title help-modal__section-title--lexique">mémoire Globale (SGA / PGA)</div>
           <ul class="help-modal__list">
-            <li><strong>Memoire Globale de Systeme (SGA)</strong> — Zone memoire partagee par l'ensemble des processus Oracle, abritant le cache de tampons, le reservoir partage, le tampon de journalisation et les structures connexes.</li>
-            <li><strong>Cache de Tampons</strong> — Portion de la memoire globale contenant les blocs de donnees lus depuis les fichiers disques, ordonnancee par l'algorithme du moindre recent usage.</li>
-            <li><strong>Compteur d'Acces</strong> — Indicateur du nombre de consultations d'un bloc dans le cache de tampons, determinant son placement dans la chaine du moindre recent usage.</li>
-            <li><strong>Verrou d'Exclusion Mutuelle (Latch)</strong> — Mecanisme de verrouillage leger protegeant l'acces concurrent aux structures partagees de la memoire globale.</li>
-            <li><strong>Memoire Globale de Programme (PGA)</strong> — Zone memoire privee allouee a chaque session d'utilisation pour les operations de tri, de regroupement et de jointure.</li>
-            <li><strong>Debordement Temporaire</strong> — Basculement des operations memoire vers les espaces temporaires sur disque lorsque la memoire globale de programme est insuffisante, entrainant une degradation sensible des temps d'execution.</li>
-            <li><strong>Point de Reprise</strong> — Evenement de synchronisation ou le processus d'ecriture des bases enregistre sur disque les blocs modifies du cache de tampons.</li>
-            <li><strong>Reservoir Partagé (Shared Pool)</strong> — Composant de la memoire globale de systeme abritant le cache de la bibliotheque, le cache du dictionnaire et les structures de controle de l'analyse syntaxique, essentiel a la reduction des analyses completes.</li>
+            <li><strong>mémoire globale de système (SGA)</strong> — Zone mémoire partagée par l'ensemble des processus Oracle, abritant le cache de tampons, le reservoir partagé, le tampon de journalisation et les structures connexes.</li>
+            <li><strong>Cache de Tampons</strong> — Portion de la mémoire globale contenant les blocs de données lus depuis les fichiers disques, ordonnancée par l'algorithme du moindre recent usage.</li>
+            <li><strong>Compteur d'Acces</strong> — Indicateur du nombre de consultations d'un bloc dans le cache de tampons, déterminant son placement dans la chaîne du moindre recent usage.</li>
+            <li><strong>Verrou d'Exclusion Mutuelle (Latch)</strong> — mécanisme de verrouillage léger protegeant l'accès concurrent aux structures partagées de la mémoire globale.</li>
+            <li><strong>mémoire Globale de Programme (PGA)</strong> — Zone mémoire privée allouée à chaque session d'utilisation pour les opérations de tri, de regroupement et de jointure.</li>
+            <li><strong>Debordement Temporaire</strong> — Basculement des opérations mémoire vers les espaces temporaires sur disque lorsque la mémoire globale de programme est insuffisante, entraînant une degradation sensible des temps d'exécution.</li>
+            <li><strong>Point de Reprise</strong> — Evenement de synchronisation où le processus d'écriture des bases enregistre sur disque les blocs modifiés du cache de tampons.</li>
+            <li><strong>Reservoir Partagé (Shared Pool)</strong> — Composant de la mémoire globale de systeme abritant le cache de la bibliothèque, le cache du dictionnaire et les structures de controle de l'analyse syntaxique, essentiel à la reduction des analyses completes.</li>
             <li><strong>Cache de la Bibliotheque (Library Cache)</strong> — Sous-composant du reservoir partage stockant les zones de programmes SQL et PL/SQL analysees, les pointeurs d'analyse et les structures de verrouillage associees au partage de code.</li>
-            <li><strong>Tampon de Journalisation Redo (Redo Log Buffer)</strong> — Zone memoire circulaire de la memoire globale de systeme recevant les entrees de journalisation de chaque modification, videe de maniere synchrone par le processus d'ecriture du journal lors de la validation.</li>
-            <li><strong>Processus d'Ecriture des Bases (DBWR)</strong> — Processus d'arriere-plan charge d'ecrire de maniere asynchrone les blocs modifies du cache de tampons vers les fichiers de donnees sur disque, declenche par les points de reprise et les seuils de saturation.</li>
-            <li><strong>Processus d'Ecriture du Journal (LGWR)</strong> — Processus d'arriere-plan responsable du vidage synchrone des entrees du tampon de journalisation vers les journaux de retablissement en ligne au moment de la validation, garantissant la persistance des modifications.</li>
-            <li><strong>Gestion Automatique de la Memoire (AMM)</strong> — Mecanisme de redimensionnement dynamique des composants de la memoire globale de systeme et de la memoire globale de programme par le moteur de base de donnees, base sur l'analyse des charges de travail courantes.</li>
-            <li><strong>Zone de Travail (Work Area)</strong> — Portion de la memoire globale de programme allouee a chaque operation de tri, de jointure par condensation ou de regroupement par table de bits, dont le depassement entraine un basculement vers l'espace temporaire.</li>
-            <li><strong>Bloc Actif (Hot Block)</strong> — Bloc de donnees du cache de tampons faisant l'objet d'acces concurrents par plusieurs sessions, generant une contention sur le verrou d'exclusion mutuelle des chaines du cache de tampons.</li>
+            <li><strong>Tampon de Journalisation Redo (Redo Log Buffer)</strong> — Zone mémoire circulaire de la mémoire globale de systeme recevant les entrees de journalisation de chaque modification, videe de manière synchrone par le processus d'écriture du journal lors de la validation.</li>
+            <li><strong>Processus d'écriture des Bases (DBWR)</strong> — Processus d'arriere-plan chargé d'écrire de manière asynchrone les blocs modifiés du cache de tampons vers les fichiers de données sur disque, Déclenché par les points de reprise et les seuils de saturation.</li>
+            <li><strong>Processus d'écriture du Journal (LGWR)</strong> — Processus d'arrière-plan responsable du vidage synchrone des entrees du tampon de journalisation vers les journaux de retablissement en ligne au moment de la validation, garantissant la persistance des modifications.</li>
+            <li><strong>Gestion Automatique de la mémoire (AMM)</strong> — mécanisme de redimensionnement dynamique des composants de la mémoire globale de systeme et de la mémoire globale de programme par le moteur de base de données, basé sur l'analyse des charges de travail courantes.</li>
+            <li><strong>Zone de Travail (Work Area)</strong> — Portion de la mémoire globale de programme allouée à chaque opération de tri, de jointure par condensation ou de regroupement par table de bits, dont le depassement entraine un basculement vers l'espace temporaire.</li>
+            <li><strong>Bloc Actif (Hot Block)</strong> — Bloc de données du cache de tampons faisant l'objet d'accès concurrents par plusieurs sessions, generant une contention sur le verrou d'exclusion mutuelle des chaines du cache de tampons.</li>
           </ul>
         </div>
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--lexique">Transactions et Reprise</div>
           <ul class="help-modal__list">
-            <li><strong>Numero de Changement Systeme (SCN)</strong> — Compteur sequentiel global horodatant chaque transaction et garantissant l'ordre causal des modifications dans l'ensemble de la base.</li>
-            <li><strong>Journal de Retablissement (Redo)</strong> — Enregistrement sequentiel de toutes les modifications appliquees a la base, utilise pour la reprise apres incident par application differee.</li>
-            <li><strong>Segment d'Annulation (Undo)</strong> — Blocs conservant l'image anterieure des donnees modifiees, necessaires a la lecture coherente et au retour en arriere des transactions.</li>
+            <li><strong>Numero de Changement Systeme (SCN)</strong> — Compteur séquentiel global horodatant chaque transaction et garantissant l'ordre causal des modifications dans l'ensemble de la base.</li>
+            <li><strong>Journal de Retablissement (Redo)</strong> — Enregistrement séquentiel de toutes les modifications appliquées à la base, utilisé pour la reprise apres incident par application differee.</li>
+            <li><strong>Segment d'Annulation (Undo)</strong> — Blocs conservant l'image anterieure des données modifiees, nécessaires à la lecture coherente et au retour en arrière des transactions.</li>
             <li><strong>Reprise apres Incident</strong> — Processus automatique de retablissement de la base apres un arret brutal, combinant l'application du journal de retablissement (avance rapide) et l'application des segments d'annulation (retour arriere).</li>
-            <li><strong>Coherence de Lecture</strong> — Mecanisme garantissant qu'une requete percoit un instantane coherent des donnees a un instant de reference, en utilisant les blocs d'annulation.</li>
-            <li><strong>Erreur d'Instantané Trop Ancien (ORA-01555)</strong> — Erreur survenant lorsque les blocs d'annulation necessaires a la lecture coherente d'une longue requete ont ete ecrases par des transactions plus recentes avant la fin de la consultation.</li>
-            <li><strong>Duree de Retention de l'Annulation</strong> — Parametre definissant le delai minimal de conservation des segments d'annulation avant leur reutilisation.</li>
-            <li><strong>Requete Flashback (Flashback Query / AS OF SCN)</strong> — Mecanisme permettant d'interroger les donnees telles qu'elles existaient a un numero de changement systeme passe, en utilisant les segments d'annulation pour reconstruire l'image historique sans restaurer de sauvegarde.</li>
-            <li><strong>Moniteur Systeme (SMON)</strong> — Processus d'arriere-plan charge de la reprise apres incident, du nettoyage des segments d'annulation orphelins et de la coalescence des espaces libres dans les espaces de tables.</li>
-            <li><strong>Liste de Transactions Interessees (ITL)</strong> — Structure d'en-tete de bloc de donnees enregistrant les identifiants des transactions actives modifiant des lignes de ce bloc, dont le nombre maximal est determine par le parametre d'initialisation du nombre de transactions simultanees par bloc.</li>
+            <li><strong>Coherence de Lecture</strong> — mécanisme garantissant qu'une requête percoit un instantane coherent des données a un instant de référence, en utilisant les blocs d'annulation.</li>
+            <li><strong>Erreur d'Instantané Trop Ancien (ORA-01555)</strong> — Erreur survenant lorsque les blocs d'annulation nécessaires à la lecture coherente d'une longue requête ont été écrasés par des transactions plus recentes avant la fin de la consultation.</li>
+            <li><strong>Durée de Retention de l'Annulation</strong> — Paramêtre definissant le delai minimal de conservation des segments d'annulation avant leur reutilisation.</li>
+            <li><strong>requête Flashback (Flashback Query / AS OF SCN)</strong> — mécanisme permettant d'interroger les données telles qu'elles existaient à un numéro de changement systeme passe, en utilisant les segments d'annulation pour reconstruire l'image historique sans restaurer de sauvegarde.</li>
+            <li><strong>Moniteur Systeme (SMON)</strong> — Processus d'arrière-plan chargé de la reprise apres incident, du nettoyage des segments d'annulation orphelins et de la coalescence des espaces libres dans les espaces de tables.</li>
+            <li><strong>Liste de Transactions Interessees (ITL)</strong> — Structure d'en-tete de bloc de données enregistrant les identifiants des transactions actives modifiant des lignes de ce bloc, dont le nombre maximal est détermine par le paramêtre d'initialisation du nombre de transactions simultanees par bloc.</li>
           </ul>
         </div>
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--lexique">Chiffrement et Securite</div>
           <ul class="help-modal__list">
-            <li><strong>Chiffrement Transparent (TDE)</strong> — Mecanisme de chiffrement des donnees au repos au sein des fichiers et des espaces de tables, sans aucune modification des applications clientes, utilisant l'algorithme AES a clef de 256 bits.</li>
-            <li><strong>Apport de Votre Propre Clef (BYOK)</strong> — Architecture de gestion des clefs de chiffrement ou l'etablissement de sante conserve la maitrise exclusive de ses clefs cryptographiques.</li>
-            <li><strong>Module de Securite Materiel (HSM)</strong> — Appareil physique dedie a la generation, au stockage et a la rotation des clefs cryptographiques, offrant une protection inviolable.</li>
-            <li><strong>Donnees au Repos (Data-at-Rest)</strong> — Etat des donnees stockees de maniere persistante sur un support physique, dont le chiffrement est assure par le mecanisme de chiffrement transparent au niveau des espaces de tables sans modification des applications.</li>
-            <li><strong>Porte-Clefs TDE (TDE Wallet / Keystore)</strong> — Conteneur cryptographique securise stockant la clef maitresse de chiffrement, protege par un mot de passe ou integre a un module de securite materiel dans l'architecture d'apport de propre clef.</li>
+            <li><strong>Chiffrement Transparent (TDE)</strong> — mécanisme de chiffrement des données au repos au sein des fichiers et des espaces de tables, sans aucune modification des applications clientes, utilisant l'algorithme AES à clé de 256 bits.</li>
+            <li><strong>Apport de Votre Propre Clef (BYOK)</strong> — Architecture de gestion des clés de chiffrement où l'établissement de santé conserve la maitrise exclusive de ses clés cryptographiques.</li>
+            <li><strong>Module de Securite Materiel (HSM)</strong> — Appareil physique dedie à la generation, au stockage et à la rotation des clés cryptographiques, offrant une protection inviolable.</li>
+            <li><strong>données au Repos (Data-at-Rest)</strong> — Etat des données stockées de manière persistante sur un support physique, dont le chiffrement est assure par le mécanisme de chiffrement transparent au niveau des espaces de tables sans modification des applications.</li>
+            <li><strong>Porte-Clés TDE (TDE Wallet / Keystore)</strong> — Conteneur cryptographique securisé stockant la clé maîtresse de chiffrement, protégé par un mot de passe ou intégré à un module de sécurité matériel dans l'architecture d'apport de propre clé.</li>
           </ul>
         </div>
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--lexique">Optimisation Automatique</div>
           <ul class="help-modal__list">
-            <li><strong>Reglage Automatique</strong> — Capacite du moteur Oracle a analyser et optimiser les performances des requetes sans intervention manuelle de l'administrateur.</li>
-            <li><strong>Gestion des Plans d'Execution (SPM)</strong> — Mecanisme de controle des versions de plans d'execution, permettant d'approuver, de geler ou de rejeter les propositions d'amelioration.</li>
-            <li><strong>Auto-Indexation</strong> — Fonctionnalite creant automatiquement les index manquants detectes par l'analyse des charges de requetes, visible dans la vue dynamique des index crees automatiquement.</li>
-            <li><strong>Ligne de Base de Plan d'Execution</strong> — Version validee d'un plan d'execution conservee par le gestionnaire de plans pour garantir la stabilite et la reproductibilite des performances.</li>
-            <li><strong>Analyse Syntaxique Complete / Partielle (Hard Parse / Soft Parse)</strong> — Mecanisme de traitement d'une instruction SQL : l'analyse complete (analyse syntaxique, semantique et optimisation) est necessaire lors de la premiere soumission d'une instruction inedite ; l'analyse partielle reutilise un plan d'execution deja present dans le reservoir partage, reduisant le cout de traitement.</li>
+            <li><strong>Reglage Automatique</strong> — Capacite du moteur Oraclé a analyser et optimiser les performances des requêtes sans intervention manuelle de l'administrateur.</li>
+            <li><strong>Gestion des Plans d'exécution (SPM)</strong> — mécanisme de controle des versions de plans d'exécution, permettant d'approuver, de geler ou de rejeter les propositions d'amelioration.</li>
+            <li><strong>Auto-Indexation</strong> — Fonctionnalité créant automatiquement les index manquants détectés par l'analyse des charges de requêtes, visible dans la vue dynamique des index créés automatiquement.</li>
+            <li><strong>Ligne de Base de Plan d'exécution</strong> — Version validée d'un plan d'exécution conservée par le gestionnaire de plans pour garantir la stabilite et la reproductibilite des performances.</li>
+            <li><strong>Analyse Syntaxique Complete / Partielle (Hard Parse / Soft Parse)</strong> — mécanisme de traitement d'une instruction SQL : l'analyse complete (analyse syntaxique, sémantique et optimisation) est nécessaire lors de la première soumission d'une instruction inédite ; l'analyse partielle réutilise un plan d'exécution déjà présent dans le reservoir partagé, réduisant le coût de traitement.</li>
           </ul>
         </div>
 
@@ -886,8 +886,8 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--lexique">Vues Dynamiques de Performance</div>
           <ul class="help-modal__list">
-            <li><strong>Vue Dynamique de Performance (V$ View)</strong> — Table memoire du dictionnaire de donnees fournissant des statistiques en temps reel sur l'etat de l'instance, les acces memoire, les operations d'entrees-sorties et l'activite transactionnelle, interrogeable par des requetes SQL standard.</li>
-            <li><strong>Garantie de Retention d'Annulation (UNDO_RETENTION GUARANTEE)</strong> — Mode de gestion des segments d'annulation garantissant que les blocs d'annulation ne sont pas reutilises avant l'expiration de la duree de retention configuree, meme au prix d'un echec des operations de modification concurrentes faute d'espace disponible.</li>
+            <li><strong>Vue Dynamique de Performance (V$ View)</strong> — Table mémoire du dictionnaire de données fournissant des statistiques en temps reel sur l'etat de l'instance, les accès mémoire, les opérations d'entrees-sorties et l'activité transactionnelle, interrogeable par des requêtes SQL standard.</li>
+            <li><strong>Garantie de Retention d'Annulation (UNDO_RETENTION GUARANTEE)</strong> — Mode de gestion des segments d'annulation garantissant que les blocs d'annulation ne sont pas réutilisés avant l'expiration de la durée de retention configurée, même au prix d'un echec des opérations de modification concurrentes faute d'espace disponible.</li>
           </ul>
         </div>
       </div>
@@ -903,8 +903,8 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       <div class="help-modal__body">
         <div class="help-modal__section">
           <p class="help-modal__text">
-            <center>Conception fonctionnelle, scenarios, developpement et relecture : Stephane Bertin<br>
-            Assiste par OpenCode, agent Big Pickle<br>
+            <center>Conception fonctionnelle, scénarios, développement et relecture : Stéphane Bertin<br>
+            Assisté par OpenCode, agent Big Pickle<br>
             2025.</center>
           </p>
         </div>
@@ -914,8 +914,8 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       </div>
     </div>
     <footer class="app-footer">
-      ORACLE_HDS::DEMO - Application de demonstration technique<br>
-      DONNEES: 100% FICTIVES - Conforme RGPD Art. 25 (Privacy by Design) - Aucune donnee de sante reelle<br>
+      ORACLE_HDS::DEMO - Application de démonstration technique<br>
+      données : 100% FICTIVES - Conforme RGPD Art. 25 (Privacy by Design) - Aucune donnée de sante réelle<br>
       Architecture: ES6 Classes - Vanilla JS - Zero Dependency - Offline<br>
       Usage pedagogique et technique uniquement
     </footer>
@@ -965,7 +965,7 @@ class StateManager {
 }
 
 /* ============================================================
-   FAKE DATA GENERATOR - DONNEES 100% FICTIVES / RGPD
+   FAKE DATA GENERATOR - données 100% FICTIVES / RGPD
    ============================================================ */
 
 class FakeDataGenerator {
@@ -993,7 +993,7 @@ class FakeDataGenerator {
 }
 
 /* ============================================================
-   DATABASE ENGINE - Moteur Oracle Simule
+   DATABASE ENGINE - Moteur Oraclé Simule
    ============================================================ */
 
 class DatabaseEngine {
@@ -1016,14 +1016,14 @@ class DatabaseEngine {
     Logger.info('BEGIN TXN ' + txnId + ' SCN_start=' + this._scn);
     return txn;
   }
-  executeDML(txnId, operation, data) {
+  executeDML(txnId, opération, data) {
     const txn = this._transactions.get(txnId);
     if (!txn) throw new Error('Transaction ' + txnId + ' introuvable');
-    const undo = { scn: this._scn, operation: 'UNDO_' + operation, data: Object.assign({}, data), txn_id: txnId };
+    const undo = { scn: this._scn, opération: 'UNDO_' + opération, data: Object.assign({}, data), txn_id: txnId };
     this._undoTable.push(undo); txn.undo_entries.push(undo);
-    const redo = { scn: this._scn, operation: 'REDO_' + operation, data: Object.assign({}, data), txn_id: txnId, timestamp: Date.now() };
+    const redo = { scn: this._scn, opération: 'REDO_' + opération, data: Object.assign({}, data), txn_id: txnId, timestamp: Date.now() };
     this._redoLog.push(redo); txn.redo_entries.push(redo);
-    Logger.debug('DML ' + operation + ' in ' + txnId + ' - Undo/Redo generes');
+    Logger.debug('DML ' + opération + ' in ' + txnId + ' - Undo/Redo generes');
   }
   instanceRecovery() {
     const steps = []; const activeTxns = [];
@@ -1041,7 +1041,7 @@ class DatabaseEngine {
     return dataset.map(row => ({
       id: row.id, nir: 'XXXX-XXX-XXX-' + row.nir.slice(-4), nom: 'PATIENT_MASQUE',
       medecin: row.medecin, service: row.service, montant_t2a: row.montant_t2a,
-      sejour_id: row.sejour_id, _meta: 'MASQUE - Oracle Data Masking applique', _masked_fields: ['nir', 'nom']
+      sejour_id: row.sejour_id, _meta: 'MASQUE - Oraclé Data Masking applique', _masked_fields: ['nir', 'nom']
     }));
   }
   tdeEncrypt(plaintext) {
@@ -1127,22 +1127,22 @@ class MultitenantModule {
     var critPct = 0; result.forEach(function(r) { if (r.isCritical) critPct += parseFloat(r.pct); });
     var ac = critPct >= 50 ? 'success' : 'warning';
     var msg = critPct >= 50 ? 'PDBs critiques garantis: ' + critPct.toFixed(1) + '% du CPU total - Plan conforme SLA.' : 'ATTENTION: PDBs critiques a ' + critPct.toFixed(1) + '% - Risque violation SLA Urgences/Bloc.';
-    var html = '<div class="alert alert--' + ac + '"><strong>Resource Plan:</strong><br>';
+    var html = '<div class="alert alert--' + ac + '"><strong>Resource plan:</strong><br>';
     result.forEach(function(r) { html += r.name + ': <strong>' + r.pct + '%</strong> (' + r.shares + ' shares) ' + (r.isCritical ? '<span class="tag tag--red">CRITIQUE</span>' : '') + '<br>'; });
     html += '<br>' + msg + '</div>';
     document.getElementById('resource-plan-result').innerHTML = html;
-    Logger.info('Resource Plan applique - Total: ' + total + ' - Critiques: ' + critPct.toFixed(1) + '%');
+    Logger.info('Resource plan applique - Total: ' + total + ' - Critiques: ' + critPct.toFixed(1) + '%');
   }
 
   _simulateContention() {
     var log = document.getElementById('contention-log'); var lw = document.getElementById('latch-waits'); var dh = document.getElementById('dict-cache-hit');
     var entries = [
-      { l: 'warn', t: 'Pic de charge - 4 PDB accedent simultanement au dictionnaire partage' },
+          { l: 'warn', t: 'Pic de charge - 4 PDB accèdent simultanément au Dictionnaire partagé' },
       { l: 'error', t: 'LATCH: row cache objects - 234 waits en 0.5s' },
       { l: 'warn', t: 'LATCH: shared pool - contention sur CDB$ROOT (shared dictionary miss)' },
       { l: 'info', t: 'PDB_URGENCES: dict cache hit ratio chute a 87.3%' },
       { l: 'error', t: 'Session hang sur PDB_RECHERCHE (full parse storm)' },
-      { l: 'info', t: 'Auto-resolution: diminution progressive de la contention apres eviction et reallocation memoire Shared Pool' },
+      { l: 'info', t: 'Auto-resolution: diminution progressive de la contention apres eviction et reallocation mémoire Shared Pool' },
       { l: 'success', t: 'Contention resolue apres 2.3s - Hit ratio restaure a 99.1%' }
     ];
     var idx = 0;
@@ -1162,12 +1162,12 @@ class MultitenantModule {
     var masked = this._engine.applyDataMasking(data);
     var target = document.getElementById('masking-target');
     if (target) target.innerHTML = masked.map(function(d) { return '<tr><td>' + d.id + '</td><td class="masked">' + d.nir + '</td><td class="masked">' + d.nom + '</td></tr>'; }).join('');
-    document.getElementById('masking-result').innerHTML = '<div class="alert alert--success">Oracle Data Masking execute avec succes. Champs sensibles (NIR, Nom) masques. Clonage PDB conforme RGPD.</div>';
+    document.getElementById('masking-result').innerHTML = '<div class="alert alert--success">Oraclé Data Masking exécute avec succes. Champs sensibles (NIR, Nom) masques. Clonage PDB conforme RGPD.</div>';
     Logger.info('Data Masking applique');
   }
 
   _verifyMasking() {
-    document.getElementById('masking-result').innerHTML = '<div class="alert alert--success">&#10003; Verification RGPD: <strong>PAS de donnees sensibles detectees.</strong><br>NIR: masque (format XXXX-XXX-XXX-XXXX) - Nom: remplace par PATIENT_MASQUE<br>Conformite: Art. 25 RGPD (Privacy by Design) - Art. 32 (Securite du traitement)</div>';
+    document.getElementById('masking-result').innerHTML = '<div class="alert alert--success">&#10003; Verification RGPD: <strong>PAS de données sensibles detectees.</strong><br>NIR: masque (format XXXX-XXX-XXX-XXXX) - Nom: remplace par PATIENT_MASQUE<br>Conformite: Art. 25 RGPD (Privacy by Design) - Art. 32 (Securite du traitement)</div>';
   }
 }
 
@@ -1215,7 +1215,7 @@ class MemoryModule {
 
   _renderPGA() {
     var c = document.getElementById('pga-result'); if (!c) return;
-    c.innerHTML = '<div class="alert alert--info">Ajustez les sliders et cliquez "Executer Requete PMSI" pour simuler un Temp Spill.</div>';
+    c.innerHTML = '<div class="alert alert--info">Ajuste les sliders et cliquez "Exécuter requête PMSI" pour simuler un Temp Spill.</div>';
   }
 
   _bindEvents() {
@@ -1223,7 +1223,7 @@ class MemoryModule {
     var sgas = document.getElementById('sga-target-slider'); var sgav = document.getElementById('sga-target-val');
     if (sgas && sgav) sgas.addEventListener('input', function() { sgav.textContent = sgas.value + ' MB'; });
     var bsga = document.getElementById('btn-apply-sga'); if (bsga) bsga.addEventListener('click', function() { var v = parseInt(sgas.value); document.getElementById('sga-result').innerHTML = '<div class="alert alert--success">SGA_TARGET redimensionne a ' + v + ' MB. AMM ajuste dynamiquement Buffer Cache et Shared Pool.</div>'; });
-    var bats = document.getElementById('btn-auto-tune-sga'); if (bats) bats.addEventListener('click', function() { document.getElementById('sga-result').innerHTML = '<div class="alert alert--info">AMM Auto-Tune: Oracle analyse les advisor et recommande SGA_TARGET = 6144 MB pour la charge CHU actuelle.</div>'; });
+    var bats = document.getElementById('btn-auto-tune-sga'); if (bats) bats.addEventListener('click', function() { document.getElementById('sga-result').innerHTML = '<div class="alert alert--info">AMM Auto-Tune: Oraclé analyse les advisor et recommande SGA_TARGET = 6144 MB pour la charge CHU actuelle.</div>'; });
 
     var blrua = document.getElementById('btn-lru-access'); if (blrua) blrua.addEventListener('click', function() { self._lruAccessBlock(); });
     var blruf = document.getElementById('btn-lru-full-scan'); if (blruf) blruf.addEventListener('click', function() { self._lruFullScan(); });
@@ -1250,13 +1250,13 @@ class MemoryModule {
   _lruFullScan() {
     for (var i = 0; i < 3; i++) { var idx = Math.floor(Math.random() * this._bufferCache.length); this._bufferCache[idx].touchCount = 0; this._bufferCache[idx].dirty = false; }
     this._renderLRUList();
-    document.getElementById('lru-result').innerHTML = '<div class="alert alert--warning">Full Table Scan simule - Blocs inseres au MIDPOINT (TC=0). Ne polluent PAS la HOT END grace a Touch Count.</div>';
+    document.getElementById('lru-result').innerHTML = '<div class="alert alert--warning">Full Table Scan simulé - Blocs insérés au MIDPOINT (TC=0). Ne polluent PAS la HOT END grâce à Touch Count.</div>';
   }
 
   _lruFlush() {
     var dirtyCount = 0; this._bufferCache.forEach(function(b) { if (b.dirty) dirtyCount++; b.dirty = false; b.touchCount = Math.max(0, b.touchCount - 1); });
     this._renderLRUList();
-    document.getElementById('lru-result').innerHTML = '<div class="alert alert--success">Checkpoint complet - ' + dirtyCount + ' dirty blocks ecrits par DBWR. Buffer Cache nettoye.</div>';
+    document.getElementById('lru-result').innerHTML = '<div class="alert alert--success">Checkpoint complet - ' + dirtyCount + ' dirty blocks écrits par DBWR. Buffer Cache nettoye.</div>';
   }
 
   _simulateLatch() {
@@ -1269,7 +1269,7 @@ class MemoryModule {
     var entries = [];
     for (var i = 0; i < Math.min(sessions, 8); i++) { entries.push({ l: i < 2 ? 'error' : 'warn', t: 'Session ' + (i+1) + ': LATCH "cache buffers chains" - spin=' + spins + ', sleep=' + sleeps + ', wait=' + (totalWaitTime / sessions).toFixed(1) + 'ms' }); }
     entries.push({ l: sessions > 8 ? 'error' : 'warn', t: 'Contention totale: ' + totalWaitTime.toFixed(0) + 'ms | Hot Block CBC Latch | Sessions: ' + sessions });
-    entries.push({ l: 'success', t: 'Recommendation: ' + (sessions > 8 ? 'Partitionner les donnees / Reduire les full scans concurrents' : 'Contention acceptable pour cette charge') });
+    entries.push({ l: 'success', t: 'Recommendation: ' + (sessions > 8 ? 'Partitionner les données / Reduire les full scans concurrents' : 'Contention acceptable pour cette charge') });
     var idx = 0; if (log) log.innerHTML = '';
     var iv = setInterval(function() {
       if (idx >= entries.length) {
@@ -1295,14 +1295,14 @@ class MemoryModule {
     var diskTime = spills ? spillMB * 50 : 0;
     var totalTime = memTime + diskTime;
     var sc = spills ? 'red' : 'green'; var tc2 = totalTime > 1000 ? 'red' : 'cyan';
-    var html = '<div class="grid-2" style="margin-bottom:var(--sp-4);"><div class="stat-block stat-block--' + sc + '"><div class="stat-block__value">' + (spills ? 'TEMP SPILL' : 'OPTIMAL') + '</div><div class="stat-block__label">Mode execution</div></div><div class="stat-block stat-block--' + tc2 + '"><div class="stat-block__value">' + totalTime.toFixed(0) + 'ms</div><div class="stat-block__label">Temps estime</div></div></div>';
+    var html = '<div class="grid-2" style="margin-bottom:var(--sp-4);"><div class="stat-block stat-block--' + sc + '"><div class="stat-block__value">' + (spills ? 'TEMP SPILL' : 'OPTIMAL') + '</div><div class="stat-block__label">Mode exécution</div></div><div class="stat-block stat-block--' + tc2 + '"><div class="stat-block__value">' + totalTime.toFixed(0) + 'ms</div><div class="stat-block__label">Temps estime</div></div></div>';
     html += '<div class="alert alert--' + (spills ? 'error' : 'success') + '">';
-    if (spills) { html += '<strong>TEMP SPILL DETECTE:</strong> Sort de ' + sortSize + 'MB excede work area (' + workAreaSize + 'MB). ' + spillMB + 'MB bascules en TEMP. Estimation pédagogique: +' + diskTime.toFixed(0) + 'ms I/O disque.<br><span class="data-mono">V$SQL_WORKAREA_ACTIVE: PASSIVE -&gt; ACTIVE -&gt; SPILLED</span>'; }
-    else { html += '<strong>Execution OPTIMALE:</strong> Sort de ' + sortSize + 'MB tient en memoire (work area: ' + workAreaSize + 'MB). Pas d I/O disque.<br><span class="data-mono">V$SQL_WORKAREA_ACTIVE: OPTIMAL</span>'; }
+    if (spills) { html += '<strong>TEMP SPILL DETECTE:</strong> Sort de ' + sortSize + 'MB excède work area (' + workAreaSize + 'MB). ' + spillMB + 'MB bascules en TEMP. Estimation pédagogique: +' + diskTime.toFixed(0) + 'ms I/O disque.<br><span class="data-mono">V$SQL_WORKAREA_ACTIVE: PASSIVE -&gt; ACTIVE -&gt; SPILLED</span>'; }
+    else { html += '<strong>exécution OPTIMALE:</strong> Sort de ' + sortSize + 'MB tient en mémoire (work area: ' + workAreaSize + 'MB). Pas d I/O disque.<br><span class="data-mono">V$SQL_WORKAREA_ACTIVE: OPTIMAL</span>'; }
     html += '</div>';
-    if (spills) html += '<div class="alert alert--warning">Impact PMSI/T2A: Les requetes volumineuses avec TEMP SPILL peuvent bloquer la production T2A. Solution: augmenter PGA_AGGREGATE_TARGET ou optimiser la requete.</div>';
+    if (spills) html += '<div class="alert alert--warning">Impact PMSI/T2A: Les requêtes volumineuses avec TEMP SPILL peuvent bloquer la production T2A. Solution: augmenter PGA_AGGREGATE_TARGET ou optimiser la requête.</div>';
     container.innerHTML = html;
-    Logger.info('Requete PMSI simulee - Sort: ' + sortSize + 'MB, PGA: ' + pgaLimit + 'MB - ' + (spills ? 'TEMP SPILL' : 'OPTIMAL'));
+    Logger.info('requête PMSI simulee - Sort: ' + sortSize + 'MB, PGA: ' + pgaLimit + 'MB - ' + (spills ? 'TEMP SPILL' : 'OPTIMAL'));
   }
 }
 
@@ -1320,10 +1320,10 @@ class IOModule {
   _renderTXNLifecycle() {
     var c = document.getElementById('txn-lifecycle'); if (!c) return;
     var steps = [
-      { id: 1, title: 'BEGIN TRANSACTION', desc: 'Allocation ITL (Interested Transaction List) dans le block header. SCN de depart enregistre.' },
-      { id: 2, title: 'DML - UPDATE facturation_t2a', desc: 'Anciens blocs copies dans UNDO (avant-image). Nouveaux blocs modifies en memoire (Buffer Cache).' },
-      { id: 3, title: 'REDO - LGWR Buffer', desc: 'Redo entries (apres-image) ecrites dans le Redo Log Buffer. Protection contre la perte.' },
-      { id: 4, title: 'COMMIT', desc: 'LGWR force l ecriture des redo entries sur disque. SCN avance. Transaction visible.' },
+      { id: 1, title: 'BEGIN TRANSACTION', desc: 'Allocation ITL (Interested Transaction List) dans le block header. SCN de départ enregistré.' },
+      { id: 2, title: 'DML - UPDATE facturation_t2a', desc: 'Anciens blocs copies dans UNDO (avant-image). Nouveaux blocs modifies en mémoire (Buffer Cache).' },
+      { id: 3, title: 'REDO - LGWR Buffer', desc: 'Redo entries (après-image) écrites dans le Redo Log Buffer. Protection contre la perte.' },
+      { id: 4, title: 'COMMIT', desc: `LGWR force l'écriture des redo entries sur disque. SCN avance. Transaction visible.` },
       { id: 5, title: 'DBWR - Lazy Write', desc: 'DBWR ecrit les dirty blocks du Buffer Cache vers les datafiles (asynchrone).' }
     ];
     c.innerHTML = steps.map(function(s) { return '<div class="flow-step" id="txn-step-' + s.id + '"><div class="flow-step__marker" id="txn-marker-' + s.id + '">' + s.id + '</div><div class="flow-step__content"><div class="flow-step__title">' + s.title + '</div><div class="flow-step__desc">' + s.desc + '</div></div></div>'; }).join('');
@@ -1331,7 +1331,7 @@ class IOModule {
 
   _renderReadConsistency() {
     var c = document.getElementById('read-consistency-demo'); if (!c) return;
-    c.innerHTML = '<div class="alert alert--info">Cliquez "Simuler Lecture Coherente" pour observer le mecanisme de read consistency avec Undo.</div><div id="rc-visualization"></div>';
+    c.innerHTML = '<div class="alert alert--info">Cliquez "Simuler Lecture Coherente" pour observer Le mécanisme de read consistency avec Undo.</div><div id="rc-visualization"></div>';
   }
 
   _bindEvents() {
@@ -1339,8 +1339,8 @@ class IOModule {
     var b1 = document.getElementById('btn-run-txn'); if (b1) b1.addEventListener('click', function() { self._runTransaction(); });
     var b2 = document.getElementById('btn-sim-crash'); if (b2) b2.addEventListener('click', function() { self._simulateCrash(); });
     var b3 = document.getElementById('btn-recovery'); if (b3) b3.addEventListener('click', function() { self._runRecovery(); });
-    var b4 = document.getElementById('btn-increment-scn'); if (b4) b4.addEventListener('click', function() { var ns = self._engine.commit(); document.getElementById('scn-result').innerHTML = '<div class="alert alert--success">COMMIT execute - SCN: ' + ns + '</div>'; });
-    var b5 = document.getElementById('btn-query-scn'); if (b5) b5.addEventListener('click', function() { var cs = self._engine.scn; document.getElementById('scn-result').innerHTML = '<div class="alert alert--info">Flashback Query: <code class="data-mono">SELECT * FROM facturation_t2a AS OF SCN ' + (cs - 5) + '</code><br>Retourne les donnees telles qu elles etaient au SCN ' + (cs - 5) + ' (reconstruites depuis Undo).</div>'; });
+    var b4 = document.getElementById('btn-increment-scn'); if (b4) b4.addEventListener('click', function() { var ns = self._engine.commit(); document.getElementById('scn-result').innerHTML = '<div class="alert alert--success">COMMIT exécute - SCN: ' + ns + '</div>'; });
+    var b5 = document.getElementById('btn-query-scn'); if (b5) b5.addEventListener('click', function() { var cs = self._engine.scn; document.getElementById('scn-result').innerHTML = '<div class="alert alert--info">Flashback Query: <code class="data-mono">SELECT * FROM facturation_t2a AS OF SCN ' + (cs - 5) + '</code><br>Retourne les données telles qu elles étaient au SCN ' + (cs - 5) + ' (reconstruites depuis Undo).</div>'; });
     var b6 = document.getElementById('btn-sim-read-consistency'); if (b6) b6.addEventListener('click', function() { self._simulateReadConsistency(); });
     var us = document.getElementById('undo-retention-slider'); var uv = document.getElementById('undo-retention-val');
     if (us && uv) us.addEventListener('input', function() { uv.textContent = us.value; });
@@ -1369,8 +1369,8 @@ class IOModule {
     });
     Promise.all(promises).then(function() {
       self._engine.commit();
-      resultDiv.innerHTML = '<div class="alert alert--success"><strong>Transaction ' + txnId + ' completee.</strong><br>Cycle complet: BEGIN -> DML (Undo) -> Redo -> COMMIT (LGWR) -> DBWR<br>SCN final: ' + self._engine.scn + ' | Coherence garantie pour la facturation T2A.</div>';
-      Logger.info('Transaction ' + txnId + ' completee');
+      resultDiv.innerHTML = '<div class="alert alert--success"><strong>Transaction ' + txnId + ' complétée.</strong><br>Cyclé complet: BEGIN -> DML (Undo) -> Redo -> COMMIT (LGWR) -> DBWR<br>SCN final: ' + self._engine.scn + ' | cohérence garantie pour la facturation T2A.</div>';
+      Logger.info('Transaction ' + txnId + ' complétée');
     });
   }
 
@@ -1378,27 +1378,27 @@ class IOModule {
     this._crashed = true;
     var resultDiv = document.getElementById('txn-result');
     for (var i = 1; i <= 5; i++) { var m = document.getElementById('txn-marker-' + i); if (m) m.className = 'flow-step__marker flow-step__marker--error'; }
-    resultDiv.innerHTML = '<div class="alert alert--error"><strong>SHUTDOWN ABORT simule - Crash Instance.</strong><br>Les dirty blocks en Buffer Cache sont perdus. Les redo logs sur disque sont intacts.<br><span class="data-mono">Instance Recovery requise au prochain startup.</span></div>';
-    Logger.error('CRASH simule - Instance Recovery necessaire');
+    resultDiv.innerHTML = '<div class="alert alert--error"><strong>SHUTDOWN ABORT simulé - Crash Instance.</strong><br>Les dirty blocks en Buffer Cache sont perdus. Les redo logs sur disque sont intacts.<br><span class="data-mono">Instance Recovery requise au prochain startup.</span></div>';
+    Logger.error('CRASH simulé - Instance Recovery nécessaire');
   }
 
   _runRecovery() {
-    if (!this._crashed) { document.getElementById('txn-result').innerHTML = '<div class="alert alert--warning">Aucun crash a recuperer. Simulez d abord un SHUTDOWN ABORT.</div>'; return; }
+    if (!this._crashed) { document.getElementById('txn-result').innerHTML = `<div class="alert alert--warning">Aucun crash a recuperer. Simulez d'abord un SHUTDOWN ABORT.</div>`; return; }
     var result = this._engine.instanceRecovery();
     var resultDiv = document.getElementById('txn-result');
     for (var i = 1; i <= 5; i++) { var m = document.getElementById('txn-marker-' + i); if (m) m.className = 'flow-step__marker flow-step__marker--done'; }
     var stepsHtml = result.steps.map(function(s) { return '<strong>' + s.phase + ':</strong> ' + s.desc + (s.txns ? ' - TXNs: ' + s.txns.join(', ') : '') + '<br>'; }).join('');
-    resultDiv.innerHTML = '<div class="alert alert--success"><strong>Instance Recovery completee - Statut: ' + result.status + '</strong><br><br>' + stepsHtml + '<br>Base ouverte et coherente. SCN: ' + this._engine.scn + '.<br><span class="data-mono">SMON: recovery complete. Database open.</span></div>';
+    resultDiv.innerHTML = '<div class="alert alert--success"><strong>Instance Recovery complétée - Statut: ' + result.status + '</strong><br><br>' + stepsHtml + '<br>Base ouverte et coherente. SCN: ' + this._engine.scn + '.<br><span class="data-mono">SMON: recovery complete. Database open.</span></div>';
     this._crashed = false;
-    Logger.info('Instance Recovery completee');
+    Logger.info('Instance Recovery complétée');
   }
 
   _simulateReadConsistency() {
     var viz = document.getElementById('rc-visualization'); if (!viz) return;
     var queryScn = Math.max(0, this._engine.scn - 3);
     var currentScn = this._engine.scn;
-    viz.innerHTML = '<div class="grid-2"><div><div class="data-label">Session A - Requete T2A (SCN ' + queryScn + ')</div><table class="data-table" style="margin-top:var(--sp-2);"><thead><tr><th>Sejour</th><th>Montant</th></tr></thead><tbody><tr><td>Sejour_SIMU_001</td><td>3 250,00 EUR <span class="tag tag--blue">SCN ' + queryScn + '</span></td></tr><tr><td>Sejour_SIMU_002</td><td>7 890,00 EUR <span class="tag tag--blue">SCN ' + queryScn + '</span></td></tr><tr><td>Sejour_SIMU_003</td><td>1 120,00 EUR <span class="tag tag--blue">SCN ' + queryScn + '</span></td></tr></tbody></table><div style="font-size:var(--fs-xs);color:#64748b;margin-top:var(--sp-2);font-family:var(--font-mono);">Reconstruit depuis Undo - Image coherente au SCN ' + queryScn + '</div></div><div><div class="data-label">Session B - Modification en cours (SCN ' + currentScn + ')</div><table class="data-table" style="margin-top:var(--sp-2);"><thead><tr><th>Sejour</th><th>Montant</th></tr></thead><tbody><tr><td>Sejour_SIMU_001</td><td class="clear-text">4 100,00 EUR <span class="tag tag--red">MODIFIE</span></td></tr><tr><td>Sejour_SIMU_002</td><td>7 890,00 EUR</td></tr><tr><td>Sejour_SIMU_003</td><td class="clear-text">1 450,00 EUR <span class="tag tag--red">MODIFIE</span></td></tr></tbody></table><div style="font-size:var(--fs-xs);color:#64748b;margin-top:var(--sp-2);font-family:var(--font-mono);">Donnees actuelles - Non visibles par Session A</div></div></div>';
-    document.getElementById('read-consistency-result').innerHTML = '<div class="alert alert--success">Read consistency garantie: Session A voit les donnees au SCN de depart de sa requete, via reconstruction Undo. La facturation T2A est protegee des modifications concurrentes.</div>';
+    viz.innerHTML = '<div class="grid-2"><div><div class="data-label">Session A - requête T2A (SCN ' + queryScn + ')</div><table class="data-table" style="margin-top:var(--sp-2);"><thead><tr><th>Sejour</th><th>Montant</th></tr></thead><tbody><tr><td>Sejour_SIMU_001</td><td>3 250,00 EUR <span class="tag tag--blue">SCN ' + queryScn + '</span></td></tr><tr><td>Sejour_SIMU_002</td><td>7 890,00 EUR <span class="tag tag--blue">SCN ' + queryScn + '</span></td></tr><tr><td>Sejour_SIMU_003</td><td>1 120,00 EUR <span class="tag tag--blue">SCN ' + queryScn + '</span></td></tr></tbody></table><div style="font-size:var(--fs-xs);color:#64748b;margin-top:var(--sp-2);font-family:var(--font-mono);">Reconstruit depuis Undo - Image coherente au SCN ' + queryScn + '</div></div><div><div class="data-label">Session B - Modification en cours (SCN ' + currentScn + ')</div><table class="data-table" style="margin-top:var(--sp-2);"><thead><tr><th>Sejour</th><th>Montant</th></tr></thead><tbody><tr><td>Sejour_SIMU_001</td><td class="clear-text">4 100,00 EUR <span class="tag tag--red">MODIFIE</span></td></tr><tr><td>Sejour_SIMU_002</td><td>7 890,00 EUR</td></tr><tr><td>Sejour_SIMU_003</td><td class="clear-text">1 450,00 EUR <span class="tag tag--red">MODIFIE</span></td></tr></tbody></table><div style="font-size:var(--fs-xs);color:#64748b;margin-top:var(--sp-2);font-family:var(--font-mono);">données actuelles - Non visibles par Session A</div></div></div>';
+    document.getElementById('read-consistency-result').innerHTML = '<div class="alert alert--success">Read consistency garantie: Session A voit les données au SCN de départ de sa requête, via reconstruction Undo. La facturation T2A est protégée des modifications concurrentes.</div>';
   }
 
   _runLongQuery() {
@@ -1414,7 +1414,7 @@ class IOModule {
       if (log) { log.innerHTML += '<div class="log-console__entry log-console__entry--' + level + '"><span class="log-console__timestamp">[' + ts + ']</span>' + text + '</div>'; log.scrollTop = log.scrollHeight; }
     };
     addLog('info', 'Configuration: UNDO_RETENTION=' + undoRetention + 's, Query=' + queryDuration + 's, DML Load=' + dmlLoad + '%');
-    addLog('info', 'Requete T2A lancee: SELECT SUM(montant_t2a) FROM facturation_t2a WHERE ...');
+    addLog('info', 'requête T2A lancee: SELECT SUM(montant_t2a) FROM facturation_t2a WHERE ...');
     var checkResult = self._engine.checkORA1555(undoRetention, queryDuration, dmlLoad);
     var simSteps = Math.min(Math.floor(queryDuration / 10), 20);
     var step = 0;
@@ -1424,11 +1424,11 @@ class IOModule {
           addLog('error', 'ORA-01555: snapshot too old: rollback segment number too small');
           addLog('error', 'Query duration (' + queryDuration + 's) > effective Undo retention (' + checkResult.effectiveRetention + 's)');
           addLog('warn', checkResult.recommendation);
-          if (resultDiv) resultDiv.innerHTML = '<div class="alert alert--error"><strong>ORA-01555 - Snapshot Too Old</strong><br>La requete a echoue car les donnees Undo necessaires ont ete ecrasees.<br><br><span class="data-mono">Retention configuree: ' + undoRetention + 's</span><br><span class="data-mono">Retention effective: ' + checkResult.effectiveRetention + 's</span><br><span class="data-mono">Duree requete: ' + queryDuration + 's</span><br><br><strong>Recommandation:</strong> ' + checkResult.recommendation + '</div>';
+          if (resultDiv) resultDiv.innerHTML = '<div class="alert alert--error"><strong>ORA-01555 - Snapshot Too Old</strong><br>La requête a échoué car les données Undo nécessaires ont été écrasées.<br><br><span class="data-mono">Retention configurée: ' + undoRetention + 's</span><br><span class="data-mono">Retention effective: ' + checkResult.effectiveRetention + 's</span><br><span class="data-mono">Durée requête: ' + queryDuration + 's</span><br><br><strong>Recommandation:</strong> ' + checkResult.recommendation + '</div>';
         } else {
-          addLog('success', 'Query completee avec succes - Aucune erreur ORA-01555.');
+          addLog('success', 'Query complétée avec succès - Aucune erreur ORA-01555.');
           addLog('info', 'Risk level: ' + checkResult.riskPercent + '% - Effective retention: ' + checkResult.effectiveRetention + 's');
-          if (resultDiv) resultDiv.innerHTML = '<div class="alert alert--success"><strong>Query completee - PAS d erreur ORA-01555</strong><br>UNDO_RETENTION (' + undoRetention + 's) est suffisant.<br>Risk level: ' + checkResult.riskPercent + '% | Effective retention: ' + checkResult.effectiveRetention + 's<br><br>' + checkResult.recommendation + '</div>';
+          if (resultDiv) resultDiv.innerHTML = `<div class="alert alert--success"><strong>Query complétée - PAS d'erreur ORA-01555</strong><br>UNDO_RETENTION (` + undoRetention + `s) est suffisant.<br>Risk level: ` + checkResult.riskPercent + `% | Effective retention: ` + checkResult.effectiveRetention + `s<br><br>` + checkResult.recommendation + `</div>`;
         }
         Logger.info('ORA-01555 sim - ' + (checkResult.willFail ? 'FAIL' : 'OK') + ' Risk: ' + checkResult.riskPercent + '%');
         return;
@@ -1453,21 +1453,21 @@ class CloudModule {
 
   _renderTDE() {
     var c = document.getElementById('tde-demo'); if (!c) return;
-    c.innerHTML = '<div><div class="data-label" style="margin-bottom:var(--sp-2);">Donnees en Clair (Avant TDE)</div><div id="tde-plaintext" style="font-family:var(--font-mono);font-size:var(--fs-xs);line-height:2;"><div>NIR: <span class="clear-text">NIR_FICTIF_1234567890123</span></div><div>Nom: <span class="clear-text">Patient_TEST_042</span></div><div>Montant: 3 250,00 EUR</div><div>Diag: <span class="clear-text">Z34.9 - Surveillance grossesse normale (FICTIF)</span></div></div></div><div style="display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);color:var(--color-purple);font-size:var(--fs-xl);">&#8594;</div><div><div class="data-label" style="margin-bottom:var(--sp-2);">Donnees Chiffrees (Apres TDE AES-256)</div><div id="tde-ciphertext" style="font-family:var(--font-mono);font-size:var(--fs-xs);line-height:2;color:#64748b;">En attente du chiffrement...</div></div>';
+    c.innerHTML = '<div><div class="data-label" style="margin-bottom:var(--sp-2);">données en Clair (Avant TDE)</div><div id="tde-plaintext" style="font-family:var(--font-mono);font-size:var(--fs-xs);line-height:2;"><div>NIR: <span class="clear-text">NIR_FICTIF_1234567890123</span></div><div>Nom: <span class="clear-text">Patient_TEST_042</span></div><div>Montant: 3 250,00 EUR</div><div>Diag: <span class="clear-text">Z34.9 - Surveillance grossesse normale (FICTIF)</span></div></div></div><div style="display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);color:var(--color-purple);font-size:var(--fs-xl);">&#8594;</div><div><div class="data-label" style="margin-bottom:var(--sp-2);">données chiffrées (Après TDE AES-256)</div><div id="tde-ciphertext" style="font-family:var(--font-mono);font-size:var(--fs-xs);line-height:2;color:#64748b;">En attente du chiffrement...</div></div>';
   }
 
   _renderIAComparison() {
     var c = document.getElementById('ia-comparison'); if (!c) return;
-    c.innerHTML = '<table class="data-table"><thead><tr><th>Critere</th><th>IA Embarquee (Auto-Tuning)</th><th>IA Generative Externe (LLM)</th></tr></thead><tbody><tr><td>Donnees de sante</td><td><span class="tag tag--green">Restent dans OCI France</span></td><td><span class="tag tag--red">Transferees hors perimetre</span></td></tr><tr><td>RGPD Art. 44-49</td><td><span class="tag tag--green">Conforme (pas de transfert)</span></td><td><span class="tag tag--red">Transfert international possible</span></td></tr><tr><td>HDS</td><td><span class="tag tag--green">Certifie HDS</span></td><td><span class="tag tag--amber">A verifier au cas par cas</span></td></tr><tr><td>Controle</td><td><span class="tag tag--green">Human-in-the-loop</span></td><td><span class="tag tag--amber">Black box</span></td></tr><tr><td>Usage</td><td>Auto-indexing, SQL Plan Management, Stats auto</td><td>Assistance redactionnelle, analyse structurelle</td></tr></tbody></table>';
+    c.innerHTML = '<table class="data-table"><thead><tr><th>Critere</th><th>IA embarquée (Auto-Tuning)</th><th>IA générative Externe (LLM)</th></tr></thead><tbody><tr><td>données de sante</td><td><span class="tag tag--green">Restent dans OCI France</span></td><td><span class="tag tag--red">Transferees hors perimêtre</span></td></tr><tr><td>RGPD Art. 44-49</td><td><span class="tag tag--green">Conforme (pas de transfert)</span></td><td><span class="tag tag--red">Transfert international possible</span></td></tr><tr><td>HDS</td><td><span class="tag tag--green">Certifie HDS</span></td><td><span class="tag tag--amber">A verifier au cas par cas</span></td></tr><tr><td>Controle</td><td><span class="tag tag--green">Human-in-the-loop</span></td><td><span class="tag tag--amber">Black box</span></td></tr><tr><td>Usage</td><td>Auto-indexing, SQL Plan Management, Stats auto</td><td>Assistance redactionnelle, analyse structurelle</td></tr></tbody></table>';
   }
 
   _renderSovereignArch() {
     var c = document.getElementById('sovereign-arch'); if (!c) return;
     var layers = [
-      { name: 'HSM / OCI Vault', desc: 'Cles maitresses TDE - BYOK', color: 'red' },
+      { name: 'HSM / OCI Vault', desc: 'Cles maiîtresses TDE - BYOK', color: 'red' },
       { name: 'TDE AES-256', desc: 'Chiffrement tablespaces/datafiles', color: 'purple' },
       { name: 'Autonomous DB', desc: 'OCI Region France (eu-france-1)', color: 'blue' },
-      { name: 'Data CHU', desc: 'Donnees de sante - HDS certifie', color: 'green' }
+      { name: 'Data CHU', desc: 'données de sante - HDS certifie', color: 'green' }
     ];
     c.innerHTML = layers.map(function(l, i) {
       return '<div class="diagram-node diagram-node--' + l.color + '" style="position:relative;"><div class="diagram-node__title">' + l.name + '</div><div class="diagram-node__detail">' + l.desc + '</div>' + (i < layers.length - 1 ? '<div style="position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);color:var(--color-border);font-size:var(--fs-lg);font-family:var(--font-mono);">&#8595;</div>' : '') + '</div>';
@@ -1488,33 +1488,33 @@ class CloudModule {
     var chars = '0123456789ABCDEF';
     function fakeEnc(len) { var s = 'TDE$AES256$'; for (var i = 0; i < len; i++) s += chars[Math.floor(Math.random() * 16)]; return s; }
     if (ct) ct.innerHTML = '<div>NIR: <span class="encrypted">' + fakeEnc(20) + '</span></div><div>Nom: <span class="encrypted">' + fakeEnc(20) + '</span></div><div>Montant: <span class="encrypted">' + fakeEnc(20) + '</span></div><div>Diag: <span class="encrypted">' + fakeEnc(20) + '</span></div><div style="margin-top:var(--sp-2);color:var(--color-purple);font-size:var(--fs-xs);">Key ID: TDE_KEY_HSM_CHU_DEMO_001 | Algo: AES-256 | Mode: Tablespace Encryption</div>';
-    document.getElementById('tde-result').innerHTML = '<div class="alert alert--success"><strong>TDE AES-256 active</strong> - Donnees chiffrees au repos (data-at-rest).<br><span class="data-mono">V$ENCRYPTED_TABLESPACES: ENCRYPTED</span><br><span class="data-mono">Cle maitresse stockee dans HSM OCI Vault (BYOK)</span></div>';
+    document.getElementById('tde-result').innerHTML = '<div class="alert alert--success"><strong>TDE AES-256 active</strong> - données chiffrées au repos (data-at-rest).<br><span class="data-mono">V$ENCRYPTED_TABLESPACES: ENCRYPTED</span><br><span class="data-mono">Clé maiîtresse stockée dans HSM OCI Vault (BYOK)</span></div>';
     Logger.info('TDE Encrypt simule - AES-256');
   }
 
   _tdeDecrypt() {
     var ct = document.getElementById('tde-ciphertext');
     if (this._tdeKeyRevoked) {
-      document.getElementById('tde-result').innerHTML = '<div class="alert alert--error"><strong>ERREUR: Cle TDE revoquee (BYOK).</strong> Impossible de dechiffrer sans la cle maitresse du HSM.<br><span class="data-mono">ORA-28365: wallet is not open</span><br>C est le comportement attendu: sans la cle, les donnees sont irrecuperables.</div>';
+      document.getElementById('tde-result').innerHTML = '<div class="alert alert--error"><strong>ERREUR: Clé TDE révoquée (BYOK).</strong> Impossible de déchiffrer sans la clé maiîtresse du HSM.<br><span class="data-mono">ORA-28365: wallet is not open</span><br>C est le comportement attendu: sans la clé, les données sont irrécupérables.</div>';
       return;
     }
-    if (ct) ct.innerHTML = '<div>NIR: <span class="clear-text">NIR_FICTIF_1234567890123</span></div><div>Nom: <span class="clear-text">Patient_TEST_042</span></div><div>Montant: 3 250,00 EUR</div><div>Diag: <span class="clear-text">Z34.9 - Surveillance grossesse normale (FICTIF)</span></div><div style="margin-top:var(--sp-2);color:var(--color-green);font-size:var(--fs-xs);">Dechiffrement reussi - Cle HSM disponible</div>';
-    document.getElementById('tde-result').innerHTML = '<div class="alert alert--success"><strong>Dechiffrement reussi</strong> - Cle maitresse disponible dans le HSM OCI Vault.<br><span class="data-mono">TDE transparent pour l application - overhead CPU: ~3-5%</span></div>';
+    if (ct) ct.innerHTML = '<div>NIR: <span class="clear-text">NIR_FICTIF_1234567890123</span></div><div>Nom: <span class="clear-text">Patient_TEST_042</span></div><div>Montant: 3 250,00 EUR</div><div>Diag: <span class="clear-text">Z34.9 - Surveillance grossesse normale (FICTIF)</span></div><div style="margin-top:var(--sp-2);color:var(--color-green);font-size:var(--fs-xs);">Dechiffrement reussi - Clé HSM disponible</div>';
+    document.getElementById('tde-result').innerHTML = `<div class="alert alert--success"><strong>Dechiffrement reussi</strong> - Clé maiîtresse disponible dans le HSM OCI Vault.<br><span class="data-mono">TDE transparent pour l'application - overhead CPU: ~3-5%</span></div>`;
   }
 
   _tdeRevoke() {
     this._tdeKeyRevoked = true;
-    document.getElementById('tde-result').innerHTML = '<div class="alert alert--error"><strong>Cle TDE revoquee (BYOK) - Simulation de rotation de cle.</strong><br>Les donnees restent chiffrees sur disque. Sans la nouvelle cle, elles sont <strong>irrecuperables</strong>.<br><span class="data-mono">OCI Vault: Key version rotated - Old key: DEPRECATED</span><br><br><strong>En production HDS:</strong> La rotation de cle doit etre planifiee avec une periode de coexistence (ancien + nouveau cle) pour dechiffrer les donnees existantes avant de revoquer definitivement.</div>';
-    Logger.warn('Cle TDE revoquee - BYOK rotation simulee');
+    document.getElementById('tde-result').innerHTML = '<div class="alert alert--error"><strong>Clé TDE révoquée (BYOK) - Simulation de rotation de cle.</strong><br>Les données restent chiffrées sur disque. Sans la nouvelle clé, elles sont <strong>irrécupérables</strong>.<br><span class="data-mono">OCI Vault: Key version rotated - Old key: DEPRECATED</span><br><br><strong>En production HDS:</strong> La rotation de clé doit être planifiée avec une période de coexistence (ancien + nouveau cle) pour déchiffrer les données existantes avant de révoquer définitivement.</div>';
+    Logger.warn('Clé TDE révoquée - BYOK rotation simulée');
   }
 
   _runAutoTune() {
     var resultDiv = document.getElementById('autotune-result');
-    resultDiv.innerHTML = '<div class="alert alert--info">Auto-Tuning en cours - Analyse du plan d execution...</div>';
+    resultDiv.innerHTML = `<div class="alert alert--info">Auto-Tuning en cours - Analyse du plan d'exécution...</div>`;
     var self = this;
     setTimeout(function() {
-      resultDiv.innerHTML = '<div class="alert alert--success"><strong>Auto-Tuning complete - 3 recommandations appliquees:</strong><br><br><strong>1. Index automatique:</strong> <span class="data-mono">CREATE INDEX idx_sejour_date_entree ON sejour_simu(date_entree)</span><br><em>Impact: Full Table Scan -&gt; Index Range Scan sur la clause WHERE</em><br><br><strong>2. SQL Plan Baseline:</strong> Plan stabilise pour la requete PMSI (SPM)<br><em>Empeche la regression de plan apres les statistiques gathering</em><br><br><strong>3. Statistiques auto:</strong> Preferences de collecte ajustees (AUTO_SAMPLE_SIZE, GRANULARITY=AUTO)<br><br><span class="data-mono">Temps estime avant: 45.2s -&gt; apres: 2.1s (x21 improvement)</span><br><span class="data-mono">V$SQL_AUTO_INDEX: INDEX CREATED | SQL_PLAN_BASELINE: ACCEPTED</span></div>';
-      Logger.info('Auto-Tuning simule - 3 recommandations appliquees');
+      resultDiv.innerHTML = '<div class="alert alert--success"><strong>Auto-Tuning complété - 3 recommandations appliquées :</strong><br><br><strong>1. Index automatique:</strong> <span class="data-mono">CREATE INDEX idx_sejour_date_entree ON sejour_simu(date_entree)</span><br><em>Impact: Full Table Scan -&gt; Index Range Scan sur la clause WHERE</em><br><br><strong>2. SQL Plan Baseline:</strong> Plan stabilise pour la requête PMSI (SPM)<br><em>empêche la regression de plan apres les statistiques gathering</em><br><br><strong>3. Statistiques auto:</strong> Préférences de collecte ajustées (AUTO_SAMPLE_SIZE, GRANULARITY=AUTO)<br><br><span class="data-mono">Temps estimé avant: 45.2s -&gt; après : 2.1s (x21 improvement)</span><br><span class="data-mono">V$SQL_AUTO_INDEX: INDEX CREATED | SQL_PLAN_BASELINE: ACCEPTED</span></div>';
+      Logger.info('Auto-Tuning simulé - 3 recommandations appliquées');
     }, 1500);
   }
 }
@@ -1587,7 +1587,7 @@ class HelpManager {
       }
     });
 
-    // Clic sur overlay = fermeture (backup, mais focus trap empeche d'atteindre l'overlay)
+    // Clic sur overlay = fermeture (backup, mais focus trap empêche d'atteindre l'overlay)
     this._overlay.addEventListener('click', function() { self.close(); });
 
     // Touche Escape = fermeture
@@ -1599,7 +1599,7 @@ class HelpManager {
       }
     });
 
-    // Focus trap : empeche Tab de sortir de la modale active
+    // Focus trap : empêche Tab de sortir de la modale active
     document.addEventListener('keydown', function(e) {
       if (e.key !== 'Tab' || !self._activeModal) return;
 
@@ -1699,7 +1699,7 @@ class Application {
   }
 
   init() {
-    Logger.info('=== Oracle HDS Demo - Initialisation ===');
+    Logger.info('=== Oraclé HDS démo - Initialisation ===');
     this._modules.multitenant = new MultitenantModule(this._state, this._engine, this._fakeData);
     this._modules.memory = new MemoryModule(this._state, this._engine);
     this._modules.io = new IOModule(this._state, this._engine, this._fakeData);
@@ -1708,7 +1708,7 @@ class Application {
     this._bindNavigation();
     this._startSCNTicker();
     this._helpManager = new HelpManager();
-    Logger.info('=== Oracle HDS Demo - Ready ===');
+    Logger.info('=== Oraclé HDS démo - Ready ===');
   }
 
   _bindNavigation() {
@@ -1754,7 +1754,7 @@ document.addEventListener('DOMContentLoaded', function() {
     app.init();
   } catch(e) {
     Logger.error('Application bootstrap error:', e);
-    document.getElementById('app-main').innerHTML = '<div class="alert alert--error"><strong>Erreur d initialisation:</strong> ' + e.message + '</div>';
+    document.getElementById('app-main').innerHTML = `<div class="alert alert--error"><strong>Erreur d'initialisation:</strong> ` + e.message + `</div>`;
   }
 });
 </script>
