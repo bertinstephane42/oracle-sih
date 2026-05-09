@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Oracle Lifecycle SIH - Serious Game Deploiement Application PUI">
-<title>Oracle Lifecycle - Deploiement Guide PUI</title>
+<meta name="description" content="Oracle Lifecycle SIH - Serious Game Déploiement Application PUI">
+<title>Oracle Lifecycle - Déploiement Guide PUI</title>
 <style>
 :root {
   --color-bg-deep: #0a0e17;
@@ -246,7 +246,7 @@ a:hover { text-decoration: underline; }
     </div>
     <div class="app-header__status">
       <span class="status-badge status-badge--online"><span class="status-dot"></span>GUIDE ACTIF</span>
-      <span class="status-badge status-badge--hds">HDS / DONNEES FICTIVES</span>
+      <span class="status-badge status-badge--hds">HDS / DONNÉES FICTIVES</span>
       <button class="page-header__help-btn" id="btn-help-lexicon" aria-label="Lexique technique" title="Lexique technique">L</button>
       <button class="page-header__help-btn" id="btn-help-credit" aria-label="Credits" title="Credits">C</button>
     </div>
@@ -256,22 +256,22 @@ a:hover { text-decoration: underline; }
     <div class="app-nav__section">
       <div class="app-nav__section-title">Projet PUI</div>
       <div style="padding: 0 var(--sp-4); font-size: var(--fs-xs); font-family: var(--font-mono); line-height: 2;">
-        <div style="color: #64748b;">ETAPE COURANTE</div>
-        <div id="nav-current-step" style="color: var(--color-blue);">Etape 1</div>
-        <div style="color: #64748b; margin-top: var(--sp-2);">ETAPES VALIDEES</div>
+        <div style="color: #64748b;">ÉTAPE COURANTE</div>
+        <div id="nav-current-step" style="color: var(--color-blue);">Étape 1</div>
+        <div style="color: #64748b; margin-top: var(--sp-2);">ÉTAPES VALIDÉES</div>
         <div id="nav-steps-done" style="color: var(--color-blue);">0 / 6</div>
         <div style="color: #64748b; margin-top: var(--sp-2);">NIVEAU RISQUE</div>
         <div id="nav-risk-level" style="color: var(--color-green);">FAIBLE</div>
       </div>
     </div>
     <div class="app-nav__section">
-      <div class="app-nav__section-title">Historique Decisions</div>
+      <div class="app-nav__section-title">Historique Décisions</div>
       <div id="decision-history" style="font-size: var(--fs-xs); font-family: var(--font-mono); max-height: 300px; overflow-y: auto;">
-        <div style="color: #475569; padding: var(--sp-2) var(--sp-4);">Aucune decision encore prise.</div>
+        <div style="color: #475569; padding: var(--sp-2) var(--sp-4);">Aucune décision encore prise.</div>
       </div>
     </div>
     <div class="app-nav__rgpd-notice">
-      DONNEES 100% FICTIVES<br>
+      DONNÉES 100% FICTIVES<br>
       Patients_TEST / PUI_SIMU<br>
       Conforme RGPD Art. 25
     </div>
@@ -281,8 +281,8 @@ a:hover { text-decoration: underline; }
     <div class="page-header">
       <h1 class="page-header__title">Cycle de vie projet Oracle PUI</h1>
       <div class="page-header__subtitle-row">
-        <p class="page-header__subtitle">Guide Interactif de Deploiement — Experimentez les consequences de vos choix techniques</p>
-        <button class="page-header__help-btn" id="btn-help-overview" aria-label="Aide vue d ensemble" title="Rubrique d'aide">?</button>
+        <p class="page-header__subtitle">Guide interactif de Déploiement — Expérimentez les conséquences de vos choix techniques</p>
+        <button class="page-header__help-btn" id="btn-help-overview" aria-label="Aide vue d'ensemble" title="Rubrique d'aide">?</button>
       </div>
     </div>
 
@@ -295,12 +295,12 @@ a:hover { text-decoration: underline; }
       <span class="step-progress__arrow">&rarr;</span>
       <div class="step-progress__item" data-step="2">
         <span class="step-progress__num">2</span>
-        <span class="step-progress__label">Securite</span>
+        <span class="step-progress__label">Sécurité</span>
       </div>
       <span class="step-progress__arrow">&rarr;</span>
       <div class="step-progress__item" data-step="3">
         <span class="step-progress__num">3</span>
-        <span class="step-progress__label">Developpement</span>
+        <span class="step-progress__label">Développement</span>
       </div>
       <span class="step-progress__arrow">&rarr;</span>
       <div class="step-progress__item" data-step="4">
@@ -323,7 +323,7 @@ a:hover { text-decoration: underline; }
     <div class="grid-4" style="margin-bottom: var(--sp-6);">
       <div class="stat-block stat-block--blue">
         <div class="stat-block__value"><span id="dash-etape">1</span>/6</div>
-        <div class="stat-block__label">Etape Courante</div>
+        <div class="stat-block__label">Étape Courante</div>
       </div>
       <div class="stat-block" id="dash-risk-stat">
         <div class="stat-block__value" id="dash-risk-val" style="color: var(--color-green);">0%</div>
@@ -335,7 +335,7 @@ a:hover { text-decoration: underline; }
       </div>
       <div class="stat-block stat-block--cyan">
         <div class="stat-block__value"><span id="dash-alerts">0</span></div>
-        <div class="stat-block__label">Alertes Declenchees</div>
+        <div class="stat-block__label">Alertes Déclenchées</div>
       </div>
     </div>
 
@@ -349,7 +349,7 @@ a:hover { text-decoration: underline; }
         </div>
         <span class="risk-gauge__pct" id="risk-gauge-pct" style="color: var(--color-green);">0%</span>
       </div>
-      <div id="risk-impact-msg" style="margin-top: var(--sp-3); font-size: var(--fs-xs); color: #64748b; font-family: var(--font-mono);">Projet sain. Aucun risque detecte.</div>
+      <div id="risk-impact-msg" style="margin-top: var(--sp-3); font-size: var(--fs-xs); color: #64748b; font-family: var(--font-mono);">Projet sain. Aucun risque détecté.</div>
     </div>
 
     <!-- ================================================================
@@ -357,17 +357,16 @@ a:hover { text-decoration: underline; }
          ================================================================ -->
     <div class="step-content step-content--active" id="step-1">
       <div class="card fade-in">
-        <div class="card__title"><span class="card__title-icon">&#9733;</span> Etape 1 — Installation &amp; architecture</div>
+        <div class="card__title"><span class="card__title-icon">&#9733;</span> Étape 1 — Installation &amp; architecture</div>
         <div class="step-desc">
-          Fondations du projet PUI. Choix du Character Set et configuration du Resource Plan CDB/PDB.
-          Ces decisions sont <strong>irreversibles</strong> apres creation de la base. Impact direct sur l'internationalisation et l'isolation des ressources.
+          Fondations du projet PUI. Choix du jeu de caractères et configuration du plan de ressources CDB/PDB. Ces décisions sont <strong>irréversibles</strong> après création de la base. Impact direct sur l'internationalisation et l'isolation des ressources.
         </div>
         <div class="decision-zone" id="step1-decisions">
         </div>
         <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
           <button class="btn btn--outline btn--sm btn-expert" data-step="1">Voir la Bonne Pratique</button>
-          <button class="btn btn--outline btn--sm btn-reset-step" data-step="1" style="display:none;">Reinitialiser le choix</button>
-          <button class="btn btn--primary btn--sm btn-validate-step" data-step="1" style="display:none;">Valider l'Etape</button>
+          <button class="btn btn--outline btn--sm btn-reset-step" data-step="1" style="display:none;">Réinitialiser le choix</button>
+          <button class="btn btn--primary btn--sm btn-validate-step" data-step="1" style="display:none;">Valider l'Étape</button>
         </div>
       </div>
     </div>
@@ -377,17 +376,17 @@ a:hover { text-decoration: underline; }
          ================================================================ -->
     <div class="step-content" id="step-2">
       <div class="card fade-in">
-        <div class="card__title"><span class="card__title-icon">&#128274;</span> Etape 2 — Securite &amp; conformite HDS/RGPD</div>
+        <div class="card__title"><span class="card__title-icon">&#128274;</span> Étape 2 — Sécurité &amp; conformité HDS/RGPD</div>
         <div class="step-desc">
-          Configuration du chiffrement TDE, de l'audit HDS et des profils de securite.
-          En environnement hospitalier, la non-conformite expose a des sanctions juridiques et a la suspension de l'habilitation HDS.
+          Configuration du chiffrement TDE, de l'audit HDS et des profils de sécurité.
+          En environnement hospitalier, la non-conformité expose à des sanctions juridiques et à la suspension de l'habilitation HDS.
         </div>
         <div class="decision-zone" id="step2-decisions">
         </div>
         <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
           <button class="btn btn--outline btn--sm btn-expert" data-step="2">Voir la Bonne Pratique</button>
-          <button class="btn btn--outline btn--sm btn-reset-step" data-step="2" style="display:none;">Reinitialiser le choix</button>
-          <button class="btn btn--primary btn--sm btn-validate-step" data-step="2" style="display:none;">Valider l'Etape</button>
+          <button class="btn btn--outline btn--sm btn-reset-step" data-step="2" style="display:none;">Réinitialiser le choix</button>
+          <button class="btn btn--primary btn--sm btn-validate-step" data-step="2" style="display:none;">Valider l'Étape</button>
         </div>
       </div>
     </div>
@@ -397,17 +396,17 @@ a:hover { text-decoration: underline; }
          ================================================================ -->
     <div class="step-content" id="step-3">
       <div class="card fade-in">
-        <div class="card__title"><span class="card__title-icon">&#128187;</span> Etape 3 — Developpement &amp; requetage</div>
+        <div class="card__title"><span class="card__title-icon">&#128187;</span> Étape 3 — Développement &amp; requêtage</div>
         <div class="step-desc">
-          Revue de code PL/SQL avant mise en production. Les choix d'ecriture SQL impactent directement
-          les performances de la PUI et la charge sur le serveur de base de donnees.
+          Revue de code PL/SQL avant mise en production. Les choix d'écriture SQL impactent directement
+          les performances de la PUI et la charge sur le serveur de base de données.
         </div>
         <div class="decision-zone" id="step3-decisions">
         </div>
         <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
           <button class="btn btn--outline btn--sm btn-expert" data-step="3">Voir la Bonne Pratique</button>
-          <button class="btn btn--outline btn--sm btn-reset-step" data-step="3" style="display:none;">Reinitialiser le choix</button>
-          <button class="btn btn--primary btn--sm btn-validate-step" data-step="3" style="display:none;">Valider l'Etape</button>
+          <button class="btn btn--outline btn--sm btn-reset-step" data-step="3" style="display:none;">Réinitialiser le choix</button>
+          <button class="btn btn--primary btn--sm btn-validate-step" data-step="3" style="display:none;">Valider l'Étape</button>
         </div>
       </div>
     </div>
@@ -417,17 +416,17 @@ a:hover { text-decoration: underline; }
          ================================================================ -->
     <div class="step-content" id="step-4">
       <div class="card fade-in">
-        <div class="card__title"><span class="card__title-icon">&#9881;</span> Etape 4 — Tuning systeme (SGA/PGA/Undo)</div>
+        <div class="card__title"><span class="card__title-icon">&#9881;</span> Étape 4 — Tuning système (SGA/PGA/Undo)</div>
         <div class="step-desc">
-          Ajustement des parametres memoire face a une charge simulee de reporting PMSI/T2A.
-          Un mauvais dimensionnement entraine des ORA-01555 et des temps de reponse degradés.
+          Ajustement des paramètres mémoire face à une charge simulée d'états PMSI/T2A (Programme de Médicalisation des Systèmes d'Information / Tarification à l'Activité).
+          Un mauvais dimensionnement entraîne des erreurs de type ORA-01555 et des temps de réponse dégradés.
         </div>
         <div class="decision-zone" id="step4-decisions">
         </div>
         <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
           <button class="btn btn--outline btn--sm btn-expert" data-step="4">Voir la Bonne Pratique</button>
-          <button class="btn btn--outline btn--sm btn-reset-step" data-step="4" style="display:none;">Reinitialiser le choix</button>
-          <button class="btn btn--primary btn--sm btn-validate-step" data-step="4" style="display:none;">Valider l'Etape</button>
+          <button class="btn btn--outline btn--sm btn-reset-step" data-step="4" style="display:none;">Réinitialiser le choix</button>
+          <button class="btn btn--primary btn--sm btn-validate-step" data-step="4" style="display:none;">Valider l'Étape</button>
         </div>
       </div>
     </div>
@@ -437,17 +436,17 @@ a:hover { text-decoration: underline; }
          ================================================================ -->
     <div class="step-content" id="step-5">
       <div class="card fade-in">
-        <div class="card__title"><span class="card__title-icon">&#128202;</span> Etape 5 — Tests de charge &amp; Recette</div>
+        <div class="card__title"><span class="card__title-icon">&#128202;</span> Étape 5 — Tests de charge &amp; Recette</div>
         <div class="step-desc">
-          Simulation de 500 utilisateurs concurrents. Un ralentissement est detecte.
-          A vous d'identifier la cause a travers les Wait Events et de proposer la correction.
+          Simulation de 500 utilisateurs concurrents. Un ralentissement est détecté.
+          À vous d'identifier la cause à travers les évènements d'attente et de proposer la correction.
         </div>
         <div class="decision-zone" id="step5-decisions">
         </div>
         <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
           <button class="btn btn--outline btn--sm btn-expert" data-step="5">Voir la Bonne Pratique</button>
-          <button class="btn btn--outline btn--sm btn-reset-step" data-step="5" style="display:none;">Reinitialiser le choix</button>
-          <button class="btn btn--primary btn--sm btn-validate-step" data-step="5" style="display:none;">Valider l'Etape</button>
+          <button class="btn btn--outline btn--sm btn-reset-step" data-step="5" style="display:none;">Réinitialiser le choix</button>
+          <button class="btn btn--primary btn--sm btn-validate-step" data-step="5" style="display:none;">Valider l'Étape</button>
         </div>
       </div>
     </div>
@@ -457,51 +456,51 @@ a:hover { text-decoration: underline; }
          ================================================================ -->
     <div class="step-content" id="step-6">
       <div class="card fade-in">
-        <div class="card__title"><span class="card__title-icon">&#127758;</span> Etape 6 — Mise en production &amp; Maintenance</div>
+        <div class="card__title"><span class="card__title-icon">&#127758;</span> Étape 6 — Mise en production &amp; Maintenance</div>
         <div class="step-desc">
-          Validation de la strategie de Backup/PRA avant le Go-Live.
-          La capacite a restaurer les donnees est la seule verite en cas de sinistre.
+          Validation de la stratégie de sauvegarde et de reprise d'activité avant le démarrage.
+          La capacité à restaurer les données est la seule opération valable en cas de sinistre.
         </div>
         <div class="decision-zone" id="step6-decisions">
         </div>
         <div style="margin-top: var(--sp-4); display: flex; gap: var(--sp-3);">
           <button class="btn btn--outline btn--sm btn-expert" data-step="6">Voir la Bonne Pratique</button>
-          <button class="btn btn--outline btn--sm btn-reset-step" data-step="6" style="display:none;">Reinitialiser le choix</button>
-          <button class="btn btn--primary btn--sm btn-validate-step" data-step="6" style="display:none;">Valider l'Etape</button>
+          <button class="btn btn--outline btn--sm btn-reset-step" data-step="6" style="display:none;">Réinitialiser le choix</button>
+          <button class="btn btn--primary btn--sm btn-validate-step" data-step="6" style="display:none;">Valider l'Étape</button>
         </div>
       </div>
     </div>
 
     <!-- Log Console -->
     <div class="card fade-in">
-      <div class="card__title"><span class="card__title-icon">&#128203;</span> Console de simulation — Logs temps reel</div>
+      <div class="card__title"><span class="card__title-icon">&#128203;</span> Console de simulation — Logs temps réel</div>
       <div class="log-console" id="sim-log" style="max-height: 280px;">
-        <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Guide de deploiement initialise. Etape 1 active.</div>
+        <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Guide de déploiement initialisé. Étape 1 active.</div>
       </div>
     </div>
 
     <!-- Performance Chart -->
     <div class="card fade-in">
-      <div class="card__title"><span class="card__title-icon">&#128200;</span> Performance projet — Indicateurs d impact</div>
+      <div class="card__title"><span class="card__title-icon">&#128200;</span> Performance projet — Indicateurs d'impact</div>
       <div class="perf-chart" id="perf-chart">
         <div class="perf-chart__bar"><div class="perf-chart__col" id="pc-install" style="height: 20%; background: var(--color-green);"></div><span class="perf-chart__label">Install</span></div>
-        <div class="perf-chart__bar"><div class="perf-chart__col" id="pc-securite" style="height: 20%; background: var(--color-border);"></div><span class="perf-chart__label">Securite</span></div>
+        <div class="perf-chart__bar"><div class="perf-chart__col" id="pc-securite" style="height: 20%; background: var(--color-border);"></div><span class="perf-chart__label">Sécurité</span></div>
         <div class="perf-chart__bar"><div class="perf-chart__col" id="pc-dev" style="height: 20%; background: var(--color-border);"></div><span class="perf-chart__label">Dev</span></div>
         <div class="perf-chart__bar"><div class="perf-chart__col" id="pc-tuning" style="height: 20%; background: var(--color-border);"></div><span class="perf-chart__label">Tuning</span></div>
         <div class="perf-chart__bar"><div class="perf-chart__col" id="pc-recette" style="height: 20%; background: var(--color-border);"></div><span class="perf-chart__label">Recette</span></div>
         <div class="perf-chart__bar"><div class="perf-chart__col" id="pc-prod" style="height: 20%; background: var(--color-border);"></div><span class="perf-chart__label">Prod</span></div>
       </div>
-      <div style="font-size: var(--fs-xs); color: #64748b; font-family: var(--font-mono); text-align: center; margin-top: var(--sp-2);">Sante par domaine: bleu (en attente), orange (risque modere), rouge (risque severe), vert (bonne pratique)</div>
+      <div style="font-size: var(--fs-xs); color: #64748b; font-family: var(--font-mono); text-align: center; margin-top: var(--sp-2);">Santé par domaine: bleu (en attente), orange (risque modéré), rouge (risque sévère), vert (bonne pratique)</div>
     </div>
 
     <!-- Completion Modal -->
     <div class="help-modal" id="completion-modal" role="dialog" aria-modal="true" aria-hidden="true">
       <div class="help-modal__header">
-        <div class="help-modal__title" id="completion-modal-title">&#10004; Projet PUI Termine !</div>
+        <div class="help-modal__title" id="completion-modal-title">&#10004; Projet PUI Terminé !</div>
       </div>
       <div class="help-modal__body" style="text-align: center; padding: var(--sp-8) var(--sp-6);">
         <div id="completion-msg" class="alert alert--success" style="margin-bottom: var(--sp-6);">
-          Felicitations ! Vous avez complete le cycle de deploiement.
+          Félicitations ! Vous avez complété le cycle de déploiement.
         </div>
         <div style="display: flex; gap: var(--sp-4); justify-content: center;">
           <button class="btn btn--primary btn--sm" id="btn-restart">Recommencer le Projet</button>
@@ -512,17 +511,17 @@ a:hover { text-decoration: underline; }
     <!-- Overview Help Modal -->
     <div class="help-overlay" id="help-overlay" aria-hidden="true"></div>
     <div class="help-modal" id="help-overview" role="dialog" aria-modal="true" aria-labelledby="help-overview-title" aria-hidden="true">
-      <div class="help-modal__header"><div class="help-modal__title" id="help-overview-title">Guide de Deploiement — Vue d'Ensemble</div><button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button></div>
+      <div class="help-modal__header"><div class="help-modal__title" id="help-overview-title">Guide de Déploiement — Vue d'Ensemble</div><button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button></div>
       <div class="help-modal__body">
         <div class="help-modal__text">
-          Ce serious game vous guide a travers les <strong>6 etapes</strong> du cycle de vie d'un projet Oracle en contexte hospitalier PUI :<br><br>
-          <strong>Etape 1 — Installation</strong> : Choix du Character Set (AL32UTF8 vs legacy), Resource Plan CDB/PDB<br>
-          <strong>Etape 2 — Securite</strong> : TDE, Audit HDS, Profils de securite — conformite obligatoire<br>
-          <strong>Etape 3 — Developpement</strong> : Revue de code PL/SQL, SELECT explicite, indexation<br>
-          <strong>Etape 4 — Tuning</strong> : SGA/PGA/Undo — eviter ORA-01555 et les temps de reponse degradés<br>
-          <strong>Etape 5 — Recette</strong> : Analyse des Wait Events sous charge, contention de sequence<br>
-          <strong>Etape 6 — Production</strong> : Backup RMAN, Data Guard, PRA — la restauration est la seule verite<br><br>
-          Chaque choix a des consequences visibles immediatement. Utilisez le bouton "Voir la Bonne Pratique" si vous souhaitez de l'aide.
+          Ce serious game vous guide à travers les <strong>6 étapes</strong> du cycle de vie d'un projet Oracle en contexte hospitalier PUI :<br><br>
+          <strong>Étape 1 — Installation</strong> : Choix du jeu de caractères (AL32UTF8 contre hérité), Plan de ressources CDB/PDB<br>
+		  <strong>Étape 2 — Sécurité</strong> : TDE, Audit HDS, Profils de sécurité — conformité obligatoire<br>
+		  <strong>Étape 3 — Développement</strong> : Revue de code PL/SQL, SELECT explicite, indexation<br>
+		  <strong>Étape 4 — Ajustement des performances</strong> : SGA/PGA/Undo — éviter ORA-01555 et les temps de réponse dégradés<br>
+		  <strong>Étape 5 — Recette</strong> : Analyse des événements d'attente sous charge, contention de séquence<br>
+		  <strong>Étape 6 — Production</strong> : Sauvegarde RMAN, Data Guard, PRA — la restauration est la seule possibilité<br><br>
+          Chaque choix a des conséquences visibles immédiatement. Utilisez le bouton "Voir la Bonne Pratique" si vous souhaitez de l'aide.
         </div>
       </div>
       <div class="help-modal__footer"><button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button></div>
@@ -538,105 +537,105 @@ a:hover { text-decoration: underline; }
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--lexique">Architecture Oracle Fondamentale</div>
           <ul class="help-modal__list">
-            <li><strong>Conteneur de Base de Donnees (CDB)</strong> — Base de donnees racine chapeautant l'ensemble des bases de donnees placables dans l'architecture multitenant Oracle 12c et suivantes.</li>
-            <li><strong>Base de Donnees Placable (PDB)</strong> — Base de donnees portable et isolee au sein d'un conteneur, apparaissant aux utilisateurs et aux applications comme une base de donnees classique.</li>
-            <li><strong>Dictionnaire Partage</strong> — Ensemble de metadonnees de definition (structures de schemas, objets, privileges) mutualisees entre toutes les bases placables d'un meme conteneur.</li>
-            <li><strong>Cache de Lignes du Dictionnaire</strong> — Structure memoire logeant dans la memoire partagee les lignes du dictionnaire, protegee par un verrou d'exclusion mutuelle (latch).</li>
-            <li><strong>Masquage de Donnees</strong> — Technique d'obfuscation des donnees sensibles (numero d'inscription au repertoire, identite des patients) lors du clonage d'une base, conforme au Reglement General sur la Protection des Donnees.</li>
+            <li><strong>Conteneur de Base de Données (CDB)</strong> — Base de données racine chapeautant l'ensemble des bases de données enfichables dans l'architecture multitenant Oracle 12c et suivantes.</li>
+            <li><strong>Base de Données Enfichable (PDB)</strong> — Base de données portable et isolée au sein d'un conteneur, apparaissant aux utilisateurs et aux applications comme une base de données classique.</li>
+            <li><strong>Dictionnaire Partage</strong> — Ensemble de métadonnées de définition (structures de schémas, objets, privilèges) mutualisées entre toutes les bases enfichables d'un même conteneur.</li>
+            <li><strong>Cache de Lignes du Dictionnaire</strong> — Structure mémoire stockant dans la mémoire partagée les lignes du dictionnaire, protégée par un verrou d'exclusion mutuelle (latch).</li>
+            <li><strong>Masquage de Données</strong> — Technique d'obfuscation des données sensibles (numéro d'inscription au répertoire, identité des patients) lors du clonage d'une base, conforme au Règlement Général sur la Protection des Données.</li>
           </ul>
         </div>
         <div class="help-modal__section">
-          <div class="help-modal__section-title help-modal__section-title--lexique">Memoire Globale (SGA / PGA)</div>
+          <div class="help-modal__section-title help-modal__section-title--lexique">Mémoire Globale (SGA / PGA)</div>
           <ul class="help-modal__list">
-            <li><strong>Memoire Globale de Systeme (SGA)</strong> — Zone memoire partagee par l'ensemble des processus Oracle, abritant le cache de tampons, le reservoir partage, le tampon de journalisation et les structures connexes.</li>
-            <li><strong>Cache de Tampons</strong> — Portion de la memoire globale contenant les blocs de donnees lus depuis les fichiers disques, ordonnancee par l'algorithme du moindre recent usage.</li>
-            <li><strong>Memoire Globale de Programme (PGA)</strong> — Zone memoire privee allouee a chaque session d'utilisation pour les operations de tri, de regroupement et de jointure.</li>
-            <li><strong>Debordement Temporaire</strong> — Basculement des operations memoire vers les espaces temporaires sur disque lorsque la memoire globale de programme est insuffisante, entrainant une degradation sensible des temps d'execution.</li>
-            <li><strong>Compteur d'Acces (Touch Count)</strong> — Indicateur du nombre de consultations d'un bloc dans le cache de tampons, determinant son placement dans la chaine du moindre recent usage.</li>
-            <li><strong>Verrou d'Exclusion Mutuelle (Latch)</strong> — Mecanisme de verrouillage leger protegeant l'acces concurrent aux structures partagees de la memoire globale.</li>
-            <li><strong>Reservoir Partagé (Shared Pool)</strong> — Composant de la Memoire Globale de Systeme logeant le cache des instructions SQL analysees, des plans d'execution memorises et du dictionnaire de donnees. Un dimensionnement insuffisant provoque une purge prematuree des requetes analysees, contraignant l'optimiseur a recomposer chaque execution.</li>
-            <li><strong>Pages de Grande Taille (HugePages)</strong> — Mecanisme d'allocation memoire du systeme d'exploitation utilisant des pages de plusieurs megaoctets plutot que les pages canoniques de quatre kilo-octets, reduisant le nombre d'entrees dans la table de traduction des adresses (TLB) et ameliorant la stabilite de la Memoire Globale de Systeme en environnement de production.</li>
+            <li><strong>Mémoire Globale de Système (SGA)</strong> — Zone mémoire partagée par l'ensemble des processus Oracle, abritant le cache de tampons, le réservoir partagé, le tampon de journalisation et les structures connexes.</li>
+            <li><strong>Cache de Tampons</strong> — Portion de la mémoire globale contenant les blocs de données lus depuis les fichiers disques, ordonnancée par l'algorithme du moindre récent usage.</li>
+            <li><strong>Mémoire Globale de Programme (PGA)</strong> — Zone mémoire privée allouée à chaque session d'utilisation pour les opérations de tri, de regroupement et de jointure.</li>
+            <li><strong>Débordement Temporaire</strong> — Basculement des opérations mémoire vers les espaces temporaires sur disque lorsque la mémoire globale de programme est insuffisante, entraînant une dégradation sensible des temps d'exécution.</li>
+            <li><strong>Compteur d'Accès (Touch Count)</strong> — Indicateur du nombre de consultations d'un bloc dans le cache de tampons, déterminant son placement dans la chaîne du moindre récent usage.</li>
+            <li><strong>Verrou d'Exclusion Mutuelle (Latch)</strong> — Mécanisme de verrouillage léger protégeant l'accès concurrent aux structures partagées de la mémoire globale.</li>
+            <li><strong>Réservoir Partagé (Shared Pool)</strong> — Composant de la Mémoire Globale de Système stockant le cache des instructions SQL analysées, des plans d'exécution mémorisés et du dictionnaire de données. Un dimensionnement insuffisant provoque une purge prématurée des requêtes analysées, contraignant l'optimiseur à recomposer chaque exécution.</li>
+            <li><strong>Pages de Grande Taille (HugePages)</strong> — Mécanisme d'allocation mémoire du système d'exploitation utilisant des pages de plusieurs mégaoctets plutôt que les pages canoniques de quatre kilo-octets, réduisant le nombre d'entrées dans la table de traduction des adresses (TLB) et améliorant la stabilité de la Mémoire Globale de Système en environnement de production.</li>
           </ul>
         </div>
         <div class="help-modal__section">
-          <div class="help-modal__section-title help-modal__section-title--lexique">Transactions et Coherence</div>
+          <div class="help-modal__section-title help-modal__section-title--lexique">Transactions et Cohérence</div>
           <ul class="help-modal__list">
-            <li><strong>Numero de Changement Systeme (SCN)</strong> — Compteur sequentiel global horodatant chaque transaction et garantissant l'ordre causal des modifications dans l'ensemble de la base.</li>
-            <li><strong>Journal de Retablissement (Redo)</strong> — Enregistrement sequentiel de toutes les modifications appliquees a la base, utilise pour la reprise apres incident par application differee.</li>
-            <li><strong>Segment d'Annulation (Undo)</strong> — Blocs conservant l'image anterieure des donnees modifiees, necessaires a la lecture coherente et au retour en arriere des transactions.</li>
-            <li><strong>Reprise apres Incident (Instance Recovery)</strong> — Processus automatique de retablissement de la base apres un arret brutal, combinant l'application du journal de retablissement (avance rapide) et l'application des segments d'annulation (retour arriere).</li>
-            <li><strong>Coherence de Lecture</strong> — Mecanisme garantissant qu'une requete percoit un instantane coherent des donnees a un instant de reference, en utilisant les blocs d'annulation.</li>
-            <li><strong>Erreur d'Instantané Trop Ancien (ORA-01555)</strong> — Erreur survenant lorsque les blocs d'annulation necessaires a la lecture coherente d'une longue requete ont ete ecrases par des transactions plus recentes avant la fin de la consultation.</li>
-            <li><strong>Erreur d'Extension de Segment d'Annulation (ORA-30036)</strong> — Echec survenant lorsque le segment d'annulation ne peut etendre son allocation dans l'espace de table qui lui est dedie, faute d'espace libre disponible. Symptome d'un dimensionnement insuffisant de l'espace de table d'annulation au regard de la duree de retention configuree — chaque transaction longue consomme des blocs d'annulation qui ne peuvent etre recycles avant l'expiration de leur delai de conservation.</li>
+            <li><strong>Numéro de Changement Système (SCN)</strong> — Compteur séquentiel global horodatant chaque transaction et garantissant l'ordre causal des modifications dans l'ensemble de la base.</li>
+            <li><strong>Journal de Rétablissement (Redo)</strong> — Enregistrement séquentiel de toutes les modifications appliquées à la base, utilisé pour la reprise après incident par application différée.</li>
+            <li><strong>Segment d'Annulation (Undo)</strong> — Blocs conservant l'image antérieure des données modifiées, nécessaires à la lecture cohérente et au retour en arrière des transactions.</li>
+            <li><strong>Reprise après Incident (Instance Recovery)</strong> — Processus automatique de rétablissement de la base après un arrêt brutal, combinant l'application du journal de rétablissement (avance rapide) et l'application des segments d'annulation (retour arrière).</li>
+            <li><strong>Cohérence de Lecture</strong> — Mécanisme garantissant qu'une requête perçoit un instantané cohérent des données à un instant de référence, en utilisant les blocs d'annulation.</li>
+            <li><strong>Erreur d'Instantané Trop Ancien (ORA-01555)</strong> — Erreur survenant lorsque les blocs d'annulation nécessaires à la lecture cohérente d'une longue requête ont été écrasés par des transactions plus récentes avant la fin de la consultation.</li>
+            <li><strong>Erreur d'Extension de Segment d'Annulation (ORA-30036)</strong> — Échec survenant lorsque le segment d'annulation ne peut étendre son allocation dans l'espace de table qui lui est dédié, faute d'espace libre disponible. Symptôme d'un dimensionnement insuffisant de l'espace de table d'annulation au regard de la durée de rétention configurée — chaque transaction longue consomme des blocs d'annulation qui ne peuvent être recyclés avant l'expiration de leur délai de conservation.</li>
           </ul>
         </div>
         <div class="help-modal__section">
-          <div class="help-modal__section-title help-modal__section-title--lexique">Optimiseur et Plans d'Execution</div>
+          <div class="help-modal__section-title help-modal__section-title--lexique">Optimiseur et Plans d'Exécution</div>
           <ul class="help-modal__list">
-            <li><strong>Optimiseur Base sur les Couts (CBO)</strong> — Moteur d'optimisation d'Oracle analysant les statistiques des objets et les couts d'acces pour determiner le plan d'execution le plus efficace pour chaque requete.</li>
-            <li><strong>Plan d'Execution</strong> — Arbre d'operations (acces tables, jointures, tris) genere par l'optimiseur pour executer une requete SQL, visible via la commande <code>EXPLAIN PLAN</code>.</li>
-            <li><strong>Parcours Integral de Table (Full Table Scan)</strong> — Methode d'acces lisant l'integralite des blocs d'une table, utilisee en l'absence d'index adapte ou lorsque la table est de petite taille.</li>
-            <li><strong>Parcours Unique par Index (Index Unique Scan)</strong> — Methode d'acces retournant au plus une ligne via un index unique, typique des recherches par cle primaire.</li>
-            <li><strong>Jointure par Hash (HASH JOIN) / Boucles Imbriquees (NESTED LOOPS)</strong> — Algorithmes de jointure : le premier convient aux grands volumes sans index, le second aux petites tables indexees.</li>
+            <li><strong>Optimiseur Basé sur les Coûts (CBO)</strong> — Moteur d'optimisation d'Oracle analysant les statistiques des objets et les coûts d'accès pour déterminer le plan d'exécution le plus efficace pour chaque requête.</li>
+            <li><strong>Plan d'Exécution</strong> — Arbre d'opérations (accès tables, jointures, tris) généré par l'optimiseur pour exécuter une requête SQL, visible via la commande <code>EXPLAIN PLAN</code>.</li>
+            <li><strong>Parcours Intégral de Table (Full Table Scan)</strong> — Méthode d'accès lisant l'intégralité des blocs d'une table, utilisée en l'absence d'index adapté ou lorsque la table est de petite taille.</li>
+            <li><strong>Parcours Unique par Index (Index Unique Scan)</strong> — Méthode d'accès retournant au plus une ligne via un index unique, typique des recherches par clé primaire.</li>
+            <li><strong>Jointure par Hash (HASH JOIN) / Boucles Imbriquées (NESTED LOOPS)</strong> — Algorithmes de jointure : le premier convient aux grands volumes sans index, le second aux petites tables indexées.</li>
           </ul>
         </div>
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--lexique">PL/SQL et Programmation</div>
           <ul class="help-modal__list">
-            <li><strong>Chargement Massif en Collection (BULK COLLECT)</strong> — Directive PL/SQL chargeant un ensemble de lignes en une seule operation dans une collection memoire (PGA), reduisant les allees-retours entre les moteurs SQL et PL/SQL.</li>
-            <li><strong>Mise a Jour Massive (FORALL)</strong> — Instruction PL/SQL executant une operation DML sur toutes les lignes d'une collection sans commutation de contexte individuelle, accelerant les traitements par lots.</li>
-            <li><strong>Commutation de Contexte (Context Switch)</strong> — Basculement entre le moteur SQL et le moteur PL/SQL, dont le cout cumule peut etre significatif dans les boucles iteratives.</li>
-            <li><strong>Declencheur (Trigger)</strong> — Bloc PL/SQL stocke s'executant automatiquement sur un evenement de modification (INSERT, UPDATE, DELETE) d'une table, utilise pour les regles metier et les contraintes complexes.</li>
-            <li><strong>Collection PL/SQL</strong> — Structure de donnees programmee (table imbriquee, VARRAY, table associative) permettant de manipuler des ensembles de lignes en memoire.</li>
-            <li><strong>Curseur (Cursor)</strong> — Structure de memoire privee associee a une session contenant le texte analyse d'une instruction SQL, son plan d'execution et l'etat courant du parcours des lignes. On distingue le curseur implicite, gere par le moteur pour les instructions DML isolees, du curseur explicite, declare, ouvert et ferme par le programmeur pour les requetes a plusieurs lignes.</li>
+            <li><strong>Chargement Massif en Collection (BULK COLLECT)</strong> — Directive PL/SQL chargeant un ensemble de lignes en une seule opération dans une collection mémoire (PGA), réduisant les allers-retours entre les moteurs SQL et PL/SQL.</li>
+            <li><strong>Mise à Jour Massive (FORALL)</strong> — Instruction PL/SQL exécutant une opération DML sur toutes les lignes d'une collection sans commutation de contexte individuelle, accélérant les traitements par lots.</li>
+            <li><strong>Commutation de Contexte (Context Switch)</strong> — Basculement entre le moteur SQL et le moteur PL/SQL, dont le coût cumulé peut être significatif dans les boucles itératives.</li>
+            <li><strong>Déclencheur (Trigger)</strong> — Bloc PL/SQL stocké s'exécutant automatiquement sur un événement de modification (INSERT, UPDATE, DELETE) d'une table, utilisé pour les règles métier et les contraintes complexes.</li>
+            <li><strong>Collection PL/SQL</strong> — Structure de données programmée (table imbriquée, VARRAY, table associative) permettant de manipuler des ensembles de lignes en mémoire.</li>
+            <li><strong>Curseur (Cursor)</strong> — Structure de mémoire privée associée à une session contenant le texte analysé d'une instruction SQL, son plan d'exécution et l'état courant du parcours des lignes. On distingue le curseur implicite, géré par le moteur pour les instructions DML isolées, du curseur explicite, déclaré, ouvert et fermé par le programmeur pour les requêtes à plusieurs lignes.</li>
           </ul>
         </div>
         <div class="help-modal__section">
-          <div class="help-modal__section-title help-modal__section-title--lexique">Securite et Gouvernance HDS</div>
+          <div class="help-modal__section-title help-modal__section-title--lexique">Sécurité et Gouvernance HDS</div>
           <ul class="help-modal__list">
-            <li><strong>Chiffrement Transparent (TDE)</strong> — Mecanisme de chiffrement des donnees au repos au sein des fichiers et des espaces de tables, sans aucune modification des applications clientes, utilisant l'algorithme AES a clef de 256 bits.</li>
-            <li><strong>Moindre Privilege (Least Privilege)</strong> — Principe de securite selon lequel un utilisateur ne dispose que des droits strictement necessaires a ses fonctions, reduisant la surface d'attaque et les risques d'erreur.</li>
-            <li><strong>Masquage Dynamique (DBMS_REDACT)</strong> — Paquetage Oracle permettant le masquage a la volee des donnees sensibles dans les resultats de requetes, sans alterer les donnees stockees.</li>
-            <li><strong>Journal d'Activite (Audit HDS)</strong> — Enregistrement chiffre et horodate de l'ensemble des actions effectuees sur le systeme, garantissant la tracabilite requise par la certification Hebergement de Donnees de Sante.</li>
-            <li><strong>Profil Oracle (Profile)</strong> — Ensemble de regles de gouvernance des sessions definissant la politique de verification des acces : nombre maximal de tentatives infructueuses avant verrouillage, duree maximale d'inactivite avant deconnexion, complexite du mot de passe et duree de validite des accreditations. Instrument central de la politique de Moindre Privilege en environnement HDS.</li>
+            <li><strong>Chiffrement Transparent (TDE)</strong> — Mécanisme de chiffrement des données au repos au sein des fichiers et des espaces de tables, sans aucune modification des applications clientes, utilisant l'algorithme AES à clé de 256 bits.</li>
+            <li><strong>Moindre Privilège (Least Privilege)</strong> — Principe de sécurité selon lequel un utilisateur ne dispose que des droits strictement nécessaires à ses fonctions, réduisant la surface d'attaque et les risques d'erreur.</li>
+            <li><strong>Masquage Dynamique (DBMS_REDACT)</strong> — Paquetage Oracle permettant le masquage à la volée des données sensibles dans les résultats de requêtes, sans altérer les données stockées.</li>
+            <li><strong>Journal d'Activité (Audit HDS)</strong> — Enregistrement chiffré et horodaté de l'ensemble des actions effectuées sur le système, garantissant la traçabilité requise par la certification Hébergement de Données de Santé.</li>
+            <li><strong>Profil Oracle (Profile)</strong> — Ensemble de règles de gouvernance des sessions définissant la politique de vérification des accès : nombre maximal de tentatives infructueuses avant verrouillage, durée maximale d'inactivité avant déconnexion, complexité du mot de passe et durée de validité des accréditations. Instrument central de la politique de Moindre Privilège en environnement HDS.</li>
           </ul>
         </div>
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--lexique">Jeux de Caractères et Internationalisation</div>
           <ul class="help-modal__list">
-            <li><strong>Jeu de Caractères (Character Set)</strong> — Table de correspondance definissant l'ensemble des symboles graphiques qu'une base de donnees est capable de représenter et la manière dont ils sont encodes en octets. Paramètre fondamental defini lors de la creation de la base, sa modification ultérieure exige une reconstruction complète, ce qui en fait une decision fondatrice irreversible pour tout systeme d'information hospitalier.</li>
-            <li><strong>AL32UTF8</strong> — Jeu de caractères Unicode sur trente-deux bits utilisant l'encodage UTF-8 a longueur variable, capable de représenter l'integralite du repertoire Unicode en preservant la compatibilite avec le jeu de caractères ASCII sur sept bits. Standard recommande par Oracle pour tout deploiement moderne, il permet le stockage correct des noms de patients comportant des signes diacritiques — accents, cedilles, trémas — et des caractères non latins.</li>
-            <li><strong>WE8MSWIN1252</strong> — Jeu de caractères sur huit bits de la famille Windows-1252, limite a deux cent cinquante-six symboles et incapable de représenter les caractères de l'Europe centrale, les ideogrammes asiatiques ou les signes diacritiques rares. Son utilisation en milieu hospitalier expose a des corruptions silencieuses des donnees onomastiques.</li>
-            <li><strong>Erreur ORA-12737</strong> — Echec declenche par Oracle lors d'une operation de conversion entre jeux de caractères incompatibles, signalant l'absence de correspondance entre un caractère de la source et le repertoire de la cible. Dans le contexte d'une base configuree en WE8MSWIN1252, cette erreur se produit lors de l'import de fichiers contenant des caractères Unicode hors du repertoire latin.</li>
+            <li><strong>Jeu de Caractères (Character Set)</strong> — Table de correspondance définissant l'ensemble des symboles graphiques qu'une base de données est capable de représenter et la manière dont ils sont encodés en octets. Paramètre fondamental défini lors de la création de la base, sa modification ultérieure exige une reconstruction complète, ce qui en fait une décision fondatrice irréversible pour tout système d'information hospitalier.</li>
+            <li><strong>AL32UTF8</strong> — Jeu de caractères Unicode sur trente-deux bits utilisant l'encodage UTF-8 à longueur variable, capable de représenter l'intégralité du répertoire Unicode en préservant la compatibilité avec le jeu de caractères ASCII sur sept bits. Standard recommandé par Oracle pour tout déploiement moderne, il permet le stockage correct des noms de patients comportant des signes diacritiques — accents, cédilles, trémas — et des caractères non latins.</li>
+            <li><strong>WE8MSWIN1252</strong> — Jeu de caractères sur huit bits de la famille Windows-1252, limité à deux cent cinquante-six symboles et incapable de représenter les caractères de l'Europe centrale, les idéogrammes asiatiques ou les signes diacritiques rares. Son utilisation en milieu hospitalier expose à des corruptions silencieuses des données onomastiques.</li>
+            <li><strong>Erreur ORA-12737</strong> — Échec déclenché par Oracle lors d'une opération de conversion entre jeux de caractères incompatibles, signalant l'absence de correspondance entre un caractère de la source et le répertoire de la cible. Dans le contexte d'une base configurée en WE8MSWIN1252, cette erreur se produit lors de l'import de fichiers contenant des caractères Unicode hors du répertoire latin.</li>
           </ul>
         </div>
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--lexique">Ordonnancement et Gestion des Ressources</div>
           <ul class="help-modal__list">
-            <li><strong>Gestionnaire de Ressources (Oracle Resource Manager — DBMS_RESOURCE_MANAGER)</strong> — Paquetage systeme permettant de repartir les ressources processeur et les entrees-sorties entre les sessions et services, selon un plan d'allocation definissant des parts proportionnelles et des seuils garantis. En architecture multitenant, il empeche la congestion d'une base par les traitements d'une autre, assurant des temps de reponse previsibles pour chaque application hebergee.</li>
-            <li><strong>Plan d'Allocation de Ressources (Resource Plan)</strong> — Directive de repartition des parts de processeur et d'entree-sortie entre les groupes de consommateurs d'une instance Oracle. Chaque service se voit attribuer des parts (shares) : un service disposant de huit parts recevra proportionnellement plus de ressources qu'un service n'en ayant qu'une en periode de contention.</li>
+            <li><strong>Gestionnaire de Ressources (Oracle Resource Manager — DBMS_RESOURCE_MANAGER)</strong> — Paquetage système permettant de répartir les ressources processeur et les entrées-sorties entre les sessions et services, selon un plan d'allocation définissant des parts proportionnelles et des seuils garantis. En architecture multitenant, il empêche la congestion d'une base par les traitements d'une autre, assurant des temps de réponse prévisibles pour chaque application hébergée.</li>
+            <li><strong>Plan d'Allocation de Ressources (Resource Plan)</strong> — Directive de répartition des parts de processeur et d'entrée-sortie entre les groupes de consommateurs d'une instance Oracle. Chaque service se voit attribuer des parts (shares) : un service disposant de huit parts recevra proportionnellement plus de ressources qu'un service n'en ayant qu'une en période de contention.</li>
           </ul>
         </div>
         <div class="help-modal__section">
-          <div class="help-modal__section-title help-modal__section-title--lexique">Evenements d'Attente et Diagnostic de Performance</div>
+          <div class="help-modal__section-title help-modal__section-title--lexique">Événements d'Attente et Diagnostic de Performance</div>
           <ul class="help-modal__list">
-            <li><strong>Evenement d'Attente (Wait Event)</strong> — Etat dans lequel se trouve une session Oracle lorsqu'elle ne peut progresser dans l'execution d'une instruction, en attente d'une ressource — verrou, entree-sortie sur disque, transmission reseau, liberation de memoire. L'analyse des evenements d'attente via le Depot Automatique de Charge de Travail constitue la methode premiere de diagnostic des goulots d'etranglement.</li>
-            <li><strong>File d'Attente de Verrou (Enqueue)</strong> — Mecanisme de verrouillage avance gerant l'acces concurrent aux ressources partagees — lignes de table, segments de memoire, sequences — par une file d'attente ordonnee. Chaque type de verrou est identifie par un code a deux lettres : TX pour les verrous de transaction, TM pour les verrous de definition de table, SQ pour les verrous de sequence.</li>
-            <li><strong>Contention de Sequence (SQ Enqueue Contention)</strong> — Evenement d'attente se produisant lorsque plusieurs sessions concurrentes tentent d'obtenir la valeur suivante d'une sequence Oracle dans un intervalle tres court, chacune devant acquerir un verrou exclusif de file d'attente de type SQ. Ce phenomene est aggrave par un cache de sequence insuffisant, chaque appel a <code>NEXTVAL</code> provoquant une ecriture dans le dictionnaire.</li>
-            <li><strong>Sequence Oracle (Sequence)</strong> — Objet du schema generant des valeurs numeriques croissantes et uniques selon une progression definie, utilise principalement pour la creation d'identifiants de lignes. Son efficacite en environnement concurrent repose sur le parametre de cache : un cache pre-alloue en memoire une plage de valeurs, evitant un acces au dictionnaire a chaque appel de <code>NEXTVAL</code>.</li>
-            <li><strong>Depot Automatique de Charge de Travail (Automatic Workload Repository — AWR)</strong> — Infrastructure de collecte et de stockage des statistiques de performance d'une instance Oracle, capturant a intervalles reguliers — par defaut toutes les soixante minutes — les metriques globales, les instructions SQL les plus couteuses et les evenements d'attente predominants, permettant une analyse comparative des performances dans le temps.</li>
+            <li><strong>Événement d'Attente (Wait Event)</strong> — État dans lequel se trouve une session Oracle lorsqu'elle ne peut progresser dans l'exécution d'une instruction, en attente d'une ressource — verrou, entrée-sortie sur disque, transmission réseau, libération de mémoire. L'analyse des événements d'attente via le Dépôt Automatique de Charge de Travail constitue la méthode première de diagnostic des goulots d'étranglement.</li>
+            <li><strong>File d'Attente de Verrou (Enqueue)</strong> — Mécanisme de verrouillage avancé gérant l'accès concurrent aux ressources partagées — lignes de table, segments de mémoire, séquences — par une file d'attente ordonnée. Chaque type de verrou est identifié par un code à deux lettres : TX pour les verrous de transaction, TM pour les verrous de définition de table, SQ pour les verrous de séquence.</li>
+            <li><strong>Contention de Séquence (SQ Enqueue Contention)</strong> — Événement d'attente se produisant lorsque plusieurs sessions concurrentes tentent d'obtenir la valeur suivante d'une séquence Oracle dans un intervalle très court, chacune devant acquérir un verrou exclusif de file d'attente de type SQ. Ce phénomène est aggravé par un cache de séquence insuffisant, chaque appel à <code>NEXTVAL</code> provoquant une écriture dans le dictionnaire.</li>
+            <li><strong>Séquence Oracle (Sequence)</strong> — Objet du schéma générant des valeurs numériques croissantes et uniques selon une progression définie, utilisé principalement pour la création d'identifiants de lignes. Son efficacité en environnement concurrent repose sur le paramètre de cache : un cache pré-alloué en mémoire une plage de valeurs, évitant un accès au dictionnaire à chaque appel de <code>NEXTVAL</code>.</li>
+            <li><strong>Dépôt Automatique de Charge de Travail (Automatic Workload Repository — AWR)</strong> — Infrastructure de collecte et de stockage des statistiques de performance d'une instance Oracle, capturant à intervalles réguliers — par défaut toutes les soixante minutes — les métriques globales, les instructions SQL les plus coûteuses et les événements d'attente prédominants, permettant une analyse comparative des performances dans le temps.</li>
           </ul>
         </div>
         <div class="help-modal__section">
-          <div class="help-modal__section-title help-modal__section-title--lexique">Sauvegarde, Reprise et Continuite d'Activite</div>
+          <div class="help-modal__section-title help-modal__section-title--lexique">Sauvegarde, Reprise et Continuité d'Activité</div>
           <ul class="help-modal__list">
-            <li><strong>Gestionnaire de Reprise (RMAN — Recovery Manager)</strong> — Utilitaire en mode client-serveur integre a la base de donnees Oracle pour la sauvegarde, la restauration et la recuperation des fichiers de donnees. Il opere au niveau des blocs de donnees en preservant la structure physique, permet la verification de la lisibilite des sauvegardes par la commande <code>VALIDATE</code> et garantit une restauration granulaire jusqu'a l'instant souhaite.</li>
-            <li><strong>Gardien de Donnees (Oracle Data Guard)</strong> — Solution de protection des donnees maintenant une ou plusieurs bases de donnees de secours synchronisees avec la base principale, permettant le basculement en cas de defaillance. En mode SYNC, chaque transaction est confirmee a l'utilisateur apres avoir ete ecrite sur le site de secours, garantissant un objectif de point de reprise nul ; en mode ASYNC, la transaction est accusee sans attendre l'ecriture distante, exposant a une perte de donnees en cas de sinistre.</li>
-            <li><strong>Pompe de Donnees (Oracle Data Pump — expdp/impdp)</strong> — Utilitaire d'exportation et d'importation logiques des objets et des donnees d'une base Oracle, produisant des fichiers binaires transportables. Contrairement au Gestionnaire de Reprise, il ne preserve pas la structure physique complete, ne permet pas la recuperation a un instant precis et son temps de restauration croit lineairement avec le volume de donnees.</li>
-            <li><strong>Objectif de Point de Reprise (Recovery Point Objective — RPO)</strong> — Mesure de la perte de donnees maximale admissible exprimee en unite de temps, definissant la fenetre de donnees qui peut etre sacrifiee lors d'une restauration. Un objectif nul signifie qu'aucune transaction validee ne peut etre perdue.</li>
-            <li><strong>Objectif de Temps de Reprise (Recovery Time Objective — RTO)</strong> — Duree maximale admissible entre la declaration d'un sinistre et le retablissement complet du service, integrant les operations de diagnostic, de restauration des donnees, de reconfiguration reseau et de validation de la reprise.</li>
-            <li><strong>Plan de Reprise d'Activite (PRA)</strong> — Ensemble documente des procedures organisationnelles et techniques permettant de restaurer les systemes d'information critiques apres un sinistre majeur. Il comprend obligatoirement la verification periodique de la capacite a restaurer les sauvegardes et a basculer vers un site secondaire.</li>
-            <li><strong>Basculement (Switchover / Failover)</strong> — Operation de permutation des roles entre la base principale et une base de secours. Le basculement planifie (switchover) est une operation controlee sans perte de donnees ; le basculement d'urgence (failover) est declenche lors d'une defaillance du site primaire, avec un risque de perte de donnees si la replication etait en mode asynchrone.</li>
+            <li><strong>Gestionnaire de Reprise (RMAN — Recovery Manager)</strong> — Utilitaire en mode client-serveur intégré à la base de données Oracle pour la sauvegarde, la restauration et la récupération des fichiers de données. Il opère au niveau des blocs de données en préservant la structure physique, permet la vérification de la lisibilité des sauvegardes par la commande <code>VALIDATE</code> et garantit une restauration granulaire jusqu'à l'instant souhaité.</li>
+            <li><strong>Gardien de Données (Oracle Data Guard)</strong> — Solution de protection des données maintenant une ou plusieurs bases de données de secours synchronisées avec la base principale, permettant le basculement en cas de défaillance. En mode SYNC, chaque transaction est confirmée à l'utilisateur après avoir été écrite sur le site de secours, garantissant un objectif de point de reprise nul ; en mode ASYNC, la transaction est accusée sans attendre l'écriture distante, exposant à une perte de données en cas de sinistre.</li>
+            <li><strong>Pompe de Données (Oracle Data Pump — expdp/impdp)</strong> — Utilitaire d'exportation et d'importation logiques des objets et des données d'une base Oracle, produisant des fichiers binaires transportables. Contrairement au Gestionnaire de Reprise, il ne préserve pas la structure physique complète, ne permet pas la récupération à un instant précis et son temps de restauration croît linéairement avec le volume de données.</li>
+            <li><strong>Objectif de Point de Reprise (Recovery Point Objective — RPO)</strong> — Mesure de la perte de données maximale admissible exprimée en unité de temps, définissant la fenêtre de données qui peut être sacrifiée lors d'une restauration. Un objectif nul signifie qu'aucune transaction validée ne peut être perdue.</li>
+            <li><strong>Objectif de Temps de Reprise (Recovery Time Objective — RTO)</strong> — Durée maximale admissible entre la déclaration d'un sinistre et le rétablissement complet du service, intégrant les opérations de diagnostic, de restauration des données, de reconfiguration réseau et de validation de la reprise.</li>
+            <li><strong>Plan de Reprise d'Activité (PRA)</strong> — Ensemble documenté des procédures organisationnelles et techniques permettant de restaurer les systèmes d'information critiques après un sinistre majeur. Il comprend obligatoirement la vérification périodique de la capacité à restaurer les sauvegardes et à basculer vers un site secondaire.</li>
+            <li><strong>Basculement (Switchover / Failover)</strong> — Opération de permutation des rôles entre la base principale et une base de secours. Le basculement planifié (switchover) est une opération contrôlée sans perte de données ; le basculement d'urgence (failover) est déclenché lors d'une défaillance du site primaire, avec un risque de perte de données si la réplication était en mode asynchrone.</li>
           </ul>
         </div>
       </div>
@@ -646,14 +645,14 @@ a:hover { text-decoration: underline; }
     </div>
     <div class="help-modal" id="help-credit" role="dialog" aria-modal="true" aria-labelledby="help-credit-title" aria-hidden="true">
       <div class="help-modal__header">
-        <div class="help-modal__title" id="help-credit-title">Credit</div>
+        <div class="help-modal__title" id="help-credit-title">Crédit</div>
         <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
       </div>
       <div class="help-modal__body">
         <div class="help-modal__section">
           <p class="help-modal__text">
-            <center>Conception fonctionnelle, scenarios, developpement et relecture : Stephane Bertin<br>
-            Assiste par OpenCode, agent Big Pickle<br>
+            <center>Conception fonctionnelle, scénarios, développement et relecture : Stéphane Bertin<br>
+            Assisté par OpenCode, agent Big Pickle<br>
             2025.</center>
           </p>
         </div>
@@ -667,7 +666,7 @@ a:hover { text-decoration: underline; }
     <div class="help-modal" id="help-expert" role="dialog" aria-modal="true" aria-labelledby="help-expert-title" aria-hidden="true">
       <div class="help-modal__header"><div class="help-modal__title" id="help-expert-title">Recommandation Expert</div><button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button></div>
       <div class="help-modal__body" id="help-expert-body">
-        <div class="help-modal__text">Contenu dynamique charge selon l'etape.</div>
+        <div class="help-modal__text">Contenu dynamique chargé selon l'étape.</div>
       </div>
       <div class="help-modal__footer">
         <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
@@ -677,19 +676,19 @@ a:hover { text-decoration: underline; }
     <!-- Confirmation Modal -->
     <div class="help-modal" id="help-confirm" role="dialog" aria-modal="true" aria-hidden="true">
       <div class="help-modal__header">
-        <div class="help-modal__title">Reflechissez avant de valider</div>
+        <div class="help-modal__title">Réfléchissez avant de valider</div>
       </div>
       <div class="help-modal__body" style="text-align: center; padding: var(--sp-8) var(--sp-6);">
         <div class="help-modal__text" style="font-size: var(--fs-md); margin-bottom: var(--sp-6);">
-          Etes-vous sur(e) de vouloir voir la bonne pratique ?<br>
+          Êtes-vous sûr(e) de vouloir voir la bonne pratique ?<br>
           <span style="font-size: var(--fs-sm); color: #94a3b8;">
-            Prenez le temps de reflechir a votre choix avant de valider.<br>
-            L'objectif pedagogique est de comprendre par l'experience.
+            Prenez le temps de réfléchir à votre choix avant de valider.<br>
+            L'objectif pédagogique est de comprendre par l'expérience.
           </span>
         </div>
         <div style="display: flex; gap: var(--sp-4); justify-content: center;">
           <button class="btn btn--primary btn--sm" id="btn-confirm-yes">Oui, voir la solution</button>
-          <button class="btn btn--outline btn--sm" id="btn-confirm-no">Non, je reflechis encore</button>
+          <button class="btn btn--outline btn--sm" id="btn-confirm-no">Non, je réfléchis encore</button>
         </div>
       </div>
     </div>
@@ -702,9 +701,9 @@ a:hover { text-decoration: underline; }
       <div class="help-modal__body" style="text-align: center; padding: var(--sp-8) var(--sp-6);">
         <div style="font-size: 2rem; margin-bottom: var(--sp-4); color: var(--color-amber);">&#9888;</div>
         <div class="help-modal__text" style="font-size: var(--fs-md); margin-bottom: var(--sp-6);">
-          Modification de choix detectee<br>
+          Modification de choix détectée<br>
           <span style="font-size: var(--fs-sm); color: #94a3b8;">
-            L'impact de cette modification peut etre notable sur le niveau de risque global du projet.<br>
+            L'impact de cette modification peut être notable sur le niveau de risque global du projet.<br>
             Voulez-vous vraiment modifier votre choix ?
           </span>
         </div>
@@ -716,8 +715,8 @@ a:hover { text-decoration: underline; }
     </div>
 
     <footer class="app-footer">
-      ORACLE_LIFECYCLE::SIH — Guide Interactif de Deploiement Oracle PUI<br>
-      DONNEES: 100% FICTIVES — Conforme RGPD Art. 25 — Aucune donnee de sante reelle<br>
+      ORACLE_LIFECYCLE::SIH — Guide interactif de Déploiement Oracle PUI<br>
+      DONNÉES: 100% FICTIVES — Conforme RGPD Art. 25 — Aucune donnée de santé réelle<br>
       Architecture: WorkflowEngine — Vanilla JS — Zero Dependency — Offline
     </footer>
   </main>
@@ -840,24 +839,24 @@ class WorkflowEngine {
 
   _expertMsg(stepId) {
     const msgs = {
-      1: 'Configuration optimale appliquee : AL32UTF8 + Resource Plan CDB avec shares PUI dedies.',
-      2: 'Configuration HDS standard appliquee : TDE AES-256 + Audit HDS standard + Profil SECURE_PUI.',
+      1: 'Configuration optimale appliquée : AL32UTF8 + Resource Plan CDB avec shares PUI dédiés.',
+      2: 'Configuration HDS standard appliquée : TDE AES-256 + Audit HDS standard + Profil SECURE_PUI.',
       3: 'Code optimise : SELECT s.med_id, s.molecule, l.qte FROM stock_med s JOIN ligne_disp l ON s.med_id = l.med_id.',
       4: 'Dimensionnement expert : UNDO_RETENTION=1800s, SGA=4G, PGA=1G, undo tablespace 4G.',
-      5: 'Correction appliquee : Analyser Contention sur sequence Oracle (SQ enqueue contention), corriger le CACHE de sequence.',
+      5: 'Correction appliquée : Analyser Contention sur séquence Oracle (SQ enqueue contention), corriger le CACHE de séquence.',
       6: 'PRA valide : RMAN validate + Data Guard Physical Standby + test trimestriel.'
     };
-    return msgs[stepId] || 'Bonne pratique appliquee.';
+    return msgs[stepId] || 'Bonne pratique appliquée.';
   }
 
   _expertDetail(stepId) {
     const details = {
-      1: 'AL32UTF8 (UTF-8) est le seul choix viable : compatibilite Unicode complete, caractères speciaux des noms de patients stockes correctement, evolution vers l\'internationalisation possible. Le Resource Plan CDB isole les ressources pour la PUI (shares=8) vs les autres PDBs, garantissant un SLA meme sous contention. ORA-12737: Risque de perte ou conversion incorrecte des caracteres Unicode lors des imports/export et des echanges inter-applicatifs.',
-      2: 'TDE AES-256 chiffre les donnees au repos sans modification applicative (fichiers .dbf, backups RMAN). L\'audit HDS trace TOUTES les operations sur les donnees de sante (LOGON, LOGOFF, DDL, DML sur tables sensibles). Le profil SECURE_PUI applique : FAILED_LOGIN_ATTEMPTS=3, PASSWORD_LOCK_TIME=1, IDLE_TIME=30. Conforme HDS et ISO 27001.',
-      3: 'SELECT * transfere toutes les colonnes au reseau, consommant de la bande passante inutilement. L\'absence d\'index sur les cles de jointure (med_id, id_lot) force des Full Table Scan. BULK COLLECT reduit les context switches de N a 1 entre SQL et PL/SQL. Gain: 10x a 50x sur les batchs de nuit.',
-      4: 'UNDO_RETENTION a 900s est insuffisant pour les rapports T2A longs (parfois >30min). ORA-01555 "Snapshot too old" survient quand les donnees Undo sont ecrasees. Une pratique courante consiste a definir UNDO_RETENTION au-dessus de la duree maximale observee des requetes longues, avec une marge de securite. Avec des rapports de 30min => 1800s minimum. SGA a 4G adapte pour 500 sessions.',
-      5: 'Contention sur sequence Oracle (SQ enqueue contention) indique un verrouillage de ligne sur une table a forte concurrence. La cause frequente est une sequence avec CACHE trop faible pour une forte concurrence : chaque NEXTVAL ecrit dans le dictionnaire, creant un verrou exclusif. Solution: CACHE=1000 ou plus. Pour les sequences utilisees par 500 sessions concurrentes, CACHE=10000 est recommandé.',
-      6: 'Un backup non teste n\'existe pas. RMAN VALIDATE verifie la lisibilite et certaines corruptions de blocs, mais ne remplace pas un veritable test complet de restauration. Data Guard Physical Standby peut assurer un RPO proche de zero en mode SYNC correctement configure en cas de crash disque. RPO=0, RTO<30min. Procedure de test trimestrielle obligatoire : switchover, restauration sur un environnement de test, validation des donnees.'
+      1: 'AL32UTF8 (UTF-8) est le seul choix viable : compatibilité Unicode complète, caractèresf spéciaux des noms de patients stockes correctement, évolution vers l\'internationalisation possible. Le Resource Plan CDB isole les ressources pour la PUI (shares=8) vs les autres PDBs, garantissant un SLA même sous contention. ORA-12737: Risque de perte ou conversion incorrecte des caractères Unicode lors des imports/export et des échanges inter-applicatifs.',
+      2: 'TDE AES-256 chiffre les données au repos sans modification applicative (fichiers .dbf, backups RMAN). L\'audit HDS trace TOUTES les opérations sur les données de santé (LOGON, LOGOFF, DDL, DML sur tables sensibles). Le profil SECURE_PUI appliqué : FAILED_LOGIN_ATTEMPTS=3, PASSWORD_LOCK_TIME=1, IDLE_TIME=30. Conforme HDS et ISO 27001.',
+      3: 'SELECT * transfère toutes les colonnes au réseau, consommant de la bande passante inutilement. L\'absence d\'index sur les clés de jointure (med_id, id_lot) force des Full Table Scan. BULK COLLECT réduit les changement de contexte de N à 1 entre SQL et PL/SQL. Gain: 10x à 50x sur les batchs de nuit.',
+      4: 'UNDO_RETENTION à 900s est insuffisant pour les rapports T2A longs (parfois >30min). ORA-01555 "Snapshot too old" survient quand les données Undo sont ecrasées. Une pratique courante consiste à définir UNDO_RETENTION au-dessus de la durée maximale observée des requêtes longues, avec une marge de sécurité. Avec des rapports de 30min => 1800s minimum. SGA à 4G adapté pour 500 sessions.',
+      5: 'Contention sur séquence Oracle (SQ enqueue contention) indique un verrouillage de ligne sur une table à forte concurrence. La cause fréquente est une séquence avec CACHE trop faible pour une forte concurrence : chaque NEXTVAL écrit dans le dictionnaire, créant un verrou exclusif. Solution: CACHE=1000 ou plus. Pour les séquences utilisées par 500 sessions concurrentes, CACHE=10000 est recommandé.',
+      6: 'Un backup non testé n\'est pas viable. RMAN VALIDATE vérifie la lisibilite et certaines corruptions de blocs, mais ne remplace pas un véritable test complet de restauration. Data Guard Physical Standby peut assurer un RPO proche de zéro en mode SYNC correctement configuré en cas de crash disque. RPO=0, RTO<30min. Procédure de test trimestrielle obligatoire : switchover, restauration sur un environnement de test, validation des données.'
     };
     return details[stepId] || 'Recommandation technique detaillee.';
   }
@@ -865,40 +864,40 @@ class WorkflowEngine {
   _evaluate(stepId, choice) {
     const scenarios = {
       1: {
-        risky: { risky: true, msg: 'ALERTE : WE8MSWIN1252 bloque l\'internationalisation. Les caractères speciaux des noms de patients (ex: "François", "Müller") seront corrompus. Risque de corruption de donnees silencieuse. ORA-12737 simule : "Character set mismatch".', detail: 'Le Character Set est definitif apres creation de la base. La seule solution est de recreer la base. En contexte hospitalier, les noms de patients contiennent frequemment des accents et caracteres speciaux. WE8MSWIN1252 ne supporte que l\'Europe de l\'Ouest.', riskDelta: 25 },
-        risky2: { risky: true, msg: 'ATTENTION : Pas de Resource Plan actif. En cas de contention CPU/IO, les requetes de recherche peuvent etre affamees par les batchs PMSI. Risque de degradation des temps de reponse aux Urgences.', detail: 'Le Resource Manager Oracle (DBMS_RESOURCE_MANAGER) garantit l\'isolation des ressources. Sans lui, un batch non controle peut consommer 100% CPU et impacter la dispensation en PUI.', riskDelta: 15 },
-        risky3: { risky: true, msg: 'ALERTE PIEGE : Sur-allocation CPU/IO detectee. Shares=20 pour la PUI affame les autres PDBs (RH, Facturation). En cas de contention, les batchs PMSI et la facturation T2A subissent des timeouts et des ralentissements critiques.', detail: 'Le Resource Manager Oracle alloue les ressources proportionnellement aux shares. Avec shares=20 sur la PUI et shares=1 sur les autres PDBs, la PUI recevra une proportion beaucoup plus importante des ressources CPU en periode de contention, au detriment des autres PDBs. La formule recommandee est shares=8 pour la PUI (soit ~60% du CPU).', riskDelta: 20 },
-        good: { risky: false, msg: 'BON CHOIX : AL32UTF8 est le standard Unicode. Le Resource Plan isole la PUI avec des shares dediees. Architecture resiliente.', detail: 'AL32UTF8 supporte tous les caracteres Unicode. Le Resource Plan CDB avec shares proportionnelles garantit que la PUI recoit un minimum de CPU/IO meme sous charge.', riskDelta: 0 }
+        risky: { risky: true, msg: 'ALERTE : WE8MSWIN1252 bloque l\'internationalisation. Les caractères spéciaux des noms de patients (ex: "François", "Müller") seront corrompus. Risque de corruption de données silencieuse. ORA-12737 simule : "Character set mismatch".', detail: 'Le Character Set est définitif apres creation de la base. La seule solution est de recréer la base. En contexte hospitalier, les noms de patients contiennent fréquemment des accents et caractères spéciaux. WE8MSWIN1252 ne supporte que l\'Europe de l\'Ouest.', riskDelta: 25 },
+        risky2: { risky: true, msg: 'ATTENTION : Pas de Resource Plan actif. En cas de contention CPU/IO, les requêtes de recherche peuvent etre affamées par les batchs PMSI. Risque de dégradation des temps de réponse aux Urgences.', detail: 'Le Resource Manager Oracle (DBMS_RESOURCE_MANAGER) garantit l\'isolation des ressources. Sans lui, un batch non contrôlé peut consommer 100% CPU et impacter la dispensation en PUI.', riskDelta: 15 },
+        risky3: { risky: true, msg: 'ALERTE PIEGE : Sur-allocation CPU/IO détectée. Shares=20 pour la PUI affame les autres PDBs (RH, Facturation). En cas de contention, les batchs PMSI et la facturation T2A subissent des timeouts et des ralentissements critiques.', detail: 'Le Resource Manager Oracle alloue les ressources proportionnellement aux shares. Avec shares=20 sur la PUI et shares=1 sur les autres PDBs, la PUI recevra une proportion beaucoup plus importante des ressources CPU en periode de contention, au detriment des autres PDBs. La formule recommandée est shares=8 pour la PUI (soit ~60% du CPU).', riskDelta: 20 },
+        good: { risky: false, msg: 'BON CHOIX : AL32UTF8 est le standard Unicode. Le Resource Plan isole la PUI avec des shares dédiées. Architecture resiliente.', detail: 'AL32UTF8 supporte tous les caractères Unicode. Le Resource Plan CDB avec shares proportionnelles garantit que la PUI recoit un minimum de CPU/IO même sous charge.', riskDelta: 0 }
       },
       2: {
-        risky: { risky: true, msg: 'ALERTE HDS : Sans audit, la tracabilite des acces aux donnees de sante est impossible. Non-conformite legale majeure (articles L.1111-8 CSP). Sanction : jusqu\'a 4% du chiffre d\'affaires ou 20M EUR (RGPD).', detail: 'La tracabilite des acces aux donnees de sante est une exigence majeure des referentiels HDS et ISO 27001. L\'impact performance de l\'audit est <2% sur les requetes OLTP. Le cout de la non-conformite est infini (suspension d\'habilitation, poursuites). Le chiffrement des donnees de sante est fortement recommande et constitue une pratique standard en environnement HDS (art. L.1110-4-1 CSP).', riskDelta: 30 },
-        risky2: { risky: true, msg: 'ATTENTION : L\'audit partiel ne couvre pas les acces en lecture aux donnees de sante. Un acces non autorise a un dossier patient ne serait pas trace. Couverture insuffisante pour la certification HDS.', detail: 'La norme HDS exige l\'audit de tous les acces aux donnees de sante, y compris les SELECT et les tentatives echouees. L\'audit partiel est considere comme non-conforme.', riskDelta: 15 },
-        risky3: { risky: true, msg: 'ALERTE PIEGE : Pas de profil SECURE_PUI. Les sessions idle restent ouvertes indefiniment. Une session laissee ouverte sur un poste de soin non surveille permet un acces non autorise aux donnees patients. Non-conformite partielle HDS et ISO 27001.', detail: 'Le profil SECURE_PUI applique IDLE_TIME=30 (deconnexion apres 30min d\'inactivite), FAILED_LOGIN_ATTEMPTS=3 (verrouillage apres 3 echecs), PASSWORD_LOCK_TIME=1 (deverrouillage apres 1 jour). Sans ce profil, une session ouverte sur un terminal de soin reste accessible. L\'audit HDS detecte l\'absence de profil lors des controles annuels.', riskDelta: 20 },
-        good: { risky: false, msg: 'EXCELLENT : TDE AES-256 + Audit HDS complet + Profil SECURE_PUI. Conforme HDS, ISO 27001, RGPD. La regle d\'or : la securite des donnees de sante n\'est pas optionnelle.', detail: 'TDE chiffre les fichiers de donnees (.dbf) et les backups RMAN. L\'audit est gere par UNIFIED_AUDIT_POLICY. Profil SECURE_PUI applique le mot de passe robuste et le verrouillage de session.', riskDelta: 0 }
+        risky: { risky: true, msg: 'ALERTE HDS : Sans audit, la tracabilite des accès aux données de santé est impossible. Non-conformité legale majeure (articles L.1111-8 CSP). Sanction : jusqu\'a 4% du chiffre d\'affaires ou 20M EUR (RGPD).', detail: 'La tracabilite des accès aux données de santé est une exigence majeure des referentiels HDS et ISO 27001. L\'impact performance de l\'audit est <2% sur les requêtes OLTP. Le cout de la non-conformite est infini (suspension d\'habilitation, poursuites). Le chiffrement des données de santé est fortement recommande et constitue une pratique standard en environnement HDS (art. L.1110-4-1 CSP).', riskDelta: 30 },
+        risky2: { risky: true, msg: 'ATTENTION : L\'audit partiel ne couvre pas les accès en lecture aux données de santé. Un accès non autorisé à un dossier patient ne serait pas trace. Couverture insuffisante pour la certification HDS.', detail: 'La norme HDS exige l\'audit de tous les accès aux données de santé, y compris les SELECT et les tentatives echouées. L\'audit partiel est considere comme non-conforme.', riskDelta: 15 },
+        risky3: { risky: true, msg: 'ALERTE PIEGE : Pas de profil SECURE_PUI. Les sessions idle restent ouvertes indéfiniment. Une session laissée ouverte sur un poste de soin non surveille permet un accès non autorisé aux données patients. Non-conformité partielle HDS et ISO 27001.', detail: 'Le profil SECURE_PUI applique IDLE_TIME=30 (deconnexion apres 30min d\'inactivite), FAILED_LOGIN_ATTEMPTS=3 (verrouillage apres 3 échecs), PASSWORD_LOCK_TIME=1 (deverrouillage apres 1 jour). Sans ce profil, une session ouverte sur un terminal de soin reste accessible. L\'audit HDS détecte l\'absence de profil lors des contrôles annuels.', riskDelta: 20 },
+        good: { risky: false, msg: 'EXCELLENT : TDE AES-256 + Audit HDS complet + Profil SECURE_PUI. Conforme HDS, ISO 27001, RGPD. La règle d\'or : la sécurité des données de santé n\'est pas optionnelle.', detail: 'TDE chiffre les fichiers de données (.dbf) et les backups RMAN. L\'audit est gere par UNIFIED_AUDIT_POLICY. Profil SECURE_PUI applique le mot de passe robuste et le verrouillage de session.', riskDelta: 0 }
       },
       3: {
-        risky: { risky: true, msg: 'ALERTE PERFORMANCE : SELECT * sur STOCK_MED renvoie 15 colonnes quand seules 2 sont necessaires. Trafic reseau multiplie par 7. L\'absence d\'index sur med_id provoque un Full Table Scan sur la table de jointure.', detail: 'SELECT * transfere toutes les colonnes (meme les LOBs) au reseau. L\'index sur les cles de jointure transforme un Full Table Scan (O(n)) en Index Scan (O(log n)). Sur 10M de lignes, le TFS dure plusieurs secondes.', riskDelta: 20 },
-        risky2: { risky: true, msg: 'ATTENTION : Curseur ligne a ligne (N * context switches). Pour 100000 lignes, 100000 transitions entre moteur SQL et PL/SQL. Temps estime : 15 secondes vs 0.5s avec BULK COLLECT.', detail: 'Chaque FETCH dans une boucle FOR LOOP entraine un context switch. BULK COLLECT charge le jeu de resultats en une operation dans la PGA. FORALL applique les DML en un seul appel. Gain : 10x a 50x.', riskDelta: 15 },
-        risky3: { risky: true, msg: 'ALERTE PIEGE : Pas de BULK COLLECT sur les batchs de nuit. Les traitements PMSI (100k+ lignes) subissent N context switches SQL/PL-SQL. Le batch de facturation T2A passe de 45s a 12min. Fenetre de maintenance depassee.', detail: 'BULK COLLECT reduit le nombre de changements de contexte entre les moteurs SQL et PL/SQL. Sans lui, chaque ligne traitee genere un context switch. Pour un lot de 100 000 lignes, cela represente 100 000 allers-retours. Avec BULK COLLECT LIMIT 1000, on descend a 100 context switches. Sur les batchs de dispensation PUI (souvent >500k lignes), le gain est de 10x a 50x.', riskDelta: 20 },
-        good: { risky: false, msg: 'CODE OPTIMAL : Colonnes explicites reduisent le trafic reseau. Index sur les cles de jointure assurent un acces O(log n). Pour les batchs, BULK COLLECT + FORALL est le pattern ETL standard.', detail: 'SELECT avec colonnes explicites, index composite (med_id, lot_id), et BULK COLLECT pour le traitement par lot. Pattern recommande par Oracle pour les applications de sante.', riskDelta: 0 }
+        risky: { risky: true, msg: 'ALERTE PERFORMANCE : SELECT * sur STOCK_MED renvoie 15 colonnes quand seules 2 sont necessaires. Trafic réseau multiplie par 7. L\'absence d\'index sur med_id provoque un Full Table Scan sur la table de jointure.', detail: 'SELECT * transfère toutes les colonnes (même les LOBs) au réseau. L\'index sur les clés de jointure transforme un Full Table Scan (O(n)) en Index Scan (O(log n)). Sur 10M de lignes, le TFS dure plusieurs secondes.', riskDelta: 20 },
+        risky2: { risky: true, msg: 'ATTENTION : Curseur ligne à ligne (N * context switches). Pour 100000 lignes, 100000 transitions entre moteur SQL et PL/SQL. Temps estime : 15 secondes vs 0.5s avec BULK COLLECT.', detail: 'Chaque FETCH dans une boucle FOR LOOP entraine un context switch. BULK COLLECT charge le jeu de resultats en une opération dans la PGA. FORALL applique les DML en un seul appel. Gain : 10x à 50x.', riskDelta: 15 },
+        risky3: { risky: true, msg: 'ALERTE PIEGE : Pas de BULK COLLECT sur les batchs de nuit. Les traitements PMSI (100k+ lignes) subissent N context switches SQL/PL-SQL. Le batch de facturation T2A passe de 45s à 12min. Fenetre de maintenance depassee.', detail: 'BULK COLLECT réduit le nombre de changements de contexte entre les moteurs SQL et PL/SQL. Sans lui, chaque ligne traitée génère un context switch. Pour un lot de 100 000 lignes, cela represente 100 000 allers-retours. Avec BULK COLLECT LIMIT 1000, on descend à 100 context switches. Sur les batchs de dispensation PUI (souvent >500k lignes), le gain est de 10x à 50x.', riskDelta: 20 },
+        good: { risky: false, msg: 'CODE OPTIMAL : Colonnes explicites reduisent le trafic réseau. Index sur les clés de jointure assurent un accès O(log n). Pour les batchs, BULK COLLECT + FORALL est le pattern ETL standard.', detail: 'SELECT avec colonnes explicites, index composite (med_id, lot_id), et BULK COLLECT pour le traitement par lot. Pattern recommande par Oracle pour les applications de santé.', riskDelta: 0 }
       },
       4: {
-        risky: { risky: true, msg: 'SIMULATION : Echec du rapport T2A avec ORA-01555 "Snapshot too old". Les donnees Undo ont ete ecrasees apres 900s alors que le rapport dure 1800s. Perte de coherence de lecture.', detail: 'ORA-01555 survient quand le snapshot SCN requis pour la coherence de lecture n\'est plus disponible dans l\'undo tablespace. La requete de facturation T2A doit etre re-executee entierement. En production, cela retarde la cloture mensuelle.', riskDelta: 25 },
-        risky2: { risky: true, msg: 'ATTENTION : SGA a 8G sur un serveur de 16G empeche le PGA de s\'allouer suffisamment. UNDO_RETENTION a 600s insuffisant pour les rapports longs.', detail: 'La memoire totale Oracle (SGA+PGA) ne doit pas depasser 80% de la RAM physique pour laisser de la place a l\'OS et au HugePages. SGA=8G + PGA=2G + OS=2G = 12G (75%) acceptable mais sous-optimal.', riskDelta: 10 },
-        risky3: { risky: true, msg: 'ALERTE PIEGE : ORA-30036 "unable to extend segment by 8 in undo tablespace" simule. UNDO_RETENTION a 3600s sans agrandir l\'undo tablespace. Les segments Undo satures avant la retention. Les transactions longues echouent en milieu de traitement.', detail: 'La taille de l\'undo tablespace doit etre dimensionnee selon la formule : taille_undo = UNDO_RETENTION * UNDO_BLOCK_SIZE * blocks_per_sec. Avec UNDO_RETENTION=3600s et un taux de generation Undo de 500 blocks/s, il faut 3600 * 8192 * 500 / 1024^3 environ 14 Go d\'undo tablespace. A 2G, la retention reelle effective est d\'environ 500s, pas 3600s. ORA-30036 survient quand les segments Undo ne peuvent plus etendre.', riskDelta: 25 },
+        risky: { risky: true, msg: 'SIMULATION : Echec du rapport T2A avec ORA-01555 "Snapshot too old". Les données Undo ont ete ecrasées apres 900s alors que le rapport dure 1800s. Perte de coherence de lecture.', detail: 'ORA-01555 survient quand le snapshot SCN requis pour la coherence de lecture n\'est plus disponible dans l\'undo tablespace. La requête de facturation T2A doit etre re-executée entierement. En production, cela retarde la cloture mensuelle.', riskDelta: 25 },
+        risky2: { risky: true, msg: 'ATTENTION : SGA à 8G sur un serveur de 16G empeche le PGA de s\'allouer suffisamment. UNDO_RETENTION à 600s insuffisant pour les rapports longs.', detail: 'La memoire totale Oracle (SGA+PGA) ne doit pas depasser 80% de la RAM physique pour laisser de la place à l\'OS et au HugePages. SGA=8G + PGA=2G + OS=2G = 12G (75%) acceptable mais sous-optimal.', riskDelta: 10 },
+        risky3: { risky: true, msg: 'ALERTE PIEGE : ORA-30036 "unable to extend segment by 8 in undo tablespace" simule. UNDO_RETENTION à 3600s sans agrandir l\'undo tablespace. Les segments Undo satures avant la retention. Les transactions longues echouent en milieu de traitement.', detail: 'La taille de l\'undo tablespace doit etre dimensionnée selon la formule : taille_undo = UNDO_RETENTION * UNDO_BLOCK_SIZE * blocks_per_sec. Avec UNDO_RETENTION=3600s et un taux de generation Undo de 500 blocks/s, il faut 3600 * 8192 * 500 / 1024^3 environ 14 Go d\'undo tablespace. A 2G, la retention reelle effective est d\'environ 500s, pas 3600s. ORA-30036 survient quand les segments Undo ne peuvent plus etendre.', riskDelta: 25 },
         good: { risky: false, msg: 'DIMENSIONNEMENT EXPERT : UNDO_RETENTION=1800s couvre les rapports T2A les plus longs. SGA=4G pour buffer cache + shared pool, PGA=1G pour les tris. Undo tablespace=4G pour les segments Undo.', detail: 'Formule : UNDO_RETENTION = max(transaction_duration * 1.5, 900). Pour des rapports de 30min => 1800s. Taille undo = UNDO_RETENTION * UNDO_BLOCK_SIZE * blocks_per_sec. SGA/PGA dimensionnes pour 500 sessions concurrentes.', riskDelta: 0 }
       },
       5: {
-        risky: { risky: true, msg: 'ALERTE : Ignorer les Wait Events masque le probleme. L\'augmentation memoire est un palliatif : le verrouillage de sequence continue et le nombre de sessions bloquees croit. A 500 utilisateurs, 40% sont en attente "Contention sur sequence Oracle (SQ enqueue contention)".', detail: 'Les Wait Events sont le premier indicateur de sante d\'Oracle. Contention sur sequence Oracle (SQ enqueue contention) apparait quand N sessions attendent un verrou exclusif sur la meme ressource. Ici, la sequence SEQ_DISPENSE avec CACHE=1 est le bottleneck. Chaque NEXTVAL ecrit dans le dictionnaire.', riskDelta: 25 },
-        risky2: { risky: true, msg: 'ATTENTION : Rebuild d\'index sans diagnostic est une operation couteuse (I/O massif, verrouillage). Les index ne sont pas en cause ici : la contention est sur les locks TX lies a la sequence.', detail: 'ALTER INDEX ... REBUILD consomme des ressources et verrouille les index pendant l\'operation. C\'est une operation de maintenance, pas une correction de performance. Le rebuild d\'index sans analyse AWR prealable est une perte de temps.', riskDelta: 10 },
-        risky3: { risky: true, msg: 'ALERTE PIEGE : L\'option ORDER sur la sequence SEQ_DISPENSE re-introduit de la contention. ORDER reduit fortement les optimisations de cache des sequences et peut augmenter la contention, notamment en environnement RAC pour garantir l\'ordre chronologique strict. Le cache devient inefficace. 40% des sessions de nouveau en attente "Contention sur sequence Oracle (SQ enqueue contention)".', detail: 'ORDER garantit que les valeurs de sequence sont generees dans l\'ordre chronologique. Cela force chaque NEXTVAL a ecrire dans le dictionnaire SYSTEM, recreant le verrouillage que le CACHE etait cense eviter. Pour une application de dispensation PUI, ORDER n\'est pas necessaire : les horodatages (timestamp) sur les lignes de dispensation suffisent a garantir la tracabilite chronologique. L\'ordre des identifiants de sequence n\'a pas d\'importance metier.', riskDelta: 20 },
-        good: { risky: false, msg: 'DIAGNOSTIC CORRECT : Contention sur sequence Oracle (SQ enqueue contention) identifie. Sequence cache augmente a 10000. Les 500 utilisateurs obtiennent NEXTVAL sans contention. Resolution definitive.', detail: 'ALTER SEQUENCE seq_dispense CACHE 10000; Le CACHE pre-alloue les valeurs en memoire, evitant les ecritures dictionnaire a chaque NEXTVAL. Pour les sequences en forte concurrence, CACHE=1000 a 10000 est standard. ORDER doit etre utilise uniquement dans des cas tres specifiques car il peut augmenter fortement la contention.', riskDelta: 0 }
+        risky: { risky: true, msg: 'ALERTE : Ignorer les Wait Events masque le probleme. L\'augmentation memoire est un palliatif : le verrouillage de séquence continue et le nombre de sessions bloquées croit. A 500 utilisateurs, 40% sont en attente "Contention sur séquence Oracle (SQ enqueue contention)".', detail: 'Les Wait Events sont le premier indicateur de santé d\'Oracle. Contention sur séquence Oracle (SQ enqueue contention) apparait quand N sessions attendent un verrou exclusif sur la même ressource. Ici, la séquence SEQ_DISPENSE avec CACHE=1 est le bottleneck. Chaque NEXTVAL écrit dans le dictionnaire.', riskDelta: 25 },
+        risky2: { risky: true, msg: 'ATTENTION : Rebuild d\'index sans diagnostic est une opération couteuse (I/O massif, verrouillage). Les index ne sont pas en cause ici : la contention est sur les locks TX lies à la séquence.', detail: 'ALTER INDEX ... REBUILD consomme des ressources et verrouille les index pendant l\'opération. C\'est une opération de maintenance, pas une correction de performance. Le rebuild d\'index sans analyse AWR prealable est une perte de temps.', riskDelta: 10 },
+        risky3: { risky: true, msg: 'ALERTE PIEGE : L\'option ORDER sur la séquence SEQ_DISPENSE re-introduit de la contention. ORDER réduit fortement les optimisations de cache des séquences et peut augmenter la contention, notamment en environnement RAC pour garantir l\'ordre chronologique strict. Le cache devient inefficace. 40% des sessions de nouveau en attente "Contention sur séquence Oracle (SQ enqueue contention)".', detail: 'ORDER garantit que les valeurs de séquence sont génerées dans l\'ordre chronologique. Cela force chaque NEXTVAL à ecrire dans le dictionnaire SYSTEM, recréant le verrouillage que le CACHE etait cense eviter. Pour une application de dispensation PUI, ORDER n\'est pas necessaire : les horodatages (timestamp) sur les lignes de dispensation suffisent à garantir la tracabilite chronologique. L\'ordre des identifiants de séquence n\'a pas d\'importance metier.', riskDelta: 20 },
+        good: { risky: false, msg: 'DIAGNOSTIC CORRECT : Contention sur séquence Oracle (SQ enqueue contention) identifié. Séquence cache augmenté à 10000. Les 500 utilisateurs obtiennent NEXTVAL sans contention. Résolution définitive.', detail: 'ALTER SEQUENCE seq_dispense CACHE 10000; Le CACHE pre-alloue les valeurs en mémoire, évitant les écritures dictionnaire à chaque NEXTVAL. Pour les séquences en forte concurrence, CACHE=1000 à 10000 est standard. ORDER doit être utilisé uniquement dans des cas très spécifiques car il peut augmenter fortement la contention.', riskDelta: 0 }
       },
       6: {
-        risky: { risky: true, msg: 'ALERTE CRITIQUE : Un backup non teste n\'est pas un backup. En cas de crash disque demain, les donnees patients sont perdues. RPO de 24h (backup journalier) sans test de restauration = perte potentielle de toutes les prescriptions du jour. RTO inconnu. Impact juridique et medical catastrophique.', detail: 'Sans test de restauration, personne ne sait si les backups sont utilisables. Erreurs classiques : fichier manquant, corruption silencieuse, incompatibilite de version. Les backups RMAN doivent etre VALIDATE regulierement.', riskDelta: 35 },
-        risky2: { risky: true, msg: 'ATTENTION : expdp est un export logique (pas physique). Il ne permet pas le point-in-time recovery, ne protege pas contre les corruptions de blocs, et le temps de restauration est prohibitif pour 5 To de donnees.', detail: 'Data Pump exporte logiquement les donnees (objets, lignes). La restauration necessite de recreer les tablespaces et d\'importer, ce qui prend des heures. RMAN restaure un fichier .dbf en quelques minutes. Data Guard offre le basculement en secondes.', riskDelta: 20 },
-        risky3: { risky: true, msg: 'ALERTE PIEGE : Data Guard en mode ASYNC = fenetre de perte de donnees. En cas de crash du site primaire, les transactions non encore transferees sont perdues (RPO 5-30s). En PUI, cela peut concerner des prescriptions en cours non sauvegardees. Le mode SYNC (RPO=0) est recommande pour les donnees de sante.', detail: 'Le mode SYNC garantit RPO=0 : chaque transaction est ecrite sur le standby AVANT d\'etre confirmee au client. Le mode ASYNC accuse reception de la transaction sans attendre l\'ecriture sur le standby. En cas de crash, les transactions dans le buffer de redo log non encore expedie sont perdues. Le RPO en ASYNC depend du trafic et de la latence reseau (typiquement 5-30s de perte). Si la latence reseau impose l\'ASYNC, le RPO doit etre documente et accepte formellement par la direction de l\'etablissement dans le cadre du PRA.', riskDelta: 20 },
-        good: { risky: false, msg: 'PLAN DE REPRISE EXPERT : RMAN validate hebdomadaire + Data Guard Physical Standby (RPO=0) + test de restauration trimestriel. La fonction de base de donnees n\'est pas de sauvegarder mais de RESTAURER.', detail: 'Configuration : RMAN> BACKUP VALIDATE CHECK LOGICAL DATABASE; Data Guard en mode SYNC (RPO=0). Test trimestriel : switchover, verification des donnees, basculement retour. Cette procedure est auditee annuellement par l\'organisme de certification HDS.', riskDelta: 0 }
+        risky: { risky: true, msg: 'ALERTE CRITIQUE : Un backup non testé n\'est pas un backup. En cas de crash disque demain, les données patients sont perdues. RPO de 24h (backup journalier) sans test de restauration = perte potentielle de toutes les prescriptions du jour. RTO inconnu. Impact juridique et medical catastrophique.', detail: 'Sans test de restauration, personne ne sait si les backups sont utilisables. Erreurs classiques : fichier manquant, corruption silencieuse, incompatibilité de version. Les backups RMAN doivent etre VALIDATE regulierement.', riskDelta: 35 },
+        risky2: { risky: true, msg: 'ATTENTION : expdp est un export logique (pas physique). Il ne permet pas le point-in-time recovery, ne protege pas contre les corruptions de blocs, et le temps de restauration est prohibitif pour 5 To de données.', detail: 'Data Pump exporte logiquement les données (objets, lignes). La restauration nécessite de recréer les tablespaces et d\'importer, ce qui prend des heures. RMAN restaure un fichier .dbf en quelques minutes. Data Guard offre le basculement en secondes.', riskDelta: 20 },
+        risky3: { risky: true, msg: 'ALERTE PIEGE : Data Guard en mode ASYNC = fenetre de perte de données. En cas de crash du site primaire, les transactions non encore transferées sont perdues (RPO 5-30s). En PUI, cela peut concerner des prescriptions en cours non sauvegardées. Le mode SYNC (RPO=0) est recommande pour les données de santé.', detail: 'Le mode SYNC garantit RPO=0 : chaque transaction est écrite sur le standby AVANT d\'etre confirmée au client. Le mode ASYNC accuse réception de la transaction sans attendre l\'écriture sur le standby. En cas de crash, les transactions dans le buffer de redo log non encore expedie sont perdues. Le RPO en ASYNC depend du trafic et de la latence réseau (typiquement 5-30s de perte). Si la latence réseau impose l\'ASYNC, le RPO doit etre documente et accepte formellement par la direction de l\'etablissement dans le cadre du PRA.', riskDelta: 20 },
+        good: { risky: false, msg: 'PLAN DE REPRISE EXPERT : RMAN validate hebdomadaire + Data Guard Physical Standby (RPO=0) + test de restauration trimestriel. La fonction de base de données n\'est pas de sauvegarder mais de RESTAURER.', detail: 'Configuration : RMAN> BACKUP VALIDATE CHECK LOGICAL DATABASE; Data Guard en mode SYNC (RPO=0). Test trimestriel : switchover, verification des données, basculement retour. Cette procédure est auditée annuellement par l\'organisme de certification HDS.', riskDelta: 0 }
       }
     };
     const stepScenarios = scenarios[stepId] || {};
@@ -958,34 +957,34 @@ class WorkflowEngine {
 // ============================================================
 const CHOICES_DATA = {
   1: [
-    { choice: 'risky',  label: 'WE8MSWIN1252 + Resource Plan par defaut',                              badge: 'Encodage 8-bit' },
-    { choice: 'good',   label: 'AL32UTF8 + Resource Plan CDB avec shares PUI dedies',                  badge: 'Encodage Unicode' },
+    { choice: 'risky',  label: 'WE8MSWIN1252 + Resource Plan par défaut',                              badge: 'Encodage 8-bit' },
+    { choice: 'good',   label: 'AL32UTF8 + Resource Plan CDB avec shares PUI dédiés',                  badge: 'Encodage Unicode' },
     { choice: 'risky2', label: 'AL32UTF8 mais SANS Resource Plan actif',                               badge: 'Sans Resource Plan' },
     { choice: 'risky3', label: 'AL32UTF8 + Resource Plan CDB avec shares=20 pour la PUI',              badge: 'Sur-allocation' }
   ],
   2: [
-    { choice: 'risky',  label: 'Pas de TDE, Audit desactive (gain perf estime 5%)',                    badge: 'Audit desactive' },
+    { choice: 'risky',  label: 'Pas de TDE, Audit désactivé (gain perf estime 5%)',                    badge: 'Audit désactivé' },
     { choice: 'good',   label: 'TDE AES-256 + Audit HDS standard + Profil SECURE_PUI',                 badge: 'Audit complet' },
-    { choice: 'risky2', label: 'Audit partiel (echecs seulement), TDE sur TS DATA seulement',          badge: 'Audit partiel' },
+    { choice: 'risky2', label: 'Audit partiel (échecs seulement), TDE sur TS DATA seulement',          badge: 'Audit partiel' },
     { choice: 'risky3', label: 'TDE + Audit HDS complet MAIS sans profil SECURE_PUI',                  badge: 'Idle illimite' }
   ],
   3: [
     { choice: 'risky',  label: 'SELECT * FROM stock_med s JOIN ligne_disp l ON s.med_id = l.med_id',                     badge: 'Colonnes implicites' },
     { choice: 'good',   label: 'SELECT s.med_id, s.molecule, l.qte FROM stock_med s JOIN ligne_disp l ON s.med_id = l.med_id',  badge: 'Colonnes explicites' },
-    { choice: 'risky2', label: 'Curseur PL/SQL ligne a ligne sans BULK COLLECT',                                        badge: 'Parcours ligne/ligne' },
+    { choice: 'risky2', label: 'Curseur PL/SQL ligne à ligne sans BULK COLLECT',                                        badge: 'Parcours ligne/ligne' },
     { choice: 'risky3', label: 'Colonnes explicites + index adaptes MAIS pas de BULK COLLECT',                          badge: 'Batch sans bulk' }
   ],
   4: [
-    { choice: 'risky',  label: 'UNDO_RETENTION=900s, SGA=2G, pas de tuning',                            badge: 'UNDO par defaut' },
+    { choice: 'risky',  label: 'UNDO_RETENTION=900s, SGA=2G, pas de tuning',                            badge: 'UNDO par défaut' },
     { choice: 'good',   label: 'UNDO_RETENTION=1800s, SGA=4G, PGA=1G, undo tablespace 4G',              badge: 'UNDO dimensionne' },
     { choice: 'risky2', label: 'SGA=8G mais UNDO_RETENTION=600s, pas de monitoring',                    badge: 'SGA sur-dimensionnee' },
-    { choice: 'risky3', label: 'UNDO_RETENTION=3600s MAIS undo tablespace toujours a 2G',               badge: 'Undo sous-dimensionne' }
+    { choice: 'risky3', label: 'UNDO_RETENTION=3600s MAIS undo tablespace toujours à 2G',               badge: 'Undo sous-dimensionne' }
   ],
   5: [
     { choice: 'risky',  label: 'Ignorer les Wait Events, augmenter la memoire',                         badge: 'Correction memoire' },
-    { choice: 'good',   label: 'Analyser Contention sur sequence Oracle (SQ enqueue contention), corriger le CACHE de sequence', badge: 'Diagnostic Wait Event' },
-    { choice: 'risky2', label: 'Rebuild de tous les index',                                             badge: 'Rebuild index' },
-    { choice: 'risky3', label: 'Cache sequence=10000 MAIS avec option ORDER activee',                   badge: 'Contention ORDER' }
+    { choice: 'good',   label: 'Analyser la contention sur séquence Oracle (SQ enqueue contention), corriger le CACHE de séquence', badge: 'Diagnostic Wait Event' },
+    { choice: 'risky2', label: 'Reconstruction de tous les index',                                             badge: 'Rebuild index' },
+    { choice: 'risky3', label: 'Cache séquence=10000 MAIS avec option ORDER activee',                   badge: 'Contention ORDER' }
   ],
   6: [
     { choice: 'risky',  label: 'Valider sans test de restauration, backup journalier seulement',        badge: 'Backup simple' },
@@ -1086,7 +1085,7 @@ class UIController {
         });
         stepEl.querySelector('.btn-reset-step').style.display = 'none';
         stepEl.querySelector('.btn-validate-step').style.display = 'none';
-        this._log('info', '[Etape ' + stepId + '] Choix reinitialise. Vous pouvez choisir a nouveau.', stepId);
+        this._log('info', '[Etape ' + stepId + '] Choix reinitialise. Vous pouvez choisir à nouveau.', stepId);
       });
     });
 
@@ -1141,7 +1140,7 @@ class UIController {
         btn.style.display = 'none';
       });
       this._closeOverlay();
-      this._log('info', 'Projet reinitialise. Retour a l\'etape 1.');
+      this._log('info', 'Projet reinitialise. Retour à l\'etape 1.');
     });
 
     // Step progress clicks (go to active step)
@@ -1251,7 +1250,7 @@ class UIController {
 
     let riskColor = 'var(--color-green)';
     let riskText = 'Faible';
-    let riskMsgText = 'Projet sain. Aucun risque detecte.';
+    let riskMsgText = 'Projet sain. Aucun risque détecté.';
     if (state.riskLevel > 70) {
       riskColor = 'var(--color-red)';
       riskText = 'CRITIQUE';
@@ -1259,11 +1258,11 @@ class UIController {
     } else if (state.riskLevel > 40) {
       riskColor = 'var(--color-amber)';
       riskText = 'Eleve';
-      riskMsgText = 'Risque significatif. Plusieurs decisions non conformes cumulees.';
+      riskMsgText = 'Risque significatif. Plusieurs decisions non conformes cumulées.';
     } else if (state.riskLevel > 15) {
       riskColor = 'var(--color-amber)';
       riskText = 'Modere';
-      riskMsgText = 'Quelques choix risques detectes. Revoyez les etapes concernees.';
+      riskMsgText = 'Quelques choix risques détectés. Revoyez les etapes concernées.';
     }
 
     riskVal.style.color = riskColor;
@@ -1306,7 +1305,7 @@ class UIController {
       } else if (totalRisk <= 50) {
         alertClass = 'alert--warning';
         titleColor = 'var(--color-amber)';
-        completionMsg = 'Projet livre avec des risques moderes. Pensez a revoir les etapes concernees avant l\'audit HDS.';
+        completionMsg = 'Projet livre avec des risques moderes. Pensez à revoir les etapes concernées avant l\'audit HDS.';
       } else {
         alertClass = 'alert--error';
         titleColor = 'var(--color-red)';
@@ -1325,7 +1324,7 @@ class UIController {
 
   _updateChart(state) {
     for (let i = 1; i <= 6; i++) {
-      const bar = document.getElementById('pc-' + ['install', 'securite', 'dev', 'tuning', 'recette', 'prod'][i - 1]);
+      const bar = document.getElementById('pc-' + ['install', 'sécurité', 'dev', 'tuning', 'recette', 'prod'][i - 1]);
       if (!bar) continue;
       const s = state.steps[i];
       if (s.status === 'done') {
@@ -1371,7 +1370,7 @@ class UIController {
       '<div class="help-modal__text"><strong>Constat :</strong><br>' + msg + '</div>' +
       '<div class="help-modal__text"><strong>Justification technique :</strong><br>' + detail + '</div>' +
       '<div class="help-modal__text" style="border-left: 2px solid var(--color-cyan); padding-left: var(--sp-4);">' +
-      '<strong>Regle d\'or :</strong> Cette recommandation est basee sur les principes d\'architecture Oracle et les exigences HDS/ISO 27001.</div>';
+      '<strong>Regle d\'or :</strong> Cette recommandation est basée sur les principes d\'architecture Oracle et les exigences HDS/ISO 27001.</div>';
     this._openModal('help-expert');
   }
 
