@@ -437,7 +437,7 @@ a:hover { text-decoration: underline; }
       <div class="help-modal__body">
         <div class="help-modal__section"><div class="help-modal__section-title help-modal__section-title--objective">Objectif</div><p class="help-modal__text">Exemples de code pédagogiques pour illustrer les concepts Oracle les plus importants en contexte PUI.</p>
         <ul class="help-modal__list"><li><strong>Erreur ORA-04091</strong> : Table mutante avec code erreur puis solution Compound Trigger.</li><li><strong>BULK COLLECT vs curseur</strong> : Comparaison de performance simulée.</li><li><strong>Hints et Explain Plan</strong> : Analyse et optimisation de plans d'exécution.</li><li><strong>VPD et Audit</strong> : Politiques de sécurité par service.</li></ul></div>
-        <div class="help-modal__section"><div class="help-modal__section-title help-modal__section-title--controls">Controles</div><ul class="help-modal__list"><li><strong>Selecteur</strong> : Choisit l'exemple à afficher.</li><li><strong>Editeur</strong> : Code SQL/PLSQL commenté en lecture seule.</li><li><strong>Simuler</strong> : Lancez la machine d'états. Certains exemples déclenchent une erreur ORA volontaire.</li></ul></div>
+        <div class="help-modal__section"><div class="help-modal__section-title help-modal__section-title--controls">Controles</div><ul class="help-modal__list"><li><strong>Selecteur</strong> : Choisit l'exemple à afficher.</li><li><strong>Editeur</strong> : Code SQL/PLSQL commenté en lecture seule.</li><li><strong>Simuler</strong> : Lancez la machine à états. Certains exemples déclenchent une erreur ORA volontaire.</li></ul></div>
       </div>
       <div class="help-modal__footer"><button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button></div>
     </div>
@@ -480,7 +480,7 @@ a:hover { text-decoration: underline; }
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--lexique">Mémoire Globale (SGA / PGA)</div>
           <ul class="help-modal__list">
-            <li><strong>Mémoire Globale de Système (SGA)</strong> — Zone mémoire partagée par l'ensemble des processus Oracle, abritant le cache de tampons, le réservoir partage, le tampon de journalisation et les structures connexes.</li>
+            <li><strong>Mémoire Globale de Système (SGA)</strong> — Zone mémoire partagée par l'ensemble des processus Oracle, abritant le cache de tampons, le réservoir partagé, le tampon de journalisation et les structures connexes.</li>
             <li><strong>Cache de Tampons</strong> — Portion de la mémoire globale contenant les blocs de données lus depuis les fichiers disques, ordonnancée par l'algorithme du moindre récent usage.</li>
             <li><strong>Mémoire Globale de Programme (PGA)</strong> — Zone mémoire privée allouée à chaque session d'utilisation pour les opérations de tri, de regroupement et de jointure.</li>
             <li><strong>Débordement Temporaire</strong> — Basculement des opérations mémoire vers les espaces temporaires sur disque lorsque la mémoire globale de programme est insuffisante, entraînant une dégradation sensible des temps d'exécution.</li>
