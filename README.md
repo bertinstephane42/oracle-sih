@@ -10,8 +10,8 @@
 2. [Méthodologie et limites](#méthodologie-et-limites)
 3. [Fichier 1 : Architecture Infrastructure](#fichier-1--architecture-infrastructure)
 4. [Fichier 2 : Atelier SQL PUI](#fichier-2--atelier-sql-pui)
-5. [Fichier 3 : Dictionnaire et Quiz Oracle](#fichier-3--lexique-et-quiz-oracle)
-6. [Fichier 4 : Flux de Décision](#fichier-4--flux-de-décision)
+5. [Fichier 3 : Lexique Oracle PUI](#fichier-3--lexique-oracle-pui)
+6. [Fichier 4 : Cycle de vie projet Oracle PUI](#fichier-4--cycle-de-vie-projet-oracle-pui)
 7. [Fichier 5 : Suite Performance Avancée](#fichier-5--suite-performance-avancee)
 8. [Thèmes transversaux](#thèmes-transversaux)
 9. [Conformité et sécurité](#conformité-et-sécurité)
@@ -69,7 +69,7 @@ Les mécanismes représentés reposent principalement sur :
 Les applications implémentent des modèles pédagogiques simplifiés permettant de représenter :
 
 * des phénomènes de contention ;
-* des mécanismes de mise en cache (cache) ;
+* des mécanismes de mise en cache ;
 * des stratégies de partitionnement ;
 * des cycles de cohérence transactionnelle ;
 * des flux analytiques distribués.
@@ -114,7 +114,7 @@ Fonctionnalités principales :
 * éditeur SQL/PLSQL ;
 * extraits de code (snippets) pédagogiques préconfigurés ;
 * simulation d’états d’exécution SQL ;
-* Plan d'explication (Explain Plan) simplifié ;
+* Plan d'exécution (Explain Plan) simplifié ;
 * grille de résultats dynamique ;
 * indicateurs de coût et d’activité logique ;
 * démonstration RBAC et audit.
@@ -130,11 +130,19 @@ Les plans d’exécution affichés sont illustratifs et ne reflètent pas un CBO
 
 ---
 
-# Fichier 3 : Dictionnaire et Quiz Oracle
+# Fichier 3 : Lexique Oracle PUI
 
 **Fichier :** `3.oracle-lexical-sih-demo.html`
 
-Base de connaissances interactive couvrant des notions Oracle courantes :
+Lexique interactif couvrant les concepts Oracle dans un contexte PUI (Pharmacie à Usage Intérieur), organisé en trois onglets :
+
+| Onglet | Contenu |
+|--------|---------|
+| Dictionnaire Interactif | 50 termes Oracle filtrables par domaine (Structure, Objets, PL/SQL, Triggers, Performance, Sécurité) avec cartes détaillées |
+| Laboratoire d'exemples | Exemples pédagogiques SQL/PLSQL avec exécution simulée et messages d'erreur ORA |
+| Quiz & Validation | QCM interactifs avec score et progression |
+
+Le dictionnaire couvre des notions telles que :
 
 * index B-tree et bitmap ;
 * transactions et verrous ;
@@ -145,30 +153,24 @@ Base de connaissances interactive couvrant des notions Oracle courantes :
 * SQL*Loader ;
 * vues dynamiques `V$`.
 
-Le module comprend :
-
-* des exemples SQL/PLSQL ;
-* des QCM interactifs ;
-* un mode de révision progressive.
-
-Les extraits de code sont fournis à des fins pédagogiques et peuvent nécessiter adaptation pour une utilisation réelle.
-
 ---
 
-# Fichier 4 : Flux de Décision
+# Fichier 4 : Cycle de vie projet Oracle PUI
 
 **Fichier :** `4.oracle-lifecycle-sih-demo.html`
 
-Simulation de flux décisionnels liés à l’exploitation d’un SIH Oracle.
+Guide interactif de déploiement d'une application PUI, simulant les conséquences des choix techniques à chaque étape du cycle de vie d'un projet Oracle.
 
-Thématiques couvertes :
+Le serious game se déroule en 6 étapes séquentielles :
 
-* chiffrement ;
-* haute disponibilité ;
-* PRA/PCA ;
-* mise à niveau (upgrade) ;
-* stratégie cloud ;
-* dimensionnement.
+| Étape | Thématique |
+|-------|-----------|
+| 1 | Installation & architecture (jeu de caractères, CDB/PDB) |
+| 2 | Sécurité (TDE, RBAC, audit) |
+| 3 | Développement (schéma, index, PL/SQL) |
+| 4 | Tuning (performance, SQL, indexation) |
+| 5 | Recette (validation, test, mise en production) |
+| 6 | Production (exploitation, surveillance, sauvegardes) |
 
 Le système attribue des scores de risque relatifs selon des heuristiques simplifiées représentant des bonnes pratiques généralement admises.
 
