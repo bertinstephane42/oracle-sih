@@ -1131,8 +1131,13 @@ class WorkbenchApp {
     this._executor = new SQLExecutor(this._logger, this._sm);
     this._helpMgr = new HelpManager();
     this._snippets = {
-      select: `-- Stocks critiques PUI — Médicaments en rupture imminente
--- Jointures multi-tables: STOCK_MED ⨝ LOT_SIMU ⨝ SERVICE_SIMU
+  select: `-- ============================================================================
+-- 1. SURVEILLANCE DES STOCKS CRITIQUES (LECTURE OPTIMISÉE)
+-- ============================================================================
+-- Enjeu : Identifier les risques de rupture en temps réel avec un seuil d'alerte
+-- dynamique (adaptatif) plutôt que fixe, tout en contextualisant l'information
+-- pour les services cliniques (règle FEFO : First Expired, First Out).
+
 SELECT
   m.med_id          AS med_code,
   m.molecule,
@@ -1142,45 +1147,65 @@ SELECT
   l.date_peremption,
   l.date_fabrication,
   s.srv_nom         AS service_destination,
+  -- Classification métier directe en base de données pour filtrage immédiat
   CASE
     WHEN l.qty_stock < 50  THEN 'CRITIQUE'
     WHEN l.qty_stock < 150 THEN 'ATTENTION'
     ELSE 'OK'
   END AS niveau_criticite
 FROM stock_med m
+-- Jointures contextuelles : on relie le médicament à son lot et au service destinataire
 JOIN lot_simu l
   ON m.lot_id = l.lot_id
 JOIN service_simu s
   ON l.srv_id = s.srv_id
-WHERE l.qty_stock < (
-  SELECT AVG(qty_stock) * 0.3
-  FROM lot_simu
-)
-AND l.date_peremption > SYSDATE
+WHERE 
+  -- Seuil dynamique : on alerte si le stock est inférieur à 30% de la moyenne globale
+  -- Cela rend l'alerte adaptable au volume global de l'établissement
+  l.qty_stock < (
+    SELECT AVG(qty_stock) * 0.3
+    FROM lot_simu
+  )
+  -- Filtre de sécurité : on ignore les lots déjà périmés
+  AND l.date_peremption > SYSDATE
+-- Priorisation : les plus petits stocks et les plus proches de la péremption en premier
 ORDER BY l.qty_stock ASC, l.date_peremption ASC;`,
-      bulk: `-- Batch nocturne de réapprovisionnement PUI
--- BULK COLLECT + FORALL: minimise les context switches
+
+  bulk: `-- ============================================================================
+-- 2. BATCH DE RÉAPPROVISIONNEMENT NOCTURNE (ÉCRITURE HAUTE PERFORMANCE)
+-- ============================================================================
+-- Enjeu : Mettre à jour des milliers de lignes rapidement sans saturer la base
+-- ni bloquer les services cliniques. Utilisation des mécanismes "Bulk" d'Oracle
+-- pour réduire les allers-retours coûteux entre le moteur SQL et PL/SQL.
+
 DECLARE
+  -- Définition d'un type enregistrement structuré pour stocker les données en mémoire
   TYPE t_reappro_rec IS RECORD (
     lot_id     lot_simu.lot_id%TYPE,
     qty_cible  NUMBER
   );
+  -- Définition d'une collection (tableau) pour charger les lots en une seule fois
   TYPE t_reappro_tab IS TABLE OF t_reappro_rec;
   v_reappro t_reappro_tab;
 
   v_count NUMBER;
 BEGIN
-  -- BULK COLLECT: chargement en PGA
+  -- ÉTAPE 1 : BULK COLLECT
+  -- Charge TOUTES les lignes éligibles en mémoire (PGA) en un seul appel SQL.
+  -- Évite la boucle ligne par ligne qui est très lente sur gros volume.
   SELECT lot_id, (seuil_alerte * 2) - qty_stock AS qty_cible
     BULK COLLECT INTO v_reappro
     FROM lot_simu
     WHERE qty_stock < seuil_alerte
+      -- Règle métier : on ne réapprovisionne pas un médicament périmant dans < 30 jours
       AND date_peremption > SYSDATE + 30;
 
   v_count := v_reappro.COUNT;
   DBMS_OUTPUT.PUT_LINE('Lots à réapprovisionner: ' || v_count);
 
-  -- FORALL: batch update en un seul appel SQL
+  -- ÉTAPE 2 : FORALL (Traitement par lots)
+  -- Envoie le tableau entier au moteur SQL pour mise à jour en un seul appel.
+  -- Transforme N opérations individuelles en 1 opération globale optimisée.
   IF v_count > 0 THEN
     FORALL i IN 1 .. v_count
       UPDATE stock_med
@@ -1188,62 +1213,88 @@ BEGIN
              date_maj = SYSDATE
        WHERE lot_id = v_reappro(i).lot_id;
 
+    -- Validation atomique : tout ou rien
     COMMIT;
     DBMS_OUTPUT.PUT_LINE(v_count || ' lots mis à jour. COMMIT OK.');
   END IF;
 
 EXCEPTION
+  -- Gestion robuste des erreurs : en cas de problème, on annule tout pour éviter
+  -- un état incohérent des stocks (traçabilité pharmaceutique critique).
   WHEN OTHERS THEN
     ROLLBACK;
     DBMS_OUTPUT.PUT_LINE('ERREUR: ' || SQLERRM);
-    RAISE;
+    RAISE; -- Propage l'erreur vers le superviseur de jobs
 END;`,
-      trigger: `-- TRIGGER: Contrôle péremption avant dispensation
--- Règle métier : empêche la sortie de médicaments expirés
+
+  trigger: `-- ============================================================================
+-- TRIGGER DE SÉCURITÉ : CONTRÔLE DE PÉREMPTION AVANT DISPENSATION
+-- ============================================================================
+-- Enjeu : Garantir l'intégrité clinique en empêchant physiquement la sortie 
+-- d'un médicament périmé du stock, même en cas d'erreur humaine ou logicielle.
+-- Ce déclencheur agit comme une "porte de sécurité" (Safety Gate) infranchissable.
+
 CREATE OR REPLACE TRIGGER trg_check_peremption
+-- Déclenchement : Avant chaque insertion ou modification du lot sur une sortie
 BEFORE INSERT OR UPDATE OF lot_id ON sortie_stock
-FOR EACH ROW
+FOR EACH ROW  -- S'exécute ligne par ligne pour chaque médicament dispensé
 DECLARE
   v_peremption lot_simu.date_peremption%TYPE;
   v_molecule   stock_med.molecule%TYPE;
+  -- Définition d'une exception métier personnalisée pour la péremption
   e_med_expire EXCEPTION;
 BEGIN
+  -- ÉTAPE 1 : VÉRIFICATION PRÉALABLE
+  -- Récupération des données du lot cible (date et molécule).
+  -- L'utilisation de :NEW.lot_id permet d'interroger le lot que l'utilisateur tente de sortir.
   SELECT l.date_peremption, m.molecule
     INTO v_peremption, v_molecule
     FROM lot_simu l
     JOIN stock_med m ON m.lot_id = l.lot_id
     WHERE l.lot_id = :NEW.lot_id;
 
+  -- ÉTAPE 2 : APPLICATION DE LA RÈGLE MÉTIER
+  -- Si la date de péremption est dépassée, on lève l'exception personnalisée.
   IF v_peremption < SYSDATE THEN
     RAISE e_med_expire;
   END IF;
 
+  -- ÉTAPE 3 : VALIDATION AUTOMATIQUE (Flux normal)
+  -- Si aucun blocage, on force la date de validation et le statut à 'VALIDE'.
   :NEW.date_validation := SYSDATE;
   :NEW.statut := 'VALIDE';
 
 EXCEPTION
+  -- GESTION ROBUSTE DES ERREURS :
+  -- Chaque scénario d'erreur renvoie un code unique (-20xxx) et un message explicite.
+
   WHEN NO_DATA_FOUND THEN
+    -- Cas : Le lot référencé n'existe plus dans le stock (incohérence de données)
     RAISE_APPLICATION_ERROR(
       -20002,
-      'LOT INTROUVABLE — Verification impossible'
+      'LOT INTROUVABLE — Vérification impossible. Le lot ID ' || :NEW.lot_id || ' est absent du référentiel.'
     );
 
   WHEN TOO_MANY_ROWS THEN
+    -- Cas : Incohérence majeure (doublons de clés primaires ou données corrompues)
     RAISE_APPLICATION_ERROR(
       -20003,
-      'INCOHÉRENCE DONNÉES — Plusieurs lots détectés'
+      'INCOHÉRENCE DONNÉES — Plusieurs lots détectés pour l''ID ' || :NEW.lot_id || '. Contact DBA requis.'
     );
+
   WHEN e_med_expire THEN
+    -- Cas : Médicament périmé détecté (Blocage de sécurité critique)
     RAISE_APPLICATION_ERROR(
       -20001,
-      'MEDICAMENT EXPIRE DETECTE — Lot: ' || :NEW.lot_id
-      || ' | Molecule: ' || v_molecule
-      || ' | Peremption: ' || TO_CHAR(v_peremption, 'DD/MM/YYYY')
-      || ' — Dispensation refusée (PUI Safety Gate)'
+      'MÉDICAMENT EXPIRÉ DÉTECTÉ — Dispensation refusée (PUI Safety Gate).' || CHR(10) ||
+      'Lot: ' || :NEW.lot_id || 
+      ' | Molécule: ' || v_molecule || 
+      ' | Périmé depuis le: ' || TO_CHAR(v_peremption, 'DD/MM/YYYY') || CHR(10) ||
+      'Action requise : Sélectionnez un lot valide ou procédez au retrait de stock.'
     );
 END trg_check_peremption;
 /`
-    };
+};
   }
 
   init() {
