@@ -229,7 +229,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
     </div>
     <div class="app-header__status">
       <span class="status-badge status-badge--online"><span class="status-dot"></span>MOTEUR ACTIF</span>
-      <span class="status-badge status-badge--hds">HDS / DONNEES FICTIVES</span>
+      <span class="status-badge status-badge--hds">HDS / DONNÉES FICTIVES</span>
       <button class="page-header__help-btn" data-help="lexicon" aria-label="Lexique technique" title="Lexique technique">L</button>
       <button class="page-header__help-btn" data-help="credit" aria-label="Credits" title="Credits">C</button>
     </div>
@@ -238,7 +238,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
   <nav class="app-nav">
     <div class="app-nav__section">
       <div class="app-nav__section-title">Advanced Performance</div>
-      <button class="app-nav__item app-nav__item--active" data-tab="partitioning"><span class="app-nav__item-icon">P</span>Partitionnement Avance</button>
+      <button class="app-nav__item app-nav__item--active" data-tab="partitioning"><span class="app-nav__item-icon">P</span>Partitionnement Avancé</button>
       <button class="app-nav__item" data-tab="inmemory"><span class="app-nav__item-icon">M</span>In-Memory Column Store</button>
       <button class="app-nav__item" data-tab="dataflow"><span class="app-nav__item-icon">F</span>OCI Data Flow &amp; Spark</button>
       <button class="app-nav__item" data-tab="dashboard"><span class="app-nav__item-icon">D</span>Dashboard Comparatif</button>
@@ -248,16 +248,16 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       <div style="padding: 0 var(--sp-4); font-size: var(--fs-xs); font-family: var(--font-mono); line-height: 2;">
         <div style="color: #64748b;">USER</div>
         <div style="color: var(--color-cyan);">DBA_PERF_SIMU</div>
-        <div style="color: #64748b; margin-top: var(--sp-2);">VOLUME DONNEES</div>
+        <div style="color: #64748b; margin-top: var(--sp-2);">VOLUME DONNÉES</div>
         <div class="data-mono" id="session-volume">5×10⁹ lignes / 2.5 To</div>
         <div style="color: #64748b; margin-top: var(--sp-2);">SCORE OPTIMISATION</div>
         <div id="session-score" style="color: var(--color-green);">0%</div>
       </div>
     </div>
     <div class="app-nav__rgpd-notice">
-      DONNEES 100% FICTIVES<br>
+      DONNÉES 100% FICTIVES<br>
       PATIENT_SIMU_XXXX / PRESCRIPTION_HISTORY<br>
-      Donnees genomiques simulees<br>
+      Données génomiques simulées<br>
       Conforme RGPD Art. 25
     </div>
   </nav>
@@ -267,15 +267,15 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
     <!-- TAB 1: Partitionnement -->
     <section class="module-section module-section--active" id="tab-partitioning">
       <div class="page-header">
-        <h1 class="page-header__title">Partitionnement Avance — Pruning &amp; Gestion</h1>
+        <h1 class="page-header__title">Partitionnement Avancé — Élagage &amp; gestion</h1>
         <div class="page-header__subtitle-row">
-          <p class="page-header__subtitle">Analyse de 10 ans d'historique de prescriptions (5×10⁹ lignes). Reduction du I/O via Partition Pruning.</p>
+          <p class="page-header__subtitle">Analyse de 10 ans d'historique de prescriptions (5×10⁹ lignes). Réduction du I/O via Partition Pruning.</p>
           <button class="page-header__help-btn" data-help="partitioning" aria-label="Aide Partitionnement" title="Rubrique d'aide">?</button>
         </div>
       </div>
       <div class="card fade-in">
         <div class="card__header">
-          <div class="card__header-title"><span class="card__title-icon">&#9632;</span> Simulation Partitionnement Range (Date)</div>
+          <div class="card__header-title"><span class="card__title-icon">&#9632;</span> Simulation du partitionnement par intervalle (Date)</div>
           <div><span class="tag tag--red" id="part-status-tag">INACTIF</span></div>
         </div>
         <div class="comp-card" id="part-comp-bars">
@@ -290,7 +290,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
           <div class="stat-block stat-block--green"><div class="stat-block__value" id="part-time-after">30s</div><div class="stat-block__label">Temps Avec</div></div>
         </div>
         <div class="slider-group" style="max-width:400px;margin-bottom:var(--sp-4);">
-          <div class="slider-group__header"><span class="slider-group__label">Periode analysee</span><span class="slider-group__value" id="part-period-val">6 mois</span></div>
+          <div class="slider-group__header"><span class="slider-group__label">Periode analysée</span><span class="slider-group__value" id="part-period-val">6 mois</span></div>
           <input type="range" id="part-period-slider" min="1" max="120" step="1" value="6">
         </div>
         <div style="display:flex;gap:var(--sp-3);margin-bottom:var(--sp-4);">
@@ -298,7 +298,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
           <button class="btn btn--outline btn--sm" id="btn-part-expert">Detail Algorithmique</button>
         </div>
         <div class="log-console" id="part-console">
-          <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Simulateur partitionnement pret. 120 partitions mensuelles.</div>
+          <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Simulateur partitionnement prêt. 120 partitions mensuelles.</div>
         </div>
       </div>
     </section>
@@ -308,7 +308,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       <div class="page-header">
         <h1 class="page-header__title">In-Memory Column Store — Compression &amp; Scan Vectorise</h1>
         <div class="page-header__subtitle-row">
-          <p class="page-header__subtitle">Transposition Row→Column, compression IMCU, scan SIMD. Passage de 45s a 0.8s.</p>
+          <p class="page-header__subtitle">Transposition Row→Column, compression IMCU, scan SIMD. Passage de 45s à 0.8s.</p>
           <button class="page-header__help-btn" data-help="inmemory" aria-label="Aide In-Memory" title="Rubrique d'aide">?</button>
         </div>
       </div>
@@ -324,12 +324,12 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         </div>
         <div class="grid-4" id="im-metrics">
           <div class="stat-block stat-block--purple"><div class="stat-block__value" id="im-compression">1.0x</div><div class="stat-block__label">Compression</div></div>
-          <div class="stat-block stat-block--cyan"><div class="stat-block__value" id="im-throughput">0.2 Go/s</div><div class="stat-block__label">Debit Scan</div></div>
+          <div class="stat-block stat-block--cyan"><div class="stat-block__value" id="im-throughput">0.2 Go/s</div><div class="stat-block__label">Débit Scan</div></div>
           <div class="stat-block stat-block--red"><div class="stat-block__value" id="im-cpu-before">100%</div><div class="stat-block__label">CPU Row Store</div></div>
           <div class="stat-block stat-block--green"><div class="stat-block__value" id="im-cpu-after">12%</div><div class="stat-block__label">CPU Column Store</div></div>
         </div>
         <div class="slider-group" style="max-width:400px;margin-bottom:var(--sp-4);">
-          <div class="slider-group__header"><span class="slider-group__label">Colonnes selectionnees (sur 200)</span><span class="slider-group__value" id="im-columns-val">5</span></div>
+          <div class="slider-group__header"><span class="slider-group__label">Colonnes sélectionnées (sur 200)</span><span class="slider-group__value" id="im-columns-val">5</span></div>
           <input type="range" id="im-columns-slider" min="2" max="200" step="1" value="5">
         </div>
         <div style="display:flex;gap:var(--sp-3);margin-bottom:var(--sp-4);">
@@ -337,7 +337,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
           <button class="btn btn--outline btn--sm" id="btn-im-expert">Detail Algorithmique</button>
         </div>
         <div class="log-console" id="im-console">
-          <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Simulateur In-Memory pret. IMCU population en attente.</div>
+          <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Simulateur In-Memory prêt. IMCU population en attente.</div>
         </div>
       </div>
     </section>
@@ -345,9 +345,9 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
     <!-- TAB 3: Data Flow -->
     <section class="module-section" id="tab-dataflow">
       <div class="page-header">
-        <h1 class="page-header__title">OCI Data Flow &amp; Spark — Architecture Distribuee</h1>
+        <h1 class="page-header__title">OCI Data Flow &amp; Spark — Architecture Distribuée</h1>
         <div class="page-header__subtitle-row">
-          <p class="page-header__subtitle">Delegation du traitement Big Data (logs connectes, genomique fictive) a un cluster Spark ephemer sur OCI.</p>
+          <p class="page-header__subtitle">Délégation du traitement Big Data (logs connectés, génomique fictive) à un cluster Spark éphémère sur OCI.</p>
           <button class="page-header__help-btn" data-help="dataflow" aria-label="Aide Data Flow" title="Rubrique d'aide">?</button>
         </div>
       </div>
@@ -369,7 +369,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         <div class="grid-4" id="df-metrics">
           <div class="stat-block stat-block--cyan"><div class="stat-block__value" id="df-nodes">4</div><div class="stat-block__label">Nœuds Spark</div></div>
           <div class="stat-block stat-block--green"><div class="stat-block__value" id="df-time">32s</div><div class="stat-block__label">Temps Spark</div></div>
-          <div class="stat-block stat-block--amber"><div class="stat-block__value" id="df-cost">$0.03</div><div class="stat-block__label">Cout estime</div></div>
+          <div class="stat-block stat-block--amber"><div class="stat-block__value" id="df-cost">$0.03</div><div class="stat-block__label">Coût estimé</div></div>
           <div class="stat-block stat-block--purple"><div class="stat-block__value" id="df-shuffle">1.2 Go</div><div class="stat-block__label">Shuffle Volume</div></div>
         </div>
         <div class="slider-group" style="max-width:400px;margin-bottom:var(--sp-4);">
@@ -382,7 +382,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         </div>
         <div id="df-node-bars" style="margin-bottom:var(--sp-4);"></div>
         <div class="df-console" id="df-console">
-          <div class="df-console__entry df-console__entry--info"><span class="df-console__timestamp">[00:00:00]</span>OCI Data Flow ready. Cluster echeancier.</div>
+          <div class="df-console__entry df-console__entry--info"><span class="df-console__timestamp">[00:00:00]</span>OCI Data Flow ready. Cluster échéancier.</div>
         </div>
       </div>
     </section>
@@ -392,17 +392,17 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       <div class="page-header">
         <h1 class="page-header__title">Dashboard Comparatif — Score Global d'Optimisation</h1>
         <div class="page-header__subtitle-row">
-          <p class="page-header__subtitle">Recapitulatif des gains par technologie. Conformite HDS / ISO 27001 / COFRAC.</p>
+          <p class="page-header__subtitle">Récapitulatif des gains par technologie. Conformité HDS / ISO 27001 / COFRAC.</p>
           <button class="page-header__help-btn" data-help="dashboard" aria-label="Aide Dashboard" title="Rubrique d'aide">?</button>
         </div>
       </div>
       <div class="card fade-in">
         <div class="card__header">
-          <div class="card__header-title"><span class="card__title-icon">&#128202;</span> Performance Comparee</div>
+          <div class="card__header-title"><span class="card__title-icon">&#128202;</span> Performance Comparée</div>
           <div><span class="tag tag--cyan" id="dashboard-score-tag">SCORE: 0%</span></div>
         </div>
         <div class="comp-card" id="dash-comp-bars">
-          <div class="comp-legend"><span><span class="comp-legend__dot comp-legend__dot--before"></span>Avant</span><span><span class="comp-legend__dot comp-legend__dot--after"></span>Apres</span></div>
+          <div class="comp-legend"><span><span class="comp-legend__dot comp-legend__dot--before"></span>Avant</span><span><span class="comp-legend__dot comp-legend__dot--after"></span>Après</span></div>
           <div class="comp-bar"><span class="comp-bar__label">Partition.</span><div class="comp-bar__track"><div class="comp-bar__fill comp-bar__fill--before" id="dash-bar-part-before" style="width:100%"></div><div class="comp-bar__fill comp-bar__fill--after" id="dash-bar-part-after" style="width:0%"></div></div><span class="comp-bar__value" id="dash-val-part">--</span></div>
           <div class="comp-bar"><span class="comp-bar__label">In-Memory</span><div class="comp-bar__track"><div class="comp-bar__fill comp-bar__fill--before" id="dash-bar-im-before" style="width:100%"></div><div class="comp-bar__fill comp-bar__fill--after" id="dash-bar-im-after" style="width:0%"></div></div><span class="comp-bar__value" id="dash-val-im">--</span></div>
           <div class="comp-bar"><span class="comp-bar__label">Data Flow</span><div class="comp-bar__track"><div class="comp-bar__fill comp-bar__fill--before" id="dash-bar-df-before" style="width:100%"></div><div class="comp-bar__fill comp-bar__fill--after" id="dash-bar-df-after" style="width:0%"></div></div><span class="comp-bar__value" id="dash-val-df">--</span></div>
@@ -410,10 +410,10 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         <div class="grid-3" id="dash-summary">
           <div class="stat-block stat-block--green"><div class="stat-block__value" id="dash-score">0%</div><div class="stat-block__label">Score global</div></div>
           <div class="stat-block stat-block--blue"><div class="stat-block__value" id="dash-techs">0/3</div><div class="stat-block__label">Technologies actives</div></div>
-          <div class="stat-block stat-block--cyan"><div class="stat-block__value" id="dash-gain">--</div><div class="stat-block__label">Gain total estime</div></div>
+          <div class="stat-block stat-block--cyan"><div class="stat-block__value" id="dash-gain">--</div><div class="stat-block__label">Gain total estimé</div></div>
         </div>
         <div class="alert alert--info" style="margin-top:var(--sp-4);">
-          <strong>Conformite HDS / ISO 27001 / COFRAC :</strong> L'optimisation des performances ne doit jamais compromettre la securite ou la tracabilite. Le partitionnement et l'In-Memory preservent le chiffrement TDE. OCI Data Flow peut etre deploye dans une region OCI France integree a un perimetre d'hebergement conforme aux exigences HDS selon l'architecture et les certifications contractuelles retenues. Toutes les donnees manipulees sont fictives et anonymisees.
+          <strong>Conformité HDS / ISO 27001 / COFRAC :</strong> L'optimisation des performances ne doit jamais compromettre la sécurité ou la traçabilité. Le partitionnement et l'In-Memory préservent le chiffrement TDE. OCI Data Flow peut être déployé dans une région OCI France intégrée à un périmètre d'hébergement conforme aux exigences HDS selon l'architecture et les certifications contractuelles retenues. Toutes les données manipulées sont fictives et anonymisées.
         </div>
       </div>
     </section>
@@ -424,27 +424,27 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
     <!-- Modal Partitionnement -->
     <div class="help-modal" id="help-partitioning" role="dialog" aria-modal="true" aria-labelledby="help-part-title" aria-hidden="true">
       <div class="help-modal__header">
-        <div class="help-modal__title" id="help-part-title">Partitionnement Avance — Algorithme de Pruning</div>
+        <div class="help-modal__title" id="help-part-title">Partitionnement Avancé — Algorithme de Pruning</div>
         <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
       </div>
       <div class="help-modal__body">
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--objective">Principe</div>
-          <p class="help-modal__text">Le <strong>Partition Pruning</strong> est un mecanisme interne du CBO qui elimine les partitions non necessaires a la resolution d'un predicat. Avec un partitionnement Range par mois sur 120 partitions (10 ans), une requete filtrant sur les 6 derniers mois ne scanne que 6 partitions au lieu de 120.</p>
+          <p class="help-modal__text">Le <strong>Partition Pruning</strong> est un mécanisme interne du moteur d'optimisation (CBO) qui élimine les partitions non nécessaires à la résolution d'un prédicat. Avec un partitionnement Range par mois sur 120 partitions (10 ans), une requête filtrant sur les 6 derniers mois ne scanne que 6 partitions au lieu de 120.</p>
         </div>
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--algorithm">Complexite Algorithmique</div>
           <p class="help-modal__text"><code>ScanTime(rows) = rows / (ioBandwidth × pruningFactor)</code></p>
           <p class="help-modal__text">Avec <code>pruningFactor = totalPartitions / scannedPartitions</code>. Sans partitionnement, <code>pruningFactor = 1</code>. Avec pruning sur 1 mois sur 120, <code>pruningFactor = 120</code>.</p>
           <ul class="help-modal__list">
-            <li><strong>Metadonnees de partition</strong> : Oracle consulte les <code>HIGH_VALUE</code>/<code>LOW_VALUE</code> de chaque partition (stockes dans <code>USER_TAB_PARTITIONS</code>) pour elaguer avant tout acces.</li>
-            <li><strong>Partition Exchange Loading (PEL)</strong> : Permet d'echanger une partition avec une table Oracle compatible via une operation essentiellement metadata only. Cette technique est critique pour le chargement massif et l'archivage sans impact significatif sur l'OLTP.</li>
-            <li><strong>Maintenance</strong> : TRUNCATE PARTITION et EXCHANGE PARTITION sont essentiellement des operations metadata only. En revanche, MERGE PARTITION et SPLIT PARTITION peuvent necessiter des mouvements ou reecritures de donnees selon la structure physique et les index locaux/globaux.</li>
+            <li><strong>Métadonnées de partition</strong> : Oracle consulte les <code>HIGH_VALUE</code>/<code>LOW_VALUE</code> de chaque partition (stockés dans <code>USER_TAB_PARTITIONS</code>) pour élaguer avant tout accès.</li>
+            <li><strong>Partition Exchange Loading (PEL)</strong> : Permet d'échanger une partition avec une table Oracle compatible via une opération essentiellement metadata only. Cette technique est critique pour le chargement massif et l'archivage sans impact significatif sur l'OLTP.</li>
+            <li><strong>Maintenance</strong> : TRUNCATE PARTITION et EXCHANGE PARTITION sont essentiellement des opérations metadata only. En revanche, MERGE PARTITION et SPLIT PARTITION peuvent nécessiter des mouvements ou réécritures de données selon la structure physique et les index locaux/globaux.</li>
           </ul>
         </div>
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--hds">Contexte HDS / COFRAC</div>
-          <p class="help-modal__text">La conservation des historiques de prescriptions sur 10+ ans est requise par la reglementation COFRAC. Le partitionnement permet de conserver l'acces aux donnees archivees sans impacter les requetes OLTP courantes. Le PEL permet d'archiver les partitions les plus anciennes sur un stockage a froid (<code>TABLESPACE_ARCHIVE</code>) tout en preservant la capacite de requetage.</p>
+          <p class="help-modal__text">La conservation des historiques de prescriptions sur 10+ ans est requise par la réglementation COFRAC. Le partitionnement permet de conserver l'accès aux données archivées sans impacter les requêtes OLTP courantes. Le PEL permet d'archiver les partitions les plus anciennes sur un stockage à froid (<code>TABLESPACE_ARCHIVE</code>) tout en préservant la capacité de requêtage.</p>
         </div>
       </div>
       <div class="help-modal__footer">
@@ -461,15 +461,15 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       <div class="help-modal__body">
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--objective">Principe</div>
-          <p class="help-modal__text">L'option Oracle Database In-Memory stocke une copie des donnees au format <strong>colonne</strong> (Column Store) dans l'In-Memory Area de la SGA, en plus du format ligne (Row Store) conserve dans le Buffer Cache. Les IMCUs (In-Memory Compression Units) sont des unites de stockage columnaires comprimees, associees a des SMU (<em>Storage Metadata Units</em>) contenant les metadonnees de pruning et de scan.</p>
+          <p class="help-modal__text">L'option Oracle Database In-Memory stocke une copie des données au format <strong>colonne</strong> (Column Store) dans l'In-Memory Area de la SGA, en plus du format ligne (Row Store) conservé dans le Buffer Cache. Les IMCUs (In-Memory Compression Units) sont des unités de stockage columnaires comprimées, associées à des SMU (<em>Storage Metadata Units</em>) contenant les métadonnées de pruning et de scan.</p>
         </div>
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--algorithm">Architecture IMCU</div>
           <ul class="help-modal__list">
-            <li><strong>Transposition Row→Column</strong> : Les colonnes selectionnees sont extraites des lignes et stockees consecutivement en memoire. Une requete SELECT SUM(qty) ne lit que les blocs colonne de <code>qty</code>, pas les 199 autres colonnes.</li>
-            <li><strong>Compression IMCU</strong> : Chaque IMCU est comprime avec un dictionnaire local (FOR ALL COLUMNS ou MEMCOMPRESS). Ratio typique 8x a 15x pour les donnees alphanumeriques.</li>
-            <li><strong>Scan Vectorise SIMD</strong> : Les CPU modernes (AVX2 256-bit) traitent 8 valeurs entieres par instruction (Single Instruction Multiple Data). Oracle vectorise les scans colonne pour atteindre des debits de 10-15 Go/s par socket.</li>
-            <li><strong>Predicate Pushdown et IMCU Pruning</strong> : Les predicats WHERE sont appliques directement lors du scan colonne (ex: <code>WHERE service = 'CARDIO'</code>). Oracle elimine les IMCUs non pertinentes via les metadonnees de min/max stockees dans les SMU, reduisant fortement le volume scanne.</li>
+            <li><strong>Transposition Row→Column</strong> : Les colonnes sélectionnées sont extraites des lignes et stockées consécutivement en mémoire. Une requête SELECT SUM(qty) ne lit que les blocs colonne de <code>qty</code>, pas les 199 autres colonnes.</li>
+            <li><strong>Compression IMCU</strong> : Chaque IMCU est comprimé avec un dictionnaire local (FOR ALL COLUMNS ou MEMCOMPRESS). Ratio typique 8x à 15x pour les données alphanumériques.</li>
+            <li><strong>Scan Vectorisé SIMD</strong> : Les CPU modernes (AVX2 256-bit) traitent 8 valeurs entières par instruction (Single Instruction Multiple Data). Oracle vectorise les scans colonne pour atteindre des débits de 10-15 Go/s par socket.</li>
+            <li><strong>Predicate Pushdown et IMCU Pruning</strong> : Les prédicats WHERE sont appliqués directement lors du scan colonne (ex: <code>WHERE service = 'CARDIO'</code>). Oracle élimine les IMCUs non pertinentes via les métadonnées de min/max stockées dans les SMU, réduisant fortement le volume scanné.</li>
           </ul>
         </div>
         <div class="help-modal__section">
@@ -494,20 +494,20 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       <div class="help-modal__body">
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--objective">Principe</div>
-          <p class="help-modal__text">OCI Data Flow est un service Apache Spark managé et serverless sur Oracle Cloud. Le service provisionne automatiquement un cluster Spark ephemere pour l'execution des jobs, sans administration manuelle d'infrastructure par l'utilisateur. L'architecture est <strong>polyglotte</strong> : Oracle SQL pour le transactionnel et l'analytique structure, Spark pour les traitements massifs et non structurés (logs, genomique, imagerie).</p>
+          <p class="help-modal__text">OCI Data Flow est un service Apache Spark managé et sans serveur sur Oracle Cloud. Le service provisionne automatiquement un cluster Spark éphémère pour l'exécution des jobs, sans administration manuelle d'infrastructure par l'utilisateur. L'architecture est <strong>polyglotte</strong> : Oracle SQL pour le transactionnel et l'analytique structuré, Spark pour les traitements massifs et non structurés (logs, génomique, imagerie).</p>
         </div>
         <div class="help-modal__section">
-          <div class="help-modal__section-title help-modal__section-title--algorithm">Architecture Distribuee</div>
+          <div class="help-modal__section-title help-modal__section-title--algorithm">Architecture Distribuée</div>
           <ul class="help-modal__list">
-            <li><strong>Spark Executor Memory</strong> : Chaque nœud executer alloue une portion de RAM (spark.executor.memory) pour les operations en memoire. Les donnees depassant cette capacite sont <em>spillées</em> sur disque (identique au mécanisme PGA Temp Spill).</li>
-            <li><strong>Shuffle Partitions</strong> : Lors d'un <code>GROUP BY</code> ou <code>JOIN</code>, Spark repartitionne les donnees entre les executors (shuffle). Le parametre <code>spark.sql.shuffle.partitions</code> controle le parallelisme. Defaut : 200 partitions.</li>
-            <li><strong>Predicate Pushdown Oracle</strong> : Le connecteur Oracle Database pour Spark (JDBC / Oracle datasource) permet de pousser les filtres WHERE dans Oracle (via Oracle SQL), reduisant le volume de donnees transferees sur le reseau. Seules les lignes correspondant aux predicats sont lues.</li>
-            <li><strong>Data Locality</strong> : Spark tente de programmer les tasks sur les nœuds où les donnees resident. En OCI, la localite est optimale quand les donnees Oracle sont dans un Autonomous Database sur la meme region (<code>eu-france-1</code>).</li>
+            <li><strong>Spark Executor Memory</strong> : Chaque nœud exécuteur alloue une portion de RAM (spark.executor.memory) pour les opérations en mémoire. Les données dépassant cette capacité sont <em>spillées</em> sur disque (identique au mécanisme PGA Temp Spill).</li>
+            <li><strong>Shuffle Partitions</strong> : Lors d'un <code>GROUP BY</code> ou <code>JOIN</code>, Spark répartitionne les données entre les exécuteurs (shuffle). Le paramètre <code>spark.sql.shuffle.partitions</code> contrôle le parallélisme. Défaut : 200 partitions.</li>
+            <li><strong>Predicate Pushdown Oracle</strong> : Le connecteur Oracle Database pour Spark (JDBC / Oracle datasource) permet de pousser les filtres WHERE dans Oracle (via Oracle SQL), réduisant le volume de données transférées sur le réseau. Seules les lignes correspondant aux prédicats sont lues.</li>
+            <li><strong>Data Locality</strong> : Spark tente de programmer les tâches sur les nœuds où les données résident. En OCI, la localité est optimale quand les données Oracle sont dans un Autonomous Database sur la même région (<code>eu-france-1</code>).</li>
           </ul>
         </div>
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--hds">Contexte HDS / Génomique</div>
-          <p class="help-modal__text">Le sequencage genomique produit des fichiers FASTQ de 50-200 Go par patient. Leur analyse (alignement, variant calling) depasse la capacite d'une base Oracle unique sans cout prohibitif. L'architecture polyglotte (Oracle pour le master data patient + Spark pour le calcul distribué) est la seule approche viable certifiable HDS. OCI Data Flow s'execute dans le perimetre OCI France certifié HDS, ISO 27001. Aucune donnee de santé ne quitte la région <code>eu-france-1</code>.</p>
+          <p class="help-modal__text">Le séquençage génomique produit des fichiers FASTQ de 50-200 Go par patient. Leur analyse (alignement, variant calling) dépasse la capacité d'une base Oracle unique sans coût prohibitif. L'architecture polyglotte (Oracle pour le master data patient + Spark pour le calcul distribué) est la seule approche viable certifiable HDS. OCI Data Flow s'exécute dans le périmètre OCI France certifié HDS, ISO 27001. Aucune donnée de santé ne quitte la région <code>eu-france-1</code>.</p>
         </div>
       </div>
       <div class="help-modal__footer">
@@ -518,13 +518,13 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
     <!-- Modal Dashboard -->
     <div class="help-modal" id="help-dashboard" role="dialog" aria-modal="true" aria-labelledby="help-dash-title" aria-hidden="true">
       <div class="help-modal__header">
-        <div class="help-modal__title" id="help-dash-title">Dashboard Comparatif — Metriques &amp; Conformite</div>
+        <div class="help-modal__title" id="help-dash-title">Dashboard Comparatif — Métriques &amp; Conformité</div>
         <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
       </div>
       <div class="help-modal__body">
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--objective">Interpretation</div>
-          <p class="help-modal__text">Le dashboard synthetise les gains des 3 technologies activees independamment. Le score global est calcule par la moyenne des ratios d'amelioration ponderes par l'impact metier estimé.</p>
+          <p class="help-modal__text">Le dashboard synthétise les gains des 3 technologies activées indépendamment. Le score global est calculé par la moyenne des ratios d'amélioration pondérés par l'impact métier estimé.</p>
         </div>
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--indicators">Formule du Score</div>
@@ -534,9 +534,9 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--hds">Conformite HDS / ISO 27001 / COFRAC</div>
           <ul class="help-modal__list">
-            <li><strong>Partitionnement</strong> : Preservation du chiffrement TDE par tablespace. Archivage COFRAC via PEL.</li>
-            <li><strong>In-Memory</strong> : Aucune sortie du perimetre HDS. Les donnees restent dans la SGA, chiffrees si TDE actif.</li>
-            <li><strong>Data Flow</strong> : Perimetre OCI France certifié HDS. Donnees genomiques fictives. Aucun transfert hors UE.</li>
+            <li><strong>Partitionnement</strong> : Préservation du chiffrement TDE par tablespace. Archivage COFRAC via PEL.</li>
+            <li><strong>In-Memory</strong> : Aucune sortie du périmètre HDS. Les données restent dans la SGA, chiffrées si TDE actif.</li>
+            <li><strong>Data Flow</strong> : Périmètre OCI France certifié HDS. Données génomiques fictives. Aucun transfert hors UE.</li>
           </ul>
         </div>
       </div>
@@ -555,92 +555,92 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--lexique">Architecture Oracle Fondamentale</div>
           <ul class="help-modal__list">
-            <li><strong>Conteneur de Base de Donnees (CDB)</strong> — Base de donnees racine chapeautant l'ensemble des bases de donnees placables dans l'architecture multitenant Oracle 12c et suivantes.</li>
-            <li><strong>Base de Donnees Placable (PDB)</strong> — Base de donnees portable et isolee au sein d'un conteneur, apparaissant aux utilisateurs et aux applications comme une base de donnees classique.</li>
-            <li><strong>Dictionnaire Partage</strong> — Ensemble de metadonnees de definition (structures de schemas, objets, privileges) mutualisees entre toutes les bases placables d'un meme conteneur.</li>
-            <li><strong>Cache de Lignes du Dictionnaire</strong> — Structure memoire logeant dans la memoire partagee les lignes du dictionnaire, protegee par un verrou d'exclusion mutuelle (latch).</li>
-            <li><strong>Masquage de Donnees</strong> — Technique d'obfuscation des donnees sensibles (numero d'inscription au repertoire, identite des patients) lors du clonage d'une base, conforme au Reglement General sur la Protection des Donnees.</li>
+            <li><strong>Conteneur de Base de Données (CDB)</strong> — Base de données racine chapeautant l'ensemble des bases de données enfichables dans l'architecture multitenant Oracle 12c et suivantes.</li>
+            <li><strong>Base de Données Enfichable (PDB)</strong> — Base de données portable et isolée au sein d'un conteneur, apparaissant aux utilisateurs et aux applications comme une base de données classique.</li>
+            <li><strong>Dictionnaire Partage</strong> — Ensemble de métadonnées de définition (structures de schémas, objets, privilèges) mutualisées entre toutes les bases enfichables d'un même conteneur.</li>
+            <li><strong>Cache de Lignes du Dictionnaire</strong> — Structure mémoire stockant dans la mémoire partagée les lignes du dictionnaire, protégée par un verrou d'exclusion mutuelle (latch).</li>
+            <li><strong>Masquage de Données</strong> — Technique d'obfuscation des données sensibles (numéro d'inscription au répertoire, identité des patients) lors du clonage d'une base, conforme au Règlement Général sur la Protection des Données.</li>
           </ul>
         </div>
         <div class="help-modal__section">
-          <div class="help-modal__section-title help-modal__section-title--lexique">Memoire Globale (SGA / PGA)</div>
+          <div class="help-modal__section-title help-modal__section-title--lexique">Mémoire Globale (SGA / PGA)</div>
           <ul class="help-modal__list">
-            <li><strong>Memoire Globale de Systeme (SGA)</strong> — Zone memoire partagee par l'ensemble des processus Oracle, abritant le cache de tampons, le reservoir partage, le tampon de journalisation et les structures connexes.</li>
-            <li><strong>Cache de Tampons</strong> — Portion de la memoire globale contenant les blocs de donnees lus depuis les fichiers disques, ordonnancee par l'algorithme du moindre recent usage.</li>
-            <li><strong>Memoire Globale de Programme (PGA)</strong> — Zone memoire privee allouee a chaque session d'utilisation pour les operations de tri, de regroupement et de jointure.</li>
-            <li><strong>Debordement Temporaire</strong> — Basculement des operations memoire vers les espaces temporaires sur disque lorsque la memoire globale de programme est insuffisante, entrainant une degradation sensible des temps d'execution.</li>
-            <li><strong>Compteur d'Acces (Touch Count)</strong> — Indicateur du nombre de consultations d'un bloc dans le cache de tampons, determinant son placement dans la chaine du moindre recent usage.</li>
-            <li><strong>Verrou d'Exclusion Mutuelle (Latch)</strong> — Mecanisme de verrouillage leger protegeant l'acces concurrent aux structures partagees de la memoire globale.</li>
+            <li><strong>Mémoire Globale de Système (SGA)</strong> — Zone mémoire partagée par l'ensemble des processus Oracle, abritant le cache de tampons, le réservoir partagé, le tampon de journalisation et les structures connexes.</li>
+            <li><strong>Cache de Tampons</strong> — Portion de la mémoire globale contenant les blocs de données lus depuis les fichiers disques, ordonnancée par l'algorithme du moindre récent usage.</li>
+            <li><strong>Mémoire Globale de Programme (PGA)</strong> — Zone mémoire privée allouée à chaque session d'utilisation pour les opérations de tri, de regroupement et de jointure.</li>
+            <li><strong>Débordement Temporaire</strong> — Basculement des opérations mémoire vers les espaces temporaires sur disque lorsque la mémoire globale de programme est insuffisante, entraînant une dégradation sensible des temps d'exécution.</li>
+            <li><strong>Compteur d'Accès (Touch Count)</strong> — Indicateur du nombre de consultations d'un bloc dans le cache de tampons, déterminant son placement dans la chaîne du moindre récent usage.</li>
+            <li><strong>Verrou d'Exclusion Mutuelle (Latch)</strong> — Mécanisme de verrouillage léger protégeant l'accès concurrent aux structures partagées de la mémoire globale.</li>
           </ul>
         </div>
         <div class="help-modal__section">
-          <div class="help-modal__section-title help-modal__section-title--lexique">Transactions et Coherence</div>
+          <div class="help-modal__section-title help-modal__section-title--lexique">Transactions et Cohérence</div>
           <ul class="help-modal__list">
-            <li><strong>Numero de Changement Systeme (SCN)</strong> — Compteur sequentiel global horodatant chaque transaction et garantissant l'ordre causal des modifications dans l'ensemble de la base.</li>
-            <li><strong>Journal de Retablissement (Redo)</strong> — Enregistrement sequentiel de toutes les modifications appliquees a la base, utilise pour la reprise apres incident par application differee.</li>
-            <li><strong>Segment d'Annulation (Undo)</strong> — Blocs conservant l'image anterieure des donnees modifiees, necessaires a la lecture coherente et au retour en arriere des transactions.</li>
-            <li><strong>Reprise apres Incident (Instance Recovery)</strong> — Processus automatique de retablissement de la base apres un arret brutal, combinant l'application du journal de retablissement (avance rapide) et l'application des segments d'annulation (retour arriere).</li>
-            <li><strong>Coherence de Lecture</strong> — Mecanisme garantissant qu'une requete percoit un instantane coherent des donnees a un instant de reference, en utilisant les blocs d'annulation.</li>
-            <li><strong>Erreur d'Instantané Trop Ancien (ORA-01555)</strong> — Erreur survenant lorsque les blocs d'annulation necessaires a la lecture coherente d'une longue requete ont ete ecrases par des transactions plus recentes avant la fin de la consultation.</li>
+            <li><strong>Numéro de Changement Système (SCN)</strong> — Compteur séquentiel global horodatant chaque transaction et garantissant l'ordre causal des modifications dans l'ensemble de la base.</li>
+            <li><strong>Journal de Rétablissement (Redo)</strong> — Enregistrement séquentiel de toutes les modifications appliquées à la base, utilisé pour la reprise après incident par application différée.</li>
+            <li><strong>Segment d'Annulation (Undo)</strong> — Blocs conservant l'image antérieure des données modifiées, nécessaires à la lecture cohérente et au retour en arrière des transactions.</li>
+            <li><strong>Reprise après Incident (Instance Recovery)</strong> — Processus automatique de rétablissement de la base après un arrêt brutal, combinant l'application du journal de rétablissement (avance rapide) et l'application des segments d'annulation (retour arrière).</li>
+            <li><strong>Cohérence de Lecture</strong> — Mécanisme garantissant qu'une requête perçoit un instantané cohérent des données à un instant de référence, en utilisant les blocs d'annulation.</li>
+            <li><strong>Erreur d'Instantané Trop Ancien (ORA-01555)</strong> — Erreur survenant lorsque les blocs d'annulation nécessaires à la lecture cohérente d'une longue requête ont été écrasés par des transactions plus récentes avant la fin de la consultation.</li>
           </ul>
         </div>
         <div class="help-modal__section">
-          <div class="help-modal__section-title help-modal__section-title--lexique">Optimiseur et Plans d'Execution</div>
+          <div class="help-modal__section-title help-modal__section-title--lexique">Optimiseur et Plans d'Exécution</div>
           <ul class="help-modal__list">
-            <li><strong>Optimiseur Base sur les Couts (CBO)</strong> — Moteur d'optimisation d'Oracle analysant les statistiques des objets et les couts d'acces pour determiner le plan d'execution le plus efficace pour chaque requete.</li>
-            <li><strong>Plan d'Execution</strong> — Arbre d'operations (acces tables, jointures, tris) genere par l'optimiseur pour executer une requete SQL, visible via la commande <code>EXPLAIN PLAN</code>.</li>
-            <li><strong>Parcours Integral de Table (Full Table Scan)</strong> — Methode d'acces lisant l'integralite des blocs d'une table, utilisee en l'absence d'index adapte ou lorsque la table est de petite taille.</li>
-            <li><strong>Parcours Unique par Index (Index Unique Scan)</strong> — Methode d'acces retournant au plus une ligne via un index unique, typique des recherches par cle primaire.</li>
-            <li><strong>Jointure par Hash (HASH JOIN) / Boucles Imbriquees (NESTED LOOPS)</strong> — Algorithmes de jointure : le premier convient aux grands volumes sans index, le second aux petites tables indexees.</li>
+            <li><strong>Optimiseur Basé sur les Coûts (CBO)</strong> — Moteur d'optimisation d'Oracle analysant les statistiques des objets et les coûts d'accès pour déterminer le plan d'exécution le plus efficace pour chaque requête.</li>
+            <li><strong>Plan d'Exécution</strong> — Arbre d'opérations (accès tables, jointures, tris) généré par l'optimiseur pour exécuter une requête SQL, visible via la commande <code>EXPLAIN PLAN</code>.</li>
+            <li><strong>Parcours Intégral de Table (Full Table Scan)</strong> — Méthode d'accès lisant l'intégralité des blocs d'une table, utilisée en l'absence d'index adapté ou lorsque la table est de petite taille.</li>
+            <li><strong>Parcours Unique par Index (Index Unique Scan)</strong> — Méthode d'accès retournant au plus une ligne via un index unique, typique des recherches par clé primaire.</li>
+            <li><strong>Jointure par Hash (HASH JOIN) / Boucles Imbriquées (NESTED LOOPS)</strong> — Algorithmes de jointure : le premier convient aux grands volumes sans index, le second aux petites tables indexées.</li>
           </ul>
         </div>
         <div class="help-modal__section">
           <div class="help-modal__section-title help-modal__section-title--lexique">PL/SQL et Programmation</div>
           <ul class="help-modal__list">
-            <li><strong>Chargement Massif en Collection (BULK COLLECT)</strong> — Directive PL/SQL chargeant un ensemble de lignes en une seule operation dans une collection memoire (PGA), reduisant les allees-retours entre les moteurs SQL et PL/SQL.</li>
-            <li><strong>Mise a Jour Massive (FORALL)</strong> — Instruction PL/SQL executant une operation DML sur toutes les lignes d'une collection sans commutation de contexte individuelle, accelerant les traitements par lots.</li>
-            <li><strong>Commutation de Contexte (Context Switch)</strong> — Basculement entre le moteur SQL et le moteur PL/SQL, dont le cout cumule peut etre significatif dans les boucles iteratives.</li>
-            <li><strong>Declencheur (Trigger)</strong> — Bloc PL/SQL stocke s'executant automatiquement sur un evenement de modification (INSERT, UPDATE, DELETE) d'une table, utilise pour les regles metier et les contraintes complexes.</li>
-            <li><strong>Collection PL/SQL</strong> — Structure de donnees programmee (table imbriquee, VARRAY, table associative) permettant de manipuler des ensembles de lignes en memoire.</li>
+            <li><strong>Chargement Massif en Collection (BULK COLLECT)</strong> — Directive PL/SQL chargeant un ensemble de lignes en une seule opération dans une collection mémoire (PGA), réduisant les allers-retours entre les moteurs SQL et PL/SQL.</li>
+            <li><strong>Mise à Jour Massive (FORALL)</strong> — Instruction PL/SQL exécutant une opération DML sur toutes les lignes d'une collection sans commutation de contexte individuelle, accélérant les traitements par lots.</li>
+            <li><strong>Commutation de Contexte (Context Switch)</strong> — Basculement entre le moteur SQL et le moteur PL/SQL, dont le coût cumulé peut être significatif dans les boucles itératives.</li>
+            <li><strong>Déclencheur (Trigger)</strong> — Bloc PL/SQL stocké s'exécutant automatiquement sur un événement de modification (INSERT, UPDATE, DELETE) d'une table, utilisé pour les règles métier et les contraintes complexes.</li>
+            <li><strong>Collection PL/SQL</strong> — Structure de données programmée (table imbriquée, VARRAY, table associative) permettant de manipuler des ensembles de lignes en mémoire.</li>
           </ul>
         </div>
         <div class="help-modal__section">
-          <div class="help-modal__section-title help-modal__section-title--lexique">Securite et Gouvernance HDS</div>
+          <div class="help-modal__section-title help-modal__section-title--lexique">Sécurité et Gouvernance HDS</div>
           <ul class="help-modal__list">
-            <li><strong>Chiffrement Transparent (TDE)</strong> — Mecanisme de chiffrement des donnees au repos au sein des fichiers et des espaces de tables, sans aucune modification des applications clientes, utilisant l'algorithme AES a clef de 256 bits.</li>
-            <li><strong>Moindre Privilege (Least Privilege)</strong> — Principe de securite selon lequel un utilisateur ne dispose que des droits strictement necessaires a ses fonctions, reduisant la surface d'attaque et les risques d'erreur.</li>
-            <li><strong>Masquage Dynamique (DBMS_REDACT)</strong> — Paquetage Oracle permettant le masquage a la volee des donnees sensibles dans les resultats de requetes, sans alterer les donnees stockees.</li>
-            <li><strong>Journal d'Activite (Audit HDS)</strong> — Enregistrement chiffre et horodate de l'ensemble des actions effectuees sur le systeme, garantissant la tracabilite requise par la certification Hebergement de Donnees de Sante.</li>
+            <li><strong>Chiffrement Transparent (TDE)</strong> — Mécanisme de chiffrement des données au repos au sein des fichiers et des espaces de tables, sans aucune modification des applications clientes, utilisant l'algorithme AES à clé de 256 bits.</li>
+            <li><strong>Moindre Privilège (Least Privilege)</strong> — Principe de sécurité selon lequel un utilisateur ne dispose que des droits strictement nécessaires à ses fonctions, réduisant la surface d'attaque et les risques d'erreur.</li>
+            <li><strong>Masquage Dynamique (DBMS_REDACT)</strong> — Paquetage Oracle permettant le masquage à la volée des données sensibles dans les résultats de requêtes, sans altérer les données stockées.</li>
+            <li><strong>Journal d'Activité (Audit HDS)</strong> — Enregistrement chiffré et horodaté de l'ensemble des actions effectuées sur le système, garantissant la traçabilité requise par la certification Hébergement de Données de Santé.</li>
           </ul>
         </div>
         <div class="help-modal__section">
-          <div class="help-modal__section-title help-modal__section-title--lexique">Partitionnement Avance</div>
+          <div class="help-modal__section-title help-modal__section-title--lexique">Partitionnement Avancé</div>
           <ul class="help-modal__list">
-            <li><strong>Elagage de Partitions (Partition Pruning)</strong> — Mecanisme interne de l'optimiseur (CBO) qui elimine du plan d'execution les partitions ne repondant pas aux predicats d'une clause de filtrage, reduisant proportionnellement le volume d'entrees-sorties et le temps de reponse.</li>
-            <li><strong>Echange par Chargement de Partition (PEL)</strong> — Operation metadier de chargement consistant a echanger une partition existante avec une table externe par simple mise a jour du dictionnaire de donnees, evitent la reconstruction des index et la journalisation ligne a ligne.</li>
-            <li><strong>Partitionnement par Intervalles (Interval Partitioning)</strong> — Extension du partitionnement par plage (Range) dans laquelle Oracle cree automatiquement de nouvelles partitions lors de l'insertion de donnees depassant la limite haute, sans intervention manuelle de l'administrateur.</li>
-            <li><strong>Facteur d'Elagage (Pruning Factor)</strong> — Rapport entre le nombre total de partitions et le nombre de partitions effectivement parcourues apres application des predicats, mesurant l'efficacite de la reduction du volume d'entrees-sorties par l'elagage.</li>
-            <li><strong>Hierarchisation du Stockage (Storage Tiering)</strong> — Strategie de placement des partitions sur des supports physiques de performances differentes (NVMe, SSD, HDD, stockage froid) selon leur age et leur frequence d'acces, combinee a l'archivage des partitions anciennes.</li>
+            <li><strong>Élagage de Partitions (Partition Pruning)</strong> — Mécanisme interne de l'optimiseur (CBO) qui élimine du plan d'exécution les partitions ne répondant pas aux prédicats d'une clause de filtrage, réduisant proportionnellement le volume d'entrées-sorties et le temps de réponse.</li>
+            <li><strong>Échange par Chargement de Partition (PEL)</strong> — Opération métier de chargement consistant à échanger une partition existante avec une table externe par simple mise à jour du dictionnaire de données, évitant la reconstruction des index et la journalisation ligne à ligne.</li>
+            <li><strong>Partitionnement par Intervalles (Interval Partitioning)</strong> — Extension du partitionnement par plage (Range) dans laquelle Oracle crée automatiquement de nouvelles partitions lors de l'insertion de données dépassant la limite haute, sans intervention manuelle de l'administrateur.</li>
+            <li><strong>Facteur d'Élagage (Pruning Factor)</strong> — Rapport entre le nombre total de partitions et le nombre de partitions effectivement parcourues après application des prédicats, mesurant l'efficacité de la réduction du volume d'entrées-sorties par l'élagage.</li>
+            <li><strong>Hiérarchisation du Stockage (Storage Tiering)</strong> — Stratégie de placement des partitions sur des supports physiques de performances différentes (NVMe, SSD, HDD, stockage à froid) selon leur âge et leur fréquence d'accès, combinée à l'archivage des partitions anciennes.</li>
           </ul>
         </div>
         <div class="help-modal__section">
-          <div class="help-modal__section-title help-modal__section-title--lexique">Stockage Colonnaire et Acceleration Vectorielle</div>
+          <div class="help-modal__section-title help-modal__section-title--lexique">Stockage Colonnaire et Accélération Vectorielle</div>
           <ul class="help-modal__list">
-            <li><strong>Unite de Compression Colonnaire en Memoire (IMCU)</strong> — Unite de stockage interne a la zone In-Memory de la SGA contenant les donnees d'un segment au format colonne, compressees et organisees en blocs de taille fixe pour un acces vectoriel optimise.</li>
-            <li><strong>Unite de Metadonnees de Stockage (SMU)</strong> — Structure de gestion associee a chaque IMCU, contenant les metadonnees d'elagage, les dictionnaires de codage par colonne et les informations necessaires aux acces concurrents et a la coherence transactionnelle.</li>
-            <li><strong>Entrepot au Format Colonnaire (Column Store)</strong> — Mode d'organisation des donnees par colonnes plutot que par lignes, permettant de ne lire que les colonnes referencees par la requete, ce qui reduit le volume d'entrees-sorties et maximise l'efficacite de la compression.</li>
-            <li><strong>Parallelisme Vectoriel (SIMD)</strong> — Technique de parallelisme au niveau du processeur appliquant une meme operation arithmetique ou logique a plusieurs valeurs simultanement via des registres vectoriels larges (256 bits avec AVX2, 512 bits avec AVX-512).</li>
-            <li><strong>Facteur d'Acceleration Vectorielle</strong> — Rapport de performance estime entre l'execution scalaire classique et l'execution vectorielle SIMD, fonction de la largeur des registres du processeur et de la bande passante memoire disponible.</li>
+            <li><strong>Unité de Compression Colonnaire en Mémoire (IMCU)</strong> — Unité de stockage interne à la zone In-Memory de la SGA contenant les données d'un segment au format colonne, compressées et organisées en blocs de taille fixe pour un accès vectoriel optimisé.</li>
+            <li><strong>Unité de Métadonnées de Stockage (SMU)</strong> — Structure de gestion associée à chaque IMCU, contenant les métadonnées d'élagage, les dictionnaires de codage par colonne et les informations nécessaires aux accès concurrents et à la cohérence transactionnelle.</li>
+            <li><strong>Entrepôt au Format Colonnaire (Column Store)</strong> — Mode d'organisation des données par colonnes plutôt que par lignes, permettant de ne lire que les colonnes référencées par la requête, ce qui réduit le volume d'entrées-sorties et maximise l'efficacité de la compression.</li>
+            <li><strong>Parallélisme Vectoriel (SIMD)</strong> — Technique de parallélisme au niveau du processeur appliquant une même opération arithmétique ou logique à plusieurs valeurs simultanément via des registres vectoriels larges (256 bits avec AVX2, 512 bits avec AVX-512).</li>
+            <li><strong>Facteur d'Accélération Vectorielle</strong> — Rapport de performance estimé entre l'exécution scalaire classique et l'exécution vectorielle SIMD, fonction de la largeur des registres du processeur et de la bande passante mémoire disponible.</li>
           </ul>
         </div>
         <div class="help-modal__section">
-          <div class="help-modal__section-title help-modal__section-title--lexique">Traitement Distribue et Architecture Polyglotte</div>
+          <div class="help-modal__section-title help-modal__section-title--lexique">Traitement Distribué et Architecture Polyglotte</div>
           <ul class="help-modal__list">
-            <li><strong>Apache Spark</strong> — Moteur de traitement unifie pour l'analyse de donnees volumineuses, fonde sur le calcul distribue en memoire (RDD / DataFrame) et l'execution parallelisee sur un ensemble de noeuds de travail ephemeres.</li>
-            <li><strong>Architecture Polyglotte</strong> — Approche combinant plusieurs systemes de gestion de donnees aux modeles differents au sein d'une meme infrastructure, ou Oracle Database assume le transactionnel structure et Spark les traitements massifs non structures (logs, genomique, imagerie).</li>
-            <li><strong>Calcul Sans Serveur (Serverless)</strong> — Modele d'execution ou le fournisseur de cloud provisionne et dimensionne automatiquement l'infrastructure de calcul, liberant l'utilisateur de la gestion des serveurs et de la planification de capacite.</li>
-            <li><strong>Processeur d'Execution Distribue (Executor)</strong> — Processus de travail lance sur un noeud d'un cluster Spark, responsable de l'execution des tâches sur une partition des donnees, dote d'une memoire allouee et d'un nombre defini de coeurs de calcul.</li>
-            <li><strong>Desequilibre des Donnees (Data Skew)</strong> — Distribution inegale des donnees entre les partitions d'un systeme distribue, provoquant la sous-utilisation de certains noeuds et la saturation d'autres par effet de goulet d'etranglement.</li>
+            <li><strong>Apache Spark</strong> — Moteur de traitement unifié pour l'analyse de données volumineuses, fondé sur le calcul distribué en mémoire (RDD / DataFrame) et l'exécution parallélisée sur un ensemble de nœuds de travail éphémères.</li>
+            <li><strong>Architecture Polyglotte</strong> — Approche combinant plusieurs systèmes de gestion de données aux modèles différents au sein d'une même infrastructure, où Oracle Database assume le transactionnel structuré et Spark les traitements massifs non structurés (logs, génomique, imagerie).</li>
+            <li><strong>Calcul Sans Serveur (Serverless)</strong> — Modèle d'exécution où le fournisseur de cloud provisionne et dimensionne automatiquement l'infrastructure de calcul, libérant l'utilisateur de la gestion des serveurs et de la planification de capacité.</li>
+            <li><strong>Processeur d'Exécution Distribué (Executor)</strong> — Processus de travail lancé sur un nœud d'un cluster Spark, responsable de l'exécution des tâches sur une partition des données, doté d'une mémoire allouée et d'un nombre défini de cœurs de calcul.</li>
+            <li><strong>Déséquilibre des Données (Data Skew)</strong> — Distribution inégale des données entre les partitions d'un système distribué, provoquant la sous-utilisation de certains nœuds et la saturation d'autres par effet de goulet d'étranglement.</li>
           </ul>
         </div>
       </div>
@@ -650,14 +650,14 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
     </div>
     <div class="help-modal" id="help-credit" role="dialog" aria-modal="true" aria-labelledby="help-credit-title" aria-hidden="true">
       <div class="help-modal__header">
-        <div class="help-modal__title" id="help-credit-title">Credit</div>
+        <div class="help-modal__title" id="help-credit-title">Crédit</div>
         <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
       </div>
       <div class="help-modal__body">
         <div class="help-modal__section">
           <p class="help-modal__text">
-            <center>Conception fonctionnelle, scenarios, developpement et relecture : Stephane Bertin<br>
-            Assiste par OpenCode, agent Big Pickle<br>
+            <center>Conception fonctionnelle, scénarios, développement et relecture : Stéphane Bertin<br>
+            Assisté par OpenCode, agent Big Pickle<br>
             2025.</center>
           </p>
         </div>
@@ -667,9 +667,9 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       </div>
     </div>
     <footer class="app-footer">
-      ORACLE_ADVANCED::SUITE - Application de demonstration technique<br>
-      DONNEES: 100% FICTIVES - Conforme RGPD Art. 25 (Privacy by Design) - HDS / ISO 27001 / COFRAC<br>
-      Architecture: ES6 Classes - Vanilla JS - Zero Dependency - Offline
+      ORACLE_ADVANCED::SUITE - Application de démonstration technique<br>
+      DONNÉES: 100% FICTIVES - Conforme RGPD Art. 25 (Privacy by Design) - HDS / ISO 27001 / COFRAC<br>
+      Architecture: ES6 Classes - Vanilla JS - Zéro Dépendance - Hors ligne
     </footer>
   </main>
 </div>
@@ -926,7 +926,7 @@ class PartitioningModule {
     document.getElementById('part-time-after').textContent = m.timeAfter + 's';
     const log = document.getElementById('part-console');
     const ts = new Date().toISOString().slice(11, 19);
-    log.innerHTML += '<div class="log-console__entry log-console__entry--' + (this._enabled ? 'success' : 'warn') + '"><span class="log-console__timestamp">[' + ts + ']</span>' + (this._enabled ? 'PARTITION PRUNING ACTIF - Pruning factor: ' + m.pruningFactor + 'x - I/O reduit de ' + m.ioReduction + '%' : 'Partitionnement desactive - Full Table Scan sur ' + this._formatRows(m.rowsBefore) + ' lignes') + '</div>';
+    log.innerHTML += '<div class="log-console__entry log-console__entry--' + (this._enabled ? 'success' : 'warn') + '"><span class="log-console__timestamp">[' + ts + ']</span>' + (this._enabled ? 'PARTITION PRUNING ACTIF - Pruning factor: ' + m.pruningFactor + 'x - I/O réduit de ' + m.ioReduction + '%' : 'Partitionnement desactive - Full Table Scan sur ' + this._formatRows(m.rowsBefore) + ' lignes') + '</div>';
     log.scrollTop = log.scrollHeight;
     this._engine._ev.emit('dashboard', {});
   }
@@ -1055,10 +1055,10 @@ class DataFlowModule {
         const fill = document.getElementById('df-node-fill-' + i);
         if (fill) fill.style.width = Math.min(100, pct + Math.floor(Math.random() * 10 - 5)) + '%';
       }
-      if (step === 3) addDF('info', 'Shuffle: ' + Math.round(Math.random() * 500 + 500) + ' MB echanges entre executors');
-      if (step === 7) addDF('info', 'Stage 1: Reduce - Aggregation des resultats');
+      if (step === 3) addDF('info', 'Shuffle: ' + Math.round(Math.random() * 500 + 500) + ' MB échangés entre executors');
+      if (step === 7) addDF('info', 'Stage 1: Réduce - Agrégation des résultats');
       if (step === 12) addDF('warn', 'GC pause: 120ms sur Executor 2');
-      if (step === 15) addDF('info', 'Stage 2: Write - Resultats vers Object Storage OCI');
+      if (step === 15) addDF('info', 'Stage 2: Write - Résultats vers Object Storage OCI');
       if (step >= totalSteps) {
         clearInterval(iv);
         for (let i = 0; i < n; i++) {
@@ -1066,7 +1066,7 @@ class DataFlowModule {
           if (fill) fill.style.width = '100%';
         }
         addDF('success', 'Job termine - ' + n + ' executors - Duree: ' + this._engine.computeDataFlowMetrics().timeAfter + 's');
-        addDF('info', 'Cout estime: $' + this._engine.computeDataFlowMetrics().cost.toFixed(4));
+        addDF('info', 'Coût estimé: $' + this._engine.computeDataFlowMetrics().cost.toFixed(4));
         this._updateUI();
       }
     }, 200);
