@@ -744,7 +744,7 @@ const SCENARIOS = [
     hints: [
       { pattern: '\\bROW_NUMBER\\(\\)\\b', msg: 'ROW_NUMBER attribue des rangs consécutifs sans ex-aequo (1, 2, 3). RANK est plus adapté si des égalités sont possibles.', level: 'info' },
       { pattern: '\\bORDER\\s+BY\\s+SUM\\(qty\\)\\s+ASC\\b', msg: 'ASC classe du plus petit au plus grand. Utilisez DESC pour voir les plus prescrits en tête.', level: 'error' },
-      { pattern: '\\bFETCH\\s+FIRST\\b', msg: 'Sans FETCH FIRST ou ROWNUM, vous obtenez toutes les lignes. Limitez à 5 pour le classement demandé.', level: 'warning' }
+      { pattern: '^(?![\\s\\S]*\\bFETCH\\s+FIRST\\b)', msg: 'Sans FETCH FIRST ou ROWNUM, vous obtenez toutes les lignes. Limitez à 5 pour le classement demandé.', level: 'warning' }
     ]
   },
   {
@@ -1065,6 +1065,13 @@ class SQLValidator {
       }
     }
 
+    // Add trigger name from CREATE OR REPLACE TRIGGER
+    const trigRe = /\bCREATE\s+(?:OR\s+REPLACE\s+)?TRIGGER\s+(\w+)\b/i;
+    const trigMatch = trigRe.exec(upper);
+    if (trigMatch) {
+      allColumns.add(trigMatch[1].toUpperCase());
+    }
+
     // Add PL/SQL DECLARE block identifiers (variables, types, cursors)
     if (/^\s*DECLARE\b/m.test(upper)) {
       const declareMatch = upper.match(/\bDECLARE\b([\s\S]*?)\bBEGIN\b/);
@@ -1155,6 +1162,9 @@ class SQLValidator {
         );
         cleaned = cleaned.replace(tableRe, '$1 ' + table + ' @');
       }
+      // Normalize trigger name (non-deterministic)
+      cleaned = cleaned.replace(/\bCREATE\s+(?:OR\s+REPLACE\s+)?TRIGGER\s+\w+/gi,
+        (m) => m.replace(/\w+$/, '@'));
       cleaned = cleaned.replace(/;\s*$/, '').replace(/\s+/g, ' ').trim();
       return cleaned;
     };
