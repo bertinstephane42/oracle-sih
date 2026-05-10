@@ -527,9 +527,8 @@ const SCENARIOS = [
     expected: "SELECT s.nom AS service,\n       COALESCE(SUM(d.qty), 0) AS qte_totale,\n       ROUND(COALESCE(AVG(d.qty), 0), 1) AS qte_moyenne\nFROM   service s\nLEFT   JOIN dispensation d ON d.service_id = s.service_id\n       AND d.date_disp >= SYSDATE - 30\nGROUP  BY s.service_id, s.nom\nORDER  BY qte_totale DESC;",
     explanation: 'La fonction d\'agrégation SUM additionne les quantités pour chaque groupe défini par GROUP BY. COALESCE remplace les valeurs NULL par zéro pour les services sans consommation. La jointure externe garantit que tous les services apparaissent, même ceux sans activité. AVG calcule la moyenne arithmétique des quantités dispensées.',
     hints: [
-      { pattern: '\\bSUM\\(|\\bAVG\\(', msg: 'Les fonctions d\'agrégation (SUM, AVG) nécessitent une clause GROUP BY sur les colonnes non agrégées du SELECT.', level: 'info' },
       { pattern: '\\bHAVING\\b', msg: 'HAVING filtre après agrégation. Souvenez-vous : WHERE avant GROUP BY, HAVING après.', level: 'info' },
-      { pattern: '\\bGROUP\\s+BY\\b(?!.*LEFT|.*JOIN)', msg: 'ORA-00937 : Colonne non agrégée dans SELECT sans GROUP BY. Ajoutez GROUP BY sur les colonnes de service.', level: 'error' }
+      { pattern: '^(?![\\s\\S]*\\bLEFT\\s+JOIN\\b)[\\s\\S]*\\bGROUP\\s+BY\\b', msg: 'ORA-00937 : Colonne non agrégée dans SELECT sans GROUP BY. Ajoutez GROUP BY sur les colonnes de service.', level: 'error' }
     ]
   },
   {
@@ -837,7 +836,7 @@ class SQLValidator {
       { test: /\bSELECT\b/.test(upper) && /\bWHERE\b/.test(upper) && !/=\s*['"]?/.test(upper) && !/\bIS\b/.test(upper) && !/\bIN\b/.test(upper), msg: 'ORA-00911 : La clause WHERE semble incomplète. Vérifiez la présence d\'une condition.', level: 'warning' },
       { test: (sql.match(/\(/g) || []).length !== (sql.match(/\)/g) || []).length, msg: 'ORA-00907 : Parenthèses déséquilibrées. Vérifiez l\'ouverture et la fermeture des parenthèses.', level: 'error' },
       { test: !/[;]\s*$/.test(sql.trim()), msg: 'ATTENTION : L\'instruction devrait se terminer par un point-virgule (;). En Oracle, le point-virgule termine une instruction SQL.', level: 'warning' },
-      { test: /\b(SUM|AVG|COUNT|MIN|MAX)\s*\(/.test(upper) && !/\bGROUP\s+BY\b/.test(upper) && /\bSELECT\b/.test(upper), msg: 'ORA-00937 : Fonction d\'agrégation sans GROUP BY. Si vous utilisez SUM, AVG ou COUNT sans GROUP BY, toutes les colonnes non agrégées du SELECT doivent être dans GROUP BY.', level: 'error' },
+      { test: (() => { const aggRe = /\b(SUM|AVG|COUNT|MIN|MAX)\s*\(/i; const m = aggRe.exec(upper); if (!m) return false; const before = upper.slice(0, m.index); if (/\(\s*SELECT\b/i.test(before)) return false; return !/\bGROUP\s+BY\b/.test(upper); })(), msg: 'ORA-00937 : Fonction d\'agrégation sans GROUP BY. Si vous utilisez SUM, AVG ou COUNT sans GROUP BY, toutes les colonnes non agrégées du SELECT doivent être dans GROUP BY.', level: 'error' },
       { test: /\bLEFT\s+JOIN\b/.test(upper) && /\bWHERE\b/.test(upper) && /\bIS\s+NULL\b/.test(upper), msg: 'ATTENTION : Un filtre WHERE ... IS NULL sur une colonne de la table jointe annule l\'effet du LEFT JOIN et le transforme en INNER JOIN.', level: 'warning' },
       { test: /\bDELETE\b/.test(upper) && /\bFROM\b/.test(upper) && !/\bWHERE\b/.test(upper), msg: 'ATTENTION : DELETE sans WHERE supprime TOUTES les lignes de la table. Vérifiez l\'intention.', level: 'warning' },
       { test: /\bUPDATE\b/.test(upper) && !/\bSET\b/.test(upper), msg: 'ORA-00924 : Mot-clé SET manquant dans l\'instruction UPDATE.', level: 'error' },
@@ -859,7 +858,7 @@ class SQLValidator {
     // Schema-aware identifier validation
     if (scenario && scenario.ddl) {
       const schema = this._parseDDL(scenario.ddl);
-      const idCheck = this._checkIdentifiers(upper, schema);
+      const idCheck = this._checkIdentifiers(upper, schema, scenario.expected);
       if (idCheck) return idCheck;
     }
     // Scenario-specific hints
@@ -871,13 +870,19 @@ class SQLValidator {
         }
       }
     }
+    // Functional equivalence check (dernière couche)
+    if (scenario && scenario.expected) {
+      const eqCheck = this._checkFunctionalEquivalence(sql, scenario.expected, scenario.ddl);
+      if (eqCheck) return eqCheck;
+    }
     return { valid: true, message: 'Syntaxe vérifiée. Aucune erreur détectée.', level: 'success' };
   }
 
   _checkConceptKeywords(upper, scenario) {
     const entry = this._conceptKeywords[scenario.concept];
     if (!entry) return null;
-    const found = entry.keywords.some(kw => upper.includes(kw));
+    const normal = upper.replace(/\s+/g, ' ');
+    const found = entry.keywords.some(kw => normal.includes(kw));
     if (!found) {
       return { valid: false, message: entry.msg, level: 'error' };
     }
@@ -984,7 +989,7 @@ class SQLValidator {
     return schema;
   }
 
-  _checkIdentifiers(upper, schema) {
+  _checkIdentifiers(upper, schema, expectedSql) {
     if (!schema.tables || Object.keys(schema.tables).length === 0) return null;
 
     const allColumns = new Set();
@@ -992,6 +997,15 @@ class SQLValidator {
     for (const [tbl, cols] of Object.entries(schema.tables)) {
       allTables.add(tbl);
       cols.forEach(c => allColumns.add(c));
+    }
+
+    // Add SELECT-list column aliases from the expected solution
+    if (expectedSql) {
+      const aliasRe = /\bAS\s+(\w+)\b/gi;
+      let am;
+      while ((am = aliasRe.exec(expectedSql)) !== null) {
+        allColumns.add(am[1].toUpperCase());
+      }
     }
 
     // Remove string literals and comments before tokenizing
@@ -1034,6 +1048,48 @@ class SQLValidator {
         message: 'ATTENTION : Identifiant(s) inconnu(s) du schéma : "' + sample + '". Vérifiez l\'orthographe. Colonnes disponibles : ' + [...allColumns].join(', '),
         level: 'warning'
       };
+    }
+    return null;
+  }
+
+  _checkFunctionalEquivalence(userSql, expectedSql, ddl) {
+    const schema = ddl ? this._parseDDL(ddl) : { tables: {} };
+    const schemaCols = new Set();
+    for (const cols of Object.values(schema.tables)) {
+      cols.forEach(c => schemaCols.add(c.toUpperCase()));
+    }
+    const normalize = (sql) => {
+      let cleaned = sql
+        .replace(/'[^']*'/g, '')
+        .replace(/--[^\n]*/g, '')
+        .replace(/\/\*[\s\S]*?\*\//g, '');
+      const aliases = {};
+      const aliasRe = /(?:FROM|JOIN|INTO|USING)\s+(\w+)\s+(?:AS\s+)?(\w+)/gi;
+      let m;
+      while ((m = aliasRe.exec(cleaned)) !== null) {
+        const alias = m[2];
+        if (this._SQL_KEYWORDS.has(alias.toUpperCase())) continue;
+        aliases[alias] = m[1];
+      }
+      cleaned = cleaned.replace(/(\w+)\.(\w+)/g, (match, prefix, column) => {
+        if (schemaCols.has(column.toUpperCase())) {
+          return '@.' + column;
+        }
+        return match;
+      });
+      for (const [alias, table] of Object.entries(aliases)) {
+        const tableRe = new RegExp(
+          '\\b(FROM|JOIN|INTO|USING)\\s+' + table + '\\s+(?:AS\\s+)?' + alias + '\\b', 'gi'
+        );
+        cleaned = cleaned.replace(tableRe, '$1 ' + table + ' @');
+      }
+      cleaned = cleaned.replace(/;\s*$/, '').replace(/\s+/g, ' ').trim();
+      return cleaned;
+    };
+    const userNorm = normalize(userSql);
+    const expectedNorm = normalize(expectedSql);
+    if (userNorm !== expectedNorm) {
+      return { valid: false, message: 'ORA-00000 : La requête ne correspond pas à la solution attendue. Vérifiez les mots-clés (majuscules), les noms de colonnes, les conditions de jointure et l\'ordre des clauses.', level: 'error' };
     }
     return null;
   }
