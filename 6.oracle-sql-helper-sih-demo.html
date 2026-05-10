@@ -1340,6 +1340,9 @@ class SQLExecutor {
         this._setState('completed');
         this._infoEl.textContent = 'Instruction exécutée avec succès.';
         this._log('Instruction exécutée avec succès.', 'success');
+        if (validation.level === 'warning') {
+          this._log('⚠ Résultat potentiellement faussé : l\'analyseur a émis un ou plusieurs avertissements. En environnement Oracle réel, le comportement pourrait différer.', 'warning');
+        }
         if (scenario) {
           const sampleData = this._generateResult(scenario);
           this._displayResult(sampleData);
