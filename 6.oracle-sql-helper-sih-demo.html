@@ -366,7 +366,7 @@ a:hover { text-decoration: underline; }
     <footer class="app-footer">
       ORACLE_SQL_HELPER::SIH<br>
       18 scénarios couvrant SQL, PL/SQL, Performance, Sécurité<br>
-      Zéro dépendance &mdash; Offline &mdash; Conception design &amp; développement : Stéphane Bertin | Assisté par OpenCode
+      Zéro dépendance &mdash; Hors ligne
     </footer>
   </main>
 </div>
@@ -803,6 +803,29 @@ class ScenarioEngine {
 // SQL VALIDATOR
 // ============================================================
 class SQLValidator {
+  constructor() {
+    this._conceptKeywords = {
+      'INNER JOIN':              { keywords: ['JOIN'], msg: 'ORA-00920 : Mot-clé JOIN manquant. Une jointure INNER JOIN est attendue pour relier les tables.' },
+      'LEFT / RIGHT OUTER JOIN': { keywords: ['LEFT JOIN', 'RIGHT JOIN', 'OUTER JOIN'], msg: 'ORA-00920 : Mot-clé LEFT/RIGHT JOIN manquant. Une jointure externe est requise pour conserver les lignes sans correspondance.' },
+      'GROUP BY / Agrégation':   { keywords: ['GROUP BY'], msg: 'ORA-00937 : Clause GROUP BY manquante. Les fonctions d\'agrégation (SUM, AVG) nécessitent un GROUP BY.' },
+      'Sous-requête Corrélée':   { keywords: ['(SELECT'], msg: 'ORA-00920 : Sous-requête corrélée attendue. Placez un SELECT imbriqué entre parenthèses dans la clause WHERE ou SELECT.' },
+      'BULK COLLECT / FORALL':   { keywords: ['BULK COLLECT', 'FORALL'], msg: 'ORA-00920 : BULK COLLECT et/ou FORALL manquants. Utilisez BULK COLLECT pour charger les données et FORALL pour les traiter.' },
+      'Trigger AFTER':           { keywords: ['TRIGGER'], msg: 'ORA-00920 : Mot-clé TRIGGER manquant. Créez un déclencheur avec CREATE OR REPLACE TRIGGER.' },
+      'CREATE VIEW':             { keywords: ['VIEW'], msg: 'ORA-00920 : Mot-clé VIEW manquant. Créez une vue avec CREATE [OR REPLACE] VIEW.' },
+      'Materialized View':       { keywords: ['MATERIALIZED VIEW'], msg: 'ORA-00920 : MATERIALIZED VIEW manquant. Utilisez CREATE MATERIALIZED VIEW pour pré-calculer les données.' },
+      'Unique Index':            { keywords: ['UNIQUE INDEX', 'UNIQUE'], msg: 'ORA-00920 : Mot-clé UNIQUE ou INDEX manquant. Créez un INDEX UNIQUE pour garantir l\'unicité des lots.' },
+      'Partition Range':         { keywords: ['PARTITION BY RANGE'], msg: 'ORA-00920 : Clause PARTITION BY RANGE manquante. Partitionnez la table par intervalle de dates.' },
+      'Sequence / NEXTVAL':      { keywords: ['SEQUENCE', 'NEXTVAL'], msg: 'ORA-00920 : CREATE SEQUENCE ou NEXTVAL manquant. Générez les identifiants avec une séquence.' },
+      'Exception / ZERO_DIVIDE': { keywords: ['EXCEPTION', 'ZERO_DIVIDE'], msg: 'ORA-00920 : Bloc EXCEPTION ou exception ZERO_DIVIDE manquant. Capturez la division par zéro dans un gestionnaire d\'exception.' },
+      'Curseur Explicite':       { keywords: ['CURSOR'], msg: 'ORA-00920 : Curseur explicite manquant. Déclarez un curseur avec CURSOR ... IS pour parcourir les réservations.' },
+      'MERGE':                   { keywords: ['MERGE'], msg: 'ORA-00920 : Instruction MERGE manquante. Utilisez MERGE pour synchroniser les stocks (upsert).' },
+      'ROW_NUMBER / RANK':       { keywords: ['RANK(', 'DENSE_RANK(', 'ROW_NUMBER('], msg: 'ORA-00920 : Fonction analytique de classement manquante. Utilisez RANK(), DENSE_RANK() ou ROW_NUMBER().' },
+      'WITH / CTE':              { keywords: ['WITH'], msg: 'ORA-00920 : Mot-clé WITH manquant. Utilisez une CTE (WITH ... AS) pour la requête hiérarchique.' },
+      'SELECT FOR UPDATE / NOWAIT': { keywords: ['FOR UPDATE'], msg: 'ORA-00920 : Clause FOR UPDATE manquante. Verrouillez la ligne avec SELECT ... FOR UPDATE NOWAIT.' },
+      'EXECUTE IMMEDIATE':       { keywords: ['EXECUTE IMMEDIATE'], msg: 'ORA-00920 : EXECUTE IMMEDIATE manquant. Utilisez EXECUTE IMMEDIATE pour le SQL dynamique.' },
+    };
+  }
+
   validate(sql, scenario) {
     if (!sql || sql.trim().length === 0) {
       return { valid: false, message: 'ORA-00900 : Instruction SQL vide. Veuillez saisir une requête.', level: 'error' };
@@ -812,6 +835,8 @@ class SQLValidator {
       { test: !/^SELECT\b|^WITH\b|^DECLARE\b|^CREATE\b|^MERGE\b|^BEGIN\b/.test(upper), msg: 'ORA-00920 : L\'instruction doit commencer par un mot-clé SQL ou PL/SQL valide (SELECT, WITH, DECLARE, CREATE, MERGE, BEGIN...).', level: 'error' },
       { test: /^SELECT\b/.test(upper) && !/\bFROM\b/.test(upper), msg: 'ORA-00923 : Mot-clé FROM manquant. Une requête SELECT nécessite une clause FROM.', level: 'error' },
       { test: /\bSELECT\b/.test(upper) && /\bWHERE\b/.test(upper) && !/=\s*['"]?/.test(upper) && !/\bIS\b/.test(upper) && !/\bIN\b/.test(upper), msg: 'ORA-00911 : La clause WHERE semble incomplète. Vérifiez la présence d\'une condition.', level: 'warning' },
+      { test: (sql.match(/\(/g) || []).length !== (sql.match(/\)/g) || []).length, msg: 'ORA-00907 : Parenthèses déséquilibrées. Vérifiez l\'ouverture et la fermeture des parenthèses.', level: 'error' },
+      { test: !/[;]\s*$/.test(sql.trim()), msg: 'ATTENTION : L\'instruction devrait se terminer par un point-virgule (;). En Oracle, le point-virgule termine une instruction SQL.', level: 'warning' },
       { test: /\b(SUM|AVG|COUNT|MIN|MAX)\s*\(/.test(upper) && !/\bGROUP\s+BY\b/.test(upper) && /\bSELECT\b/.test(upper), msg: 'ORA-00937 : Fonction d\'agrégation sans GROUP BY. Si vous utilisez SUM, AVG ou COUNT sans GROUP BY, toutes les colonnes non agrégées du SELECT doivent être dans GROUP BY.', level: 'error' },
       { test: /\bLEFT\s+JOIN\b/.test(upper) && /\bWHERE\b/.test(upper) && /\bIS\s+NULL\b/.test(upper), msg: 'ATTENTION : Un filtre WHERE ... IS NULL sur une colonne de la table jointe annule l\'effet du LEFT JOIN et le transforme en INNER JOIN.', level: 'warning' },
       { test: /\bDELETE\b/.test(upper) && /\bFROM\b/.test(upper) && !/\bWHERE\b/.test(upper), msg: 'ATTENTION : DELETE sans WHERE supprime TOUTES les lignes de la table. Vérifiez l\'intention.', level: 'warning' },
@@ -823,6 +848,18 @@ class SQLValidator {
     for (const check of checks) {
       if (check.test) return { valid: false, message: check.msg, level: check.level };
     }
+    // Concept keywords validation
+    if (scenario && scenario.concept) {
+      const conceptCheck = this._checkConceptKeywords(upper, scenario);
+      if (conceptCheck) return conceptCheck;
+    }
+    // Schema-aware identifier validation
+    if (scenario && scenario.ddl) {
+      const schema = this._parseDDL(scenario.ddl);
+      const idCheck = this._checkIdentifiers(upper, schema);
+      if (idCheck) return idCheck;
+    }
+    // Scenario-specific hints
     if (scenario && scenario.hints) {
       for (const hint of scenario.hints) {
         const re = new RegExp(hint.pattern, 'i');
@@ -833,7 +870,146 @@ class SQLValidator {
     }
     return { valid: true, message: 'Syntaxe vérifiée. Aucune erreur détectée.', level: 'success' };
   }
+
+  _checkConceptKeywords(upper, scenario) {
+    const entry = this._conceptKeywords[scenario.concept];
+    if (!entry) return null;
+    const found = entry.keywords.some(kw => upper.includes(kw));
+    if (!found) {
+      return { valid: false, message: entry.msg, level: 'error' };
+    }
+    return null;
+  }
+
+  _parseDDL(ddl) {
+    const schema = { tables: {} };
+    const tableRegex = /CREATE\s+TABLE\s+(\w+)/gi;
+    let match;
+    while ((match = tableRegex.exec(ddl)) !== null) {
+      const tableName = match[1].toUpperCase();
+      const rest = ddl.substring(match.index + match[0].length);
+      let depth = 0;
+      let startIdx = -1;
+      let endIdx = -1;
+      for (let i = 0; i < rest.length; i++) {
+        const ch = rest[i];
+        if (ch === '(') {
+          if (depth === 0) startIdx = i + 1;
+          depth++;
+        } else if (ch === ')') {
+          depth--;
+          if (depth === 0 && startIdx !== -1) {
+            endIdx = i;
+            break;
+          }
+        }
+      }
+      if (startIdx === -1 || endIdx === -1) continue;
+      const inner = rest.substring(startIdx, endIdx);
+      const cols = [];
+      depth = 0;
+      let current = '';
+      for (const ch of inner) {
+        if (ch === '(') depth++;
+        else if (ch === ')') depth--;
+        if (ch === ',' && depth === 0) {
+          const m = current.trim().match(/^(\w+)/);
+          if (m) cols.push(m[1].toUpperCase());
+          current = '';
+        } else {
+          current += ch;
+        }
+      }
+      const m = current.trim().match(/^(\w+)/);
+      if (m) cols.push(m[1].toUpperCase());
+      schema.tables[tableName] = cols;
+    }
+    return schema;
+  }
+
+  _checkIdentifiers(upper, schema) {
+    if (!schema.tables || Object.keys(schema.tables).length === 0) return null;
+
+    const allColumns = new Set();
+    const allTables = new Set();
+    for (const [tbl, cols] of Object.entries(schema.tables)) {
+      allTables.add(tbl);
+      cols.forEach(c => allColumns.add(c));
+    }
+
+    // Remove string literals and comments before tokenizing
+    const clean = upper
+      .replace(/'[^']*'/g, '')
+      .replace(/--[^\n]*/g, '')
+      .replace(/\/\*[\s\S]*?\*\//g, '');
+
+    // Check alias.column patterns
+    const aliasColRe = /(\w+)\.(\w+)/g;
+    let am;
+    while ((am = aliasColRe.exec(clean)) !== null) {
+      const col = am[2].toUpperCase();
+      if (!allColumns.has(col)) {
+        return {
+          valid: true,
+          message: 'ATTENTION : La colonne "' + am[2] + '" n\'existe pas dans le schéma DDL. Colonnes disponibles : ' + [...allColumns].join(', '),
+          level: 'warning'
+        };
+      }
+    }
+
+    // Check standalone tokens
+    const tokens = [];
+    const tokenRe = /[A-Za-z_]\w*/g;
+    let m;
+    while ((m = tokenRe.exec(clean)) !== null) {
+      const tok = m[0];
+      if (this._SQL_KEYWORDS.has(tok)) continue;
+      if (tok.length === 1) continue;
+      tokens.push(tok);
+    }
+
+    const uniqueTokens = [...new Set(tokens)];
+    const unknown = uniqueTokens.filter(t => !allTables.has(t) && !allColumns.has(t));
+    if (unknown.length > 0) {
+      const sample = unknown.slice(0, 3).join(', ');
+      return {
+        valid: true,
+        message: 'ATTENTION : Identifiant(s) inconnu(s) du schéma : "' + sample + '". Vérifiez l\'orthographe. Colonnes disponibles : ' + [...allColumns].join(', '),
+        level: 'warning'
+      };
+    }
+    return null;
+  }
 }
+
+SQLValidator.prototype._SQL_KEYWORDS = new Set([
+  'SELECT', 'FROM', 'WHERE', 'JOIN', 'ON', 'AS', 'AND', 'OR', 'IN', 'NOT', 'NULL',
+  'IS', 'LIKE', 'BETWEEN', 'EXISTS', 'UNION', 'ALL', 'ORDER', 'BY', 'GROUP', 'HAVING',
+  'DESC', 'ASC', 'LEFT', 'RIGHT', 'INNER', 'OUTER', 'FULL', 'CROSS', 'WHEN', 'THEN',
+  'ELSE', 'END', 'CASE', 'BEGIN', 'DECLARE', 'EXCEPTION', 'IF', 'ELSE',
+  'WHILE', 'RETURN', 'COMMIT', 'ROLLBACK', 'SET', 'INTO', 'VALUES', 'INSERT', 'UPDATE',
+  'DELETE', 'CREATE', 'TABLE', 'INDEX', 'VIEW', 'TRIGGER', 'SEQUENCE', 'WITH', 'MERGE',
+  'USING', 'MATCHED', 'FETCH', 'FIRST', 'ROWS', 'ONLY', 'FUNCTION', 'PROCEDURE',
+  'PACKAGE', 'TYPE', 'CURSOR', 'OPEN', 'CLOSE', 'FETCH', 'BULK', 'COLLECT', 'FORALL',
+  'NOWAIT', 'WAIT', 'SHARE', 'EXCLUSIVE', 'LOCK', 'OF', 'REFRESH', 'COMPLETE', 'FAST',
+  'DEMAND', 'MATERIALIZED', 'PRIMARY', 'KEY', 'FOREIGN', 'REFERENCES', 'CONSTRAINT',
+  'UNIQUE', 'CHECK', 'DEFAULT', 'NUMBER', 'VARCHAR', 'VARCHAR2', 'CHAR', 'DATE',
+  'TIMESTAMP', 'CLOB', 'BLOB', 'GENERATED', 'ALWAYS', 'IDENTITY', 'PARTITION', 'RANGE',
+  'LIST', 'HASH', 'VALUES', 'LESS', 'THAN', 'MAXVALUE', 'MODIFY', 'RENAME', 'DROP',
+  'TRUNCATE', 'GRANT', 'REVOKE', 'EXECUTE', 'IMMEDIATE', 'SYSDATE', 'TRUNC',
+  'ADD_MONTHS', 'MONTHS_BETWEEN', 'NVL', 'COALESCE', 'ROUND', 'SUM', 'AVG', 'COUNT',
+  'MIN', 'MAX', 'RANK', 'DENSE_RANK', 'ROW_NUMBER', 'LAG', 'LEAD',
+  'FIRST_VALUE', 'LAST_VALUE', 'TO_DATE', 'TO_CHAR', 'TO_NUMBER', 'CAST', 'NULLIF',
+  'NVL2', 'DECODE', 'EXTRACT', 'GREATEST', 'LEAST', 'UPPER', 'LOWER', 'INITCAP',
+  'LENGTH', 'SUBSTR', 'REPLACE', 'LPAD', 'RPAD', 'TRIM', 'INSTR', 'CONCAT', 'USER',
+  'SYSTIMESTAMP', 'SYS_CONTEXT', 'DBMS_OUTPUT', 'DBMS_MVIEW', 'SQLERRM', 'SQLCODE',
+  'ZERO_DIVIDE', 'NO_DATA_FOUND', 'TOO_MANY_ROWS', 'DUP_VAL_ON_INDEX', 'OTHERS',
+  'PUT_LINE', 'NEW', 'OLD', 'PRIOR', 'CONNECT', 'LEVEL', 'SIBLINGS',
+  'NOCYCLE', 'NOCACHE', 'NOMAXVALUE', 'NOMINVALUE', 'NEXT', 'CURRVAL', 'INCREMENT',
+  'START', 'CACHE', 'CYCLE', 'MINVALUE', 'EXIT', 'LOOP', 'FOR', 'DO', 'THEN',
+  'DUAL', 'TOP', 'PERCENT', 'OFFSET', 'TIES', 'GROUPS', 'WITHIN', 'EXCLUDE',
+  'INCLUDE', 'NULLS', 'LAST', 'LOOP', 'WHILE', 'CONTINUE'
+]);
 
 // ============================================================
 // SQL EXECUTOR (simulateur)
