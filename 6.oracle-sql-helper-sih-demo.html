@@ -659,7 +659,7 @@ const SCENARIOS = [
     explanation: 'Un index unique garantit qu\'aucune valeur dupliquée n\'existe dans les colonnes indexées. Créé sur la combinaison (NUMERO_LOT, FABRICANT), il empêche l\'insertion de deux lots distincts portant le même numéro pour le même fabricant. Oracle utilise cet index pour accélérer les recherches par numéro de lot tout en maintenant l\'intégrité des données. La contrainte UNIQUE crée automatiquement un index unique du même nom.',
     hints: [
       { pattern: '\\bPRIMARY\\s+KEY\\b', msg: 'La clé primaire garantit l\'unicité de LOT_ID, pas du couple (numero_lot, fabricant). Créez une contrainte dédiée.', level: 'error' },
-      { pattern: '\\bINDEX\\b(?!.*UNIQUE)', msg: 'Un index classique n\'empêche pas les doublons. Ajoutez le mot-clé UNIQUE.', level: 'error' },
+      { pattern: '^(?![\\s\\S]*\\bUNIQUE\\b)[\\s\\S]*\\bINDEX\\b', msg: 'Un index classique n\'empêche pas les doublons. Ajoutez le mot-clé UNIQUE.', level: 'error' },
       { pattern: '\\bNOT\\s+NULL\\b', msg: 'NOT NULL ne garantit pas l\'unicité. Vous devez créer un index unique ou une contrainte UNIQUE.', level: 'info' }
     ]
   },
@@ -688,7 +688,7 @@ const SCENARIOS = [
     hints: [
       { pattern: '\\bSELECT\\s+MAX\\(ord_id\\)\\s*\\+\\s*1\\b', msg: 'SELECT MAX + 1 échouera en environnement concurrent (deux sessions obtiendront le même ID). Utilisez une séquence.', level: 'error' },
       { pattern: '\\bseq_ordonnance\\.CURRVAL\\b', msg: 'CURRVAL retourne la dernière valeur générée dans la session, mais nécessite un NEXTVAL préalable.', level: 'info' },
-      { pattern: '\\bINSERT\\s+INTO\\s+ordonnance\\b(?!.*NEXTVAL)', msg: 'L\'INSERT doit utiliser seq_ordonnance.NEXTVAL pour la colonne ORD_ID.', level: 'error' }
+      { pattern: '\\bINSERT\\s+INTO\\s+ordonnance\\b(?![\\s\\S]*NEXTVAL)', msg: 'L\'INSERT doit utiliser seq_ordonnance.NEXTVAL pour la colonne ORD_ID.', level: 'error' }
     ]
   },
   {
@@ -1053,6 +1053,15 @@ class SQLValidator {
       while ((am = aliasRe.exec(expectedSql)) !== null) {
         allColumns.add(am[1].toUpperCase());
       }
+      // Extract CTE output columns from expected solution
+      const cteColRe = /WITH\s+\w+\s*\(([^)]+)\)\s*AS\s*\(/gi;
+      let cem;
+      while ((cem = cteColRe.exec(expectedSql)) !== null) {
+        cem[1].split(',').forEach(col => {
+          const c = col.trim().toUpperCase();
+          if (c && !this._SQL_KEYWORDS.has(c)) allColumns.add(c);
+        });
+      }
     }
 
     // Add table aliases from the user's query (non-deterministic)
@@ -1072,6 +1081,13 @@ class SQLValidator {
       allColumns.add(trigMatch[1].toUpperCase());
     }
 
+    // Add DDL object names (view, index, sequence)
+    const ddlObjRe = /\bCREATE\s+(?:OR\s+REPLACE\s+)?(?:UNIQUE\s+|MATERIALIZED\s+)?(?:VIEW|INDEX|SEQUENCE)\s+(\w+)/gi;
+    let dom;
+    while ((dom = ddlObjRe.exec(upper)) !== null) {
+      allColumns.add(dom[1].toUpperCase());
+    }
+
     // Add PL/SQL DECLARE block identifiers (variables, types, cursors)
     if (/^\s*DECLARE\b/m.test(upper)) {
       const declareMatch = upper.match(/\bDECLARE\b([\s\S]*?)\bBEGIN\b/);
@@ -1084,6 +1100,14 @@ class SQLValidator {
           }
         }
       }
+    }
+
+    // Add PL/SQL FOR loop variables
+    const forRe = /\bFOR\s+(\w+)\s+IN\b/gi;
+    let fm;
+    while ((fm = forRe.exec(upper)) !== null) {
+      const v = fm[1].toUpperCase();
+      if (v && !this._SQL_KEYWORDS.has(v)) allColumns.add(v);
     }
 
     // Remove string literals and comments before tokenizing
@@ -1164,6 +1188,10 @@ class SQLValidator {
       }
       // Normalize trigger name (non-deterministic)
       cleaned = cleaned.replace(/\bCREATE\s+(?:OR\s+REPLACE\s+)?TRIGGER\s+\w+/gi,
+        (m) => m.replace(/\w+$/, '@'));
+      // Normalize DDL object names (view, index, sequence)
+      cleaned = cleaned.replace(
+        /\bCREATE\s+(?:OR\s+REPLACE\s+)?(?:UNIQUE\s+|MATERIALIZED\s+)?(?:VIEW|INDEX|SEQUENCE)\s+\w+/gi,
         (m) => m.replace(/\w+$/, '@'));
       cleaned = cleaned.replace(/;\s*$/, '').replace(/\s+/g, ' ').trim();
       return cleaned;
