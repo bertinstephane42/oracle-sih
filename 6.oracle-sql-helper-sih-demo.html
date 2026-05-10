@@ -577,7 +577,7 @@ const SCENARIOS = [
   {
     id: 3, title: 'Agrégation — Consommation moyenne par service',
     concept: 'GROUP BY / Agrégation',
-    challenge: 'Le comité du médicament souhaite analyser la consommation mensuelle moyenne par service hospitalier pour ajuster les dotations. À partir de la table de sorties de stock, calculez la quantité totale et la quantité moyenne dispensées par service au cours des trente derniers jours. Les services sans consommation doivent apparaître avec une valeur nulle.',
+    challenge: 'Le comité du médicament souhaite analyser la consommation mensuelle moyenne par service hospitalier pour ajuster les dotations. À partir de la table DISPENSATION, calculez la quantité totale et la quantité moyenne dispensées par service au cours des trente derniers jours. Les services sans consommation doivent apparaître avec une valeur nulle.',
     ddl: 'CREATE TABLE service (\n  service_id  NUMBER PRIMARY KEY,\n  nom         VARCHAR2(60)\n);\nCREATE TABLE dispensation (\n  disp_id     NUMBER PRIMARY KEY,\n  service_id  NUMBER REFERENCES service(service_id),\n  qty         NUMBER(8),\n  date_disp   DATE\n);',
     inserts: "INSERT INTO service VALUES (1, 'Urgences');\nINSERT INTO service VALUES (2, 'Cardiologie');\nINSERT INTO service VALUES (3, 'Pédiatrie');\nINSERT INTO service VALUES (4, 'Oncologie');\nINSERT INTO dispensation VALUES (1, 1, 450, DATE '2025-04-01');\nINSERT INTO dispensation VALUES (2, 1, 320, DATE '2025-04-05');\nINSERT INTO dispensation VALUES (3, 2, 180, DATE '2025-04-02');\nINSERT INTO dispensation VALUES (4, 2, 210, DATE '2025-04-10');\nINSERT INTO dispensation VALUES (5, 3, 95, DATE '2025-04-03');\nINSERT INTO dispensation VALUES (6, 4, 0, DATE '2025-03-28');",
     expected: "SELECT s.nom AS service,\n       COALESCE(SUM(d.qty), 0) AS qte_totale,\n       ROUND(COALESCE(AVG(d.qty), 0), 1) AS qte_moyenne\nFROM   service s\nLEFT   JOIN dispensation d ON d.service_id = s.service_id\n       AND d.date_disp >= SYSDATE - 30\nGROUP  BY s.service_id, s.nom\nORDER  BY qte_totale DESC;",
@@ -660,7 +660,7 @@ const SCENARIOS = [
   {
     id: 9, title: 'Index Unique — Contrôle d\'intégrité des lots',
     concept: 'Unique Index',
-    challenge: 'Chaque lot de médicament entrant à la pharmacie possède un numéro de lot fourni par le fabricant. Ce numéro, associé au fabricant, doit être unique dans la base pour éviter toute confusion lors des rappels de lots. Créez la contrainte d\'unicité appropriée sur la table LOT_SIMU pour garantir l\'intégrité référentielle au niveau des colonnes NUMERO_LOT et FABRICANT.',
+    challenge: 'Chaque lot de médicament entrant à la pharmacie possède un numéro de lot fourni par le fabricant. Ce numéro, associé au fabricant, doit être unique dans la base pour éviter toute confusion lors des rappels de lots. Créez la contrainte d\'unicité appropriée sur la table LOT_SIMU pour garantir l\'unicité du couple (NUMERO_LOT, FABRICANT).',
     ddl: 'CREATE TABLE lot_simu (\n  lot_id      NUMBER PRIMARY KEY,\n  med_id      NUMBER NOT NULL,\n  numero_lot  VARCHAR2(30) NOT NULL,\n  fabricant   VARCHAR2(60) NOT NULL,\n  date_perem  DATE,\n  qty         NUMBER(8)\n);',
     inserts: "INSERT INTO lot_simu VALUES (1, 101, 'LOT-2025-A001', 'Sanofi', DATE '2026-06-01', 500);\nINSERT INTO lot_simu VALUES (2, 101, 'LOT-2025-A002', 'Sanofi', DATE '2025-12-31', 300);\nINSERT INTO lot_simu VALUES (3, 102, 'LOT-2025-B045', 'Mylan', DATE '2026-03-20', 200);",
     expected: "CREATE UNIQUE INDEX idx_lot_unique\nON lot_simu(numero_lot, fabricant);\n\n-- Alternative avec contrainte UNIQUE :\n-- ALTER TABLE lot_simu ADD CONSTRAINT uq_lot_fab UNIQUE (numero_lot, fabricant);",
@@ -674,15 +674,15 @@ const SCENARIOS = [
   {
     id: 10, title: 'Partitionnement — Historique par année',
     concept: 'Partition Range',
-    challenge: 'La table SORTIE_STOCK contient plusieurs millions de lignes couvrant dix années d\'activité. Les requêtes de rapport annuel sur les dispensations subissent des temps d\'exécution excessifs en raison du parcours intégral de la table. Vous devez partitionner cette table par année sur la colonne DATE_SORTIE afin que l\'optimiseur puisse élaguer les partitions non concernées par chaque requête.',
+    challenge: 'La table SORTIE_STOCK est partitionnée par année (RANGE sur DATE_SORTIE) afin d\'accélérer les requêtes historiques. En période de bilan annuel, le pharmacien a besoin de consulter toutes les dispensations de l\'année 2025. Écrivez une requête qui filtre sur cette plage de dates : l\'optimiseur pratiquera l\'élagage de partition (partition pruning) et ne parcourra que la partition p_2025, sans lire les années antérieures ni les partitions futures.',
     ddl: 'CREATE TABLE sortie_stock (\n  sortie_id    NUMBER,\n  med_id       NUMBER NOT NULL,\n  qty          NUMBER(8),\n  date_sortie  DATE\n)\nPARTITION BY RANGE (date_sortie) (\n  PARTITION p_2023 VALUES LESS THAN (TO_DATE(\'2024-01-01\', \'YYYY-MM-DD\')),\n  PARTITION p_2024 VALUES LESS THAN (TO_DATE(\'2025-01-01\', \'YYYY-MM-DD\')),\n  PARTITION p_2025 VALUES LESS THAN (TO_DATE(\'2026-01-01\', \'YYYY-MM-DD\')),\n  PARTITION p_future VALUES LESS THAN (MAXVALUE)\n);',
     inserts: "INSERT INTO sortie_stock VALUES (1, 101, 200, DATE '2024-03-15');\nINSERT INTO sortie_stock VALUES (2, 102, 50, DATE '2024-07-22');\nINSERT INTO sortie_stock VALUES (3, 103, 85, DATE '2025-01-10');\nINSERT INTO sortie_stock VALUES (4, 104, 120, DATE '2025-11-05');\nINSERT INTO sortie_stock VALUES (5, 105, 300, DATE '2023-12-01');",
     expected: "SELECT sortie_id, med_id, qty, date_sortie\nFROM   sortie_stock\nWHERE  date_sortie >= DATE '2025-01-01'\nAND    date_sortie <  DATE '2026-01-01'\nORDER  BY date_sortie;\n\n-- L'optimiseur élaguera (partition pruning) et\n-- ne parcourra que la partition p_2025.",
     explanation: 'Le partitionnement par intervalle (RANGE) divise la table en segments physiques indépendants selon une clé temporelle. Lorsqu\'une requête filtre sur la colonne de partition, l\'optimiseur CBO pratique l\'élaguage de partition (Partition Pruning) : il ne lit que le ou les segments pertinents, ignorant les autres. Cette technique divise le nombre d\'entrées/sorties par le nombre de partitions, améliorant les performances des requêtes historiques de façon considérable.',
     hints: [
-      { pattern: '\\bCREATE\\s+TABLE\\b(?!.*PARTITION)', msg: 'La table doit être créée avec la clause PARTITION BY RANGE. La partition est déclarée au moment du CREATE TABLE.', level: 'error' },
-      { pattern: '\\bPARTITION\\s+BY\\s+(LIST|HASH)\\b', msg: 'Pour une partition temporelle, utilisez RANGE. LIST est pour les valeurs discrètes, HASH pour la distribution uniforme.', level: 'warning' },
-      { pattern: '\\bVALUES\\s+LESS\\s+THAN\\s*\\(\\s*MAXVALUE\\s*\\)', msg: 'La partition MAXVALUE capture toutes les données futures. Veillez à son emplacement en dernière position.', level: 'info' }
+      { pattern: '^(?![\\s\\S]*\\bWHERE\\b)', msg: 'Ajoutez une clause WHERE sur DATE_SORTIE pour limiter aux lignes de l\'année cible et déclencher le partition pruning.', level: 'error' },
+      { pattern: '\\bWHERE\\b(?!.*date_sortie)', msg: 'Le filtre WHERE doit porter sur la colonne de partition DATE_SORTIE pour que l\'optimiseur élague les partitions non concernées.', level: 'error' },
+      { pattern: '\\bSELECT\\s+\\*\\b', msg: 'Énumérez explicitement les colonnes (sortie_id, med_id, qty, date_sortie) plutôt que SELECT *.', level: 'info' }
     ]
   },
   {
@@ -869,6 +869,7 @@ class SQLValidator {
       'CREATE VIEW':             { keywords: ['VIEW'], msg: 'ORA-00920 : Mot-clé VIEW manquant. Créez une vue avec CREATE [OR REPLACE] VIEW.' },
       'Materialized View':       { keywords: ['MATERIALIZED VIEW'], msg: 'ORA-00920 : MATERIALIZED VIEW manquant. Utilisez CREATE MATERIALIZED VIEW pour pré-calculer les données.' },
       'Unique Index':            { keywords: ['UNIQUE INDEX', 'UNIQUE'], msg: 'ORA-00920 : Mot-clé UNIQUE ou INDEX manquant. Créez un INDEX UNIQUE pour garantir l\'unicité des lots.' },
+      'Partition Range':         { keywords: ['PARTITION', 'PRUNING', 'ÉLAGAGE'], msg: 'ORA-00920 : Mot-clé PARTITION ou notion d\'élagage manquants. Une table partitionnée par RANGE permet au CBO de n\'accéder qu\'aux segments utiles.' },
       'Sequence / NEXTVAL':      { keywords: ['SEQUENCE', 'NEXTVAL'], msg: 'ORA-00920 : CREATE SEQUENCE ou NEXTVAL manquant. Générez les identifiants avec une séquence.' },
       'Exception / ZERO_DIVIDE': { keywords: ['EXCEPTION', 'ZERO_DIVIDE'], msg: 'ORA-00920 : Bloc EXCEPTION ou exception ZERO_DIVIDE manquant. Capturez la division par zéro dans un gestionnaire d\'exception.' },
       'Curseur Explicite':       { keywords: ['CURSOR'], msg: 'ORA-00920 : Curseur explicite manquant. Déclarez un curseur avec CURSOR ... IS pour parcourir les réservations.' },
