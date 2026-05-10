@@ -162,6 +162,7 @@ a:hover { text-decoration: underline; }
 .log-console__entry--error { color: var(--color-red); }
 .log-console__entry--warning { color: var(--color-amber); }
 .log-console__entry--system { color: var(--color-cyan); }
+.log-console__entry--hint { color: var(--color-gold); border-left: 3px solid var(--color-gold); padding-left: var(--sp-2); }
 
 .result-table-wrap { overflow-x: auto; margin-top: var(--sp-4); }
 .result-table { width: 100%; font-family: var(--font-mono); font-size: var(--fs-xs); border-collapse: collapse; }
@@ -333,6 +334,7 @@ a:hover { text-decoration: underline; }
         <div class="toolbar">
           <button class="btn btn--outline btn--sm" id="btn-verify">&#10003; Vérifier la syntaxe</button>
           <button class="btn btn--primary btn--sm" id="btn-execute">&#9654; Exécuter</button>
+          <button class="btn btn--outline btn--sm" id="btn-hint">&#128161; Suggérer un indice</button>
           <button class="btn btn--gold btn--sm" id="btn-solution">&#9733; Voir la Solution Expert</button>
           <button class="btn btn--outline btn--sm" id="btn-reset-editor">Réinitialiser</button>
         </div>
@@ -541,6 +543,8 @@ class StateManager {
   get solved() { return this._data.solved; }
   set current(id) { this._data.currentScenario = id; this._save(); }
   get current() { return this._data.currentScenario; }
+  get(key) { return this._data[key]; }
+  set(key, val) { this._data[key] = val; this._save(); }
 }
 
 // ============================================================
@@ -559,6 +563,11 @@ const SCENARIOS = [
       { pattern: '\\bFROM\\s+\\w+\\s*,\\s*\\w+\\b', msg: 'ORA-00918 : Vous utilisez une virgule entre les tables. Préférez la syntaxe explicite JOIN ... ON ... pour une meilleure lisibilité.', level: 'warning' },
       { pattern: '\\bWHERE\\s+\\w+\\.\\w+\\s*=\\s*\\w+\\.\\w+', msg: 'Syntaxe acceptable mais nous recommandons JOIN ... ON ... pour ce module.', level: 'info' },
       { pattern: '\\b(LEFT|RIGHT|FULL)\\s+JOIN\\b', msg: 'ORA-01425 : Une jointure externe n\'est pas appropriée ici : seuls les enregistrements avec une correspondance sont demandés.', level: 'error' }
+    ],
+    progressiveHints: [
+      'Vous devez relier STOCK_MED et SERVICE en utilisant JOIN ... ON ... sur service_id.',
+      'Un INNER JOIN ne conserve que les lignes avec une correspondance. Pensez à utiliser JOIN (la syntaxe explicite).',
+      'La clé de jointure est service_id. Sélectionnez s.nom AS service, m.molecule et m.qty, triez par s.nom puis m.molecule.'
     ]
   },
   {
@@ -572,6 +581,11 @@ const SCENARIOS = [
     hints: [
       { pattern: '\\bJOIN\\s+\\w+\\s+ON\\b(?!.*LEFT|.*RIGHT|.*FULL)', msg: 'ORA-01426 : Une jointure interne exclurait les médicaments sans sortie. Utilisez LEFT JOIN pour les conserver.', level: 'error' },
       { pattern: '\\bWHERE\\s+\\.*date_sortie\\s+IS\\s+NOT\\s+NULL', msg: 'Attention : un filtre WHERE sur la table de droite après une LEFT JOIN annule l\'effet de la jointure externe.', level: 'warning' }
+    ],
+    progressiveHints: [
+      'Vous devez lister TOUS les médicaments, même ceux sans sortie. LEFT JOIN est la solution.',
+      'Après le LEFT JOIN, utilisez MAX(date_sortie) avec GROUP BY par médicament pour une seule ligne par molécule.',
+      'Ajoutez ORDER BY derniere_sortie NULLS FIRST pour placer les médicaments sans mouvement en tête de liste.'
     ]
   },
   {
@@ -585,6 +599,11 @@ const SCENARIOS = [
     hints: [
       { pattern: '\\bHAVING\\b', msg: 'HAVING filtre après agrégation. Souvenez-vous : WHERE avant GROUP BY, HAVING après.', level: 'info' },
       { pattern: '^(?![\\s\\S]*\\bLEFT\\s+JOIN\\b)[\\s\\S]*\\bGROUP\\s+BY\\b', msg: 'ORA-00937 : Colonne non agrégée dans SELECT sans GROUP BY. Ajoutez GROUP BY sur les colonnes de service.', level: 'error' }
+    ],
+    progressiveHints: [
+      'Vous devez utiliser SUM et AVG sur les quantités, avec un LEFT JOIN pour conserver les services sans consommation.',
+      'COALESCE(SUM(d.qty), 0) remplace les NULL par zéro. Ajoutez la condition date dans la jointure, pas dans WHERE.',
+      'Groupez par s.service_id et s.nom, filtrez les 30 derniers jours avec d.date_disp >= SYSDATE - 30 dans la jointure.'
     ]
   },
   {
@@ -599,6 +618,11 @@ const SCENARIOS = [
       { pattern: '\\bJOIN\\b', msg: 'Une jointure simple peut produire des doublons si plusieurs lots existent par médicament. Une sous-requête corrélée garantit une ligne par médicament.', level: 'warning' },
       { pattern: 'SELECT\\s+.*\\bMAX\\b', msg: 'MAX(date_perem) est la fonction appropriée pour trouver la date la plus tardive. Vérifiez qu\'elle porte sur la table LOT.', level: 'info' },
       { pattern: '\\bGROUP\\s+BY\\b.*\\blot\\b', msg: 'Une jointure suivie de GROUP BY fonctionne mais une sous-requête corrélée est plus élégante pour cet exercice.', level: 'info' }
+    ],
+    progressiveHints: [
+      'Une sous-requête dans le SELECT peut renvoyer la date de péremption maximale pour chaque médicament.',
+      'Dans le SELECT principal, placez un (SELECT MAX(l2.date_perem) FROM lot l2 WHERE l2.med_id = m.med_id) comme colonne.',
+      'La table externe est medicament m. La sous-requête est corrélée via l2.med_id = m.med_id dans son WHERE.'
     ]
   },
   {
@@ -613,6 +637,11 @@ const SCENARIOS = [
       { pattern: '\\bCURSOR\\b|\\bFOR\\s+\\w+\\s+IN\\s+\\(\\s*SELECT\\b', msg: 'Un curseur explicite ou une boucle FOR itérative génère un changement de contexte par ligne. Préférez BULK COLLECT + FORALL.', level: 'warning' },
       { pattern: '\\bBULK\\s+COLLECT\\b(?![\\s\\S]*FORALL)', msg: 'BULK COLLECT sans FORALL ne fait que charger les données. Vous devez aussi écrire l\'instruction de mise à jour massive.', level: 'error' },
       { pattern: 'UPDATE\\s+\\w+\\s+SET\\s+prix_achat\\s*=\\s*prix_achat', msg: 'N\'oubliez pas la majoration de 5% : multipliez par 1.05.', level: 'warning' }
+    ],
+    progressiveHints: [
+      'Structure : DECLARE TYPE ... IS TABLE OF medicament%ROWTYPE; puis BULK COLLECT INTO depuis medicament.',
+      'Bouclez sur la collection avec FOR i IN 1..v_meds.COUNT LOOP pour appliquer la majoration de 5% dans la collection.',
+      'Utilisez FORALL i IN 1..v_meds.COUNT pour UPDATE medicament en une seule opération massive.'
     ]
   },
   {
@@ -627,6 +656,11 @@ const SCENARIOS = [
       { pattern: '\\bBEFORE\\s+DELETE\\b', msg: 'Un déclencheur BEFORE DELETE capture les valeurs avant suppression mais la ligne existe encore. AFTER DELETE est recommandé pour l\'audit.', level: 'warning' },
       { pattern: '\\:NEW\\b', msg: 'ORA-04082 : :NEW n\'est pas défini pour un DELETE. Utilisez :OLD pour accéder aux valeurs supprimées.', level: 'error' },
       { pattern: '\\bINSERT\\s+INTO\\s+sortie_stock\\b', msg: 'L\'INSERT doit cibler la table AUDIT_SORTIE, pas SORTIE_STOCK (cela créerait une récursion).', level: 'error' }
+    ],
+    progressiveHints: [
+      'Créez un trigger AFTER DELETE ON sortie_stock FOR EACH ROW qui insère dans AUDIT_SORTIE.',
+      'Utilisez :OLD.sortie_id, :OLD.med_id, :OLD.qty et :OLD.service pour capturer les valeurs supprimées.',
+      'Ajoutez NVL(V(\'APP_USER\'), \'INCONNU\') pour l\'utilisateur. L\'horodatage est automatique via DEFAULT SYSDATE de la table cible.'
     ]
   },
   {
@@ -641,6 +675,11 @@ const SCENARIOS = [
       { pattern: '\\bSELECT\\s+\\*\\b', msg: 'SELECT * expose toutes les colonnes y compris le NIR. Énumérez explicitement les colonnes autorisées.', level: 'error' },
       { pattern: '\\bnir\\b', msg: 'Le NIR est une donnée sensible (CNIL). Il ne doit pas apparaître dans la vue.', level: 'error' },
       { pattern: '\\bCREATE\\s+(OR\\s+REPLACE\\s+)?(VIEW|TABLE)\\b(?!.*v_)', msg: 'Par convention, nommez la vue avec le préfixe v_ pour la distinguer des tables.', level: 'info' }
+    ],
+    progressiveHints: [
+      'Structure : CREATE OR REPLACE VIEW v_patient_anonymise AS SELECT ... FROM patient WITH READ ONLY.',
+      'N\'incluez PAS les colonnes nom, prenom, nir. Ajoutez une colonne CASE pour la tranche d\'âge (Mineur, Adulte, Senior).',
+      'La colonne tranche_age utilise CASE WHEN age < 18 THEN ... WHEN age BETWEEN 18 AND 65 THEN ... ELSE ... END.'
     ]
   },
   {
@@ -655,6 +694,11 @@ const SCENARIOS = [
       { pattern: '\\bCREATE\\s+(OR\\s+REPLACE\\s+)?VIEW\\b(?!.*MATERIALIZED)', msg: 'Une vue simple ne stocke pas les données. Utilisez MATERIALIZED VIEW pour pré-calculer les agrégations.', level: 'error' },
       { pattern: '\\bCREATE\\s+TABLE\\b', msg: 'Une table n\'a pas de mécanisme de refresh automatique. Utilisez MATERIALIZED VIEW.', level: 'error' },
       { pattern: '\\bREFRESH\\s+FAST\\b', msg: 'REFRESH FAST nécessite un journal de vue matérialisée (MV LOG). REFRESH COMPLETE est plus simple pour cet exercice.', level: 'info' }
+    ],
+    progressiveHints: [
+      'Utilisez CREATE MATERIALIZED VIEW avec REFRESH COMPLETE ON DEMAND pour pré-calculer les agrégations.',
+      'La requête interne joint service et dispensation, agrège par service et TRUNC(date_disp), et filtre les 7 derniers jours.',
+      'Calculez SUM(d.qty) AS qte_totale et COUNT(*) AS nb_dispensations. Triez par service et jour descendant.'
     ]
   },
   {
@@ -669,6 +713,11 @@ const SCENARIOS = [
       { pattern: '\\bPRIMARY\\s+KEY\\b', msg: 'La clé primaire garantit l\'unicité de LOT_ID, pas du couple (numero_lot, fabricant). Créez une contrainte dédiée.', level: 'error' },
       { pattern: '^(?![\\s\\S]*\\bUNIQUE\\b)[\\s\\S]*\\bINDEX\\b', msg: 'Un index classique n\'empêche pas les doublons. Ajoutez le mot-clé UNIQUE.', level: 'error' },
       { pattern: '\\bNOT\\s+NULL\\b', msg: 'NOT NULL ne garantit pas l\'unicité. Vous devez créer un index unique ou une contrainte UNIQUE.', level: 'info' }
+    ],
+    progressiveHints: [
+      'Vous devez créer un index unique sur LOT_SIMU pour empêcher les doublons de (numero_lot, fabricant).',
+      'Un UNIQUE INDEX est la solution directe : CREATE UNIQUE INDEX ... ON lot_simu(numero_lot, fabricant).',
+      'Une alternative équivalente : ALTER TABLE lot_simu ADD CONSTRAINT ... UNIQUE (numero_lot, fabricant).'
     ]
   },
   {
@@ -683,6 +732,11 @@ const SCENARIOS = [
       { pattern: '^(?![\\s\\S]*\\bWHERE\\b)', msg: 'Ajoutez une clause WHERE sur DATE_SORTIE pour limiter aux lignes de l\'année cible et déclencher le partition pruning.', level: 'error' },
       { pattern: '\\bWHERE\\b(?!.*date_sortie)', msg: 'Le filtre WHERE doit porter sur la colonne de partition DATE_SORTIE pour que l\'optimiseur élague les partitions non concernées.', level: 'error' },
       { pattern: '\\bSELECT\\s+\\*\\b', msg: 'Énumérez explicitement les colonnes (sortie_id, med_id, qty, date_sortie) plutôt que SELECT *.', level: 'info' }
+    ],
+    progressiveHints: [
+      'Pensez à filtrer sur la colonne de partition DATE_SORTIE pour bénéficier du partition pruning.',
+      'Une clause WHERE avec des opérateurs de comparaison (>=, <) sur DATE_SORTIE ne parcourt que la partition concernée.',
+      'WHERE date_sortie >= DATE \'2025-01-01\' AND date_sortie < DATE \'2026-01-01\' cible uniquement la partition p_2025.'
     ]
   },
   {
@@ -697,6 +751,11 @@ const SCENARIOS = [
       { pattern: '\\bSELECT\\s+MAX\\(ord_id\\)\\s*\\+\\s*1\\b', msg: 'SELECT MAX + 1 échouera en environnement concurrent (deux sessions obtiendront le même ID). Utilisez une séquence.', level: 'error' },
       { pattern: '\\bseq_ordonnance\\.CURRVAL\\b', msg: 'CURRVAL retourne la dernière valeur générée dans la session, mais nécessite un NEXTVAL préalable.', level: 'info' },
       { pattern: '\\bINSERT\\s+INTO\\s+ordonnance\\b(?![\\s\\S]*NEXTVAL)', msg: 'L\'INSERT doit utiliser seq_ordonnance.NEXTVAL pour la colonne ORD_ID.', level: 'error' }
+    ],
+    progressiveHints: [
+      'CREATE SEQUENCE seq_ordonnance START WITH 10000 INCREMENT BY 1 NOCACHE NOCYCLE.',
+      'Ensuite, INSERT INTO ordonnance (...) VALUES (seq_ordonnance.NEXTVAL, 1, 101, 60) pour utiliser la séquence.',
+      'NOCACHE évite la perte de valeurs au redémarrage. NOCYCLE empêche le recyclage après la valeur maximale.'
     ]
   },
   {
@@ -711,6 +770,11 @@ const SCENARIOS = [
       { pattern: '\\bWHEN\\s+OTHERS\\b', msg: 'WHEN OTHERS capture toutes les exceptions. Privilégiez WHEN ZERO_DIVIDE pour cibler l\'erreur spécifique.', level: 'warning' },
       { pattern: '\\bqty\\s*=\\s*0\\b|\\bqty\\s*=\\s*NULL\\b|\\bNULL\\b', msg: 'Un test conditionnel (IF qty = 0) est une alternative, mais l\'exercice demande l\'utilisation de la gestion d\'exceptions.', level: 'info' },
       { pattern: '\\bEXCEPTION\\b(?![\\s\\S]*ZERO_DIVIDE)', msg: 'Le bloc EXCEPTION doit contenir WHEN ZERO_DIVIDE pour capturer la division par zéro.', level: 'error' }
+    ],
+    progressiveHints: [
+      'Parcourez stock_med avec une boucle FOR r IN (SELECT * FROM stock_med) LOOP ... END LOOP.',
+      'À l\'intérieur, placez un sous-bloc BEGIN ... EXCEPTION ... END pour capturer ZERO_DIVIDE sur la division cout_total / r.qty.',
+      'Le sous-bloc interne évite que l\'exception n\'interrompe la boucle. WHEN ZERO_DIVIDE THEN ... affiche un message et continue.'
     ]
   },
   {
@@ -725,6 +789,11 @@ const SCENARIOS = [
       { pattern: '\\bSELECT\\s+.*\\s+INTO\\b', msg: 'SELECT INTO convient pour une seule ligne. Pour plusieurs réservations, utilisez un curseur explicite avec boucle FOR.', level: 'warning' },
       { pattern: "\\bUPDATE\\s+reservation\\s+SET\\s+statut\\s*=\\s*[']VALIDEE[']\\b", msg: 'La validation est conditionnelle. Ajoutez une clause ELSE pour REFUSEE quand le stock est insuffisant.', level: 'info' },
       { pattern: '^(?![\\s\\S]*\\bFOR\\s+UPDATE\\b)', msg: 'Sans FOR UPDATE, une autre session pourrait modifier les lignes entre la lecture et la mise à jour.', level: 'warning' }
+    ],
+    progressiveHints: [
+      'Déclarez un CURSOR c_res IS SELECT ... FROM reservation JOIN stock_med WHERE statut = \'EN_ATTENTE\' FOR UPDATE.',
+      'Bouclez avec FOR rec IN c_res LOOP. Si rec.qty_dem <= rec.stock_dispo, validez et décrémentez le stock.',
+      'Sinon, marquez la réservation comme REFUSEE. Terminez par COMMIT pour libérer les verrous FOR UPDATE.'
     ]
   },
   {
@@ -739,6 +808,11 @@ const SCENARIOS = [
       { pattern: '\\bIF\\b|\\bBEGIN\\b', msg: 'Un bloc PL/SQL avec IF explicite est plus verbeux. Utilisez l\'instruction MERGE qui combine tout en une seule commande SQL.', level: 'warning' },
       { pattern: '\\bUPDATE\\s+stock_theorique\\b(?!.*MERGE)', msg: 'Un UPDATE seul ne gère pas les nouvelles lignes de l\'inventaire. L\'instruction MERGE couvre les deux cas.', level: 'error' },
       { pattern: '\\bMERGE\\s+INTO\\s+\\w+\\s+USING\\b(?!.*WHEN\\s+MATCHED)', msg: 'La clause WHEN MATCHED est obligatoire pour une mise à jour. Ajoutez également WHEN NOT MATCHED pour les insertions.', level: 'error' }
+    ],
+    progressiveHints: [
+      'MERGE INTO stock_theorique t USING inventaire i ON (t.med_id = i.med_id) est la structure de base.',
+      'WHEN MATCHED THEN UPDATE SET t.qty = i.qty_reel pour les médicaments existants.',
+      'WHEN NOT MATCHED THEN INSERT (med_id, molecule, qty) VALUES (i.med_id, \'NOUVEAU\', i.qty_reel) pour les nouveaux.'
     ]
   },
   {
@@ -753,6 +827,11 @@ const SCENARIOS = [
       { pattern: '\\bROW_NUMBER\\(\\)\\b', msg: 'ROW_NUMBER attribue des rangs consécutifs sans ex-aequo (1, 2, 3). RANK est plus adapté si des égalités sont possibles.', level: 'info' },
       { pattern: '\\bORDER\\s+BY\\s+SUM\\(qty\\)\\s+ASC\\b', msg: 'ASC classe du plus petit au plus grand. Utilisez DESC pour voir les plus prescrits en tête.', level: 'error' },
       { pattern: '^(?![\\s\\S]*\\bFETCH\\s+FIRST\\b)', msg: 'Sans FETCH FIRST ou ROWNUM, vous obtenez toutes les lignes. Limitez à 5 pour le classement demandé.', level: 'warning' }
+    ],
+    progressiveHints: [
+      'Groupez par molecule avec SUM(qty), puis utilisez RANK() OVER (ORDER BY SUM(qty) DESC) pour classer.',
+      'Filtrez le semestre avec date_disp >= ADD_MONTHS(TRUNC(SYSDATE), -6) dans le WHERE avant le GROUP BY.',
+      'Limitez à 5 résultats avec FETCH FIRST 5 ROWS ONLY après ORDER BY rang.'
     ]
   },
   {
@@ -767,6 +846,11 @@ const SCENARIOS = [
       { pattern: '\\bCONNECT\\s+BY\\b', msg: 'CONNECT BY PRIOR est la syntaxe Oracle classique pour les requêtes hiérarchiques. L\'exercice demande une CTE récursive (WITH).', level: 'info' },
       { pattern: '\\bUNION\\b(?!.*ALL)', msg: 'UNION applique un DISTINCT coûteux. UNION ALL est suffisant et plus performant pour les CTE récursives.', level: 'warning' },
       { pattern: "\\bWHERE\\s+code\\s*=\\s*[']C[']\\b(?!.*UNION)", msg: 'Le membre d\'ancrage doit filtrer la racine. Le membre récursif ne doit pas contenir ce filtre.', level: 'error' }
+    ],
+    progressiveHints: [
+      'Structure de base : WITH cat_tree (code, libelle, niveau, chemin) AS ( ... ) SELECT ... FROM cat_tree.',
+      'Le membre d\'ancrage : SELECT code, libelle, 1, code FROM categorie_atc WHERE code = \'C\'.',
+      'Le membre récursif (UNION ALL) : SELECT c.code, c.libelle, niveau+1, chemin || \' > \' || c.code FROM categorie_atc c JOIN cat_tree ON c.code_parent = ct.code.'
     ]
   },
   {
@@ -781,6 +865,11 @@ const SCENARIOS = [
       { pattern: '\\bSELECT\\b(?![\\s\\S]*FOR\\s+UPDATE)', msg: 'Un SELECT simple ne verrouille pas les lignes. Ajoutez FOR UPDATE pour la réservation.', level: 'error' },
       { pattern: '\\bFOR\\s+UPDATE\\b(?!.*NOWAIT)', msg: 'Sans NOWAIT, la session attend indéfiniment si la ligne est verrouillée. NOWAIT retourne une erreur immédiate.', level: 'warning' },
       { pattern: '\\bCOMMIT\\b', msg: 'N\'oubliez pas de COMMIT pour libérer les verrous après le traitement.', level: 'info' }
+    ],
+    progressiveHints: [
+      'Déclarez un curseur avec SELECT qty FROM stock_med WHERE med_id = 1 FOR UPDATE NOWAIT.',
+      'Ouvrez le curseur, FETCH dans une variable, vérifiez si le stock est suffisant (>= 100), puis UPDATE ou affichez un message.',
+      'Gérez l\'exception WHEN OTHERS pour le cas où la ligne est déjà verrouillée. Terminez par COMMIT ou ROLLBACK.'
     ]
   },
   {
@@ -795,6 +884,11 @@ const SCENARIOS = [
       { pattern: '\\bEXECUTE\\b(?!.*IMMEDIATE)', msg: 'EXECUTE tout seul est pour les commandes SQL*Plus. Utilisez EXECUTE IMMEDIATE en PL/SQL.', level: 'error' },
       { pattern: '\\bUSING\\b', msg: 'Les variables de liaison (USING) protègent contre les injections SQL et optimisent les performances.', level: 'info' },
       { pattern: "\\b(?:INSERT\\s+INTO)\\s*['\"].*['\"]", msg: 'Le nom de la table ne doit pas être entre guillemets dans la construction dynamique.', level: 'error' }
+    ],
+    progressiveHints: [
+      'Déclarez v_table VARCHAR2(30) avec le nom de la table cible et construisez la chaîne SQL dynamiquement.',
+      'Utilisez EXECUTE IMMEDIATE v_sql USING 999, \'Nouveau médicament\', 100 pour exécuter avec des variables de liaison.',
+      'Concaténez le nom de la table dans la chaîne SQL, mais pas les valeurs (utilisez :1, :2, :3 avec USING).'
     ]
   }
 ];
@@ -1451,6 +1545,7 @@ class App {
     });
     document.getElementById('btn-verify').addEventListener('click', () => this._verify());
     document.getElementById('btn-execute').addEventListener('click', () => this._execute());
+    document.getElementById('btn-hint').addEventListener('click', () => this._showHint());
     document.getElementById('btn-solution').addEventListener('click', () => this._showSolution());
     document.getElementById('btn-reset-editor').addEventListener('click', () => this._openModal('help-confirm-reset'));
     document.getElementById('btn-confirm-yes').addEventListener('click', () => this._confirmSolution());
@@ -1482,6 +1577,7 @@ class App {
     document.getElementById('challenge-concept').innerHTML = '<span class="tag tag--gold">' + scenario.concept + '</span>';
     document.getElementById('session-scenario-name').textContent = scenario.title;
     document.getElementById('editor-filename').textContent = 'scenario_' + id + '.sql';
+    this._sm.set('hint_idx_' + id, 0);
     this._resetEditor();
     this._executor.reset();
     this._logConsole('Scénario chargé : ' + scenario.title, 'system');
@@ -1514,6 +1610,23 @@ class App {
     }
     this._executor.execute(validation, scenario, this._sm.attempts);
     this._updateUI();
+  }
+  _showHint() {
+    const scenario = this._engine.getCurrent();
+    if (!scenario) { this._logConsole('Aucun scénario actif.', 'error'); return; }
+    if (!scenario.progressiveHints || scenario.progressiveHints.length === 0) {
+      this._logConsole('Aucun indice disponible pour ce scénario.', 'info');
+      return;
+    }
+    const key = 'hint_idx_' + scenario.id;
+    let idx = this._sm.get(key) || 0;
+    if (idx >= scenario.progressiveHints.length) {
+      this._logConsole('Vous avez déjà consulté tous les indices (' + scenario.progressiveHints.length + '/' + scenario.progressiveHints.length + '). Tentez de résoudre le défi par vous-même !', 'info');
+      return;
+    }
+    const hint = scenario.progressiveHints[idx];
+    this._logConsole('&#128161; Indice ' + (idx + 1) + '/' + scenario.progressiveHints.length + ' : ' + hint, 'hint');
+    this._sm.set(key, idx + 1);
   }
   _showSolution() {
     const scenario = this._engine.getCurrent();
