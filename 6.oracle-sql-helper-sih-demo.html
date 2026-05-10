@@ -654,7 +654,7 @@ const SCENARIOS = [
     hints: [
       { pattern: '\\bWHEN\\s+OTHERS\\b', msg: 'WHEN OTHERS capture toutes les exceptions. Privilégiez WHEN ZERO_DIVIDE pour cibler l\'erreur spécifique.', level: 'warning' },
       { pattern: '\\bqty\\s*=\\s*0\\b|\\bqty\\s*=\\s*NULL\\b|\\bNULL\\b', msg: 'Un test conditionnel (IF qty = 0) est une alternative, mais l\'exercice demande l\'utilisation de la gestion d\'exceptions.', level: 'info' },
-      { pattern: '\\bEXCEPTION\\b(?!.*ZERO_DIVIDE)', msg: 'Le bloc EXCEPTION doit contenir WHEN ZERO_DIVIDE pour capturer la division par zéro.', level: 'error' }
+      { pattern: '\\bEXCEPTION\\b(?![\\s\\S]*ZERO_DIVIDE)', msg: 'Le bloc EXCEPTION doit contenir WHEN ZERO_DIVIDE pour capturer la division par zéro.', level: 'error' }
     ]
   },
   {
@@ -722,7 +722,7 @@ const SCENARIOS = [
     expected: "DECLARE\n  v_qty_dispo NUMBER;\n  CURSOR c_lock IS\n    SELECT qty FROM stock_med\n    WHERE  med_id = 1\n    FOR UPDATE NOWAIT;\nBEGIN\n  OPEN c_lock;\n  FETCH c_lock INTO v_qty_dispo;\n  IF v_qty_dispo >= 100 THEN\n    UPDATE stock_med SET qty = qty - 100 WHERE med_id = 1;\n    DBMS_OUTPUT.PUT_LINE('Réservation confirmée. Stock restant : ' || (v_qty_dispo - 100));\n  ELSE\n    DBMS_OUTPUT.PUT_LINE('Stock insuffisant.');\n  END IF;\n  CLOSE c_lock;\n  COMMIT;\nEXCEPTION\n  WHEN OTHERS THEN\n    DBMS_OUTPUT.PUT_LINE('Impossible de verrouiller la ligne (déjà réservée).');\n    ROLLBACK;\nEND;",
     explanation: 'FOR UPDATE verrouille les lignes sélectionnées au niveau ligne (ROW SHARE), empêchant toute autre session de les modifier ou de les verrouiller jusqu\'à la fin de la transaction. NOWAIT fait échouer immédiatement l\'opération si les lignes sont déjà verrouillées, sans attendre (évite le blocage). SKIP LOCKED est une alternative pour ignorer les lignes verrouillées et traiter les lignes disponibles.',
     hints: [
-      { pattern: '\\bSELECT\\b(?!.*FOR\\s+UPDATE)', msg: 'Un SELECT simple ne verrouille pas les lignes. Ajoutez FOR UPDATE pour la réservation.', level: 'error' },
+      { pattern: '\\bSELECT\\b(?![\\s\\S]*FOR\\s+UPDATE)', msg: 'Un SELECT simple ne verrouille pas les lignes. Ajoutez FOR UPDATE pour la réservation.', level: 'error' },
       { pattern: '\\bFOR\\s+UPDATE\\b(?!.*NOWAIT)', msg: 'Sans NOWAIT, la session attend indéfiniment si la ligne est verrouillée. NOWAIT retourne une erreur immédiate.', level: 'warning' },
       { pattern: '\\bCOMMIT\\b', msg: 'N\'oubliez pas de COMMIT pour libérer les verrous après le traitement.', level: 'info' }
     ]
@@ -813,7 +813,6 @@ class SQLValidator {
       'CREATE VIEW':             { keywords: ['VIEW'], msg: 'ORA-00920 : Mot-clé VIEW manquant. Créez une vue avec CREATE [OR REPLACE] VIEW.' },
       'Materialized View':       { keywords: ['MATERIALIZED VIEW'], msg: 'ORA-00920 : MATERIALIZED VIEW manquant. Utilisez CREATE MATERIALIZED VIEW pour pré-calculer les données.' },
       'Unique Index':            { keywords: ['UNIQUE INDEX', 'UNIQUE'], msg: 'ORA-00920 : Mot-clé UNIQUE ou INDEX manquant. Créez un INDEX UNIQUE pour garantir l\'unicité des lots.' },
-      'Partition Range':         { keywords: ['PARTITION BY RANGE'], msg: 'ORA-00920 : Clause PARTITION BY RANGE manquante. Partitionnez la table par intervalle de dates.' },
       'Sequence / NEXTVAL':      { keywords: ['SEQUENCE', 'NEXTVAL'], msg: 'ORA-00920 : CREATE SEQUENCE ou NEXTVAL manquant. Générez les identifiants avec une séquence.' },
       'Exception / ZERO_DIVIDE': { keywords: ['EXCEPTION', 'ZERO_DIVIDE'], msg: 'ORA-00920 : Bloc EXCEPTION ou exception ZERO_DIVIDE manquant. Capturez la division par zéro dans un gestionnaire d\'exception.' },
       'Curseur Explicite':       { keywords: ['CURSOR'], msg: 'ORA-00920 : Curseur explicite manquant. Déclarez un curseur avec CURSOR ... IS pour parcourir les réservations.' },
@@ -1122,31 +1121,31 @@ class SQLValidator {
 
 SQLValidator.prototype._SQL_KEYWORDS = new Set([
   'SELECT', 'FROM', 'WHERE', 'JOIN', 'ON', 'AS', 'AND', 'OR', 'IN', 'NOT', 'NULL',
-  'IS', 'LIKE', 'BETWEEN', 'EXISTS', 'UNION', 'ALL', 'ORDER', 'BY', 'GROUP', 'HAVING',
+  'IS', 'LIKE', 'BETWEEN', 'EXISTS', 'UNION', 'ALL', 'ADD', 'ALTER', 'ORDER', 'BY', 'GROUP', 'HAVING',
   'DESC', 'ASC', 'LEFT', 'RIGHT', 'INNER', 'OUTER', 'FULL', 'CROSS', 'WHEN', 'THEN',
   'ELSE', 'END', 'CASE', 'BEGIN', 'DECLARE', 'EXCEPTION', 'IF', 'ELSE',
   'WHILE', 'RETURN', 'COMMIT', 'ROLLBACK', 'SET', 'INTO', 'VALUES', 'INSERT', 'UPDATE',
   'DELETE', 'CREATE', 'TABLE', 'INDEX', 'VIEW', 'TRIGGER', 'SEQUENCE', 'WITH', 'MERGE',
-  'USING', 'MATCHED', 'FETCH', 'FIRST', 'ROWS', 'ONLY', 'FUNCTION', 'PROCEDURE',
+  'USING', 'MATCHED', 'FETCH', 'FIRST', 'ONLY', 'FUNCTION', 'PROCEDURE',
   'PACKAGE', 'TYPE', 'CURSOR', 'OPEN', 'CLOSE', 'FETCH', 'BULK', 'COLLECT', 'FORALL',
   'NOWAIT', 'WAIT', 'SHARE', 'EXCLUSIVE', 'LOCK', 'OF', 'REFRESH', 'COMPLETE', 'FAST',
   'DEMAND', 'MATERIALIZED', 'PRIMARY', 'KEY', 'FOREIGN', 'REFERENCES', 'CONSTRAINT',
   'UNIQUE', 'CHECK', 'DEFAULT', 'NUMBER', 'VARCHAR', 'VARCHAR2', 'CHAR', 'DATE',
   'TIMESTAMP', 'CLOB', 'BLOB', 'GENERATED', 'ALWAYS', 'IDENTITY', 'PARTITION', 'RANGE',
-  'LIST', 'HASH', 'VALUES', 'LESS', 'THAN', 'MAXVALUE', 'MODIFY', 'RENAME', 'DROP',
+  'READ', 'LIST', 'HASH', 'VALUES', 'LESS', 'THAN', 'MAXVALUE', 'MODIFY', 'RENAME', 'DROP',
   'TRUNCATE', 'GRANT', 'REVOKE', 'EXECUTE', 'IMMEDIATE', 'SYSDATE', 'TRUNC',
   'ADD_MONTHS', 'MONTHS_BETWEEN', 'NVL', 'COALESCE', 'ROUND', 'SUM', 'AVG', 'COUNT',
-  'MIN', 'MAX', 'RANK', 'DENSE_RANK', 'ROW_NUMBER', 'LAG', 'LEAD',
+  'MIN', 'MAX', 'RANK', 'DENSE_RANK', 'ROW_NUMBER', 'OVER', 'LAG', 'LEAD',
   'FIRST_VALUE', 'LAST_VALUE', 'TO_DATE', 'TO_CHAR', 'TO_NUMBER', 'CAST', 'NULLIF',
   'NVL2', 'DECODE', 'EXTRACT', 'GREATEST', 'LEAST', 'UPPER', 'LOWER', 'INITCAP',
   'LENGTH', 'SUBSTR', 'REPLACE', 'LPAD', 'RPAD', 'TRIM', 'INSTR', 'CONCAT', 'USER',
   'SYSTIMESTAMP', 'SYS_CONTEXT', 'DBMS_OUTPUT', 'DBMS_MVIEW', 'SQLERRM', 'SQLCODE',
   'ZERO_DIVIDE', 'NO_DATA_FOUND', 'TOO_MANY_ROWS', 'DUP_VAL_ON_INDEX', 'OTHERS',
   'PUT_LINE', 'NEW', 'OLD', 'PRIOR', 'CONNECT', 'LEVEL', 'SIBLINGS',
-  'NOCYCLE', 'NOCACHE', 'NOMAXVALUE', 'NOMINVALUE', 'NEXT', 'CURRVAL', 'INCREMENT',
-  'START', 'CACHE', 'CYCLE', 'MINVALUE', 'EXIT', 'LOOP', 'FOR', 'DO', 'THEN',
+  'NOCYCLE', 'NOCACHE', 'NOMAXVALUE', 'NOMINVALUE', 'NEXT', 'NEXTVAL', 'CURRVAL', 'INCREMENT',
+  'START', 'CACHE', 'CYCLE', 'MINVALUE',   'EXIT', 'LOOP', 'FOR', 'EACH', 'DO', 'THEN',
   'DUAL', 'TOP', 'PERCENT', 'OFFSET', 'TIES', 'GROUPS', 'WITHIN', 'EXCLUDE',
-  'INCLUDE', 'NULLS', 'LAST', 'LOOP', 'WHILE', 'CONTINUE', 'ROWTYPE',
+  'INCLUDE', 'NULLS', 'LAST', 'ROW', 'ROWS', 'LOOP', 'WHILE', 'CONTINUE', 'ROWTYPE',
   'AFTER', 'BEFORE'
 ]);
 
