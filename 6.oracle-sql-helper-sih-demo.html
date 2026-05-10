@@ -555,7 +555,7 @@ const SCENARIOS = [
     explanation: 'BULK COLLECT charge toutes les lignes en une seule transition SQL→PL/SQL dans une collection. La modification s\'effectue en mémoire (PGA) dans la collection. FORALL exécute l\'UPDATE pour chaque élément de la collection en un seul appel au moteur SQL, réduisant le nombre de changements de contexte de N (itération individuelle) à 2 (collecte + mise à jour massive).',
     hints: [
       { pattern: '\\bCURSOR\\b|\\bFOR\\s+\\w+\\s+IN\\s+\\(\\s*SELECT\\b', msg: 'Un curseur explicite ou une boucle FOR itérative génère un changement de contexte par ligne. Préférez BULK COLLECT + FORALL.', level: 'warning' },
-      { pattern: '\\bBULK\\s+COLLECT\\b(?!.*FORALL)', msg: 'BULK COLLECT sans FORALL ne fait que charger les données. Vous devez aussi écrire l\'instruction de mise à jour massive.', level: 'error' },
+      { pattern: '\\bBULK\\s+COLLECT\\b(?![\\s\\S]*FORALL)', msg: 'BULK COLLECT sans FORALL ne fait que charger les données. Vous devez aussi écrire l\'instruction de mise à jour massive.', level: 'error' },
       { pattern: 'UPDATE\\s+\\w+\\s+SET\\s+prix_achat\\s*=\\s*prix_achat', msg: 'N\'oubliez pas la majoration de 5% : multipliez par 1.05.', level: 'warning' }
     ]
   },
@@ -1018,6 +1018,20 @@ class SQLValidator {
       }
     }
 
+    // Add PL/SQL DECLARE block identifiers (variables, types, cursors)
+    if (/^\s*DECLARE\b/m.test(upper)) {
+      const declareMatch = upper.match(/\bDECLARE\b([\s\S]*?)\bBEGIN\b/);
+      if (declareMatch) {
+        const declTokens = declareMatch[1].match(/[A-Za-z_]\w{1,}/g) || [];
+        for (const tok of declTokens) {
+          const t = tok.toUpperCase();
+          if (!this._SQL_KEYWORDS.has(t)) {
+            allColumns.add(t);
+          }
+        }
+      }
+    }
+
     // Remove string literals and comments before tokenizing
     const clean = upper
       .replace(/'[^']*'/g, '')
@@ -1025,10 +1039,11 @@ class SQLValidator {
       .replace(/\/\*[\s\S]*?\*\//g, '');
 
     // Check alias.column patterns
-    const aliasColRe = /(\w+)\.(\w+)/g;
+    const aliasColRe = /([A-Za-z_]\w*)\.(\w+)/g;
     let am;
     while ((am = aliasColRe.exec(clean)) !== null) {
       const col = am[2].toUpperCase();
+      if (this._SQL_KEYWORDS.has(col)) continue;
       if (!allColumns.has(col)) {
         return {
           valid: true,
@@ -1131,7 +1146,8 @@ SQLValidator.prototype._SQL_KEYWORDS = new Set([
   'NOCYCLE', 'NOCACHE', 'NOMAXVALUE', 'NOMINVALUE', 'NEXT', 'CURRVAL', 'INCREMENT',
   'START', 'CACHE', 'CYCLE', 'MINVALUE', 'EXIT', 'LOOP', 'FOR', 'DO', 'THEN',
   'DUAL', 'TOP', 'PERCENT', 'OFFSET', 'TIES', 'GROUPS', 'WITHIN', 'EXCLUDE',
-  'INCLUDE', 'NULLS', 'LAST', 'LOOP', 'WHILE', 'CONTINUE'
+  'INCLUDE', 'NULLS', 'LAST', 'LOOP', 'WHILE', 'CONTINUE', 'ROWTYPE',
+  'AFTER', 'BEFORE'
 ]);
 
 // ============================================================
