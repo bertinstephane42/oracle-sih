@@ -495,6 +495,29 @@ a:hover { text-decoration: underline; }
   </div>
 </div>
 
+<!-- Hint Confirmation Modal -->
+<div class="help-modal" id="help-confirm-hint" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="help-modal__header">
+    <div class="help-modal__title">Suggérer un indice</div>
+  </div>
+  <div class="help-modal__body" style="text-align: center; padding: var(--sp-8) var(--sp-6);">
+    <div class="help-modal__text" style="font-size: var(--fs-md); margin-bottom: var(--sp-6);">
+      Un indice va être affiché dans la console.<br>
+      <span id="hint-counter" style="display: block; margin-top: var(--sp-3); font-size: var(--fs-sm); color: var(--color-gold);">
+        Indice <span id="hint-current-idx">1</span>/<span id="hint-total">3</span> disponible
+      </span>
+      <span style="display: block; margin-top: var(--sp-3); font-size: var(--fs-sm); color: #94a3b8;">
+        Chaque indice vous rapproche de la solution.<br>
+        Souhaitez-vous vraiment en consulter un ?
+      </span>
+    </div>
+    <div style="display: flex; gap: var(--sp-4); justify-content: center;">
+      <button class="btn btn--primary btn--sm" id="btn-hint-confirm-yes">Oui, montrez-moi</button>
+      <button class="btn btn--outline btn--sm" id="btn-hint-confirm-no">Non, je cherche encore</button>
+    </div>
+  </div>
+</div>
+
 <!-- Typed Confirmation Modal -->
 <div class="help-modal" id="help-confirm-typed" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="help-modal__header">
@@ -1546,6 +1569,8 @@ class App {
     document.getElementById('btn-verify').addEventListener('click', () => this._verify());
     document.getElementById('btn-execute').addEventListener('click', () => this._execute());
     document.getElementById('btn-hint').addEventListener('click', () => this._showHint());
+    document.getElementById('btn-hint-confirm-yes').addEventListener('click', () => this._confirmHint());
+    document.getElementById('btn-hint-confirm-no').addEventListener('click', () => this._cancelHint());
     document.getElementById('btn-solution').addEventListener('click', () => this._showSolution());
     document.getElementById('btn-reset-editor').addEventListener('click', () => this._openModal('help-confirm-reset'));
     document.getElementById('btn-confirm-yes').addEventListener('click', () => this._confirmSolution());
@@ -1619,14 +1644,31 @@ class App {
       return;
     }
     const key = 'hint_idx_' + scenario.id;
-    let idx = this._sm.get(key) || 0;
+    const idx = this._sm.get(key) || 0;
     if (idx >= scenario.progressiveHints.length) {
       this._logConsole('Vous avez déjà consulté tous les indices (' + scenario.progressiveHints.length + '/' + scenario.progressiveHints.length + '). Tentez de résoudre le défi par vous-même !', 'info');
       return;
     }
+    document.getElementById('hint-current-idx').textContent = idx + 1;
+    document.getElementById('hint-total').textContent = scenario.progressiveHints.length;
+    this._openModal('help-confirm-hint');
+  }
+  _confirmHint() {
+    this._closeModal('help-confirm-hint');
+    this._closeOverlay();
+    const scenario = this._engine.getCurrent();
+    if (!scenario) return;
+    const key = 'hint_idx_' + scenario.id;
+    let idx = this._sm.get(key) || 0;
+    if (idx >= scenario.progressiveHints.length) return;
     const hint = scenario.progressiveHints[idx];
     this._logConsole('&#128161; Indice ' + (idx + 1) + '/' + scenario.progressiveHints.length + ' : ' + hint, 'hint');
     this._sm.set(key, idx + 1);
+  }
+  _cancelHint() {
+    this._closeModal('help-confirm-hint');
+    this._closeOverlay();
+    this._logConsole('Consultation d\'indice annulée. Continuez à chercher !', 'info');
   }
   _showSolution() {
     const scenario = this._engine.getCurrent();
