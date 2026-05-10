@@ -848,6 +848,9 @@ class SQLValidator {
     for (const check of checks) {
       if (check.test) return { valid: false, message: check.msg, level: check.level };
     }
+    // Keyword misspelling detection
+    const misspellingCheck = this._detectKeywordMisspellings(upper);
+    if (misspellingCheck) return misspellingCheck;
     // Concept keywords validation
     if (scenario && scenario.concept) {
       const conceptCheck = this._checkConceptKeywords(upper, scenario);
@@ -879,6 +882,61 @@ class SQLValidator {
       return { valid: false, message: entry.msg, level: 'error' };
     }
     return null;
+  }
+
+  _detectKeywordMisspellings(upper) {
+    const clean = upper
+      .replace(/'[^']*'/g, '')
+      .replace(/--[^\n]*/g, '')
+      .replace(/\/\*[\s\S]*?\*\//g, '');
+    const tokens = [];
+    const tokenRe = /[A-Za-z_]\w*/g;
+    let m;
+    while ((m = tokenRe.exec(clean)) !== null) {
+      const tok = m[0];
+      if (this._SQL_KEYWORDS.has(tok)) continue;
+      if (tok.length < 3 || tok.length > 15) continue;
+      tokens.push(tok);
+    }
+    const uniqueTokens = [...new Set(tokens)];
+    for (const token of uniqueTokens) {
+      const closest = this._findClosestKeyword(token);
+      if (closest) {
+        return { valid: false, message: 'ORA-00920 : Erreur de syntaxe : "' + token + '" n\'est pas un mot-clé SQL reconnu. Vouliez-vous dire "' + closest + '" ?', level: 'error' };
+      }
+    }
+    return null;
+  }
+
+  _findClosestKeyword(token) {
+    const list = [...this._SQL_KEYWORDS];
+    let bestKeyword = null;
+    let bestDist = 3;
+    for (const kw of list) {
+      const dist = this._levenshtein(token, kw);
+      if (dist < bestDist || (dist === bestDist && kw.length > (bestKeyword || '').length)) {
+        bestDist = dist;
+        bestKeyword = kw;
+      }
+    }
+    return bestKeyword;
+  }
+
+  _levenshtein(a, b) {
+    const m = a.length, n = b.length;
+    if (m === 0) return n;
+    if (n === 0) return m;
+    const dp = Array.from({ length: n + 1 }, (_, i) => i);
+    for (let i = 1; i <= m; i++) {
+      let prev = dp[0];
+      dp[0] = i;
+      for (let j = 1; j <= n; j++) {
+        const tmp = dp[j];
+        dp[j] = a[i - 1] === b[j - 1] ? prev : 1 + Math.min(prev, dp[j], dp[j - 1]);
+        prev = tmp;
+      }
+    }
+    return dp[n];
   }
 
   _parseDDL(ddl) {
