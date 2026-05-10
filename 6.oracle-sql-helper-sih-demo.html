@@ -466,6 +466,25 @@ a:hover { text-decoration: underline; }
   </div>
 </div>
 
+<!-- Reset Confirmation Modal -->
+<div class="help-modal" id="help-confirm-reset" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="help-modal__header">
+    <div class="help-modal__title">Réinitialiser l'éditeur ?</div>
+  </div>
+  <div class="help-modal__body" style="text-align: center; padding: var(--sp-8) var(--sp-6);">
+    <div class="help-modal__text" style="font-size: var(--fs-md); margin-bottom: var(--sp-6);">
+      Cette action effacera votre code et les résultats.<br>
+      <span style="font-size: var(--fs-sm); color: #94a3b8;">
+        Voulez-vous vraiment réinitialiser ?
+      </span>
+    </div>
+    <div style="display: flex; gap: var(--sp-4); justify-content: center;">
+      <button class="btn btn--primary btn--sm" id="btn-reset-confirm-yes">Oui, réinitialiser</button>
+      <button class="btn btn--outline btn--sm" id="btn-reset-confirm-no">Annuler</button>
+    </div>
+  </div>
+</div>
+
 <script>
 'use strict';
 // ============================================================
@@ -1304,9 +1323,11 @@ class App {
     document.getElementById('btn-verify').addEventListener('click', () => this._verify());
     document.getElementById('btn-execute').addEventListener('click', () => this._execute());
     document.getElementById('btn-solution').addEventListener('click', () => this._showSolution());
-    document.getElementById('btn-reset-editor').addEventListener('click', () => this._resetEditor());
+    document.getElementById('btn-reset-editor').addEventListener('click', () => this._openModal('help-confirm-reset'));
     document.getElementById('btn-confirm-yes').addEventListener('click', () => this._confirmSolution());
     document.getElementById('btn-confirm-no').addEventListener('click', () => this._cancelSolution());
+    document.getElementById('btn-reset-confirm-yes').addEventListener('click', () => this._confirmReset());
+    document.getElementById('btn-reset-confirm-no').addEventListener('click', () => this._cancelReset());
     document.querySelectorAll('[data-help]').forEach(btn => {
       btn.addEventListener('click', () => this._helpMgr.open(btn.dataset.help));
     });
@@ -1379,6 +1400,17 @@ class App {
     this._closeModal('help-confirm');
     this._closeOverlay();
     this._logConsole('Consultation de la solution annulée. Continuez à chercher !', 'info');
+  }
+  _confirmReset() {
+    this._closeModal('help-confirm-reset');
+    this._closeOverlay();
+    this._resetEditor();
+    this._logConsole('Réinitialisation effectuée.', 'info');
+  }
+  _cancelReset() {
+    this._closeModal('help-confirm-reset');
+    this._closeOverlay();
+    this._logConsole('Réinitialisation annulée.', 'info');
   }
   _openModal(id) {
     document.getElementById(id).classList.add('help-modal--active');
