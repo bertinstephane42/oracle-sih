@@ -1,6 +1,6 @@
 ﻿# Oracle SIH (Système d'Information Hospitalier) — Démonstrations Techniques
 
-> Ensemble de 5 applications HTML/CSS/JavaScript autonomes, sans dépendance externe et exécutables hors-ligne, destinées à la démonstration pédagogique de mécanismes Oracle Database et d’architectures SIH (Système d’Information Hospitalier) dans un contexte de conformité HDS/RGPD.
+> Ensemble de 6 applications HTML/CSS/JavaScript autonomes, sans dépendance externe et exécutables hors-ligne, destinées à la démonstration pédagogique de mécanismes Oracle Database et d’architectures SIH (Système d’Information Hospitalier) dans un contexte de conformité HDS/RGPD.
 
 ---
 
@@ -13,11 +13,12 @@
 5. [Fichier 3 : Lexique Oracle PUI](#fichier-3--lexique-oracle-pui)
 6. [Fichier 4 : Cycle de vie projet Oracle PUI](#fichier-4--cycle-de-vie-projet-oracle-pui)
 7. [Fichier 5 : Suite Performance Avancée](#fichier-5--suite-performance-avancee)
-8. [Thèmes transversaux](#thèmes-transversaux)
-9. [Conformité et sécurité](#conformité-et-sécurité)
-10. [Aide intégrée et lexiques contextuels](#aide-intégrée-et-lexiques-contextuels)
-11. [Prérequis](#prérequis)
-12. [Licence](#licence)
+8. [Fichier 6 : Assistant SQL PUI](#fichier-6--assistant-sql-pui)
+9. [Thèmes transversaux](#thèmes-transversaux)
+10. [Conformité et sécurité](#conformité-et-sécurité)
+11. [Aide intégrée et lexiques contextuels](#aide-intégrée-et-lexiques-contextuels)
+12. [Prérequis](#prérequis)
+13. [Licence](#licence)
 
 ---
 
@@ -203,6 +204,39 @@ Fonctionnalités :
 * simulation de gains analytiques.
 
 Les accélérations présentées correspondent à des scénarios favorables et ne doivent pas être interprétées comme des garanties de performance réelles.
+
+---
+
+# Fichier 6 : Assistant SQL PUI
+
+**Fichier :** `6.oracle-sql-helper-sih-demo.html`
+
+Atelier pédagogique interactif de 18 scénarios SQL/PLSQL couvrant les mécanismes fondamentaux d'Oracle Database dans le contexte d'une Pharmacie à Usage Intérieur (PUI).
+
+| Scénarios | Concepts abordés |
+|-----------|-----------------|
+| 1 – 2 | Jointure interne (INNER JOIN) et externe (LEFT/RIGHT OUTER JOIN) |
+| 3 – 4 | Agrégation (GROUP BY) et sous-requête corrélée |
+| 5 – 6 | BULK COLLECT / FORALL et Trigger AFTER DELETE |
+| 7 – 8 | Vue simple (CREATE VIEW) et vue matérialisée (MATERIALIZED VIEW) |
+| 9 – 10 | Index unique (UNIQUE INDEX) et partitionnement (PARTITION BY RANGE) |
+| 11 – 12 | Séquence (SEQUENCE / NEXTVAL) et exception ZERO_DIVIDE |
+| 13 – 14 | Curseur explicite et MERGE (upsert) |
+| 15 – 16 | Fonction analytique (RANK) et CTE récursive (WITH) |
+| 17 – 18 | FOR UPDATE NOWAIT et EXECUTE IMMEDIATE |
+
+Fonctionnalités :
+
+* éditeur SQL avec validation contextuelle ;
+* détection des erreurs syntaxiques (`;` manquant, parenthèses déséquilibrées) ;
+* vérification des mots-clés par concept avec suggestion par distance de Levenshtein ;
+* validation des identifiants (tables/colonnes) par analyse du schéma DDL ;
+* exécution simulée avec affichage de résultats et grille dynamique ;
+* indices de débogage progressifs (hints) par scénario ;
+* solution experte accessible après confirmation (pédagogie active) ;
+* console de sortie et tableau de bord de progression.
+
+Données 100 % fictives, contexte PUI, conformes à la charte graphique des modules 1 à 5.
 
 ---
 
