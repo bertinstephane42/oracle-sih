@@ -1214,6 +1214,35 @@ class SQLValidator {
         const re = new RegExp('\\b' + name + '\\b', 'gi');
         cleaned = cleaned.replace(re, '@');
       }
+      // Normalize PL/SQL local identifiers (non-deterministic)
+      const schemaTables = new Set();
+      for (const tbl of Object.keys(schema.tables)) {
+        schemaTables.add(tbl.toUpperCase());
+      }
+      const plsqlIds = [];
+      const dclMatch = cleaned.match(/\bDECLARE\b([\s\S]*?)\bBEGIN\b/);
+      if (dclMatch) {
+        const declTokens = dclMatch[1].match(/[A-Za-z_]\w{1,}/g) || [];
+        for (const tok of declTokens) {
+          const t = tok.toUpperCase();
+          if (t && !this._SQL_KEYWORDS.has(t) && !schemaCols.has(t) && !schemaTables.has(t)) {
+            plsqlIds.push(tok);
+          }
+        }
+      }
+      const forRe = /\bFOR\s+(\w+)\s+IN\b/gi;
+      let ffm;
+      while ((ffm = forRe.exec(cleaned)) !== null) {
+        const v = ffm[1];
+        const t = v.toUpperCase();
+        if (v && !this._SQL_KEYWORDS.has(t) && !schemaCols.has(t) && !schemaTables.has(t)) {
+          plsqlIds.push(v);
+        }
+      }
+      for (const name of [...new Set(plsqlIds)]) {
+        const re = new RegExp('\\b' + name + '\\b', 'gi');
+        cleaned = cleaned.replace(re, '@');
+      }
       cleaned = cleaned.replace(/;\s*$/, '').replace(/\s+/g, ' ').trim();
       return cleaned;
     };
