@@ -276,6 +276,13 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
   font-size: var(--fs-sm); color: #cbd5e1; line-height: 1.7;
   margin-bottom: var(--sp-3);
 }
+.help-modal__credit { text-align: center; padding: var(--sp-4) 0; }
+.help-modal__credit-role { font-size: var(--fs-xs); color: #64748b; margin-bottom: var(--sp-4); line-height: 1.7; }
+.help-modal__credit-author { font-size: var(--fs-lg); font-weight: 700; margin-bottom: var(--sp-2); }
+.help-modal__credit-author a { color: var(--color-cyan); text-decoration: none; transition: color var(--transition-normal); }
+.help-modal__credit-author a:hover { color: var(--color-blue); text-decoration: underline; }
+.help-modal__credit-assist { font-size: var(--fs-xs); color: var(--color-amber-dim); margin-bottom: var(--sp-4); line-height: 1.6; }
+.help-modal__credit-year { font-size: var(--fs-xs); color: #475569; }
 .help-modal__text code {
   font-family: var(--font-mono); font-size: var(--fs-xs);
   background: var(--color-bg-elevated); padding: var(--sp-1) var(--sp-2);
@@ -901,12 +908,13 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
       </div>
       <div class="help-modal__body">
-        <div class="help-modal__section">
-          <p class="help-modal__text">
-            <center>Conception fonctionnelle, scénarios, développement et relecture : Stéphane Bertin<br>
-            Assisté par OpenCode, agent Big Pickle<br>
-            2026.</center>
+        <div class="help-modal__credit">
+          <p class="help-modal__credit-role">Conception fonctionnelle, scénarios, développement et relecture</p>
+          <p class="help-modal__credit-author">
+            <a href="https://github.com/bertinstephane42/oracle-sih" target="_blank" rel="noopener noreferrer">Stéphane Bertin</a>
           </p>
+          <p class="help-modal__credit-assist">Assisté par <strong>OpenCode</strong>, agent <strong>Big Pickle</strong></p>
+          <p class="help-modal__credit-year">2025</p>
         </div>
       </div>
       <div class="help-modal__footer">
