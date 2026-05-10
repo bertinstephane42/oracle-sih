@@ -1054,7 +1054,7 @@ class SQLValidator {
         allColumns.add(am[1].toUpperCase());
       }
       // Extract CTE name and output columns from expected solution
-      const cteRe = /WITH\s+(\w+)\s*(?:\(([^)]*)\))?\s+AS\s*\(/gi;
+      const cteRe = /(?:,|WITH)\s+(\w+)\s*(?:\(([^)]*)\))?\s+AS\s*\(/gi;
       let cem;
       while ((cem = cteRe.exec(expectedSql)) !== null) {
         allTables.add(cem[1].toUpperCase());
@@ -1078,7 +1078,7 @@ class SQLValidator {
     }
 
     // Add CTE names from the user's query
-    const userCteRe = /WITH\s+(\w+)\s*(?:\(([^)]*)\))?\s+AS\s*\(/gi;
+    const userCteRe = /(?:,|WITH)\s+(\w+)\s*(?:\(([^)]*)\))?\s+AS\s*\(/gi;
     let ucm;
     while ((ucm = userCteRe.exec(upper)) !== null) {
       allTables.add(ucm[1].toUpperCase());
@@ -1203,6 +1203,17 @@ class SQLValidator {
       cleaned = cleaned.replace(
         /\bCREATE\s+(?:OR\s+REPLACE\s+)?(?:UNIQUE\s+|MATERIALIZED\s+)?(?:VIEW|INDEX|SEQUENCE)\s+\w+/gi,
         (m) => m.replace(/\w+$/, '@'));
+      // Normalize CTE names (non-deterministic)
+      const cteNames = [];
+      const cteNameRe = /\bWITH\s+(\w+)/gi;
+      let ctm;
+      while ((ctm = cteNameRe.exec(cleaned)) !== null) {
+        cteNames.push(ctm[1]);
+      }
+      for (const name of cteNames) {
+        const re = new RegExp('\\b' + name + '\\b', 'gi');
+        cleaned = cleaned.replace(re, '@');
+      }
       cleaned = cleaned.replace(/;\s*$/, '').replace(/\s+/g, ' ').trim();
       return cleaned;
     };
