@@ -1008,6 +1008,16 @@ class SQLValidator {
       }
     }
 
+    // Add table aliases from the user's query (non-deterministic)
+    const tblAliasRe = /(?:FROM|JOIN|INTO|USING)\s+(\w+)\s+(?:AS\s+)?(\w+)/gi;
+    let ta;
+    while ((ta = tblAliasRe.exec(upper)) !== null) {
+      const alias = ta[2].toUpperCase();
+      if (alias && !this._SQL_KEYWORDS.has(alias)) {
+        allTables.add(alias);
+      }
+    }
+
     // Remove string literals and comments before tokenizing
     const clean = upper
       .replace(/'[^']*'/g, '')
