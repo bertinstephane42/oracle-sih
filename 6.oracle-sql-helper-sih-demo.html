@@ -849,7 +849,7 @@ class SQLValidator {
       if (check.test) return { valid: false, message: check.msg, level: check.level };
     }
     // Keyword misspelling detection
-    const misspellingCheck = this._detectKeywordMisspellings(upper);
+    const misspellingCheck = this._detectKeywordMisspellings(sql);
     if (misspellingCheck) return misspellingCheck;
     // Concept keywords validation
     if (scenario && scenario.concept) {
@@ -884,25 +884,24 @@ class SQLValidator {
     return null;
   }
 
-  _detectKeywordMisspellings(upper) {
-    const clean = upper
+  _detectKeywordMisspellings(sql) {
+    const clean = sql
       .replace(/'[^']*'/g, '')
       .replace(/--[^\n]*/g, '')
       .replace(/\/\*[\s\S]*?\*\//g, '');
     const tokens = [];
-    const tokenRe = /[A-Za-z_]\w*/g;
+    const tokenRe = /[A-Z][A-Z_0-9]{2,14}/g;
     let m;
     while ((m = tokenRe.exec(clean)) !== null) {
       const tok = m[0];
       if (this._SQL_KEYWORDS.has(tok)) continue;
-      if (tok.length < 3 || tok.length > 15) continue;
       tokens.push(tok);
     }
     const uniqueTokens = [...new Set(tokens)];
     for (const token of uniqueTokens) {
       const closest = this._findClosestKeyword(token);
       if (closest) {
-        return { valid: false, message: 'ORA-00920 : Erreur de syntaxe : "' + token + '" n\'est pas un mot-clé SQL reconnu. Vouliez-vous dire "' + closest + '" ?', level: 'error' };
+        return { valid: false, message: 'ORA-00920 : Erreur de syntaxe : "' + token + '" n\'est pas un mot-clé SQL reconnu (vérification sensible à la casse : les mots-clés doivent être en majuscules). Vouliez-vous dire "' + closest + '" ?', level: 'error' };
       }
     }
     return null;
