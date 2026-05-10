@@ -568,6 +568,7 @@ class StateManager {
   get current() { return this._data.currentScenario; }
   get(key) { return this._data[key]; }
   set(key, val) { this._data[key] = val; this._save(); }
+  resetAttempts() { this._data.attempts = 0; this._save(); }
 }
 
 // ============================================================
@@ -1710,7 +1711,9 @@ class App {
     this._closeModal('help-confirm-reset');
     this._closeOverlay();
     this._resetEditor();
-    this._logConsole('Réinitialisation effectuée.', 'info');
+    this._sm.resetAttempts();
+    this._updateUI();
+    this._logConsole('Réinitialisation effectuée. Tentative remise à zéro.', 'info');
   }
   _cancelReset() {
     this._closeModal('help-confirm-reset');
@@ -1732,6 +1735,8 @@ class App {
     document.getElementById('result-console').innerHTML =
       '<div class="log-console__entry log-console__entry--system"><span class="log-console__timestamp">[--:--:--]</span>Console réinitialisée. Sélectionnez un scénario.</div>';
     this._executor.reset();
+    const sc = this._engine.getCurrent();
+    if (sc) this._sm.set('hint_idx_' + sc.id, 0);
   }
   _logConsole(msg, level = 'info') {
     const ts = new Date().toLocaleTimeString('fr-FR', { hour12: false });
