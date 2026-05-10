@@ -716,7 +716,7 @@ const SCENARIOS = [
     hints: [
       { pattern: '\\bSELECT\\s+.*\\s+INTO\\b', msg: 'SELECT INTO convient pour une seule ligne. Pour plusieurs réservations, utilisez un curseur explicite avec boucle FOR.', level: 'warning' },
       { pattern: "\\bUPDATE\\s+reservation\\s+SET\\s+statut\\s*=\\s*[']VALIDEE[']\\b", msg: 'La validation est conditionnelle. Ajoutez une clause ELSE pour REFUSEE quand le stock est insuffisant.', level: 'info' },
-      { pattern: '\\bFOR\\s+UPDATE\\b', msg: 'Sans FOR UPDATE, une autre session pourrait modifier les lignes entre la lecture et la mise à jour.', level: 'warning' }
+      { pattern: '^(?![\\s\\S]*\\bFOR\\s+UPDATE\\b)', msg: 'Sans FOR UPDATE, une autre session pourrait modifier les lignes entre la lecture et la mise à jour.', level: 'warning' }
     ]
   },
   {
@@ -1053,14 +1053,17 @@ class SQLValidator {
       while ((am = aliasRe.exec(expectedSql)) !== null) {
         allColumns.add(am[1].toUpperCase());
       }
-      // Extract CTE output columns from expected solution
-      const cteColRe = /WITH\s+\w+\s*\(([^)]+)\)\s*AS\s*\(/gi;
+      // Extract CTE name and output columns from expected solution
+      const cteRe = /WITH\s+(\w+)\s*(?:\(([^)]*)\))?\s+AS\s*\(/gi;
       let cem;
-      while ((cem = cteColRe.exec(expectedSql)) !== null) {
-        cem[1].split(',').forEach(col => {
-          const c = col.trim().toUpperCase();
-          if (c && !this._SQL_KEYWORDS.has(c)) allColumns.add(c);
-        });
+      while ((cem = cteRe.exec(expectedSql)) !== null) {
+        allTables.add(cem[1].toUpperCase());
+        if (cem[2]) {
+          cem[2].split(',').forEach(col => {
+            const c = col.trim().toUpperCase();
+            if (c && !this._SQL_KEYWORDS.has(c)) allColumns.add(c);
+          });
+        }
       }
     }
 
@@ -1072,6 +1075,13 @@ class SQLValidator {
       if (alias && !this._SQL_KEYWORDS.has(alias)) {
         allTables.add(alias);
       }
+    }
+
+    // Add CTE names from the user's query
+    const userCteRe = /WITH\s+(\w+)\s*(?:\(([^)]*)\))?\s+AS\s*\(/gi;
+    let ucm;
+    while ((ucm = userCteRe.exec(upper)) !== null) {
+      allTables.add(ucm[1].toUpperCase());
     }
 
     // Add trigger name from CREATE OR REPLACE TRIGGER
