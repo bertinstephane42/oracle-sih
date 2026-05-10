@@ -1,0 +1,1115 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Oracle SQL Helper SIH - Atelier dynamique de construction de requêtes Oracle, 18 scénarios PUI">
+<title>Oracle SQL Helper - SIH</title>
+<style>
+:root {
+  --color-bg-deep: #0a0e17;
+  --color-bg-surface: #131a2a;
+  --color-bg-elevated: #1a2340;
+  --color-bg-hover: #243052;
+  --color-border: #1e2d4a;
+  --color-border-active: #3b82f6;
+  --color-blue: #3b82f6;
+  --color-blue-dim: #1e3a6e;
+  --color-red: #ef4444;
+  --color-red-dim: #7f1d1d;
+  --color-green: #22c55e;
+  --color-green-dim: #166534;
+  --color-amber: #f59e0b;
+  --color-amber-dim: #78350f;
+  --color-cyan: #06b6d4;
+  --color-purple: #a855f7;
+  --color-gold: #eab308;
+  --color-gold-dim: #713f12;
+  --font-ui: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+  --fs-xs: 0.6875rem;
+  --fs-sm: 0.8125rem;
+  --fs-base: 0.9375rem;
+  --fs-md: 1.0625rem;
+  --fs-lg: 1.25rem;
+  --fs-xl: 1.5rem;
+  --fs-2xl: 2rem;
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-6: 1.5rem;
+  --sp-8: 2rem;
+  --sp-12: 3rem;
+  --nav-width: 260px;
+  --header-height: 56px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --transition-fast: 150ms ease;
+  --transition-normal: 300ms ease;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+body { font-family: var(--font-ui); font-size: var(--fs-base); color: #e2e8f0; background: var(--color-bg-deep); line-height: 1.6; overflow-x: hidden; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input, select, textarea { font-family: inherit; font-size: inherit; }
+pre, code { font-family: var(--font-mono); }
+table { border-collapse: collapse; width: 100%; }
+a { color: var(--color-cyan); text-decoration: none; }
+a:hover { text-decoration: underline; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--color-bg-deep); }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: var(--radius-sm); }
+::-webkit-scrollbar-thumb:hover { background: var(--color-blue); }
+
+.app-layout { display: grid; grid-template-columns: var(--nav-width) 1fr; grid-template-rows: var(--header-height) 1fr; grid-template-areas: "header header" "nav main"; min-height: 100vh; }
+.app-header { grid-area: header; display: flex; align-items: center; justify-content: space-between; padding: 0 var(--sp-6); background: var(--color-bg-surface); border-bottom: 1px solid var(--color-border); z-index: 100; }
+.app-header__brand { display: flex; align-items: center; gap: var(--sp-3); font-family: var(--font-mono); font-size: var(--fs-md); font-weight: 700; letter-spacing: -0.02em; }
+.app-header__brand-icon { width: 28px; height: 28px; background: var(--color-blue); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: var(--fs-sm); font-weight: 900; color: #fff; }
+.app-header__status { display: flex; align-items: center; gap: var(--sp-4); font-size: var(--fs-xs); font-family: var(--font-mono); }
+.status-badge { display: inline-flex; align-items: center; gap: var(--sp-2); padding: var(--sp-1) var(--sp-3); border-radius: var(--radius-sm); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.status-badge--online { background: var(--color-green-dim); color: var(--color-green); }
+.status-badge--hds { background: var(--color-blue-dim); color: var(--color-blue); }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: pulse-dot 2s infinite; }
+@keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+.header-btn { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-bg-elevated); color: #94a3b8; font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700; transition: all var(--transition-fast); }
+.header-btn:hover { border-color: var(--color-blue); color: var(--color-blue); background: var(--color-blue-dim); }
+
+.app-nav { grid-area: nav; background: var(--color-bg-surface); border-right: 1px solid var(--color-border); padding: var(--sp-6) 0; overflow-y: auto; }
+.app-nav__section { padding: 0 var(--sp-4); margin-bottom: var(--sp-6); }
+.app-nav__section-title { font-size: var(--fs-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-blue); margin-bottom: var(--sp-3); font-family: var(--font-mono); }
+.app-nav__item { display: flex; align-items: center; gap: var(--sp-3); width: 100%; padding: var(--sp-3) var(--sp-4); border-radius: var(--radius-md); font-size: var(--fs-sm); font-weight: 500; color: #94a3b8; transition: all var(--transition-fast); text-align: left; }
+.app-nav__item:hover { background: var(--color-bg-hover); color: #e2e8f0; }
+.app-nav__item--active { background: var(--color-blue-dim); color: var(--color-blue); font-weight: 600; }
+.app-nav__item-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: var(--fs-xs); font-weight: 800; background: var(--color-bg-elevated); flex-shrink: 0; }
+.app-nav__item--active .app-nav__item-icon { background: var(--color-blue); color: #fff; }
+.app-nav__rgpd-notice { margin: var(--sp-8) var(--sp-4) 0; padding: var(--sp-3) var(--sp-4); font-size: var(--fs-xs); color: #475569; border-top: 1px solid var(--color-border); font-family: var(--font-mono); line-height: 1.5; }
+
+.app-main { grid-area: main; padding: var(--sp-8); overflow-y: auto; max-height: calc(100vh - var(--header-height)); }
+
+.page-header { margin-bottom: var(--sp-8); padding-bottom: var(--sp-4); border-bottom: 1px solid var(--color-border); }
+.page-header__title { font-size: var(--fs-xl); font-weight: 700; letter-spacing: -0.02em; margin-bottom: var(--sp-2); }
+.page-header__subtitle { font-size: var(--fs-sm); color: #94a3b8; font-family: var(--font-mono); }
+.page-header__subtitle-row { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); }
+.page-header__help-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 1px solid var(--color-border); border-radius: 50%; background: var(--color-bg-elevated); color: #94a3b8; font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700; cursor: pointer; transition: all var(--transition-fast); flex-shrink: 0; }
+.page-header__help-btn:hover { border-color: var(--color-blue); color: var(--color-blue); background: var(--color-blue-dim); }
+
+.card { background: var(--color-bg-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--sp-6); margin-bottom: var(--sp-6); }
+.card__title { font-size: var(--fs-md); font-weight: 700; margin-bottom: var(--sp-4); display: flex; align-items: center; gap: var(--sp-3); font-family: var(--font-mono); }
+.card__title-icon { color: var(--color-blue); }
+
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-6); }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-6); }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-6); }
+@media (max-width: 1200px) { .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+.data-mono { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--color-cyan); background: var(--color-bg-elevated); padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); display: inline-block; }
+.data-label { font-size: var(--fs-xs); color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+.data-value { font-family: var(--font-mono); font-size: var(--fs-base); font-weight: 600; }
+
+.stat-block { background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--sp-4); text-align: center; }
+.stat-block__value { font-family: var(--font-mono); font-size: var(--fs-xl); font-weight: 700; margin-bottom: var(--sp-1); }
+.stat-block__label { font-size: var(--fs-xs); color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+.stat-block--blue .stat-block__value { color: var(--color-blue); }
+.stat-block--green .stat-block__value { color: var(--color-green); }
+.stat-block--red .stat-block__value { color: var(--color-red); }
+.stat-block--amber .stat-block__value { color: var(--color-amber); }
+.stat-block--cyan .stat-block__value { color: var(--color-cyan); }
+.stat-block--purple .stat-block__value { color: var(--color-purple); }
+.stat-block--gold .stat-block__value { color: var(--color-gold); }
+
+.tag { display: inline-flex; align-items: center; padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); font-size: var(--fs-xs); font-weight: 600; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.03em; }
+.tag--blue { background: var(--color-blue-dim); color: var(--color-blue); }
+.tag--green { background: var(--color-green-dim); color: var(--color-green); }
+.tag--red { background: var(--color-red-dim); color: var(--color-red); }
+.tag--amber { background: var(--color-amber-dim); color: var(--color-amber); }
+.tag--purple { background: #4c1d95; color: var(--color-purple); }
+.tag--gold { background: var(--color-gold-dim); color: var(--color-gold); }
+.tag--neutral { background: #1e293b; color: #94a3b8; border: 1px solid var(--color-border); }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2); padding: var(--sp-3) var(--sp-6); border-radius: var(--radius-md); font-size: var(--fs-sm); font-weight: 600; transition: all var(--transition-fast); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.03em; }
+.btn--primary { background: var(--color-blue); color: #fff; }
+.btn--primary:hover { background: #2563eb; }
+.btn--outline { background: transparent; border: 1px solid var(--color-border); color: #94a3b8; }
+.btn--outline:hover { border-color: var(--color-blue); color: var(--color-blue); }
+.btn--success { background: var(--color-green); color: #fff; }
+.btn--success:hover { background: #16a34a; }
+.btn--gold { background: var(--color-gold); color: #0a0e17; }
+.btn--gold:hover { background: #facc15; }
+.btn--sm { padding: var(--sp-2) var(--sp-4); font-size: var(--fs-xs); }
+.btn--danger { background: var(--color-red); color: #fff; }
+.btn--danger:hover { background: #dc2626; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.select-styled { width: 100%; padding: var(--sp-3) var(--sp-4); background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-md); color: #e2e8f0; font-family: var(--font-mono); font-size: var(--fs-sm); outline: none; transition: border-color var(--transition-fast); appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
+.select-styled:focus { border-color: var(--color-blue); }
+.select-styled option { background: var(--color-bg-elevated); color: #e2e8f0; }
+
+.code-editor-wrapper { border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; }
+.code-editor__header { display: flex; align-items: center; justify-content: space-between; padding: var(--sp-2) var(--sp-4); background: var(--color-bg-elevated); border-bottom: 1px solid var(--color-border); }
+.code-editor__label { font-family: var(--font-mono); font-size: var(--fs-xs); color: #64748b; }
+.code-editor__textarea { width: 100%; min-height: 200px; padding: var(--sp-4); background: var(--color-bg-deep); border: none; color: #e2e8f0; font-family: var(--font-mono); font-size: var(--fs-sm); line-height: 1.7; resize: vertical; outline: none; tab-size: 2; }
+.code-editor__textarea:focus { background: #0d111f; }
+
+.log-console { background: var(--color-bg-deep); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--sp-3); min-height: 120px; max-height: 300px; overflow-y: auto; font-family: var(--font-mono); font-size: var(--fs-xs); line-height: 1.8; }
+.log-console__entry { padding: var(--sp-1) 0; border-bottom: 1px solid rgba(30, 45, 74, 0.3); display: flex; gap: var(--sp-3); }
+.log-console__entry:last-child { border-bottom: none; }
+.log-console__timestamp { color: #475569; flex-shrink: 0; }
+.log-console__entry--info { color: #94a3b8; }
+.log-console__entry--success { color: var(--color-green); }
+.log-console__entry--error { color: var(--color-red); }
+.log-console__entry--warning { color: var(--color-amber); }
+.log-console__entry--system { color: var(--color-cyan); }
+
+.result-table-wrap { overflow-x: auto; margin-top: var(--sp-4); }
+.result-table { width: 100%; font-family: var(--font-mono); font-size: var(--fs-xs); border-collapse: collapse; }
+.result-table th { background: var(--color-bg-elevated); padding: var(--sp-2) var(--sp-3); text-align: left; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--color-border); }
+.result-table td { padding: var(--sp-2) var(--sp-3); border-bottom: 1px solid rgba(30, 45, 74, 0.3); color: #e2e8f0; }
+.result-table tr:hover td { background: var(--color-bg-hover); }
+.result-table tr:last-child td { border-bottom: none; }
+
+.schema-box { font-family: var(--font-mono); font-size: var(--fs-xs); line-height: 1.8; color: var(--color-cyan); white-space: pre-wrap; word-break: break-all; background: var(--color-bg-deep); padding: var(--sp-4); border-radius: var(--radius-md); border: 1px solid var(--color-border); max-height: 200px; overflow-y: auto; }
+.data-box { font-family: var(--font-mono); font-size: var(--fs-xs); line-height: 1.8; color: var(--color-green); white-space: pre-wrap; word-break: break-all; background: var(--color-bg-deep); padding: var(--sp-4); border-radius: var(--radius-md); border: 1px solid var(--color-border); max-height: 200px; overflow-y: auto; }
+
+.challenge-text { font-size: var(--fs-base); line-height: 1.8; color: #e2e8f0; padding: var(--sp-4); background: var(--color-bg-deep); border-left: 3px solid var(--color-blue); border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+.challenge-concept { display: inline-flex; align-items: center; gap: var(--sp-2); margin-top: var(--sp-3); }
+
+.state-machine { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; padding: var(--sp-3) 0; }
+.state-step { display: flex; align-items: center; gap: var(--sp-2); font-family: var(--font-mono); font-size: var(--fs-xs); padding: var(--sp-1) var(--sp-3); border-radius: var(--radius-sm); background: var(--color-bg-elevated); color: #475569; }
+.state-step--active { background: var(--color-blue-dim); color: var(--color-blue); font-weight: 700; }
+.state-step__dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.state-arrow { color: #475569; font-family: var(--font-mono); font-size: var(--fs-xs); }
+
+.empty-state { text-align: center; padding: var(--sp-12) var(--sp-6); color: #475569; }
+.empty-state__icon { font-size: 3rem; margin-bottom: var(--sp-4); opacity: 0.3; }
+.empty-state__text { font-family: var(--font-mono); font-size: var(--fs-sm); }
+
+.fade-in { animation: fadeIn var(--transition-normal); }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.help-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; opacity: 0; pointer-events: none; transition: opacity var(--transition-normal); }
+.help-overlay--active { opacity: 1; pointer-events: all; }
+.help-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); background: var(--color-bg-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); z-index: 201; width: 640px; max-width: calc(100vw - var(--sp-8)); max-height: calc(100vh - var(--sp-8)); display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: all var(--transition-normal); box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
+.help-modal--active { opacity: 1; pointer-events: all; transform: translate(-50%, -50%) scale(1); }
+.help-modal__header { display: flex; align-items: center; justify-content: space-between; padding: var(--sp-6) var(--sp-6) var(--sp-4); border-bottom: 1px solid var(--color-border); }
+.help-modal__title { font-size: var(--fs-lg); font-weight: 700; font-family: var(--font-mono); }
+.help-modal__close { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--color-border); border-radius: var(--radius-sm); font-size: var(--fs-lg); color: #64748b; transition: all var(--transition-fast); }
+.help-modal__close:hover { border-color: var(--color-red); color: var(--color-red); }
+.help-modal__body { padding: var(--sp-6); overflow-y: auto; flex: 1; }
+.help-modal__section { margin-bottom: var(--sp-6); }
+.help-modal__section:last-child { margin-bottom: 0; }
+.help-modal__section-title { font-size: var(--fs-sm); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--sp-2); }
+.help-modal__section-title--objective { color: var(--color-blue); }
+.help-modal__section-title--controls { color: var(--color-cyan); }
+.help-modal__section-title--lexique { color: var(--color-purple); }
+.help-modal__text { font-size: var(--fs-sm); line-height: 1.8; color: #cbd5e1; }
+.help-modal__list { list-style: none; padding: 0; margin: var(--sp-3) 0; }
+.help-modal__list li { padding: var(--sp-2) 0; padding-left: var(--sp-4); border-left: 2px solid var(--color-border); margin-bottom: var(--sp-1); font-size: var(--fs-sm); line-height: 1.7; color: #cbd5e1; }
+.help-modal__list li strong { color: #e2e8f0; }
+.help-modal__footer { padding: var(--sp-4) var(--sp-6); border-top: 1px solid var(--color-border); display: flex; justify-content: flex-end; }
+
+.app-footer { text-align: center; padding: var(--sp-8) var(--sp-4) var(--sp-4); font-size: var(--fs-xs); color: #475569; font-family: var(--font-mono); line-height: 1.8; border-top: 1px solid var(--color-border); margin-top: var(--sp-8); }
+
+.solution-comment { color: #64748b; font-style: italic; }
+.solution-keyword { color: var(--color-blue); font-weight: 600; }
+.solution-table { color: var(--color-green); }
+.solution-var { color: var(--color-amber); }
+
+.hint-box { padding: var(--sp-3) var(--sp-4); border-radius: var(--radius-md); font-family: var(--font-mono); font-size: var(--fs-xs); line-height: 1.8; margin-top: var(--sp-3); }
+.hint-box--error { background: var(--color-red-dim); border: 1px solid var(--color-red); color: #fca5a5; }
+.hint-box--success { background: var(--color-green-dim); border: 1px solid var(--color-green); color: #86efac; }
+.hint-box--warning { background: var(--color-amber-dim); border: 1px solid var(--color-amber); color: #fde68a; }
+.hint-box code { background: rgba(0,0,0,0.3); padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); }
+
+.toolbar { display: flex; gap: var(--sp-3); flex-wrap: wrap; margin-top: var(--sp-4); }
+
+.lex-highlight { background: var(--color-blue-dim); border-left: 3px solid var(--color-blue); padding: var(--sp-2) var(--sp-4); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+</style>
+</head>
+<body>
+<div class="app-layout">
+  <header class="app-header">
+    <div class="app-header__brand">
+      <div class="app-header__brand-icon">S</div>
+      <span>Oracle SQL Helper :: SIH</span>
+    </div>
+    <div class="app-header__status">
+      <span class="status-badge status-badge--hds"><span class="status-dot"></span>HDS</span>
+      <span class="status-badge status-badge--online">ATELIER</span>
+      <button class="page-header__help-btn" data-help="lexicon" aria-label="Lexique technique" title="Lexique technique">L</button>
+      <button class="page-header__help-btn" data-help="credit" aria-label="Credits" title="Credits">C</button>
+    </div>
+  </header>
+
+  <nav class="app-nav">
+    <div class="app-nav__section">
+      <div class="app-nav__section-title">Atelier SQL Helper</div>
+      <div class="app-nav__item app-nav__item--active"><span class="app-nav__item-icon">&gt;_</span>Atelier de requêtes</div>
+    </div>
+    <div class="app-nav__section">
+      <div class="app-nav__section-title">Sélecteur de scénario</div>
+      <div style="padding: 0 var(--sp-4);">
+        <select class="select-styled" id="scenario-select">
+          <option value="">-- Choisir un scénario --</option>
+        </select>
+      </div>
+    </div>
+    <div class="app-nav__section">
+      <div class="app-nav__section-title">Progression</div>
+      <div style="padding: 0 var(--sp-4); font-size: var(--fs-xs); font-family: var(--font-mono); line-height: 2;">
+        <div style="color: #64748b;">SCÉNARIO</div>
+        <div id="session-scenario-name" style="color: var(--color-cyan);">—</div>
+        <div style="color: #64748b; margin-top: var(--sp-2);">TENTATIVES</div>
+        <div id="session-attempts" style="color: var(--color-green);">0</div>
+        <div style="color: #64748b; margin-top: var(--sp-2);">STATUT</div>
+        <div id="session-status" style="color: var(--color-amber);">EN ATTENTE</div>
+      </div>
+    </div>
+    <div class="app-nav__rgpd-notice">
+      Contexte PUI Hospitalière<br>
+      (Pharmacie à Usage Intérieur)<br>
+      Données 100% fictives
+    </div>
+  </nav>
+
+  <main class="app-main" id="app-main">
+    <div class="page-header">
+      <h1 class="page-header__title">Atelier de Construction de Requêtes</h1>
+      <div class="page-header__subtitle-row">
+        <p class="page-header__subtitle">18 scénarios PUI pour maîtriser l'art de la requête Oracle — écrivez, validez, progressez</p>
+        <button class="page-header__help-btn" data-help="workshop" aria-label="Aide Atelier" title="Aide">?</button>
+      </div>
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div class="card fade-in" id="empty-state">
+      <div class="empty-state">
+        <div class="empty-state__icon">&#128640;</div>
+        <div class="empty-state__text">Choisissez un scénario dans le sélecteur pour débuter l'atelier.<br>Chaque défi vous confie un problème métier PUI à résoudre en SQL.</div>
+      </div>
+    </div>
+
+    <!-- SCHEMA & DATA -->
+    <div id="workspace" style="display: none;">
+      <div class="grid-2">
+        <div class="card fade-in">
+          <div class="card__title"><span class="card__title-icon">&#128196;</span> Schéma des tables</div>
+          <div class="schema-box" id="schema-display">—</div>
+        </div>
+        <div class="card fade-in">
+          <div class="card__title"><span class="card__title-icon">&#128202;</span> Données initiales</div>
+          <div class="data-box" id="data-display">—</div>
+        </div>
+      </div>
+
+      <!-- CHALLENGE -->
+      <div class="card fade-in">
+        <div class="card__title"><span class="card__title-icon">&#9889;</span> Défi</div>
+        <div class="challenge-text" id="challenge-display">
+          <em>Sélectionnez un scénario pour faire apparaître l'énoncé.</em>
+        </div>
+        <div class="challenge-concept" id="challenge-concept"></div>
+      </div>
+
+      <!-- EDITOR -->
+      <div class="card fade-in">
+        <div class="card__title"><span class="card__title-icon">&gt;_</span> Éditeur de code</div>
+        <div class="code-editor-wrapper">
+          <div class="code-editor__header">
+            <span class="code-editor__label" id="editor-filename">solution.sql</span>
+            <span class="code-editor__label">SQL</span>
+          </div>
+          <textarea class="code-editor__textarea" id="sql-editor" spellcheck="false" placeholder="Écrivez votre requête SQL ici...&#10;Exemple : SELECT * FROM stock_med WHERE qty < 50;"></textarea>
+        </div>
+        <div class="toolbar">
+          <button class="btn btn--outline btn--sm" id="btn-verify">&#10003; Vérifier la syntaxe</button>
+          <button class="btn btn--primary btn--sm" id="btn-execute">&#9654; Exécuter</button>
+          <button class="btn btn--gold btn--sm" id="btn-solution">&#9733; Voir la Solution Expert</button>
+          <button class="btn btn--outline btn--sm" id="btn-reset-editor">Réinitialiser</button>
+        </div>
+      </div>
+
+      <!-- STATE MACHINE -->
+      <div class="card fade-in">
+        <div class="card__title"><span class="card__title-icon">&#9202;</span> Moteur d'exécution</div>
+        <div class="state-machine" id="exec-state-machine">
+          <div class="state-step state-step--active" id="exec-state-idle"><span class="state-step__dot"></span>IDLE</div>
+          <span class="state-arrow">&rarr;</span>
+          <div class="state-step" id="exec-state-parsing"><span class="state-step__dot"></span>PARSING</div>
+          <span class="state-arrow">&rarr;</span>
+          <div class="state-step" id="exec-state-compiling"><span class="state-step__dot"></span>COMPILING</div>
+          <span class="state-arrow">&rarr;</span>
+          <div class="state-step" id="exec-state-executing"><span class="state-step__dot"></span>EXECUTING</div>
+          <span class="state-arrow">&rarr;</span>
+          <div class="state-step" id="exec-state-completed"><span class="state-step__dot"></span>COMPLETED</div>
+        </div>
+        <div id="exec-state-info" style="margin-top: var(--sp-2); font-size: var(--fs-xs); color: #64748b; font-family: var(--font-mono);">En attente d'une instruction.</div>
+      </div>
+
+      <!-- CONSOLE -->
+      <div class="card fade-in">
+        <div class="card__title"><span class="card__title-icon">&#128203;</span> Console de sortie</div>
+        <div class="log-console" id="result-console">
+          <div class="log-console__entry log-console__entry--system"><span class="log-console__timestamp">[--:--:--]</span>Atelier initialisé. Sélectionnez un scénario.</div>
+        </div>
+      </div>
+
+      <!-- RESULT TABLE -->
+      <div class="card fade-in" id="result-card" style="display: none;">
+        <div class="card__title"><span class="card__title-icon">&#128203;</span> Résultat</div>
+        <div class="result-table-wrap" id="result-table-wrap"></div>
+      </div>
+    </div>
+
+    <footer class="app-footer">
+      ORACLE_SQL_HELPER::SIH<br>
+      18 scénarios couvrant SQL, PL/SQL, Performance, Sécurité<br>
+      Zéro dépendance &mdash; Offline &mdash; Conception design &amp; développement : Stéphane Bertin | Assisté par OpenCode
+    </footer>
+  </main>
+</div>
+
+<!-- HELP MODAL -->
+<div class="help-overlay" id="help-overlay" aria-hidden="true"></div>
+<div class="help-modal" id="help-workshop" role="dialog" aria-modal="true" aria-labelledby="help-workshop-title" aria-hidden="true">
+  <div class="help-modal__header"><div class="help-modal__title" id="help-workshop-title">Atelier de Construction de Requêtes</div><button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button></div>
+  <div class="help-modal__body">
+    <div class="help-modal__section"><div class="help-modal__section-title help-modal__section-title--objective">Objectif</div><p class="help-modal__text">Cet atelier vous propose 18 scénarios métiers tirés du contexte d'une Pharmacie à Usage Intérieur (PUI). Pour chaque défi, vous devez rédiger la requête SQL ou le bloc PL/SQL qui résout le problème posé. Un moteur de validation syntaxique et logique vous assiste dans votre apprentissage.</p>
+    <ul class="help-modal__list"><li><strong>Sélection</strong> : Choisissez un scénario dans le menu déroulant de la barre latérale.</li><li><strong>Éditeur</strong> : Rédigez votre solution dans la zone de texte dédiée.</li><li><strong>Vérification</strong> : Le bouton « Vérifier la syntaxe » analyse votre code et signale les erreurs courantes.</li><li><strong>Exécution</strong> : Lancez votre requête pour voir le résultat simulé.</li><li><strong>Solution Expert</strong> : Consultez la solution optimale commentée ligne par ligne.</li></ul></div>
+    <div class="help-modal__section"><div class="help-modal__section-title help-modal__section-title--controls">Contrôles</div><ul class="help-modal__list"><li><strong>Sélecteur de scénario</strong> : 18 concepts Oracle avec contextes PUI variés.</li><li><strong>Schéma & Données</strong> : Affiche la structure des tables et un extrait du jeu de données.</li><li><strong>Éditeur SQL</strong> : Zone de saisie libre avec coloration syntaxique implicite.</li><li><strong>Console</strong> : Journal d'exécution avec messages d'erreur ORA simulés et pistes de correction.</li></ul></div>
+  </div>
+  <div class="help-modal__footer"><button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button></div>
+</div>
+
+<!-- LEXICON MODAL -->
+<div class="help-modal" id="help-lexicon" role="dialog" aria-modal="true" aria-labelledby="help-lexicon-title" aria-hidden="true">
+  <div class="help-modal__header"><div class="help-modal__title" id="help-lexicon-title">Lexique technique — Oracle SQL Helper</div><button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button></div>
+  <div class="help-modal__body" id="lexicon-body">
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--lexique">Concepts fondamentaux</div>
+      <ul class="help-modal__list" id="lexicon-default">
+        <li><strong>Jointure (JOIN)</strong> — Opération relationnelle combinant les lignes de deux tables selon une condition de correspondance entre leurs colonnes. La jointure interne (<code>INNER JOIN</code>) ne retient que les paires vérifiant la condition ; la jointure externe (<code>LEFT/RIGHT/FULL OUTER JOIN</code>) conserve également les lignes orphelines de la table préservée.</li>
+        <li><strong>Agrégation</strong> — Fonction de synthèse (<code>SUM</code>, <code>AVG</code>, <code>COUNT</code>, <code>MIN</code>, <code>MAX</code>) réduisant un ensemble de lignes en une valeur unique. La clause <code>GROUP BY</code> partitionne les lignes en groupes avant agrégation ; la clause <code>HAVING</code> filtre les groupes après agrégation.</li>
+        <li><strong>Sous-requête Corrélée</strong> — Requête imbriquée dont la condition interne fait référence à une colonne de la requête externe, provoquant sa réévaluation pour chaque ligne de l'ensemble parent. Alternative : fonction analytique ou jointure, souvent plus performantes.</li>
+        <li><strong>BULK COLLECT</strong> — Directive PL/SQL chargeant un ensemble complet de lignes dans une collection mémoire en une seule transition entre le moteur SQL et le moteur PL/SQL, réduisant drastiquement le nombre de changements de contexte.</li>
+        <li><strong>Déclencheur (Trigger)</strong> — Bloc PL/SQL stocké, exécuté automatiquement sur un événement DML (<code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>) d'une table. Utilisé pour l'audit, les règles métier et les contraintes complexes.</li>
+        <li><strong>Vue (View)</strong> — Table virtuelle issue d'une requête <code>SELECT</code> stockée comme objet du schéma. Ne contient aucune donnée propre mais offre abstraction, masquage et simplification des requêtes.</li>
+        <li><strong>Vue Matérialisée (Materialized View)</strong> — Vue dont les résultats sont physiquement stockés sur disque, actualisables par <code>REFRESH</code> (COMPLETE, FAST, ON DEMAND, ON COMMIT). Optimale pour les rapports pré-calculés.</li>
+        <li><strong>Index Unique</strong> — Index B-tree garantissant l'unicité des valeurs d'une colonne ou d'une combinaison de colonnes. Créé automatiquement par les contraintes <code>PRIMARY KEY</code> et <code>UNIQUE</code>.</li>
+        <li><strong>Partitionnement</strong> — Division d'une table volumineuse en segments physiques indépendants selon une clé de partition (Range, List, Hash). L'élagage (Partition Pruning) permet à l'optimiseur de ne consulter que les segments pertinents.</li>
+        <li><strong>Séquence (Sequence)</strong> — Générateur de nombres uniques et incrémentaux, utilisé pour les clés primaires. <code>NEXTVAL</code> retourne la valeur suivante ; <code>CURRVAL</code> la dernière valeur générée dans la session courante.</li>
+        <li><strong>Gestion d'Exceptions</strong> — Mécanisme PL/SQL de capture et traitement des erreurs via les blocs <code>EXCEPTION</code>. Exceptions prédéfinies : <code>NO_DATA_FOUND</code>, <code>TOO_MANY_ROWS</code>, <code>ZERO_DIVIDE</code>.</li>
+        <li><strong>Curseur Explicite</strong> — Pointeur déclaré (<code>CURSOR c IS SELECT...</code>) permettant le parcours ligne à ligne d'un ensemble de résultats, avec ouverture, extraction et fermeture contrôlées par le programmeur.</li>
+        <li><strong>MERGE (Upsert)</strong> — Instruction conditionnelle combinant <code>INSERT</code> et <code>UPDATE</code> en une seule passe : si la ligne cible existe, elle est mise à jour ; sinon, elle est insérée. Syntaxe : <code>MERGE INTO cible USING source ON (condition) WHEN MATCHED THEN UPDATE WHEN NOT MATCHED THEN INSERT</code>.</li>
+        <li><strong>Fonction Analytique</strong> — Fonction de fenêtrage (<code>ROW_NUMBER()</code>, <code>RANK()</code>, <code>DENSE_RANK()</code>, <code>LAG()</code>, <code>LEAD()</code>) calculant une valeur sur un ensemble de lignes défini par la clause <code>OVER (PARTITION BY ... ORDER BY ...)</code>.</li>
+        <li><strong>CTE (WITH clause)</strong> — Expression de table commune définissant un jeu de résultats temporaire nommé, utilisable dans la requête principale et récursivement pour les structures hiérarchiques.</li>
+        <li><strong>Verrouillage (LOCK)</strong> — Mécanisme de contrôle de concurrence. <code>SELECT ... FOR UPDATE</code> verrouille les lignes sélectionnées, empêchant toute modification concurrente jusqu'à la fin de la transaction. <code>NOWAIT</code> et <code>SKIP LOCKED</code> modifient le comportement d'attente.</li>
+        <li><strong>SQL Dynamique (EXECUTE IMMEDIATE)</strong> — Instruction PL/SQL construisant et exécutant une commande SQL à la volée, dont la structure (table, colonne, condition) peut être déterminée à l'exécution plutôt qu'à la compilation.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="help-modal__footer"><button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button></div>
+</div>
+
+<!-- SOLUTION MODAL -->
+<div class="help-modal" id="help-solution" role="dialog" aria-modal="true" aria-labelledby="help-solution-title" aria-hidden="true">
+  <div class="help-modal__header"><div class="help-modal__title" id="help-solution-title">Solution Expert</div><button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button></div>
+  <div class="help-modal__body" id="solution-body">
+    <div class="help-modal__section">
+      <p class="help-modal__text" id="solution-explanation"></p>
+      <div class="code-editor-wrapper" style="margin-top: var(--sp-4);">
+        <div class="code-editor__header">
+          <span class="code-editor__label">solution.sql</span>
+          <span class="code-editor__label" style="color: var(--color-gold);">&#9733; EXPERT</span>
+        </div>
+        <textarea class="code-editor__textarea" id="solution-code" readonly spellcheck="false" style="min-height: 150px;"></textarea>
+      </div>
+    </div>
+  </div>
+  <div class="help-modal__footer"><button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button></div>
+</div>
+
+<!-- CREDIT MODAL -->
+<div class="help-modal" id="help-credit" role="dialog" aria-modal="true" aria-labelledby="help-credit-title" aria-hidden="true">
+  <div class="help-modal__header"><div class="help-modal__title" id="help-credit-title">Crédit</div><button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button></div>
+  <div class="help-modal__body">
+    <div class="help-modal__section">
+      <p class="help-modal__text">
+        <center>Conception fonctionnelle, scénarios, développement et relecture : Stéphane Bertin<br>
+        Assisté par OpenCode, agent Big Pickle<br>
+        2025.</center>
+      </p>
+    </div>
+  </div>
+  <div class="help-modal__footer"><button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button></div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="help-modal" id="help-confirm" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="help-modal__header">
+    <div class="help-modal__title">Réfléchissez avant de consulter la solution</div>
+  </div>
+  <div class="help-modal__body" style="text-align: center; padding: var(--sp-8) var(--sp-6);">
+    <div class="help-modal__text" style="font-size: var(--fs-md); margin-bottom: var(--sp-6);">
+      Êtes-vous sûr(e) de vouloir voir la solution experte ?<br>
+      <span style="font-size: var(--fs-sm); color: #94a3b8;">
+        Prenez le temps de réfléchir à votre approche avant de valider.<br>
+        L'objectif pédagogique est de comprendre par l'expérience.
+      </span>
+    </div>
+    <div style="display: flex; gap: var(--sp-4); justify-content: center;">
+      <button class="btn btn--primary btn--sm" id="btn-confirm-yes">Oui, voir la solution</button>
+      <button class="btn btn--outline btn--sm" id="btn-confirm-no">Non, je réfléchis encore</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+// ============================================================
+// STATE MANAGER
+// ============================================================
+class StateManager {
+  constructor(key = 'oracle_sql_helper_state') {
+    this._key = key;
+    this._data = this._load();
+  }
+  _load() { try { return JSON.parse(localStorage.getItem(this._key)) || this._defaults(); } catch { return this._defaults(); } }
+  _defaults() { return { attempts: 0, solved: [], currentScenario: null }; }
+  _save() { try { localStorage.setItem(this._key, JSON.stringify(this._data)); } catch {} }
+  get attempts() { return this._data.attempts; }
+  addAttempt() { this._data.attempts++; this._save(); }
+  markSolved(id) { if (!this._data.solved.includes(id)) { this._data.solved.push(id); this._save(); } }
+  get solved() { return this._data.solved; }
+  set current(id) { this._data.currentScenario = id; this._save(); }
+  get current() { return this._data.currentScenario; }
+}
+
+// ============================================================
+// 18 SCENARIOS
+// ============================================================
+const SCENARIOS = [
+  {
+    id: 1, title: 'Jointure Interne — Stocks par service',
+    concept: 'INNER JOIN',
+    challenge: 'La direction de la pharmacie souhaite consulter l\'intégralité des médicaments actuellement en stock, accompagnés du nom du service hospitalier auquel ils sont affectés. Seuls les médicaments possédant une affectation doivent apparaître dans cet état. Vous devez produire une requête reliant la table STOCK_MED à la table SERVICE par l\'identifiant de service, en ne retenant que les paires pour lesquelles la correspondance est établie.',
+    ddl: 'CREATE TABLE service (\n  service_id   NUMBER PRIMARY KEY,\n  nom          VARCHAR2(60) NOT NULL,\n  batiment     VARCHAR2(30)\n);\nCREATE TABLE stock_med (\n  med_id       NUMBER PRIMARY KEY,\n  molecule     VARCHAR2(100) NOT NULL,\n  qty          NUMBER(8) NOT NULL,\n  service_id   NUMBER REFERENCES service(service_id)\n);',
+    inserts: "INSERT INTO service VALUES (1, 'Urgences', 'Aile A');\nINSERT INTO service VALUES (2, 'Cardiologie', 'Aile B');\nINSERT INTO service VALUES (3, 'Pédiatrie', 'Aile C');\nINSERT INTO stock_med VALUES (101, 'Paracétamol 500mg', 1200, 1);\nINSERT INTO stock_med VALUES (102, 'Amoxicilline 250mg', 340, 2);\nINSERT INTO stock_med VALUES (103, 'Salbutamol aérosol', 85, 1);\nINSERT INTO stock_med VALUES (104, 'Ibuprofène 400mg', 560, 3);\nINSERT INTO stock_med VALUES (105, 'Diazépam 10mg', 200, NULL);",
+    expected: "SELECT s.nom AS service,\n       m.molecule,\n       m.qty\nFROM   stock_med m\nJOIN   service s ON s.service_id = m.service_id\nORDER  BY s.nom, m.molecule;",
+    explanation: 'La jointure interne (INNER JOIN) est la plus courante des opérations relationnelles. Elle ne retient que les lignes pour lesquelles la condition de jointure est vérifiée dans les deux tables. Ici, les médicaments sans affectation (service_id IS NULL) sont exclus du résultat. L\'ordre alphabétique par service puis par molécule facilite la lecture du tableau de bord.',
+    hints: [
+      { pattern: '\\bFROM\\s+\\w+\\s*,\\s*\\w+\\b', msg: 'ORA-00918 : Vous utilisez une virgule entre les tables. Préférez la syntaxe explicite JOIN ... ON ... pour une meilleure lisibilité.', level: 'warning' },
+      { pattern: '\\bWHERE\\s+\\w+\\.\\w+\\s*=\\s*\\w+\\.\\w+', msg: 'Syntaxe acceptable mais nous recommandons JOIN ... ON ... pour ce module.', level: 'info' },
+      { pattern: '\\b(LEFT|RIGHT|FULL)\\s+JOIN\\b', msg: 'ORA-01425 : Une jointure externe n\'est pas appropriée ici : seuls les enregistrements avec une correspondance sont demandés.', level: 'error' }
+    ]
+  },
+  {
+    id: 2, title: 'Jointure Externe — Médicaments sans mouvement',
+    concept: 'LEFT / RIGHT OUTER JOIN',
+    challenge: 'Le pharmacien responsable souhaite identifier les médicaments référencés au catalogue qui n\'ont jamais fait l\'objet d\'une dispensation. Un médicament sans aucune ligne dans la table SORTIE_STOCK est soit nouvellement référencé, soit retiré de la prescription sans avoir été purgé. Produisez une requête listant tous les médicaments du catalogue avec, le cas échéant, la date de leur dernière sortie, en veillant à inclure ceux qui n\'ont aucun mouvement.',
+    ddl: 'CREATE TABLE medicament (\n  med_id    NUMBER PRIMARY KEY,\n  molecule  VARCHAR2(100) NOT NULL,\n  forme     VARCHAR2(40)\n);\nCREATE TABLE sortie_stock (\n  sortie_id  NUMBER PRIMARY KEY,\n  med_id     NUMBER REFERENCES medicament(med_id),\n  qty        NUMBER(8),\n  date_sortie DATE\n);',
+    inserts: "INSERT INTO medicament VALUES (1, 'Paracétamol 500mg', 'Comprimé');\nINSERT INTO medicament VALUES (2, 'Morphine 10mg', 'Injectable');\nINSERT INTO medicament VALUES (3, 'Salbutamol', 'Aérosol');\nINSERT INTO medicament VALUES (4, 'Héparine 5000UI', 'Injectable');\nINSERT INTO sortie_stock VALUES (1001, 1, 200, DATE '2025-03-15');\nINSERT INTO sortie_stock VALUES (1002, 1, 50, DATE '2025-03-20');\nINSERT INTO sortie_stock VALUES (1003, 3, 30, DATE '2025-03-18');",
+    expected: "SELECT m.molecule,\n       m.forme,\n       MAX(s.date_sortie) AS derniere_sortie\nFROM   medicament m\nLEFT   JOIN sortie_stock s ON s.med_id = m.med_id\nGROUP  BY m.med_id, m.molecule, m.forme\nORDER  BY derniere_sortie NULLS FIRST;",
+    explanation: 'La jointure externe gauche (LEFT OUTER JOIN) préserve toutes les lignes de la table de gauche (MEDICAMENT), même celles sans correspondance dans SORTIE_STOCK. Les colonnes de la table de droite sont alors NULL. La fonction MAX et GROUP BY permettent de n\'afficher qu\'une ligne par médicament avec sa dernière date de sortie. NULLS FIRST place les médicaments sans mouvement en tête de liste.',
+    hints: [
+      { pattern: '\\bJOIN\\s+\\w+\\s+ON\\b(?!.*LEFT|.*RIGHT|.*FULL)', msg: 'ORA-01426 : Une jointure interne exclurait les médicaments sans sortie. Utilisez LEFT JOIN pour les conserver.', level: 'error' },
+      { pattern: '\\bWHERE\\s+\\.*date_sortie\\s+IS\\s+NOT\\s+NULL', msg: 'Attention : un filtre WHERE sur la table de droite après une LEFT JOIN annule l\'effet de la jointure externe.', level: 'warning' }
+    ]
+  },
+  {
+    id: 3, title: 'Agrégation — Consommation moyenne par service',
+    concept: 'GROUP BY / Agrégation',
+    challenge: 'Le comité du médicament souhaite analyser la consommation mensuelle moyenne par service hospitalier pour ajuster les dotations. À partir de la table de sorties de stock, calculez la quantité totale et la quantité moyenne dispensées par service au cours des trente derniers jours. Les services sans consommation doivent apparaître avec une valeur nulle.',
+    ddl: 'CREATE TABLE service (\n  service_id  NUMBER PRIMARY KEY,\n  nom         VARCHAR2(60)\n);\nCREATE TABLE dispensation (\n  disp_id     NUMBER PRIMARY KEY,\n  service_id  NUMBER REFERENCES service(service_id),\n  qty         NUMBER(8),\n  date_disp   DATE\n);',
+    inserts: "INSERT INTO service VALUES (1, 'Urgences');\nINSERT INTO service VALUES (2, 'Cardiologie');\nINSERT INTO service VALUES (3, 'Pédiatrie');\nINSERT INTO service VALUES (4, 'Oncologie');\nINSERT INTO dispensation VALUES (1, 1, 450, DATE '2025-04-01');\nINSERT INTO dispensation VALUES (2, 1, 320, DATE '2025-04-05');\nINSERT INTO dispensation VALUES (3, 2, 180, DATE '2025-04-02');\nINSERT INTO dispensation VALUES (4, 2, 210, DATE '2025-04-10');\nINSERT INTO dispensation VALUES (5, 3, 95, DATE '2025-04-03');\nINSERT INTO dispensation VALUES (6, 4, 0, DATE '2025-03-28');",
+    expected: "SELECT s.nom AS service,\n       COALESCE(SUM(d.qty), 0) AS qte_totale,\n       ROUND(COALESCE(AVG(d.qty), 0), 1) AS qte_moyenne\nFROM   service s\nLEFT   JOIN dispensation d ON d.service_id = s.service_id\n       AND d.date_disp >= SYSDATE - 30\nGROUP  BY s.service_id, s.nom\nORDER  BY qte_totale DESC;",
+    explanation: 'La fonction d\'agrégation SUM additionne les quantités pour chaque groupe défini par GROUP BY. COALESCE remplace les valeurs NULL par zéro pour les services sans consommation. La jointure externe garantit que tous les services apparaissent, même ceux sans activité. AVG calcule la moyenne arithmétique des quantités dispensées.',
+    hints: [
+      { pattern: '\\bSUM\\(|\\bAVG\\(', msg: 'Les fonctions d\'agrégation (SUM, AVG) nécessitent une clause GROUP BY sur les colonnes non agrégées du SELECT.', level: 'info' },
+      { pattern: '\\bHAVING\\b', msg: 'HAVING filtre après agrégation. Souvenez-vous : WHERE avant GROUP BY, HAVING après.', level: 'info' },
+      { pattern: '\\bGROUP\\s+BY\\b(?!.*LEFT|.*JOIN)', msg: 'ORA-00937 : Colonne non agrégée dans SELECT sans GROUP BY. Ajoutez GROUP BY sur les colonnes de service.', level: 'error' }
+    ]
+  },
+  {
+    id: 4, title: 'Sous-requête Corrélée — Dernière péremption',
+    concept: 'Sous-requête Corrélée',
+    challenge: 'Le préparateur en chef doit vérifier la date de péremption la plus récente de chaque lot de médicament afin d\'organiser la rotation des stocks. Pour chaque médicament référencé, extrayez la date de péremption la plus tardive parmi tous ses lots. Une sous-requête corrélée vous permettra de filtrer les lots par médicament.',
+    ddl: 'CREATE TABLE medicament (\n  med_id    NUMBER PRIMARY KEY,\n  molecule  VARCHAR2(100)\n);\nCREATE TABLE lot (\n  lot_id      NUMBER PRIMARY KEY,\n  med_id      NUMBER REFERENCES medicament(med_id),\n  date_perem  DATE NOT NULL,\n  qty         NUMBER(8)\n);',
+    inserts: "INSERT INTO medicament VALUES (1, 'Paracétamol 500mg');\nINSERT INTO medicament VALUES (2, 'Amoxicilline 250mg');\nINSERT INTO medicament VALUES (3, 'Salbutamol aérosol');\nINSERT INTO lot VALUES (101, 1, DATE '2026-06-01', 500);\nINSERT INTO lot VALUES (102, 1, DATE '2025-12-31', 300);\nINSERT INTO lot VALUES (103, 2, DATE '2025-09-15', 200);\nINSERT INTO lot VALUES (104, 2, DATE '2026-03-20', 150);\nINSERT INTO lot VALUES (105, 3, DATE '2025-11-01', 80);",
+    expected: "SELECT m.molecule,\n       (SELECT MAX(l2.date_perem)\n        FROM   lot l2\n        WHERE  l2.med_id = m.med_id) AS derniere_peremption\nFROM   medicament m\nORDER  BY derniere_peremption NULLS LAST;",
+    explanation: 'Une sous-requête corrélée est réévaluée pour chaque ligne de la requête externe. Ici, pour chaque médicament de la table MEDICAMENT, la requête interne interroge la table LOT en ne retenant que les lots appartenant à ce médicament, et en sélectionne la date de péremption maximale. Une alternative plus performante serait une fonction analytique ou une jointure avec GROUP BY.',
+    hints: [
+      { pattern: '\\bJOIN\\b', msg: 'Une jointure simple peut produire des doublons si plusieurs lots existent par médicament. Une sous-requête corrélée garantit une ligne par médicament.', level: 'warning' },
+      { pattern: 'SELECT\\s+.*\\bMAX\\b', msg: 'MAX(date_perem) est la fonction appropriée pour trouver la date la plus tardive. Vérifiez qu\'elle porte sur la table LOT.', level: 'info' },
+      { pattern: '\\bGROUP\\s+BY\\b.*\\blot\\b', msg: 'Une jointure suivie de GROUP BY fonctionne mais une sous-requête corrélée est plus élégante pour cet exercice.', level: 'info' }
+    ]
+  },
+  {
+    id: 5, title: 'Bulk Collect — Mise à jour massive des prix',
+    concept: 'BULK COLLECT / FORALL',
+    challenge: 'Une révision générale des prix d\'achat des médicaments est ordonnée par la direction financière. Vous devez, en un seul bloc PL/SQL, charger l\'intégralité des médicaments du catalogue dans une collection, appliquer une majoration de 5 % sur le prix unitaire, puis mettre à jour la table en une seule opération massive. Utilisez BULK COLLECT et FORALL pour minimiser les changements de contexte entre les moteurs SQL et PL/SQL.',
+    ddl: 'CREATE TABLE medicament (\n  med_id     NUMBER PRIMARY KEY,\n  molecule   VARCHAR2(100),\n  prix_achat NUMBER(10,2)\n);',
+    inserts: "INSERT INTO medicament VALUES (1, 'Paracétamol 500mg', 2.50);\nINSERT INTO medicament VALUES (2, 'Amoxicilline 250mg', 4.20);\nINSERT INTO medicament VALUES (3, 'Salbutamol aérosol', 12.80);\nINSERT INTO medicament VALUES (4, 'Morphine 10mg', 8.90);",
+    expected: "DECLARE\n  TYPE t_med_tab IS TABLE OF medicament%ROWTYPE;\n  v_meds t_med_tab;\nBEGIN\n  SELECT * BULK COLLECT INTO v_meds FROM medicament;\n  FOR i IN 1..v_meds.COUNT LOOP\n    v_meds(i).prix_achat := ROUND(v_meds(i).prix_achat * 1.05, 2);\n  END LOOP;\n  FORALL i IN 1..v_meds.COUNT\n    UPDATE medicament SET prix_achat = v_meds(i).prix_achat\n    WHERE  med_id = v_meds(i).med_id;\n  DBMS_OUTPUT.PUT_LINE(v_meds.COUNT || ' lignes mises à jour.');\nEND;",
+    explanation: 'BULK COLLECT charge toutes les lignes en une seule transition SQL→PL/SQL dans une collection. La modification s\'effectue en mémoire (PGA) dans la collection. FORALL exécute l\'UPDATE pour chaque élément de la collection en un seul appel au moteur SQL, réduisant le nombre de changements de contexte de N (itération individuelle) à 2 (collecte + mise à jour massive).',
+    hints: [
+      { pattern: '\\bCURSOR\\b|\\bFOR\\s+\\w+\\s+IN\\s+\\(\\s*SELECT\\b', msg: 'Un curseur explicite ou une boucle FOR itérative génère un changement de contexte par ligne. Préférez BULK COLLECT + FORALL.', level: 'warning' },
+      { pattern: '\\bBULK\\s+COLLECT\\b(?!.*FORALL)', msg: 'BULK COLLECT sans FORALL ne fait que charger les données. Vous devez aussi écrire l\'instruction de mise à jour massive.', level: 'error' },
+      { pattern: 'UPDATE\\s+\\w+\\s+SET\\s+prix_achat\\s*=\\s*prix_achat', msg: 'N\'oubliez pas la majoration de 5% : multipliez par 1.05.', level: 'warning' }
+    ]
+  },
+  {
+    id: 6, title: 'Trigger — Audit HDS des sorties de stock',
+    concept: 'Trigger AFTER',
+    challenge: 'La conformité HDS impose une traçabilité exhaustive de toute sortie de stock. Chaque ligne supprimée dans la table SORTIE_STOCK doit être automatiquement archivée dans une table AUDIT_SORTIE avec l\'horodatage de la suppression et l\'identifiant de l\'utilisateur (simulé par une variable). Rédigez le déclencheur AFTER DELETE qui réalise cet archivage.',
+    ddl: 'CREATE TABLE sortie_stock (\n  sortie_id  NUMBER PRIMARY KEY,\n  med_id     NUMBER NOT NULL,\n  qty        NUMBER(8),\n  service    VARCHAR2(60)\n);\nCREATE TABLE audit_sortie (\n  audit_id    NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,\n  sortie_id   NUMBER,\n  med_id      NUMBER,\n  qty         NUMBER(8),\n  service     VARCHAR2(60),\n  date_suppr  DATE DEFAULT SYSDATE,\n  user_suppr  VARCHAR2(60)\n);',
+    inserts: "INSERT INTO sortie_stock VALUES (1, 101, 200, 'Urgences');\nINSERT INTO sortie_stock VALUES (2, 102, 50, 'Cardiologie');\n-- Le déclencheur doit être testé après création par :\n-- DELETE FROM sortie_stock WHERE sortie_id = 1;",
+    expected: "CREATE OR REPLACE TRIGGER trg_audit_suppr_sortie\nAFTER DELETE ON sortie_stock\nFOR EACH ROW\nBEGIN\n  INSERT INTO audit_sortie (sortie_id, med_id, qty, service, user_suppr)\n  VALUES (:OLD.sortie_id, :OLD.med_id, :OLD.qty, :OLD.service,\n          NVL(V('APP_USER'), 'INCONNU'));\nEND;",
+    explanation: 'Un déclencheur AFTER DELETE s\'exécute après la suppression effective de la ligne. Le pseudo-enregistrement :OLD contient les valeurs de la ligne avant suppression. L\'horodatage est fourni par la clause DEFAULT SYSDATE de la table AUDIT_SORTIE. L\'utilisateur est récupéré par la fonction V (contexte Oracle APEX) ou une variable de session.',
+    hints: [
+      { pattern: '\\bBEFORE\\s+DELETE\\b', msg: 'Un déclencheur BEFORE DELETE capture les valeurs avant suppression mais la ligne existe encore. AFTER DELETE est recommandé pour l\'audit.', level: 'warning' },
+      { pattern: '\\:NEW\\b', msg: 'ORA-04082 : :NEW n\'est pas défini pour un DELETE. Utilisez :OLD pour accéder aux valeurs supprimées.', level: 'error' },
+      { pattern: '\\bINSERT\\s+INTO\\s+sortie_stock\\b', msg: 'L\'INSERT doit cibler la table AUDIT_SORTIE, pas SORTIE_STOCK (cela créerait une récursion).', level: 'error' }
+    ]
+  },
+  {
+    id: 7, title: 'Vue Simple — Masquage des données sensibles',
+    concept: 'CREATE VIEW',
+    challenge: 'Le délégué à la protection des données (DPD) exige que les accès aux informations nominatives des patients soient restreints pour les utilisateurs non habilités. Créez une vue faisant office d\'interface sécurisée sur la table PATIENT, en exposant uniquement l\'identifiant, le sexe, la tranche d\'âge et le service, tout en masquant le nom, le prénom et le numéro d\'inscription au répertoire (NIR).',
+    ddl: 'CREATE TABLE patient (\n  patient_id  NUMBER PRIMARY KEY,\n  nom         VARCHAR2(60),\n  prenom      VARCHAR2(60),\n  sexe        CHAR(1),\n  age         NUMBER(3),\n  nir         VARCHAR2(15),\n  service     VARCHAR2(60)\n);',
+    inserts: "INSERT INTO patient VALUES (1, 'Dupont', 'Marie', 'F', 45, '1 85 12 34 567 890 12', 'Cardiologie');\nINSERT INTO patient VALUES (2, 'Martin', 'Jean', 'M', 72, '1 52 09 87 654 321 78', 'Urgences');\nINSERT INTO patient VALUES (3, 'Petit', 'Sophie', 'F', 34, '2 90 45 123 456 789 45', 'Pédiatrie');",
+    expected: "CREATE OR REPLACE VIEW v_patient_anonymise AS\nSELECT patient_id,\n       sexe,\n       CASE\n         WHEN age < 18 THEN 'Mineur'\n         WHEN age BETWEEN 18 AND 65 THEN 'Adulte'\n         ELSE 'Senior'\n       END AS tranche_age,\n       service\nFROM   patient\nWITH  READ ONLY;",
+    explanation: 'Une vue stocke une requête dans le dictionnaire et en restitue les résultats à chaque appel. En omettant les colonnes sensibles (nom, prénom, nir), la vue constitue une barrière d\'abstraction. WITH READ ONLY interdit toute modification via la vue, renforçant la sécurité. Le principe de moindre privilège est ainsi respecté : l\'utilisateur non habilité ne voit que ce qui est strictement nécessaire à sa fonction.',
+    hints: [
+      { pattern: '\\bSELECT\\s+\\*\\b', msg: 'SELECT * expose toutes les colonnes y compris le NIR. Énumérez explicitement les colonnes autorisées.', level: 'error' },
+      { pattern: '\\bnir\\b', msg: 'Le NIR est une donnée sensible (CNIL). Il ne doit pas apparaître dans la vue.', level: 'error' },
+      { pattern: '\\bCREATE\\s+(OR\\s+REPLACE\\s+)?(VIEW|TABLE)\\b(?!.*v_)', msg: 'Par convention, nommez la vue avec le préfixe v_ pour la distinguer des tables.', level: 'info' }
+    ]
+  },
+  {
+    id: 8, title: 'Vue Matérialisée — Rapport journalier pré-calculé',
+    concept: 'Materialized View',
+    challenge: 'Le rapport de consommation par service est sollicité plusieurs dizaines de fois par jour par différents tableaux de bord. Afin d\'éviter des calculs d\'agrégation répétés sur des volumes croissants, créez une vue matérialisée qui pré-calcule chaque nuit les quantités totales dispensées par service pour les sept derniers jours. Le mécanisme d\'actualisation (REFRESH) garantira des données à jour sans impacter les performances des requêtes.',
+    ddl: 'CREATE TABLE service (\n  service_id  NUMBER PRIMARY KEY,\n  nom         VARCHAR2(60)\n);\nCREATE TABLE dispensation (\n  disp_id     NUMBER PRIMARY KEY,\n  service_id  NUMBER REFERENCES service(service_id),\n  qty         NUMBER(8),\n  date_disp   DATE\n);',
+    inserts: "INSERT INTO service VALUES (1, 'Urgences');\nINSERT INTO service VALUES (2, 'Cardiologie');\nINSERT INTO service VALUES (3, 'Pédiatrie');\nINSERT INTO dispensation VALUES (1, 1, 450, DATE '2025-04-08');\nINSERT INTO dispensation VALUES (2, 1, 320, DATE '2025-04-09');\nINSERT INTO dispensation VALUES (3, 2, 180, DATE '2025-04-08');\nINSERT INTO dispensation VALUES (4, 2, 210, DATE '2025-04-07');\nINSERT INTO dispensation VALUES (5, 3, 95, DATE '2025-04-09');",
+    expected: "CREATE MATERIALIZED VIEW mv_hebdo_consommation\nREFRESH COMPLETE ON DEMAND\nAS\nSELECT s.nom AS service,\n       TRUNC(d.date_disp) AS jour,\n       SUM(d.qty) AS qte_totale,\n       COUNT(*) AS nb_dispensations\nFROM   service s\nJOIN   dispensation d ON d.service_id = s.service_id\nWHERE  d.date_disp >= TRUNC(SYSDATE) - 7\nGROUP  BY s.nom, TRUNC(d.date_disp)\nORDER  BY s.nom, TRUNC(d.date_disp) DESC;\n\n-- Actualisation :\n-- EXEC DBMS_MVIEW.REFRESH('mv_hebdo_consommation', 'C');",
+    explanation: 'Une vue matérialisée stocke physiquement le résultat de la requête, contrairement à une vue simple. L\'option REFRESH COMPLETE ON DEMAND reconstruit intégralement les données à la demande via DBMS_MVIEW.REFRESH. L\'agrégation par service et par jour est pré-calculée, réduisant le temps de réponse des tableaux de bord à une simple lecture.',
+    hints: [
+      { pattern: '\\bCREATE\\s+(OR\\s+REPLACE\\s+)?VIEW\\b(?!.*MATERIALIZED)', msg: 'Une vue simple ne stocke pas les données. Utilisez MATERIALIZED VIEW pour pré-calculer les agrégations.', level: 'error' },
+      { pattern: '\\bCREATE\\s+TABLE\\b', msg: 'Une table n\'a pas de mécanisme de refresh automatique. Utilisez MATERIALIZED VIEW.', level: 'error' },
+      { pattern: '\\bREFRESH\\s+FAST\\b', msg: 'REFRESH FAST nécessite un journal de vue matérialisée (MV LOG). REFRESH COMPLETE est plus simple pour cet exercice.', level: 'info' }
+    ]
+  },
+  {
+    id: 9, title: 'Index Unique — Contrôle d\'intégrité des lots',
+    concept: 'Unique Index',
+    challenge: 'Chaque lot de médicament entrant à la pharmacie possède un numéro de lot fourni par le fabricant. Ce numéro, associé au fabricant, doit être unique dans la base pour éviter toute confusion lors des rappels de lots. Créez la contrainte d\'unicité appropriée sur la table LOT_SIMU pour garantir l\'intégrité référentielle au niveau des colonnes NUMERO_LOT et FABRICANT.',
+    ddl: 'CREATE TABLE lot_simu (\n  lot_id      NUMBER PRIMARY KEY,\n  med_id      NUMBER NOT NULL,\n  numero_lot  VARCHAR2(30) NOT NULL,\n  fabricant   VARCHAR2(60) NOT NULL,\n  date_perem  DATE,\n  qty         NUMBER(8)\n);',
+    inserts: "INSERT INTO lot_simu VALUES (1, 101, 'LOT-2025-A001', 'Sanofi', DATE '2026-06-01', 500);\nINSERT INTO lot_simu VALUES (2, 101, 'LOT-2025-A001', 'Sanofi', DATE '2025-12-31', 300);\nINSERT INTO lot_simu VALUES (3, 102, 'LOT-2025-B045', 'Mylan', DATE '2026-03-20', 200);",
+    expected: "CREATE UNIQUE INDEX idx_lot_unique\nON lot_simu(numero_lot, fabricant);\n\n-- Alternative avec contrainte UNIQUE :\n-- ALTER TABLE lot_simu ADD CONSTRAINT uq_lot_fab UNIQUE (numero_lot, fabricant);",
+    explanation: 'Un index unique garantit qu\'aucune valeur dupliquée n\'existe dans les colonnes indexées. Créé sur la combinaison (NUMERO_LOT, FABRICANT), il empêche l\'insertion de deux lots distincts portant le même numéro pour le même fabricant. Oracle utilise cet index pour accélérer les recherches par numéro de lot tout en maintenant l\'intégrité des données. La contrainte UNIQUE crée automatiquement un index unique du même nom.',
+    hints: [
+      { pattern: '\\bPRIMARY\\s+KEY\\b', msg: 'La clé primaire garantit l\'unicité de LOT_ID, pas du couple (numero_lot, fabricant). Créez une contrainte dédiée.', level: 'error' },
+      { pattern: '\\bINDEX\\b(?!.*UNIQUE)', msg: 'Un index classique n\'empêche pas les doublons. Ajoutez le mot-clé UNIQUE.', level: 'error' },
+      { pattern: '\\bNOT\\s+NULL\\b', msg: 'NOT NULL ne garantit pas l\'unicité. Vous devez créer un index unique ou une contrainte UNIQUE.', level: 'info' }
+    ]
+  },
+  {
+    id: 10, title: 'Partitionnement — Historique par année',
+    concept: 'Partition Range',
+    challenge: 'La table SORTIE_STOCK contient plusieurs millions de lignes couvrant dix années d\'activité. Les requêtes de rapport annuel sur les dispensations subissent des temps d\'exécution excessifs en raison du parcours intégral de la table. Vous devez partitionner cette table par année sur la colonne DATE_SORTIE afin que l\'optimiseur puisse élaguer les partitions non concernées par chaque requête.',
+    ddl: 'CREATE TABLE sortie_stock (\n  sortie_id    NUMBER,\n  med_id       NUMBER NOT NULL,\n  qty          NUMBER(8),\n  date_sortie  DATE\n)\nPARTITION BY RANGE (date_sortie) (\n  PARTITION p_2023 VALUES LESS THAN (TO_DATE(\'2024-01-01\', \'YYYY-MM-DD\')),\n  PARTITION p_2024 VALUES LESS THAN (TO_DATE(\'2025-01-01\', \'YYYY-MM-DD\')),\n  PARTITION p_2025 VALUES LESS THAN (TO_DATE(\'2026-01-01\', \'YYYY-MM-DD\')),\n  PARTITION p_future VALUES LESS THAN (MAXVALUE)\n);',
+    inserts: "INSERT INTO sortie_stock VALUES (1, 101, 200, DATE '2024-03-15');\nINSERT INTO sortie_stock VALUES (2, 102, 50, DATE '2024-07-22');\nINSERT INTO sortie_stock VALUES (3, 103, 85, DATE '2025-01-10');\nINSERT INTO sortie_stock VALUES (4, 104, 120, DATE '2025-11-05');\nINSERT INTO sortie_stock VALUES (5, 105, 300, DATE '2023-12-01');",
+    expected: "SELECT sortie_id, med_id, qty, date_sortie\nFROM   sortie_stock\nWHERE  date_sortie >= DATE '2025-01-01'\nAND    date_sortie <  DATE '2026-01-01'\nORDER  BY date_sortie;\n\n-- L'optimiseur élaguera (partition pruning) et\n-- ne parcourra que la partition p_2025.",
+    explanation: 'Le partitionnement par intervalle (RANGE) divise la table en segments physiques indépendants selon une clé temporelle. Lorsqu\'une requête filtre sur la colonne de partition, l\'optimiseur CBO pratique l\'élaguage de partition (Partition Pruning) : il ne lit que le ou les segments pertinents, ignorant les autres. Cette technique divise le nombre d\'entrées/sorties par le nombre de partitions, améliorant les performances des requêtes historiques de façon considérable.',
+    hints: [
+      { pattern: '\\bCREATE\\s+TABLE\\b(?!.*PARTITION)', msg: 'La table doit être créée avec la clause PARTITION BY RANGE. La partition est déclarée au moment du CREATE TABLE.', level: 'error' },
+      { pattern: '\\bPARTITION\\s+BY\\s+(LIST|HASH)\\b', msg: 'Pour une partition temporelle, utilisez RANGE. LIST est pour les valeurs discrètes, HASH pour la distribution uniforme.', level: 'warning' },
+      { pattern: '\\bVALUES\\s+LESS\\s+THAN\\s*\\(\\s*MAXVALUE\\s*\\)', msg: 'La partition MAXVALUE capture toutes les données futures. Veillez à son emplacement en dernière position.', level: 'info' }
+    ]
+  },
+  {
+    id: 11, title: 'Séquence — Génération d\'ID d\'ordonnance',
+    concept: 'Sequence / NEXTVAL',
+    challenge: 'Le système de prescription nécessite un générateur d\'identifiants uniques et séquentiels pour les ordonnances, garantissant l\'absence de collision même en cas d\'accès concurrentiel intensif. Créez une séquence adaptée à un volume de 5000 ordonnances par jour, avec un pas d\'incrémentation de 1, démarrant à 10000. Insérez ensuite une ordonnance en utilisant cette séquence.',
+    ddl: 'CREATE TABLE ordonnance (\n  ord_id     NUMBER PRIMARY KEY,\n  patient_id NUMBER NOT NULL,\n  med_id     NUMBER NOT NULL,\n  qty        NUMBER(8),\n  date_presc DATE DEFAULT SYSDATE\n);',
+    inserts: "INSERT INTO ordonnance VALUES (SEQ_ORDONNANCE.NEXTVAL, 1, 101, 60, SYSDATE);\nINSERT INTO ordonnance VALUES (SEQ_ORDONNANCE.NEXTVAL, 2, 102, 30, SYSDATE);",
+    expected: "CREATE SEQUENCE seq_ordonnance\nSTART WITH 10000\nINCREMENT BY 1\nNOCACHE\nNOCYCLE;\n\nINSERT INTO ordonnance (ord_id, patient_id, med_id, qty)\nVALUES (seq_ordonnance.NEXTVAL, 1, 101, 60);",
+    explanation: 'Une séquence Oracle garantit la génération atomique de nombres uniques, même sous charge concurrente élevée. NEXTVAL incrémente la séquence et retourne la nouvelle valeur. NOCACHE évite la perte de valeurs en cas de redémarrage de l\'instance. NOCYCLE empêche le recyclage après avoir atteint la valeur maximale, protégeant ainsi l\'intégrité des clés.',
+    hints: [
+      { pattern: '\\bSELECT\\s+MAX\\(ord_id\\)\\s*\\+\\s*1\\b', msg: 'SELECT MAX + 1 échouera en environnement concurrent (deux sessions obtiendront le même ID). Utilisez une séquence.', level: 'error' },
+      { pattern: '\\bseq_ordonnance\\.CURRVAL\\b', msg: 'CURRVAL retourne la dernière valeur générée dans la session, mais nécessite un NEXTVAL préalable.', level: 'info' },
+      { pattern: '\\bINSERT\\s+INTO\\s+ordonnance\\b(?!.*NEXTVAL)', msg: 'L\'INSERT doit utiliser seq_ordonnance.NEXTVAL pour la colonne ORD_ID.', level: 'error' }
+    ]
+  },
+  {
+    id: 12, title: 'Exception Handling — Division par zéro dans le coût unitaire',
+    concept: 'Exception / ZERO_DIVIDE',
+    challenge: 'Le calcul du coût unitaire par molécule (prix total divisé par la quantité) peut rencontrer des divisions par zéro lorsque la quantité en stock est nulle. Écrivez un bloc PL/SQL qui parcourt la table STOCK_MED, calcule le coût unitaire pour chaque ligne, et capture élégamment l\'exception ZERO_DIVIDE pour les lignes problématiques en affichant un message explicite sans interrompre le traitement.',
+    ddl: 'CREATE TABLE stock_med (\n  med_id    NUMBER PRIMARY KEY,\n  molecule  VARCHAR2(100),\n  qty       NUMBER(8),\n  cout_total NUMBER(10,2)\n);',
+    inserts: "INSERT INTO stock_med VALUES (1, 'Paracétamol 500mg', 1200, 3000.00);\nINSERT INTO stock_med VALUES (2, 'Amoxicilline 250mg', 0, 0);\nINSERT INTO stock_med VALUES (3, 'Salbutamol aérosol', 85, 1088.00);\nINSERT INTO stock_med VALUES (4, 'Morphine 10mg', 0, 0);",
+    expected: "DECLARE\n  v_cout_unitaire NUMBER(10,2);\nBEGIN\n  FOR r IN (SELECT * FROM stock_med) LOOP\n    BEGIN\n      v_cout_unitaire := r.cout_total / r.qty;\n      DBMS_OUTPUT.PUT_LINE(r.molecule || ' : ' ||\n        TO_CHAR(v_cout_unitaire, '999.99'));\n    EXCEPTION\n      WHEN ZERO_DIVIDE THEN\n        DBMS_OUTPUT.PUT_LINE(r.molecule ||\n          ' : Quantité nulle, calcul impossible.');\n    END;\n  END LOOP;\nEND;",
+    explanation: 'Le bloc interne BEGIN...EXCEPTION...END crée un sous-bloc de protection autour de la division. Si l\'exception ZERO_DIVIDE est levée (qty = 0), elle est capturée par le gestionnaire WHEN ZERO_DIVIDE, qui affiche un message d\'avertissement sans interrompre la boucle. Le bloc externe continue son itération normalement. Cette technique d\'exception locale est préférable à WHEN OTHERS pour cibler précisément le type d\'erreur.',
+    hints: [
+      { pattern: '\\bWHEN\\s+OTHERS\\b', msg: 'WHEN OTHERS capture toutes les exceptions. Privilégiez WHEN ZERO_DIVIDE pour cibler l\'erreur spécifique.', level: 'warning' },
+      { pattern: '\\bqty\\s*=\\s*0\\b|\\bqty\\s*=\\s*NULL\\b|\\bNULL\\b', msg: 'Un test conditionnel (IF qty = 0) est une alternative, mais l\'exercice demande l\'utilisation de la gestion d\'exceptions.', level: 'info' },
+      { pattern: '\\bEXCEPTION\\b(?!.*ZERO_DIVIDE)', msg: 'Le bloc EXCEPTION doit contenir WHEN ZERO_DIVIDE pour capturer la division par zéro.', level: 'error' }
+    ]
+  },
+  {
+    id: 13, title: 'Curseur Explicite — Traitement des réservations en attente',
+    concept: 'Curseur Explicite',
+    challenge: 'Le service des urgences nécessite un traitement séquentiel des réservations de médicaments en attente de validation. Chaque réservation doit être examinée individuellement : si le stock est suffisant, elle est marquée comme validée et le stock est décrémenté ; sinon, elle est marquée comme refusée. Utilisez un curseur explicite pour parcourir les réservations ligne à ligne.',
+    ddl: 'CREATE TABLE reservation (\n  res_id    NUMBER PRIMARY KEY,\n  med_id    NUMBER NOT NULL,\n  qty_dem   NUMBER(8),\n  statut    VARCHAR2(20) DEFAULT \'EN_ATTENTE\',\n  date_res  DATE DEFAULT SYSDATE\n);\nCREATE TABLE stock_med (\n  med_id    NUMBER PRIMARY KEY,\n  qty       NUMBER(8)\n);',
+    inserts: "INSERT INTO stock_med VALUES (101, 500);\nINSERT INTO stock_med VALUES (102, 30);\nINSERT INTO reservation VALUES (1, 101, 100, 'EN_ATTENTE', SYSDATE);\nINSERT INTO reservation VALUES (2, 102, 50, 'EN_ATTENTE', SYSDATE);\nINSERT INTO reservation VALUES (3, 101, 450, 'EN_ATTENTE', SYSDATE);",
+    expected: "DECLARE\n  CURSOR c_res IS\n    SELECT r.res_id, r.med_id, r.qty_dem, s.qty AS stock_dispo\n    FROM   reservation r\n    JOIN   stock_med s ON s.med_id = r.med_id\n    WHERE  r.statut = 'EN_ATTENTE'\n    FOR UPDATE OF r.statut;\nBEGIN\n  FOR rec IN c_res LOOP\n    IF rec.qty_dem <= rec.stock_dispo THEN\n      UPDATE reservation SET statut = 'VALIDEE' WHERE res_id = rec.res_id;\n      UPDATE stock_med SET qty = qty - rec.qty_dem WHERE med_id = rec.med_id;\n    ELSE\n      UPDATE reservation SET statut = 'REFUSEE' WHERE res_id = rec.res_id;\n    END IF;\n  END LOOP;\n  COMMIT;\nEND;",
+    explanation: 'Un curseur explicite est déclaré (CURSOR), puis parcouru par une boucle FOR qui l\'ouvre, extrait chaque ligne et le ferme automatiquement. La clause FOR UPDATE verrouille les lignes sélectionnées pendant la durée du curseur, empêchant les modifications concurrentes. La condition IF évalue la disponibilité du stock pour chaque réservation.',
+    hints: [
+      { pattern: '\\bSELECT\\s+.*\\s+INTO\\b', msg: 'SELECT INTO convient pour une seule ligne. Pour plusieurs réservations, utilisez un curseur explicite avec boucle FOR.', level: 'warning' },
+      { pattern: "\\bUPDATE\\s+reservation\\s+SET\\s+statut\\s*=\\s*[']VALIDEE[']\\b", msg: 'La validation est conditionnelle. Ajoutez une clause ELSE pour REFUSEE quand le stock est insuffisant.', level: 'info' },
+      { pattern: '\\bFOR\\s+UPDATE\\b', msg: 'Sans FOR UPDATE, une autre session pourrait modifier les lignes entre la lecture et la mise à jour.', level: 'warning' }
+    ]
+  },
+  {
+    id: 14, title: 'MERGE — Synchronisation stock théorique et réel',
+    concept: 'MERGE (Upsert)',
+    challenge: 'L\'inventaire mensuel produit une table INVENTAIRE contenant les quantités réelles comptées pour chaque médicament. Vous devez synchroniser la table STOCK_THEORIQUE avec ces données : si le médicament existe déjà dans le stock théorique, mettez à jour sa quantité avec la valeur réelle ; s\'il n\'existe pas, insérez une nouvelle ligne. Une seule instruction MERGE suffit.',
+    ddl: 'CREATE TABLE stock_theorique (\n  med_id   NUMBER PRIMARY KEY,\n  molecule VARCHAR2(100),\n  qty      NUMBER(8)\n);\nCREATE TABLE inventaire (\n  med_id   NUMBER PRIMARY KEY,\n  qty_reel NUMBER(8)\n);',
+    inserts: "INSERT INTO stock_theorique VALUES (1, 'Paracétamol 500mg', 1200);\nINSERT INTO stock_theorique VALUES (2, 'Amoxicilline 250mg', 340);\nINSERT INTO inventaire VALUES (1, 1180);\nINSERT INTO inventaire VALUES (2, 335);\nINSERT INTO inventaire VALUES (3, 500);",
+    expected: "MERGE INTO stock_theorique t\nUSING inventaire i ON (t.med_id = i.med_id)\nWHEN MATCHED THEN\n  UPDATE SET t.qty = i.qty_reel\nWHEN NOT MATCHED THEN\n  INSERT (med_id, molecule, qty)\n  VALUES (i.med_id, 'NOUVEAU', i.qty_reel);",
+    explanation: 'L\'instruction MERGE est une opération conditionnelle combinant INSERT et UPDATE en une seule passe. USING définit la source de données, ON spécifie la condition de correspondance. WHEN MATCHED met à jour la ligne cible si la clé existe déjà. WHEN NOT MATCHED insère une nouvelle ligne si la clé est absente. Cette opération est atomique et plus performante qu\'une séquence UPDATE + INSERT avec vérification préalable.',
+    hints: [
+      { pattern: '\\bIF\\b|\\bBEGIN\\b', msg: 'Un bloc PL/SQL avec IF explicite est plus verbeux. Utilisez l\'instruction MERGE qui combine tout en une seule commande SQL.', level: 'warning' },
+      { pattern: '\\bUPDATE\\s+stock_theorique\\b(?!.*MERGE)', msg: 'Un UPDATE seul ne gère pas les nouvelles lignes de l\'inventaire. L\'instruction MERGE couvre les deux cas.', level: 'error' },
+      { pattern: '\\bMERGE\\s+INTO\\s+\\w+\\s+USING\\b(?!.*WHEN\\s+MATCHED)', msg: 'La clause WHEN MATCHED est obligatoire pour une mise à jour. Ajoutez également WHEN NOT MATCHED pour les insertions.', level: 'error' }
+    ]
+  },
+  {
+    id: 15, title: 'Analytic Function — Rang des médicaments les plus prescrits',
+    concept: 'ROW_NUMBER / RANK',
+    challenge: 'Le comité de pharmacologie souhaite identifier les cinq molécules les plus prescrites du semestre afin d\'optimiser les négociations d\'achat. À partir de la table de dispensation, calculez le rang de chaque molécule par quantité totale dispensée, en utilisant une fonction analytique pour classer les résultats sans agrégation préalable.',
+    ddl: 'CREATE TABLE dispensation (\n  disp_id    NUMBER PRIMARY KEY,\n  med_id     NUMBER NOT NULL,\n  molecule   VARCHAR2(100),\n  qty        NUMBER(8),\n  date_disp  DATE\n);',
+    inserts: "INSERT INTO dispensation VALUES (1, 101, 'Paracétamol 500mg', 450, DATE '2025-01-15');\nINSERT INTO dispensation VALUES (2, 102, 'Amoxicilline 250mg', 320, DATE '2025-01-20');\nINSERT INTO dispensation VALUES (3, 101, 'Paracétamol 500mg', 380, DATE '2025-02-10');\nINSERT INTO dispensation VALUES (4, 103, 'Salbutamol aérosol', 210, DATE '2025-02-15');\nINSERT INTO dispensation VALUES (5, 102, 'Amoxicilline 250mg', 290, DATE '2025-03-01');\nINSERT INTO dispensation VALUES (6, 104, 'Morphine 10mg', 180, DATE '2025-03-05');\nINSERT INTO dispensation VALUES (7, 105, 'Diazépam 10mg', 95, DATE '2025-03-10');\nINSERT INTO dispensation VALUES (8, 103, 'Salbutamol aérosol', 195, DATE '2025-03-15');",
+    expected: "SELECT molecule,\n       SUM(qty) AS qte_totale,\n       RANK() OVER (ORDER BY SUM(qty) DESC) AS rang\nFROM   dispensation\nWHERE  date_disp >= ADD_MONTHS(TRUNC(SYSDATE), -6)\nGROUP  BY molecule\nORDER  BY rang\nFETCH  FIRST 5 ROWS ONLY;",
+    explanation: 'RANK() OVER (ORDER BY ...) est une fonction analytique qui attribue un rang à chaque ligne sans réduire le nombre de lignes. Combinée à SUM(qty) et GROUP BY, elle classe les molécules par volume total. FETCH FIRST 5 ROWS ONLY (Oracle 12c+) limite le résultat aux cinq premières. En cas d\'égalité, RANK saute des rangs (1, 1, 3) contrairement à DENSE_RANK (1, 1, 2).',
+    hints: [
+      { pattern: '\\bROW_NUMBER\\(\\)\\b', msg: 'ROW_NUMBER attribue des rangs consécutifs sans ex-aequo (1, 2, 3). RANK est plus adapté si des égalités sont possibles.', level: 'info' },
+      { pattern: '\\bORDER\\s+BY\\s+SUM\\(qty\\)\\s+ASC\\b', msg: 'ASC classe du plus petit au plus grand. Utilisez DESC pour voir les plus prescrits en tête.', level: 'error' },
+      { pattern: '\\bFETCH\\s+FIRST\\b', msg: 'Sans FETCH FIRST ou ROWNUM, vous obtenez toutes les lignes. Limitez à 5 pour le classement demandé.', level: 'warning' }
+    ]
+  },
+  {
+    id: 16, title: 'CTE — Requête hiérarchique des catégories thérapeutiques',
+    concept: 'WITH / CTE',
+    challenge: 'Le référentiel des médicaments est organisé en arbre hiérarchique de catégories thérapeutiques (ATC). La direction souhaite obtenir la liste de toutes les sous-catégories rattachées à la catégorie « Système cardiovasculaire », avec leur niveau de profondeur. Utilisez une expression de table commune (CTE) récursive pour parcourir cette hiérarchie.',
+    ddl: 'CREATE TABLE categorie_atc (\n  code       VARCHAR2(10) PRIMARY KEY,\n  libelle    VARCHAR2(100),\n  code_parent VARCHAR2(10) REFERENCES categorie_atc(code)\n);\nCREATE TABLE medicament (\n  med_id     NUMBER PRIMARY KEY,\n  molecule   VARCHAR2(100),\n  code_atc   VARCHAR2(10) REFERENCES categorie_atc(code)\n);',
+    inserts: "INSERT INTO categorie_atc VALUES ('C', 'Système cardiovasculaire', NULL);\nINSERT INTO categorie_atc VALUES ('C01', 'Thérapie cardiaque', 'C');\nINSERT INTO categorie_atc VALUES ('C02', 'Antihypertenseurs', 'C');\nINSERT INTO categorie_atc VALUES ('C01A', 'Glucosides cardiotoniques', 'C01');\nINSERT INTO categorie_atc VALUES ('C01B', 'Antiarythmiques', 'C01');\nINSERT INTO categorie_atc VALUES ('C02A', 'Diurétiques', 'C02');\nINSERT INTO categorie_atc VALUES ('N', 'Système nerveux', NULL);",
+    expected: "WITH recursive cat_tree (code, libelle, niveau, chemin) AS (\n  SELECT code, libelle, 1, code\n  FROM   categorie_atc\n  WHERE  code = 'C'\n  UNION ALL\n  SELECT c.code, c.libelle, ct.niveau + 1,\n         ct.chemin || ' > ' || c.code\n  FROM   categorie_atc c\n  JOIN   cat_tree ct ON c.code_parent = ct.code\n)\nSELECT code, libelle, niveau, chemin\nFROM   cat_tree\nORDER  BY chemin;",
+    explanation: 'Une CTE récursive (WITH ... AS (...) UNION ALL ...) permet de parcourir une structure arborescente sans requêtes multiples. Le membre d\'ancrage sélectionne la racine (code = \'C\'). Le membre récursif descend d\'un niveau à chaque itération en joignant la table sur CODE_PARENT. Oracle répète la récursion tant que le membre récursif produit de nouvelles lignes. La colonne CHEMIN concatène les codes pour visualiser la hiérarchie.',
+    hints: [
+      { pattern: '\\bCONNECT\\s+BY\\b', msg: 'CONNECT BY PRIOR est la syntaxe Oracle classique pour les requêtes hiérarchiques. L\'exercice demande une CTE récursive (WITH).', level: 'info' },
+      { pattern: '\\bUNION\\b(?!.*ALL)', msg: 'UNION applique un DISTINCT coûteux. UNION ALL est suffisant et plus performant pour les CTE récursives.', level: 'warning' },
+      { pattern: "\\bWHERE\\s+code\\s*=\\s*[']C[']\\b(?!.*UNION)", msg: 'Le membre d\'ancrage doit filtrer la racine. Le membre récursif ne doit pas contenir ce filtre.', level: 'error' }
+    ]
+  },
+  {
+    id: 17, title: 'Locking — Réservation de stock avec FOR UPDATE',
+    concept: 'SELECT FOR UPDATE / NOWAIT',
+    challenge: 'Lors de la préparation d\'une dispensation urgente, le préparateur doit réserver une quantité précise de médicament en stock. Pour éviter qu\'un autre préparateur ne lui prenne la même unité simultanément, vous devez verrouiller la ligne de stock au moment de la lecture. Utilisez SELECT ... FOR UPDATE NOWAIT pour tenter de réserver le stock et signaler immédiatement un échec si la ligne est déjà verrouillée.',
+    ddl: 'CREATE TABLE stock_med (\n  med_id    NUMBER PRIMARY KEY,\n  molecule  VARCHAR2(100),\n  qty       NUMBER(8)\n);',
+    inserts: "INSERT INTO stock_med VALUES (1, 'Paracétamol 500mg', 500);\nINSERT INTO stock_med VALUES (2, 'Amoxicilline 250mg', 200);\nINSERT INTO stock_med VALUES (3, 'Salbutamol aérosol', 80);",
+    expected: "DECLARE\n  v_qty_dispo NUMBER;\n  CURSOR c_lock IS\n    SELECT qty FROM stock_med\n    WHERE  med_id = 1\n    FOR UPDATE NOWAIT;\nBEGIN\n  OPEN c_lock;\n  FETCH c_lock INTO v_qty_dispo;\n  IF v_qty_dispo >= 100 THEN\n    UPDATE stock_med SET qty = qty - 100 WHERE med_id = 1;\n    DBMS_OUTPUT.PUT_LINE('Réservation confirmée. Stock restant : ' || (v_qty_dispo - 100));\n  ELSE\n    DBMS_OUTPUT.PUT_LINE('Stock insuffisant.');\n  END IF;\n  CLOSE c_lock;\n  COMMIT;\nEXCEPTION\n  WHEN OTHERS THEN\n    DBMS_OUTPUT.PUT_LINE('Impossible de verrouiller la ligne (déjà réservée).');\n    ROLLBACK;\nEND;",
+    explanation: 'FOR UPDATE verrouille les lignes sélectionnées au niveau ligne (ROW SHARE), empêchant toute autre session de les modifier ou de les verrouiller jusqu\'à la fin de la transaction. NOWAIT fait échouer immédiatement l\'opération si les lignes sont déjà verrouillées, sans attendre (évite le blocage). SKIP LOCKED est une alternative pour ignorer les lignes verrouillées et traiter les lignes disponibles.',
+    hints: [
+      { pattern: '\\bSELECT\\b(?!.*FOR\\s+UPDATE)', msg: 'Un SELECT simple ne verrouille pas les lignes. Ajoutez FOR UPDATE pour la réservation.', level: 'error' },
+      { pattern: '\\bFOR\\s+UPDATE\\b(?!.*NOWAIT)', msg: 'Sans NOWAIT, la session attend indéfiniment si la ligne est verrouillée. NOWAIT retourne une erreur immédiate.', level: 'warning' },
+      { pattern: '\\bCOMMIT\\b', msg: 'N\'oubliez pas de COMMIT pour libérer les verrous après le traitement.', level: 'info' }
+    ]
+  },
+  {
+    id: 18, title: 'Dynamic SQL — Exécution conditionnelle paramétrée',
+    concept: 'EXECUTE IMMEDIATE',
+    challenge: 'Le module d\'import développé par la DSI doit pouvoir insérer des données dans différentes tables de staging selon le type de flux reçu. La table cible est déterminée dynamiquement par un paramètre. Écrivez un bloc PL/SQL qui construit et exécute une instruction INSERT à la volée en fonction du nom de table passé en paramètre, en utilisant EXECUTE IMMEDIATE avec des variables de liaison.',
+    ddl: 'CREATE TABLE staging_medicament (\n  med_id    NUMBER,\n  molecule  VARCHAR2(100),\n  qty       NUMBER(8)\n);\nCREATE TABLE staging_lot (\n  lot_id    NUMBER,\n  med_id    NUMBER,\n  date_perem DATE\n);',
+    inserts: "-- Les tables sont vides initialement.\n-- L'objectif est d'insérer dynamiquement dans l'une ou l'autre.",
+    expected: "DECLARE\n  v_table  VARCHAR2(30) := 'STAGING_MEDICAMENT';\n  v_sql    VARCHAR2(500);\nBEGIN\n  v_sql := 'INSERT INTO ' || v_table ||\n           ' (med_id, molecule, qty) VALUES (:1, :2, :3)';\n  EXECUTE IMMEDIATE v_sql USING 999, 'Nouveau médicament', 100;\n  DBMS_OUTPUT.PUT_LINE('Ligne insérée dans ' || v_table);\nEXCEPTION\n  WHEN OTHERS THEN\n    DBMS_OUTPUT.PUT_LINE('Erreur : ' || SQLERRM);\nEND;",
+    explanation: 'EXECUTE IMMEDIATE construit et exécute une instruction SQL dont la structure peut varier à l\'exécution. Les variables de liaison (:1, :2, :3) sont fournies par la clause USING, protégeant contre les injections SQL. Le nom de la table est concaténé dynamiquement. La gestion d\'exception capture les erreurs potentielles (table inexistante, contrainte violée) via SQLERRM.',
+    hints: [
+      { pattern: '\\bEXECUTE\\b(?!.*IMMEDIATE)', msg: 'EXECUTE tout seul est pour les commandes SQL*Plus. Utilisez EXECUTE IMMEDIATE en PL/SQL.', level: 'error' },
+      { pattern: '\\bUSING\\b', msg: 'Les variables de liaison (USING) protègent contre les injections SQL et optimisent les performances.', level: 'info' },
+      { pattern: "\\b(?:INSERT\\s+INTO)\\s*['\"].*['\"]", msg: 'Le nom de la table ne doit pas être entre guillemets dans la construction dynamique.', level: 'error' }
+    ]
+  }
+];
+
+// ============================================================
+// HELP MANAGER
+// ============================================================
+class HelpManager {
+  constructor() {
+    this._overlay = document.getElementById('help-overlay');
+    this._active = null;
+    this._boundKey = this._onKey.bind(this);
+    this._overlay.addEventListener('click', () => this.close());
+  }
+  open(id) {
+    const modal = document.getElementById('help-' + id);
+    if (!modal) return;
+    this._active = modal;
+    this._overlay.classList.add('help-overlay--active');
+    this._overlay.setAttribute('aria-hidden', 'false');
+    modal.classList.add('help-modal--active');
+    modal.setAttribute('aria-hidden', 'false');
+    document.addEventListener('keydown', this._boundKey);
+    const cb = modal.querySelector('.help-modal__close');
+    if (cb) cb.focus();
+  }
+  close() {
+    if (!this._active) return;
+    this._active.classList.remove('help-modal--active');
+    this._active.setAttribute('aria-hidden', 'true');
+    this._overlay.classList.remove('help-overlay--active');
+    this._overlay.setAttribute('aria-hidden', 'true');
+    document.removeEventListener('keydown', this._boundKey);
+    this._active = null;
+  }
+  _onKey(e) {
+    if (e.key === 'Escape') { this.close(); return; }
+    if (e.key !== 'Tab' || !this._active) return;
+    const focusable = this._active.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    if (!focusable.length) return;
+    const first = focusable[0], last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
+}
+
+// ============================================================
+// SCENARIO ENGINE
+// ============================================================
+class ScenarioEngine {
+  constructor() { this._current = null; }
+  load(id) {
+    this._current = SCENARIOS.find(s => s.id === id) || null;
+    return this._current;
+  }
+  getCurrent() { return this._current; }
+  getConcepts() { return SCENARIOS.map(s => ({ id: s.id, title: s.title, concept: s.concept })); }
+}
+
+// ============================================================
+// SQL VALIDATOR
+// ============================================================
+class SQLValidator {
+  validate(sql, scenario) {
+    if (!sql || sql.trim().length === 0) {
+      return { valid: false, message: 'ORA-00900 : Instruction SQL vide. Veuillez saisir une requête.', level: 'error' };
+    }
+    const upper = sql.toUpperCase().trim();
+    const checks = [
+      { test: !/^SELECT\b|^WITH\b|^DECLARE\b|^CREATE\b|^MERGE\b|^BEGIN\b/.test(upper), msg: 'ORA-00920 : L\'instruction doit commencer par un mot-clé SQL ou PL/SQL valide (SELECT, WITH, DECLARE, CREATE, MERGE, BEGIN...).', level: 'error' },
+      { test: /^SELECT\b/.test(upper) && !/\bFROM\b/.test(upper), msg: 'ORA-00923 : Mot-clé FROM manquant. Une requête SELECT nécessite une clause FROM.', level: 'error' },
+      { test: /\bSELECT\b/.test(upper) && /\bWHERE\b/.test(upper) && !/=\s*['"]?/.test(upper) && !/\bIS\b/.test(upper) && !/\bIN\b/.test(upper), msg: 'ORA-00911 : La clause WHERE semble incomplète. Vérifiez la présence d\'une condition.', level: 'warning' },
+      { test: /\b(SUM|AVG|COUNT|MIN|MAX)\s*\(/.test(upper) && !/\bGROUP\s+BY\b/.test(upper) && /\bSELECT\b/.test(upper), msg: 'ORA-00937 : Fonction d\'agrégation sans GROUP BY. Si vous utilisez SUM, AVG ou COUNT sans GROUP BY, toutes les colonnes non agrégées du SELECT doivent être dans GROUP BY.', level: 'error' },
+      { test: /\bLEFT\s+JOIN\b/.test(upper) && /\bWHERE\b/.test(upper) && /\bIS\s+NULL\b/.test(upper), msg: 'ATTENTION : Un filtre WHERE ... IS NULL sur une colonne de la table jointe annule l\'effet du LEFT JOIN et le transforme en INNER JOIN.', level: 'warning' },
+      { test: /\bDELETE\b/.test(upper) && /\bFROM\b/.test(upper) && !/\bWHERE\b/.test(upper), msg: 'ATTENTION : DELETE sans WHERE supprime TOUTES les lignes de la table. Vérifiez l\'intention.', level: 'warning' },
+      { test: /\bUPDATE\b/.test(upper) && !/\bSET\b/.test(upper), msg: 'ORA-00924 : Mot-clé SET manquant dans l\'instruction UPDATE.', level: 'error' },
+      { test: /\bINSERT\b/.test(upper) && /\bINTO\b/.test(upper) && !/\bVALUES\b/.test(upper) && !/\bSELECT\b/.test(upper), msg: 'ORA-00926 : Clause VALUES ou SELECT manquante dans l\'instruction INSERT.', level: 'error' },
+      { test: /\bMERGE\b/.test(upper) && !/\bWHEN\b/.test(upper), msg: 'ORA-00927 : L\'instruction MERGE nécessite au moins une clause WHEN MATCHED ou WHEN NOT MATCHED.', level: 'error' },
+      { test: /\bFORALL\b/.test(upper) && !/\bBULK\s+COLLECT\b/.test(upper), msg: 'FORALL seul n\'a pas de données à traiter. Utilisez BULK COLLECT pour charger les données dans une collection.', level: 'info' },
+    ];
+    for (const check of checks) {
+      if (check.test) return { valid: false, message: check.msg, level: check.level };
+    }
+    if (scenario && scenario.hints) {
+      for (const hint of scenario.hints) {
+        const re = new RegExp(hint.pattern, 'i');
+        if (re.test(sql)) {
+          return { valid: hint.level === 'error' ? false : true, message: hint.msg, level: hint.level };
+        }
+      }
+    }
+    return { valid: true, message: 'Syntaxe vérifiée. Aucune erreur détectée.', level: 'success' };
+  }
+}
+
+// ============================================================
+// SQL EXECUTOR (simulateur)
+// ============================================================
+class SQLExecutor {
+  constructor(consoleEl, stateMachineEl, stateInfoEl, resultCardEl, resultWrapEl) {
+    this._console = consoleEl;
+    this._smEl = stateMachineEl;
+    this._infoEl = stateInfoEl;
+    this._resultCard = resultCardEl;
+    this._resultWrap = resultWrapEl;
+    this._valid = false;
+  }
+  _setState(activeId) {
+    this._smEl.querySelectorAll('.state-step').forEach(el => el.classList.remove('state-step--active'));
+    const target = document.getElementById('exec-state-' + activeId);
+    if (target) target.classList.add('state-step--active');
+  }
+  _log(msg, level = 'info') {
+    const ts = new Date().toLocaleTimeString('fr-FR', { hour12: false });
+    const entry = document.createElement('div');
+    entry.className = 'log-console__entry log-console__entry--' + level;
+    entry.innerHTML = '<span class="log-console__timestamp">[' + ts + ']</span>' + msg;
+    this._console.appendChild(entry);
+    this._console.scrollTop = this._console.scrollHeight;
+  }
+  _clearResult() {
+    this._resultCard.style.display = 'none';
+    this._resultWrap.innerHTML = '';
+  }
+  execute(validation, scenario, attempts) {
+    this._clearResult();
+    if (!validation.valid) {
+      this._setState('parsing');
+      this._infoEl.textContent = 'Échec de l\'analyse syntaxique.';
+      this._log(validation.message, validation.level === 'error' ? 'error' : 'warning');
+      if (validation.level === 'error') {
+        this._setState('idle');
+        return;
+      }
+    }
+    setTimeout(() => {
+      this._setState('compiling');
+      this._infoEl.textContent = 'Compilation en cours...';
+      this._log('Compilation: Analyse sémantique en cours.', 'info');
+    }, 400);
+    setTimeout(() => {
+      this._setState('executing');
+      this._infoEl.textContent = 'Exécution...';
+      this._log('Exécution: Traitement de l\'instruction.', 'info');
+    }, 800);
+    setTimeout(() => {
+      if (validation.valid) {
+        this._setState('completed');
+        this._infoEl.textContent = 'Instruction exécutée avec succès.';
+        this._log('Instruction exécutée avec succès.', 'success');
+        if (scenario) {
+          const sampleData = this._generateResult(scenario);
+          this._displayResult(sampleData);
+          this._log(resultRows(scenario.id) + ' ligne(s) traitée(s).', 'success');
+        }
+        this._valid = true;
+      } else {
+        this._setState('completed');
+        this._infoEl.textContent = 'Exécution terminée avec avertissements.';
+        this._log('Exécution terminée.', 'info');
+        this._valid = true;
+      }
+    }, 1200);
+  }
+  _generateResult(scenario) {
+    const data = [];
+    const rows = resultRows(scenario.id);
+    for (let i = 0; i < rows; i++) {
+      const row = {};
+      row['ID'] = i + 1;
+      row['MOLECULE'] = ['Paracétamol', 'Amoxicilline', 'Salbutamol', 'Morphine', 'Diazépam', 'Ibuprofène', 'Héparine', 'Midazolam'][i % 8];
+      row['QTE'] = Math.floor(Math.random() * 500) + 10;
+      row['SERVICE'] = ['Urgences', 'Cardiologie', 'Pédiatrie', 'Oncologie', 'Réanimation'][i % 5];
+      row['DATE'] = '2025-0' + ((i % 9) + 1) + '-' + String(10 + i).padStart(2, '0');
+      data.push(row);
+    }
+    return data;
+  }
+  _displayResult(data) {
+    if (!data || data.length === 0) return;
+    const cols = Object.keys(data[0]);
+    let html = '<table class="result-table"><thead><tr>';
+    cols.forEach(c => { html += '<th>' + c + '</th>'; });
+    html += '</tr></thead><tbody>';
+    data.forEach(r => {
+      html += '<tr>';
+      cols.forEach(c => { html += '<td>' + r[c] + '</td>'; });
+      html += '</tr>';
+    });
+    html += '</tbody></table>';
+    this._resultWrap.innerHTML = html;
+    this._resultCard.style.display = 'block';
+  }
+  reset() {
+    this._setState('idle');
+    this._infoEl.textContent = 'En attente d\'une instruction.';
+    this._clearResult();
+  }
+}
+
+function resultRows(id) {
+  const map = {1:8,2:6,3:5,4:4,5:4,6:3,7:3,8:6,9:3,10:5,11:2,12:4,13:3,14:3,15:5,16:6,17:3,18:1};
+  return map[id] || 3;
+}
+
+// ============================================================
+// APPLICATION
+// ============================================================
+class App {
+  constructor() {
+    this._sm = new StateManager();
+    this._helpMgr = new HelpManager();
+    this._engine = new ScenarioEngine();
+    this._validator = new SQLValidator();
+    this._executor = new SQLExecutor(
+      document.getElementById('result-console'),
+      document.getElementById('exec-state-machine'),
+      document.getElementById('exec-state-info'),
+      document.getElementById('result-card'),
+      document.getElementById('result-table-wrap')
+    );
+    this._currentId = null;
+  }
+  init() {
+    this._populateSelector();
+    this._bindEvents();
+    this._restoreState();
+    this._updateUI();
+  }
+  _populateSelector() {
+    const sel = document.getElementById('scenario-select');
+    const concepts = this._engine.getConcepts();
+    concepts.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.id;
+      opt.textContent = s.id + '. ' + s.title + ' [' + s.concept + ']';
+      sel.appendChild(opt);
+    });
+  }
+  _restoreState() {
+    // La page démarre sans scénario préchargé.
+    // L'utilisateur choisit un scénario dans le sélecteur.
+  }
+  _bindEvents() {
+    document.getElementById('scenario-select').addEventListener('change', (e) => {
+      if (e.target.value) this._loadScenario(parseInt(e.target.value));
+    });
+    document.getElementById('btn-verify').addEventListener('click', () => this._verify());
+    document.getElementById('btn-execute').addEventListener('click', () => this._execute());
+    document.getElementById('btn-solution').addEventListener('click', () => this._showSolution());
+    document.getElementById('btn-reset-editor').addEventListener('click', () => this._resetEditor());
+    document.getElementById('btn-confirm-yes').addEventListener('click', () => this._confirmSolution());
+    document.getElementById('btn-confirm-no').addEventListener('click', () => this._cancelSolution());
+    document.querySelectorAll('[data-help]').forEach(btn => {
+      btn.addEventListener('click', () => this._helpMgr.open(btn.dataset.help));
+    });
+    document.querySelectorAll('.help-modal__close, .help-modal__footer-btn').forEach(btn => {
+      btn.addEventListener('click', () => this._helpMgr.close());
+    });
+  }
+  _loadScenario(id) {
+    const scenario = this._engine.load(id);
+    if (!scenario) return;
+    this._currentId = id;
+    this._sm.current = id;
+    document.getElementById('empty-state').style.display = 'none';
+    document.getElementById('workspace').style.display = 'block';
+    document.getElementById('schema-display').textContent = scenario.ddl;
+    document.getElementById('data-display').textContent = scenario.inserts;
+    document.getElementById('challenge-display').innerHTML = scenario.challenge.replace(/\n/g, '<br>');
+    document.getElementById('challenge-concept').innerHTML = '<span class="tag tag--gold">' + scenario.concept + '</span>';
+    document.getElementById('session-scenario-name').textContent = scenario.title;
+    document.getElementById('editor-filename').textContent = 'scenario_' + id + '.sql';
+    this._resetEditor();
+    this._executor.reset();
+    this._logConsole('Scénario chargé : ' + scenario.title, 'system');
+    this._logConsole('Concept : ' + scenario.concept + ' — À vous de résoudre le défi.', 'info');
+    this._updateUI();
+  }
+  _verify() {
+    const sql = document.getElementById('sql-editor').value;
+    const scenario = this._engine.getCurrent();
+    if (!scenario) { this._logConsole('Aucun scénario actif.', 'error'); return; }
+    const result = this._validator.validate(sql, scenario);
+    if (result.valid && result.level === 'success') {
+      this._logConsole(result.message, 'success');
+    } else if (result.level === 'error') {
+      this._logConsole(result.message, 'error');
+    } else if (result.level === 'warning') {
+      this._logConsole(result.message, 'warning');
+    } else {
+      this._logConsole(result.message, 'info');
+    }
+  }
+  _execute() {
+    const sql = document.getElementById('sql-editor').value;
+    const scenario = this._engine.getCurrent();
+    if (!scenario) { this._logConsole('Aucun scénario actif.', 'error'); return; }
+    const validation = this._validator.validate(sql, scenario);
+    this._sm.addAttempt();
+    if (validation.valid && validation.level === 'success') {
+      this._sm.markSolved(scenario.id);
+    }
+    this._executor.execute(validation, scenario, this._sm.attempts);
+    this._updateUI();
+  }
+  _showSolution() {
+    const scenario = this._engine.getCurrent();
+    if (!scenario) { this._logConsole('Aucun scénario actif.', 'error'); return; }
+    this._openModal('help-confirm');
+  }
+  _confirmSolution() {
+    this._closeModal('help-confirm');
+    this._closeOverlay();
+    const scenario = this._engine.getCurrent();
+    if (!scenario) { this._logConsole('Aucun scénario actif.', 'error'); return; }
+    document.getElementById('solution-explanation').textContent = scenario.explanation;
+    document.getElementById('solution-code').value = scenario.expected;
+    this._helpMgr.open('solution');
+    this._logConsole('Solution experte consultée pour le scénario ' + scenario.id, 'info');
+  }
+  _cancelSolution() {
+    this._closeModal('help-confirm');
+    this._closeOverlay();
+    this._logConsole('Consultation de la solution annulée. Continuez à chercher !', 'info');
+  }
+  _openModal(id) {
+    document.getElementById(id).classList.add('help-modal--active');
+    document.getElementById('help-overlay').classList.add('help-overlay--active');
+  }
+  _closeModal(id) {
+    document.getElementById(id).classList.remove('help-modal--active');
+  }
+  _closeOverlay() {
+    document.getElementById('help-overlay').classList.remove('help-overlay--active');
+  }
+  _resetEditor() {
+    document.getElementById('sql-editor').value = '';
+    document.getElementById('result-console').innerHTML =
+      '<div class="log-console__entry log-console__entry--system"><span class="log-console__timestamp">[--:--:--]</span>Console réinitialisée. Sélectionnez un scénario.</div>';
+    this._executor.reset();
+  }
+  _logConsole(msg, level = 'info') {
+    const ts = new Date().toLocaleTimeString('fr-FR', { hour12: false });
+    const el = document.getElementById('result-console');
+    const entry = document.createElement('div');
+    entry.className = 'log-console__entry log-console__entry--' + level;
+    entry.innerHTML = '<span class="log-console__timestamp">[' + ts + ']</span>' + msg;
+    el.appendChild(entry);
+    el.scrollTop = el.scrollHeight;
+  }
+  _updateUI() {
+    document.getElementById('session-attempts').textContent = this._sm.attempts;
+    const statusEl = document.getElementById('session-status');
+    if (this._sm.attempts === 0) {
+      statusEl.textContent = 'EN ATTENTE';
+      statusEl.style.color = 'var(--color-amber)';
+    } else if (this._currentId && this._sm.solved.includes(this._currentId)) {
+      statusEl.textContent = 'RÉUSSI';
+      statusEl.style.color = 'var(--color-green)';
+    } else {
+      statusEl.textContent = 'EN COURS';
+      statusEl.style.color = 'var(--color-cyan)';
+    }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  new App().init();
+});
+</script>
+</body>
+</html>
