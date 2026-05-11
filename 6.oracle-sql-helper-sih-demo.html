@@ -284,7 +284,7 @@ a:hover { text-decoration: underline; }
 
   <main class="app-main" id="app-main">
     <div class="page-header">
-      <h1 class="page-header__title">Atelier de Construction de Requêtes</h1>
+      <h1 class="page-header__title">Atelier de construction de requêtes</h1>
       <div class="page-header__subtitle-row">
         <p class="page-header__subtitle">18 scénarios PUI pour maîtriser l'art de la requête Oracle — écrivez, validez, progressez</p>
         <button class="page-header__help-btn" data-help="workshop" aria-label="Aide Atelier" title="Aide">?</button>
@@ -383,7 +383,7 @@ a:hover { text-decoration: underline; }
 <!-- HELP MODAL -->
 <div class="help-overlay" id="help-overlay" aria-hidden="true"></div>
 <div class="help-modal" id="help-workshop" role="dialog" aria-modal="true" aria-labelledby="help-workshop-title" aria-hidden="true">
-  <div class="help-modal__header"><div class="help-modal__title" id="help-workshop-title">Atelier de Construction de Requêtes</div><button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button></div>
+  <div class="help-modal__header"><div class="help-modal__title" id="help-workshop-title">Atelier de construction de requêtes</div><button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button></div>
   <div class="help-modal__body">
     <div class="help-modal__section"><div class="help-modal__section-title help-modal__section-title--objective">Objectif</div><p class="help-modal__text">Cet atelier vous propose 18 scénarios métiers tirés du contexte d'une Pharmacie à Usage Intérieur (PUI). Pour chaque défi, vous devez rédiger la requête SQL ou le bloc PL/SQL qui résout le problème posé. Un moteur de validation syntaxique et logique vous assiste dans votre apprentissage.</p>
     <ul class="help-modal__list"><li><strong>Sélection</strong> : Choisissez un scénario dans le menu déroulant de la barre latérale.</li><li><strong>Éditeur</strong> : Rédigez votre solution dans la zone de texte dédiée.</li><li><strong>Vérification</strong> : Le bouton « Vérifier la syntaxe » analyse votre code et signale les erreurs courantes.</li><li><strong>Exécution</strong> : Lancez votre requête pour voir le résultat simulé.</li><li><strong>Solution Expert</strong> : Consultez la solution optimale commentée ligne par ligne.</li></ul></div>
@@ -627,7 +627,7 @@ const SCENARIOS = [
   },
   {
     id: 3, title: 'Agrégation — Consommation moyenne par service',
-    concept: 'GROUP BY / Agrégation',
+    concept: 'GROUP BY / AGGREGATION',
     challenge: 'Le comité du médicament souhaite analyser la consommation mensuelle moyenne par service hospitalier pour ajuster les dotations. À partir de la table DISPENSATION, calculez la quantité totale et la quantité moyenne dispensées par service au cours des trente derniers jours. Les services sans consommation doivent apparaître avec une valeur nulle.',
     ddl: 'CREATE TABLE service (\n  service_id  NUMBER PRIMARY KEY,\n  nom         VARCHAR2(60)\n);\nCREATE TABLE dispensation (\n  disp_id     NUMBER PRIMARY KEY,\n  service_id  NUMBER REFERENCES service(service_id),\n  qty         NUMBER(8),\n  date_disp   DATE\n);',
     inserts: "INSERT INTO service VALUES (1, 'Urgences');\nINSERT INTO service VALUES (2, 'Cardiologie');\nINSERT INTO service VALUES (3, 'Pédiatrie');\nINSERT INTO service VALUES (4, 'Oncologie');\nINSERT INTO dispensation VALUES (1, 1, 450, DATE '2025-04-01');\nINSERT INTO dispensation VALUES (2, 1, 320, DATE '2025-04-05');\nINSERT INTO dispensation VALUES (3, 2, 180, DATE '2025-04-02');\nINSERT INTO dispensation VALUES (4, 2, 210, DATE '2025-04-10');\nINSERT INTO dispensation VALUES (5, 3, 95, DATE '2025-04-03');\nINSERT INTO dispensation VALUES (6, 4, 0, DATE '2025-03-28');",
@@ -651,7 +651,7 @@ const SCENARIOS = [
   },
   {
     id: 4, title: 'Sous-requête Corrélée — Dernière péremption',
-    concept: 'Sous-requête Corrélée',
+    concept: 'CORRELATED SUBQUERY',
     challenge: 'Le préparateur en chef doit vérifier la date de péremption la plus récente de chaque lot de médicament afin d\'organiser la rotation des stocks. Pour chaque médicament référencé, extrayez la date de péremption la plus tardive parmi tous ses lots. Une sous-requête corrélée vous permettra de filtrer les lots par médicament.',
     ddl: 'CREATE TABLE medicament (\n  med_id    NUMBER PRIMARY KEY,\n  molecule  VARCHAR2(100)\n);\nCREATE TABLE lot (\n  lot_id      NUMBER PRIMARY KEY,\n  med_id      NUMBER REFERENCES medicament(med_id),\n  date_perem  DATE NOT NULL,\n  qty         NUMBER(8)\n);',
     inserts: "INSERT INTO medicament VALUES (1, 'Paracétamol 500mg');\nINSERT INTO medicament VALUES (2, 'Amoxicilline 250mg');\nINSERT INTO medicament VALUES (3, 'Salbutamol aérosol');\nINSERT INTO lot VALUES (101, 1, DATE '2026-06-01', 500);\nINSERT INTO lot VALUES (102, 1, DATE '2025-12-31', 300);\nINSERT INTO lot VALUES (103, 2, DATE '2025-09-15', 200);\nINSERT INTO lot VALUES (104, 2, DATE '2026-03-20', 150);\nINSERT INTO lot VALUES (105, 3, DATE '2025-11-01', 80);",
@@ -674,7 +674,7 @@ const SCENARIOS = [
     ]
   },
   {
-    id: 5, title: 'Bulk Collect — Mise à jour massive des prix',
+    id: 5, title: 'Collecte en masse — Mise à jour massive des prix',
     concept: 'BULK COLLECT / FORALL',
     challenge: 'Une révision générale des prix d\'achat des médicaments est ordonnée par la direction financière. Vous devez, en un seul bloc PL/SQL, charger l\'intégralité des médicaments du catalogue dans une collection, appliquer une majoration de 5 % sur le prix unitaire, puis mettre à jour la table en une seule opération massive. Utilisez BULK COLLECT et FORALL pour minimiser les changements de contexte entre les moteurs SQL et PL/SQL.',
     ddl: 'CREATE TABLE medicament (\n  med_id     NUMBER PRIMARY KEY,\n  molecule   VARCHAR2(100),\n  prix_achat NUMBER(10,2)\n);',
@@ -694,8 +694,8 @@ const SCENARIOS = [
     ]
   },
   {
-    id: 6, title: 'Trigger — Audit HDS des sorties de stock',
-    concept: 'Trigger AFTER',
+    id: 6, title: 'Déclencheur — Audit HDS des sorties de stock',
+    concept: 'TRIGGER',
     challenge: 'La conformité HDS impose une traçabilité exhaustive de toute sortie de stock. Chaque ligne supprimée dans la table SORTIE_STOCK doit être automatiquement archivée dans une table AUDIT_SORTIE avec l\'horodatage de la suppression et l\'identifiant de l\'utilisateur (simulé par une variable). Rédigez le déclencheur AFTER DELETE qui réalise cet archivage.',
     ddl: 'CREATE TABLE sortie_stock (\n  sortie_id  NUMBER PRIMARY KEY,\n  med_id     NUMBER NOT NULL,\n  qty        NUMBER(8),\n  service    VARCHAR2(60)\n);\nCREATE TABLE audit_sortie (\n  audit_id    NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,\n  sortie_id   NUMBER,\n  med_id      NUMBER,\n  qty         NUMBER(8),\n  service     VARCHAR2(60),\n  date_suppr  DATE DEFAULT SYSDATE,\n  user_suppr  VARCHAR2(60)\n);',
     inserts: "INSERT INTO sortie_stock VALUES (1, 101, 200, 'Urgences');\nINSERT INTO sortie_stock VALUES (2, 102, 50, 'Cardiologie');\n-- Le déclencheur doit être testé après création par :\n-- DELETE FROM sortie_stock WHERE sortie_id = 1;",
@@ -735,7 +735,7 @@ const SCENARIOS = [
   },
   {
     id: 8, title: 'Vue Matérialisée — Rapport journalier pré-calculé',
-    concept: 'Materialized View',
+    concept: 'MATERIALIZED VIEW',
     challenge: 'Le rapport de consommation par service est sollicité plusieurs dizaines de fois par jour par différents tableaux de bord. Afin d\'éviter des calculs d\'agrégation répétés sur des volumes croissants, créez une vue matérialisée qui pré-calcule chaque nuit les quantités totales dispensées par service pour les sept derniers jours. Le mécanisme d\'actualisation (REFRESH) garantira des données à jour sans impacter les performances des requêtes.',
     ddl: 'CREATE TABLE service (\n  service_id  NUMBER PRIMARY KEY,\n  nom         VARCHAR2(60)\n);\nCREATE TABLE dispensation (\n  disp_id     NUMBER PRIMARY KEY,\n  service_id  NUMBER REFERENCES service(service_id),\n  qty         NUMBER(8),\n  date_disp   DATE\n);',
     inserts: "INSERT INTO service VALUES (1, 'Urgences');\nINSERT INTO service VALUES (2, 'Cardiologie');\nINSERT INTO service VALUES (3, 'Pédiatrie');\nINSERT INTO dispensation VALUES (1, 1, 450, DATE '2025-04-08');\nINSERT INTO dispensation VALUES (2, 1, 320, DATE '2025-04-09');\nINSERT INTO dispensation VALUES (3, 2, 180, DATE '2025-04-08');\nINSERT INTO dispensation VALUES (4, 2, 210, DATE '2025-04-07');\nINSERT INTO dispensation VALUES (5, 3, 95, DATE '2025-04-09');",
@@ -755,7 +755,7 @@ const SCENARIOS = [
   },
   {
     id: 9, title: 'Index Unique — Contrôle d\'intégrité des lots',
-    concept: 'Unique Index',
+    concept: 'UNIQUE INDEX',
     challenge: 'Chaque lot de médicament entrant à la pharmacie possède un numéro de lot fourni par le fabricant. Ce numéro, associé au fabricant, doit être unique dans la base pour éviter toute confusion lors des rappels de lots. Créez la contrainte d\'unicité appropriée sur la table LOT_SIMU pour garantir l\'unicité du couple (NUMERO_LOT, FABRICANT).',
     ddl: 'CREATE TABLE lot_simu (\n  lot_id      NUMBER PRIMARY KEY,\n  med_id      NUMBER NOT NULL,\n  numero_lot  VARCHAR2(30) NOT NULL,\n  fabricant   VARCHAR2(60) NOT NULL,\n  date_perem  DATE,\n  qty         NUMBER(8)\n);',
     inserts: "INSERT INTO lot_simu VALUES (1, 101, 'LOT-2025-A001', 'Sanofi', DATE '2026-06-01', 500);\nINSERT INTO lot_simu VALUES (2, 101, 'LOT-2025-A002', 'Sanofi', DATE '2025-12-31', 300);\nINSERT INTO lot_simu VALUES (3, 102, 'LOT-2025-B045', 'Mylan', DATE '2026-03-20', 200);",
@@ -775,7 +775,7 @@ const SCENARIOS = [
   },
   {
     id: 10, title: 'Partitionnement — Historique par année',
-    concept: 'Partition Range',
+    concept: 'RANGE PARTITION',
     challenge: 'La table SORTIE_STOCK est partitionnée par année (RANGE sur DATE_SORTIE) afin d\'accélérer les requêtes historiques. En période de bilan annuel, le pharmacien a besoin de consulter toutes les dispensations de l\'année 2025. Écrivez une requête qui filtre sur cette plage de dates : l\'optimiseur pratiquera l\'élagage de partition (partition pruning) et ne parcourra que la partition p_2025, sans lire les années antérieures ni les partitions futures.',
     ddl: 'CREATE TABLE sortie_stock (\n  sortie_id    NUMBER,\n  med_id       NUMBER NOT NULL,\n  qty          NUMBER(8),\n  date_sortie  DATE\n)\nPARTITION BY RANGE (date_sortie) (\n  PARTITION p_2023 VALUES LESS THAN (TO_DATE(\'2024-01-01\', \'YYYY-MM-DD\')),\n  PARTITION p_2024 VALUES LESS THAN (TO_DATE(\'2025-01-01\', \'YYYY-MM-DD\')),\n  PARTITION p_2025 VALUES LESS THAN (TO_DATE(\'2026-01-01\', \'YYYY-MM-DD\')),\n  PARTITION p_future VALUES LESS THAN (MAXVALUE)\n);',
     inserts: "INSERT INTO sortie_stock VALUES (1, 101, 200, DATE '2024-03-15');\nINSERT INTO sortie_stock VALUES (2, 102, 50, DATE '2024-07-22');\nINSERT INTO sortie_stock VALUES (3, 103, 85, DATE '2025-01-10');\nINSERT INTO sortie_stock VALUES (4, 104, 120, DATE '2025-11-05');\nINSERT INTO sortie_stock VALUES (5, 105, 300, DATE '2023-12-01');",
@@ -798,7 +798,7 @@ const SCENARIOS = [
   },
   {
     id: 11, title: 'Séquence — Génération d\'ID d\'ordonnance',
-    concept: 'Sequence / NEXTVAL',
+    concept: 'SEQUENCE / NEXTVAL',
     challenge: 'Le système de prescription nécessite un générateur d\'identifiants uniques et séquentiels pour les ordonnances, garantissant l\'absence de collision même en cas d\'accès concurrentiel intensif. Créez une séquence adaptée à un volume de 5000 ordonnances par jour, avec un pas d\'incrémentation de 1, démarrant à 10000. Insérez ensuite une ordonnance en utilisant cette séquence.',
     ddl: 'CREATE TABLE ordonnance (\n  ord_id     NUMBER PRIMARY KEY,\n  patient_id NUMBER NOT NULL,\n  med_id     NUMBER NOT NULL,\n  qty        NUMBER(8),\n  date_presc DATE DEFAULT SYSDATE\n);',
     inserts: "INSERT INTO ordonnance VALUES (SEQ_ORDONNANCE.NEXTVAL, 1, 101, 60, SYSDATE);\nINSERT INTO ordonnance VALUES (SEQ_ORDONNANCE.NEXTVAL, 2, 102, 30, SYSDATE);",
@@ -817,8 +817,8 @@ const SCENARIOS = [
     ]
   },
   {
-    id: 12, title: 'Exception Handling — Division par zéro dans le coût unitaire',
-    concept: 'Exception / ZERO_DIVIDE',
+    id: 12, title: 'Gestion d\'exception — Division par zéro dans le coût unitaire',
+    concept: 'EXCEPTION / ZERO_DIVIDE',
     challenge: 'Le calcul du coût unitaire par molécule (prix total divisé par la quantité) peut rencontrer des divisions par zéro lorsque la quantité en stock est nulle. Écrivez un bloc PL/SQL qui parcourt la table STOCK_MED, calcule le coût unitaire pour chaque ligne, et capture élégamment l\'exception ZERO_DIVIDE pour les lignes problématiques en affichant un message explicite sans interrompre le traitement.',
     ddl: 'CREATE TABLE stock_med (\n  med_id    NUMBER PRIMARY KEY,\n  molecule  VARCHAR2(100),\n  qty       NUMBER(8),\n  cout_total NUMBER(10,2)\n);',
     inserts: "INSERT INTO stock_med VALUES (1, 'Paracétamol 500mg', 1200, 3000.00);\nINSERT INTO stock_med VALUES (2, 'Amoxicilline 250mg', 0, 0);\nINSERT INTO stock_med VALUES (3, 'Salbutamol aérosol', 85, 1088.00);\nINSERT INTO stock_med VALUES (4, 'Morphine 10mg', 0, 0);",
@@ -838,7 +838,7 @@ const SCENARIOS = [
   },
   {
     id: 13, title: 'Curseur Explicite — Traitement des réservations en attente',
-    concept: 'Curseur Explicite',
+    concept: 'CURSOR',
     challenge: 'Le service des urgences nécessite un traitement séquentiel des réservations de médicaments en attente de validation. Chaque réservation doit être examinée individuellement : si le stock est suffisant, elle est marquée comme validée et le stock est décrémenté ; sinon, elle est marquée comme refusée. Utilisez un curseur explicite pour parcourir les réservations ligne à ligne.',
     ddl: 'CREATE TABLE reservation (\n  res_id    NUMBER PRIMARY KEY,\n  med_id    NUMBER NOT NULL,\n  qty_dem   NUMBER(8),\n  statut    VARCHAR2(20) DEFAULT \'EN_ATTENTE\',\n  date_res  DATE DEFAULT SYSDATE\n);\nCREATE TABLE stock_med (\n  med_id    NUMBER PRIMARY KEY,\n  qty       NUMBER(8)\n);',
     inserts: "INSERT INTO stock_med VALUES (101, 500);\nINSERT INTO stock_med VALUES (102, 30);\nINSERT INTO reservation VALUES (1, 101, 100, 'EN_ATTENTE', SYSDATE);\nINSERT INTO reservation VALUES (2, 102, 50, 'EN_ATTENTE', SYSDATE);\nINSERT INTO reservation VALUES (3, 101, 450, 'EN_ATTENTE', SYSDATE);",
@@ -858,7 +858,7 @@ const SCENARIOS = [
   },
   {
     id: 14, title: 'MERGE — Synchronisation stock théorique et réel',
-    concept: 'MERGE (Upsert)',
+    concept: 'MERGE',
     challenge: 'L\'inventaire mensuel produit une table INVENTAIRE contenant les quantités réelles comptées pour chaque médicament. Vous devez synchroniser la table STOCK_THEORIQUE avec ces données : si le médicament existe déjà dans le stock théorique, mettez à jour sa quantité avec la valeur réelle ; s\'il n\'existe pas, insérez une nouvelle ligne. Une seule instruction MERGE suffit.',
     ddl: 'CREATE TABLE stock_theorique (\n  med_id   NUMBER PRIMARY KEY,\n  molecule VARCHAR2(100),\n  qty      NUMBER(8)\n);\nCREATE TABLE inventaire (\n  med_id   NUMBER PRIMARY KEY,\n  qty_reel NUMBER(8)\n);',
     inserts: "INSERT INTO stock_theorique VALUES (1, 'Paracétamol 500mg', 1200);\nINSERT INTO stock_theorique VALUES (2, 'Amoxicilline 250mg', 340);\nINSERT INTO inventaire VALUES (1, 1180);\nINSERT INTO inventaire VALUES (2, 335);\nINSERT INTO inventaire VALUES (3, 500);",
@@ -877,7 +877,7 @@ const SCENARIOS = [
     ]
   },
   {
-    id: 15, title: 'Analytic Function — Rang des médicaments les plus prescrits',
+    id: 15, title: 'Fonction analytique — Rang des médicaments les plus prescrits',
     concept: 'ROW_NUMBER / RANK',
     challenge: 'Le comité de pharmacologie souhaite identifier les cinq molécules les plus prescrites du semestre afin d\'optimiser les négociations d\'achat. À partir de la table de dispensation, calculez le rang de chaque molécule par quantité totale dispensée, en utilisant une fonction analytique pour classer les résultats après agrégation par molécule.',
     ddl: 'CREATE TABLE dispensation (\n  disp_id    NUMBER PRIMARY KEY,\n  med_id     NUMBER NOT NULL,\n  molecule   VARCHAR2(100),\n  qty        NUMBER(8),\n  date_disp  DATE\n);',
@@ -930,7 +930,7 @@ const SCENARIOS = [
     ]
   },
   {
-    id: 17, title: 'Locking — Réservation de stock avec FOR UPDATE',
+    id: 17, title: 'Verrouillage — Réservation de stock avec FOR UPDATE',
     concept: 'SELECT FOR UPDATE / NOWAIT',
     challenge: 'Lors de la préparation d\'une dispensation urgente, le préparateur doit réserver une quantité précise de médicament en stock. Pour éviter qu\'un autre préparateur ne lui prenne la même unité simultanément, vous devez verrouiller la ligne de stock au moment de la lecture. Utilisez SELECT ... FOR UPDATE NOWAIT pour tenter de réserver le stock et signaler immédiatement un échec si la ligne est déjà verrouillée.',
     ddl: 'CREATE TABLE stock_med (\n  med_id    NUMBER PRIMARY KEY,\n  molecule  VARCHAR2(100),\n  qty       NUMBER(8)\n);',
@@ -950,7 +950,7 @@ const SCENARIOS = [
     ]
   },
   {
-    id: 18, title: 'Dynamic SQL — Exécution conditionnelle paramétrée',
+    id: 18, title: 'SQL dynamique — Exécution conditionnelle paramétrée',
     concept: 'EXECUTE IMMEDIATE',
     challenge: 'Le module d\'import développé par la DSI doit pouvoir insérer des données dans différentes tables de staging selon le type de flux reçu. La table cible est déterminée dynamiquement par un paramètre. Écrivez un bloc PL/SQL qui construit et exécute une instruction INSERT à la volée en fonction du nom de table passé en paramètre, en utilisant EXECUTE IMMEDIATE avec des variables de liaison.',
     ddl: 'CREATE TABLE staging_medicament (\n  med_id    NUMBER,\n  molecule  VARCHAR2(100),\n  qty       NUMBER(8)\n);\nCREATE TABLE staging_lot (\n  lot_id    NUMBER,\n  med_id    NUMBER,\n  date_perem DATE\n);',
@@ -1034,17 +1034,17 @@ class SQLValidator {
     this._conceptKeywords = {
       'INNER JOIN':              { keywords: ['JOIN'], msg: 'ORA-00920 : Mot-clé JOIN manquant. Une jointure INNER JOIN est attendue pour relier les tables.' },
       'LEFT / RIGHT OUTER JOIN': { keywords: ['LEFT JOIN', 'RIGHT JOIN', 'OUTER JOIN'], msg: 'ORA-00920 : Mot-clé LEFT/RIGHT JOIN manquant. Une jointure externe est requise pour conserver les lignes sans correspondance.' },
-      'GROUP BY / Agrégation':   { keywords: ['GROUP BY'], msg: 'ORA-00937 : Clause GROUP BY manquante. Les fonctions d\'agrégation (SUM, AVG) nécessitent un GROUP BY.' },
-      'Sous-requête Corrélée':   { keywords: ['(SELECT'], msg: 'ORA-00920 : Sous-requête corrélée attendue. Placez un SELECT imbriqué entre parenthèses dans la clause WHERE ou SELECT.' },
+      'GROUP BY / AGGREGATION':   { keywords: ['GROUP BY'], msg: 'ORA-00937 : Clause GROUP BY manquante. Les fonctions d\'agrégation (SUM, AVG) nécessitent un GROUP BY.' },
+      'CORRELATED SUBQUERY':   { keywords: ['(SELECT'], msg: 'ORA-00920 : Sous-requête corrélée attendue. Placez un SELECT imbriqué entre parenthèses dans la clause WHERE ou SELECT.' },
       'BULK COLLECT / FORALL':   { keywords: ['BULK COLLECT', 'FORALL'], msg: 'ORA-00920 : BULK COLLECT et/ou FORALL manquants. Utilisez BULK COLLECT pour charger les données et FORALL pour les traiter.' },
-      'Trigger AFTER':           { keywords: ['TRIGGER'], msg: 'ORA-00920 : Mot-clé TRIGGER manquant. Créez un déclencheur avec CREATE OR REPLACE TRIGGER.' },
+      'TRIGGER':           { keywords: ['TRIGGER'], msg: 'ORA-00920 : Mot-clé TRIGGER manquant. Créez un déclencheur avec CREATE OR REPLACE TRIGGER.' },
       'CREATE VIEW':             { keywords: ['VIEW'], msg: 'ORA-00920 : Mot-clé VIEW manquant. Créez une vue avec CREATE [OR REPLACE] VIEW.' },
-      'Materialized View':       { keywords: ['MATERIALIZED VIEW'], msg: 'ORA-00920 : MATERIALIZED VIEW manquant. Utilisez CREATE MATERIALIZED VIEW pour pré-calculer les données.' },
-      'Unique Index':            { keywords: ['UNIQUE INDEX', 'UNIQUE'], msg: 'ORA-00920 : Mot-clé UNIQUE ou INDEX manquant. Créez un INDEX UNIQUE pour garantir l\'unicité des lots.' },
-      'Partition Range':         { keywords: ['PARTITION', 'PRUNING', 'ÉLAGAGE'], msg: 'ORA-00920 : Mot-clé PARTITION ou notion d\'élagage manquants. Une table partitionnée par RANGE permet au CBO de n\'accéder qu\'aux segments utiles.' },
-      'Sequence / NEXTVAL':      { keywords: ['SEQUENCE', 'NEXTVAL'], msg: 'ORA-00920 : CREATE SEQUENCE ou NEXTVAL manquant. Générez les identifiants avec une séquence.' },
-      'Exception / ZERO_DIVIDE': { keywords: ['EXCEPTION', 'ZERO_DIVIDE'], msg: 'ORA-00920 : Bloc EXCEPTION ou exception ZERO_DIVIDE manquant. Capturez la division par zéro dans un gestionnaire d\'exception.' },
-      'Curseur Explicite':       { keywords: ['CURSOR'], msg: 'ORA-00920 : Curseur explicite manquant. Déclarez un curseur avec CURSOR ... IS pour parcourir les réservations.' },
+      'MATERIALIZED VIEW':       { keywords: ['MATERIALIZED VIEW'], msg: 'ORA-00920 : MATERIALIZED VIEW manquant. Utilisez CREATE MATERIALIZED VIEW pour pré-calculer les données.' },
+      'UNIQUE INDEX':            { keywords: ['UNIQUE INDEX', 'UNIQUE'], msg: 'ORA-00920 : Mot-clé UNIQUE ou INDEX manquant. Créez un INDEX UNIQUE pour garantir l\'unicité des lots.' },
+      'RANGE PARTITION':         { keywords: ['PARTITION', 'PRUNING', 'ÉLAGAGE'], msg: 'ORA-00920 : Mot-clé PARTITION ou notion d\'élagage manquants. Une table partitionnée par RANGE permet au CBO de n\'accéder qu\'aux segments utiles.' },
+      'SEQUENCE / NEXTVAL':      { keywords: ['SEQUENCE', 'NEXTVAL'], msg: 'ORA-00920 : CREATE SEQUENCE ou NEXTVAL manquant. Générez les identifiants avec une séquence.' },
+      'EXCEPTION / ZERO_DIVIDE': { keywords: ['EXCEPTION', 'ZERO_DIVIDE'], msg: 'ORA-00920 : Bloc EXCEPTION ou exception ZERO_DIVIDE manquant. Capturez la division par zéro dans un gestionnaire d\'exception.' },
+      'CURSOR':       { keywords: ['CURSOR'], msg: 'ORA-00920 : Curseur explicite manquant. Déclarez un curseur avec CURSOR ... IS pour parcourir les réservations.' },
       'MERGE':                   { keywords: ['MERGE'], msg: 'ORA-00920 : Instruction MERGE manquante. Utilisez MERGE pour synchroniser les stocks (upsert).' },
       'ROW_NUMBER / RANK':       { keywords: ['RANK(', 'DENSE_RANK(', 'ROW_NUMBER('], msg: 'ORA-00920 : Fonction analytique de classement manquante. Utilisez RANK(), DENSE_RANK() ou ROW_NUMBER().' },
       'WITH / CTE':              { keywords: ['WITH'], msg: 'ORA-00920 : Mot-clé WITH manquant. Utilisez une CTE (WITH ... AS) pour la requête hiérarchique.' },
