@@ -170,7 +170,6 @@ a:hover { text-decoration: underline; }
 .result-table td { padding: var(--sp-2) var(--sp-3); border-bottom: 1px solid rgba(30, 45, 74, 0.3); color: #e2e8f0; }
 .result-table tr:hover td { background: var(--color-bg-hover); }
 .result-table tr:last-child td { border-bottom: none; }
-.result-message { padding: var(--sp-4); color: var(--color-green); font-family: var(--font-mono); font-size: var(--fs-sm); white-space: pre-wrap; }
 
 .schema-box { font-family: var(--font-mono); font-size: var(--fs-xs); line-height: 1.8; color: var(--color-cyan); white-space: pre-wrap; word-break: break-all; background: var(--color-bg-deep); padding: var(--sp-4); border-radius: var(--radius-md); border: 1px solid var(--color-border); max-height: 200px; overflow-y: auto; }
 .data-box { font-family: var(--font-mono); font-size: var(--fs-xs); line-height: 1.8; color: var(--color-green); white-space: pre-wrap; word-break: break-all; background: var(--color-bg-deep); padding: var(--sp-4); border-radius: var(--radius-md); border: 1px solid var(--color-border); max-height: 200px; overflow-y: auto; }
@@ -681,6 +680,12 @@ const SCENARIOS = [
     ddl: 'CREATE TABLE medicament (\n  med_id     NUMBER PRIMARY KEY,\n  molecule   VARCHAR2(100),\n  prix_achat NUMBER(10,2)\n);',
     inserts: "INSERT INTO medicament VALUES (1, 'Paracétamol 500mg', 2.50);\nINSERT INTO medicament VALUES (2, 'Amoxicilline 250mg', 4.20);\nINSERT INTO medicament VALUES (3, 'Salbutamol aérosol', 12.80);\nINSERT INTO medicament VALUES (4, 'Morphine 10mg', 8.90);",
     expected: "DECLARE\n  -- Définition d'un type table correspondant à la structure de la table medicament\n  TYPE t_med_tab IS TABLE OF medicament%ROWTYPE;\n  v_meds t_med_tab; -- Variable de type table pour stocker les résultats\nBEGIN\n  -- Chargement massif de toutes les lignes en mémoire (RAM)\n  SELECT * BULK COLLECT INTO v_meds FROM medicament;\n  \n  -- Boucle en mémoire pour modifier les données (pas d'écriture SQL ici)\n  FOR i IN 1..v_meds.COUNT LOOP\n    v_meds(i).prix_achat := ROUND(v_meds(i).prix_achat * 1.05, 2);\n  END LOOP;\n  \n  -- Envoi massif des mises à jour vers la base de données en une seule instruction\n  FORALL i IN 1..v_meds.COUNT\n    UPDATE medicament SET prix_achat = v_meds(i).prix_achat\n    WHERE  med_id = v_meds(i).med_id;\n    \n  DBMS_OUTPUT.PUT_LINE(v_meds.COUNT || ' lignes mises à jour.');\nEND;\n",
+    mockResult: [
+      { med_id: 1, molecule: 'Paracétamol 500mg',  prix_achat: 2.63 },
+      { med_id: 2, molecule: 'Amoxicilline 250mg', prix_achat: 4.41 },
+      { med_id: 3, molecule: 'Salbutamol aérosol', prix_achat: 13.44 },
+      { med_id: 4, molecule: 'Morphine 10mg',      prix_achat: 9.35 },
+    ],
     completionMessage: 'DBMS_OUTPUT : 4 lignes mises à jour.',
     explanation: 'BULK COLLECT charge toutes les lignes en une seule transition SQL→PL/SQL dans une collection. La modification s\'effectue en mémoire (PGA) dans la collection. FORALL exécute l\'UPDATE pour chaque élément de la collection en un seul appel au moteur SQL, réduisant le nombre de changements de contexte de N (itération individuelle) à 2 (collecte + mise à jour massive).',
     hints: [
@@ -721,6 +726,11 @@ const SCENARIOS = [
     ddl: 'CREATE TABLE patient (\n  patient_id  NUMBER PRIMARY KEY,\n  nom         VARCHAR2(60),\n  prenom      VARCHAR2(60),\n  sexe        CHAR(1),\n  age         NUMBER(3),\n  nir         VARCHAR2(15),\n  service     VARCHAR2(60)\n);',
     inserts: "INSERT INTO patient VALUES (1, 'Dupont', 'Marie', 'F', 45, '1 85 12 34 567 890 12', 'Cardiologie');\nINSERT INTO patient VALUES (2, 'Martin', 'Jean', 'M', 72, '1 52 09 87 654 321 78', 'Urgences');\nINSERT INTO patient VALUES (3, 'Petit', 'Sophie', 'F', 34, '2 90 45 123 456 789 45', 'Pédiatrie');",
     expected: "CREATE OR REPLACE VIEW v_patient_anonymise AS\nSELECT \n    patient_id,\n    sexe,\n    -- Création d'une catégorie d'âge dynamique\n    CASE\n      WHEN age < 18 THEN 'Mineur'\n      WHEN age BETWEEN 18 AND 65 THEN 'Adulte'\n      ELSE 'Senior'\n    END AS tranche_age,\n    service\nFROM   patient\nWITH  READ ONLY; -- Interdit toute modification (INSERT/UPDATE/DELETE) via cette vue\n",
+    mockResult: [
+      { patient_id: 1, sexe: 'F', tranche_age: 'Adulte',  service: 'Cardiologie' },
+      { patient_id: 2, sexe: 'M', tranche_age: 'Senior',  service: 'Urgences' },
+      { patient_id: 3, sexe: 'F', tranche_age: 'Adulte',  service: 'Pédiatrie' },
+    ],
     completionMessage: 'Vue V_PATIENT_ANONYMISE créée (lecture seule).',
     explanation: 'Une vue stocke une requête dans le dictionnaire et en restitue les résultats à chaque appel. En omettant les colonnes sensibles (nom, prénom, nir), la vue constitue une barrière d\'abstraction. WITH READ ONLY interdit toute modification via la vue, renforçant la sécurité. Le principe de moindre privilège est ainsi respecté : l\'utilisateur non habilité ne voit que ce qui est strictement nécessaire à sa fonction.',
     hints: [
@@ -741,6 +751,13 @@ const SCENARIOS = [
     ddl: 'CREATE TABLE service (\n  service_id  NUMBER PRIMARY KEY,\n  nom         VARCHAR2(60)\n);\nCREATE TABLE dispensation (\n  disp_id     NUMBER PRIMARY KEY,\n  service_id  NUMBER REFERENCES service(service_id),\n  qty         NUMBER(8),\n  date_disp   DATE\n);',
     inserts: "INSERT INTO service VALUES (1, 'Urgences');\nINSERT INTO service VALUES (2, 'Cardiologie');\nINSERT INTO service VALUES (3, 'Pédiatrie');\nINSERT INTO dispensation VALUES (1, 1, 450, DATE '2025-04-08');\nINSERT INTO dispensation VALUES (2, 1, 320, DATE '2025-04-09');\nINSERT INTO dispensation VALUES (3, 2, 180, DATE '2025-04-08');\nINSERT INTO dispensation VALUES (4, 2, 210, DATE '2025-04-07');\nINSERT INTO dispensation VALUES (5, 3, 95, DATE '2025-04-09');",
     expected: "CREATE MATERIALIZED VIEW mv_hebdo_consommation\nREFRESH COMPLETE ON DEMAND -- Rafraîchissement complet uniquement sur demande manuelle\nAS\nSELECT \n    s.nom AS service,\n    TRUNC(d.date_disp) AS jour, -- Troncature pour ne garder que la date (pas l'heure)\n    SUM(d.qty) AS qte_totale,\n    COUNT(*) AS nb_dispensations\nFROM   service s\nJOIN   dispensation d ON d.service_id = s.service_id\nWHERE  d.date_disp >= TRUNC(SYSDATE) - 7 -- Filtre : 7 derniers jours\nGROUP  BY s.nom, TRUNC(d.date_disp)\nORDER  BY s.nom, TRUNC(d.date_disp) DESC;\n",
+    mockResult: [
+      { service: 'Cardiologie', jour: '2025-04-07', qte_totale: 210, nb_dispensations: 1 },
+      { service: 'Cardiologie', jour: '2025-04-08', qte_totale: 180, nb_dispensations: 1 },
+      { service: 'Urgences',    jour: '2025-04-08', qte_totale: 450, nb_dispensations: 1 },
+      { service: 'Pédiatrie',   jour: '2025-04-09', qte_totale: 95,  nb_dispensations: 1 },
+      { service: 'Urgences',    jour: '2025-04-09', qte_totale: 320, nb_dispensations: 1 },
+    ],
     completionMessage: 'Vue matérialisée MV_HEBDO_CONSOMMATION créée.',
     explanation: 'Une vue matérialisée stocke physiquement le résultat de la requête, contrairement à une vue simple. L\'option REFRESH COMPLETE ON DEMAND reconstruit intégralement les données à la demande via DBMS_MVIEW.REFRESH. L\'agrégation par service et par jour est pré-calculée, réduisant le temps de réponse des tableaux de bord à une simple lecture.',
     hints: [
@@ -761,6 +778,11 @@ const SCENARIOS = [
     ddl: 'CREATE TABLE lot_simu (\n  lot_id      NUMBER PRIMARY KEY,\n  med_id      NUMBER NOT NULL,\n  numero_lot  VARCHAR2(30) NOT NULL,\n  fabricant   VARCHAR2(60) NOT NULL,\n  date_perem  DATE,\n  qty         NUMBER(8)\n);',
     inserts: "INSERT INTO lot_simu VALUES (1, 101, 'LOT-2025-A001', 'Sanofi', DATE '2026-06-01', 500);\nINSERT INTO lot_simu VALUES (2, 101, 'LOT-2025-A002', 'Sanofi', DATE '2025-12-31', 300);\nINSERT INTO lot_simu VALUES (3, 102, 'LOT-2025-B045', 'Mylan', DATE '2026-03-20', 200);",
     expected: "CREATE UNIQUE INDEX idx_lot_unique\nON lot_simu(numero_lot, fabricant);\n\n-- Alternative avec contrainte UNIQUE (souvent préférée pour l'intégrité métier) :\n-- ALTER TABLE lot_simu ADD CONSTRAINT uq_lot_fab UNIQUE (numero_lot, fabricant);\n",
+    mockResult: [
+      { lot_id: 1, med_id: 101, numero_lot: 'LOT-2025-A001', fabricant: 'Sanofi',  date_perem: '2026-06-01', qty: 500 },
+      { lot_id: 2, med_id: 101, numero_lot: 'LOT-2025-A002', fabricant: 'Sanofi',  date_perem: '2025-12-31', qty: 300 },
+      { lot_id: 3, med_id: 102, numero_lot: 'LOT-2025-B045', fabricant: 'Mylan',   date_perem: '2026-03-20', qty: 200 },
+    ],
     completionMessage: 'Index unique IDX_LOT_UNIQUE créé.',
     explanation: 'Un index unique garantit qu\'aucune valeur dupliquée n\'existe dans les colonnes indexées. Créé sur la combinaison (NUMERO_LOT, FABRICANT), il empêche l\'insertion de deux lots distincts portant le même numéro pour le même fabricant. Oracle utilise cet index pour accélérer les recherches par numéro de lot tout en maintenant l\'intégrité des données. La contrainte UNIQUE crée automatiquement un index unique du même nom.',
     hints: [
@@ -804,6 +826,10 @@ const SCENARIOS = [
     ddl: 'CREATE TABLE ordonnance (\n  ord_id     NUMBER PRIMARY KEY,\n  patient_id NUMBER NOT NULL,\n  med_id     NUMBER NOT NULL,\n  qty        NUMBER(8),\n  date_presc DATE DEFAULT SYSDATE\n);',
     inserts: "INSERT INTO ordonnance VALUES (SEQ_ORDONNANCE.NEXTVAL, 1, 101, 60, SYSDATE);\nINSERT INTO ordonnance VALUES (SEQ_ORDONNANCE.NEXTVAL, 2, 102, 30, SYSDATE);",
     expected: "-- Création de la séquence\nCREATE SEQUENCE seq_ordonnance\nSTART WITH 10000   -- Première valeur\nINCREMENT BY 1     -- Pas d'incrément\nNOCACHE            -- Pas de mise en cache (plus sûr en cas de crash, moins performant)\nNOCYCLE;           -- Ne recommence pas à zéro si la limite est atteinte\n\n-- Utilisation de la séquence lors d'un insert\nINSERT INTO ordonnance (ord_id, patient_id, med_id, qty)\nVALUES (seq_ordonnance.NEXTVAL, 1, 101, 60); -- NEXTVAL génère le nouvel ID\n",
+    mockResult: [
+      { ord_id: 10000, patient_id: 1, med_id: 101, qty: 60, date_presc: '2025-05-11' },
+      { ord_id: 10001, patient_id: 2, med_id: 102, qty: 30, date_presc: '2025-05-11' },
+    ],
     completionMessage: 'Séquence SEQ_ORDONNANCE créée (START WITH 10000).\n2 lignes insérées dans ORDONNANCE.',
     explanation: 'Une séquence Oracle garantit la génération atomique de nombres uniques, même sous charge concurrente élevée. NEXTVAL incrémente la séquence et retourne la nouvelle valeur. NOCACHE évite la perte de valeurs en cas de redémarrage de l\'instance. NOCYCLE empêche le recyclage après avoir atteint la valeur maximale, protégeant ainsi l\'intégrité des clés.',
     hints: [
@@ -824,6 +850,12 @@ const SCENARIOS = [
     ddl: 'CREATE TABLE stock_med (\n  med_id    NUMBER PRIMARY KEY,\n  molecule  VARCHAR2(100),\n  qty       NUMBER(8),\n  cout_total NUMBER(10,2)\n);',
     inserts: "INSERT INTO stock_med VALUES (1, 'Paracétamol 500mg', 1200, 3000.00);\nINSERT INTO stock_med VALUES (2, 'Amoxicilline 250mg', 0, 0);\nINSERT INTO stock_med VALUES (3, 'Salbutamol aérosol', 85, 1088.00);\nINSERT INTO stock_med VALUES (4, 'Morphine 10mg', 0, 0);",
     expected: "DECLARE\n  v_cout_unitaire NUMBER(10,2);\nBEGIN\n  -- Boucle implicite sur chaque ligne du stock\n  FOR r IN (SELECT * FROM stock_med) LOOP\n    BEGIN\n      -- Tentative de calcul\n      v_cout_unitaire := r.cout_total / r.qty;\n      DBMS_OUTPUT.PUT_LINE(r.molecule || ' : ' ||\n        TO_CHAR(v_cout_unitaire, '999.99'));\n    EXCEPTION\n      -- Capture spécifique de l'erreur de division par zéro\n      WHEN ZERO_DIVIDE THEN\n        DBMS_OUTPUT.PUT_LINE(r.molecule ||\n          ' : Quantité nulle, calcul impossible.');\n    END;\n  END LOOP;\nEND;\n",
+    mockResult: [
+      { molecule: 'Paracétamol 500mg',  cout_unitaire: 2.50 },
+      { molecule: 'Amoxicilline 250mg', cout_unitaire: 'ERREUR: division par zéro' },
+      { molecule: 'Salbutamol aérosol', cout_unitaire: 12.80 },
+      { molecule: 'Morphine 10mg',      cout_unitaire: 'ERREUR: division par zéro' },
+    ],
     completionMessage: 'DBMS_OUTPUT :\nParacétamol 500mg :   2.50\nAmoxicilline 250mg : Quantité nulle, calcul impossible.\nSalbutamol aérosol :  12.80\nMorphine 10mg : Quantité nulle, calcul impossible.',
     explanation: 'Le bloc interne BEGIN...EXCEPTION...END crée un sous-bloc de protection autour de la division. Si l\'exception ZERO_DIVIDE est levée (qty = 0), elle est capturée par le gestionnaire WHEN ZERO_DIVIDE, qui affiche un message d\'avertissement sans interrompre la boucle. Le bloc externe continue son itération normalement. Cette technique d\'exception locale est préférable à WHEN OTHERS pour cibler précisément le type d\'erreur.',
     hints: [
@@ -844,6 +876,11 @@ const SCENARIOS = [
     ddl: 'CREATE TABLE reservation (\n  res_id    NUMBER PRIMARY KEY,\n  med_id    NUMBER NOT NULL,\n  qty_dem   NUMBER(8),\n  statut    VARCHAR2(20) DEFAULT \'EN_ATTENTE\',\n  date_res  DATE DEFAULT SYSDATE\n);\nCREATE TABLE stock_med (\n  med_id    NUMBER PRIMARY KEY,\n  qty       NUMBER(8)\n);',
     inserts: "INSERT INTO stock_med VALUES (101, 500);\nINSERT INTO stock_med VALUES (102, 30);\nINSERT INTO reservation VALUES (1, 101, 100, 'EN_ATTENTE', SYSDATE);\nINSERT INTO reservation VALUES (2, 102, 50, 'EN_ATTENTE', SYSDATE);\nINSERT INTO reservation VALUES (3, 101, 450, 'EN_ATTENTE', SYSDATE);",
     expected: "DECLARE\n  -- Définition du curseur avec clause FOR UPDATE pour verrouiller les lignes lues\n  CURSOR c_res IS\n    SELECT r.res_id, r.med_id, r.qty_dem, s.qty AS stock_dispo\n    FROM   reservation r\n    JOIN   stock_med s ON s.med_id = r.med_id\n    WHERE  r.statut = 'EN_ATTENTE'\n    FOR UPDATE OF r.statut; -- Verrouille spécifiquement la colonne statut de la réservation\nBEGIN\n  FOR rec IN c_res LOOP\n    -- Vérification logique métier\n    IF rec.qty_dem <= rec.stock_dispo THEN\n      -- Validation : mise à jour de la réservation et déstockage\n      UPDATE reservation SET statut = 'VALIDEE' WHERE res_id = rec.res_id;\n      UPDATE stock_med SET qty = qty - rec.qty_dem WHERE med_id = rec.med_id;\n    ELSE\n      -- Refus si stock insuffisant\n      UPDATE reservation SET statut = 'REFUSEE' WHERE res_id = rec.res_id;\n    END IF;\n  END LOOP;\n  COMMIT; -- Validation de toutes les modifications\nEND;\n",
+    mockResult: [
+      { res_id: 1, statut: 'VALIDEE', stock_restant: 400 },
+      { res_id: 2, statut: 'REFUSEE', stock_restant: 30 },
+      { res_id: 3, statut: 'VALIDEE', stock_restant: 0 },
+    ],
     completionMessage: 'DBMS_OUTPUT : Réservation 1 VALIDEE, Réservation 2 REFUSEE, Réservation 3 VALIDEE.',
     explanation: 'Un curseur explicite est déclaré (CURSOR), puis parcouru par une boucle FOR qui l\'ouvre, extrait chaque ligne et le ferme automatiquement. La clause FOR UPDATE verrouille les lignes sélectionnées pendant la durée du curseur, empêchant les modifications concurrentes. La condition IF évalue la disponibilité du stock pour chaque réservation.',
     hints: [
@@ -937,6 +974,9 @@ const SCENARIOS = [
     ddl: 'CREATE TABLE stock_med (\n  med_id    NUMBER PRIMARY KEY,\n  molecule  VARCHAR2(100),\n  qty       NUMBER(8)\n);',
     inserts: "INSERT INTO stock_med VALUES (1, 'Paracétamol 500mg', 500);\nINSERT INTO stock_med VALUES (2, 'Amoxicilline 250mg', 200);\nINSERT INTO stock_med VALUES (3, 'Salbutamol aérosol', 80);",
     expected: "DECLARE\n  v_qty_dispo NUMBER;\n  -- Curseur avec verrouillage immédiat et sans attente\n  CURSOR c_lock IS\n    SELECT qty FROM stock_med\n    WHERE  med_id = 1\n    FOR UPDATE NOWAIT; -- NOWAIT lève une exception si la ligne est déjà verrouillée\nBEGIN\n  OPEN c_lock;\n  FETCH c_lock INTO v_qty_dispo;\n  \n  IF v_qty_dispo >= 100 THEN\n    -- Mise à jour sécurisée car la ligne est verrouillée pour cette session\n    UPDATE stock_med SET qty = qty - 100 WHERE med_id = 1;\n    DBMS_OUTPUT.PUT_LINE('Réservation confirmée. Stock restant : ' || (v_qty_dispo - 100));\n  ELSE\n    DBMS_OUTPUT.PUT_LINE('Stock insuffisant.');\n  END IF;\n  \n  CLOSE c_lock;\n  COMMIT;\nEXCEPTION\n  WHEN OTHERS THEN\n    -- Capture l'erreur ORA-00054 (ressource occupée) ou autres\n    DBMS_OUTPUT.PUT_LINE('Impossible de verrouiller la ligne (déjà réservée).');\n    ROLLBACK; -- Annulation propre en cas d'échec\nEND;\n",
+    mockResult: [
+      { med_id: 1, molecule: 'Paracétamol 500mg', stock_initial: 500, quantite_reservee: 100, stock_restant: 400 },
+    ],
     completionMessage: 'DBMS_OUTPUT : Réservation confirmée. Stock restant : 400',
     explanation: 'FOR UPDATE verrouille les lignes sélectionnées, empêchant toute autre session de les modifier ou de les verrouiller jusqu\'à la fin de la transaction. NOWAIT fait échouer immédiatement l\'opération si les lignes sont déjà verrouillées, sans attendre (évite le blocage). SKIP LOCKED est une alternative pour ignorer les lignes verrouillées et traiter les lignes disponibles.',
     hints: [
@@ -957,6 +997,9 @@ const SCENARIOS = [
     ddl: 'CREATE TABLE staging_medicament (\n  med_id    NUMBER,\n  molecule  VARCHAR2(100),\n  qty       NUMBER(8)\n);\nCREATE TABLE staging_lot (\n  lot_id    NUMBER,\n  med_id    NUMBER,\n  date_perem DATE\n);',
     inserts: "-- Les tables sont vides initialement.\n-- L'objectif est d'insérer dynamiquement dans l'une ou l'autre.",
     expected: "DECLARE\n  v_table  VARCHAR2(30) := 'STAGING_MEDICAMENT'; -- Nom de table dynamique\n  v_sql    VARCHAR2(500);\nBEGIN\n  -- Construction de la chaîne SQL\n  v_sql := 'INSERT INTO ' || v_table ||\n           ' (med_id, molecule, qty) VALUES (:1, :2, :3)';\n           \n  -- Exécution avec passage de paramètres sécurisés (évite l'injection SQL)\n  EXECUTE IMMEDIATE v_sql USING 999, 'Nouveau médicament', 100;\n  \n  DBMS_OUTPUT.PUT_LINE('Ligne insérée dans ' || v_table);\nEXCEPTION\n  WHEN OTHERS THEN\n    -- Affichage de l'erreur Oracle complète\n    DBMS_OUTPUT.PUT_LINE('Erreur : ' || SQLERRM);\nEND;",
+    mockResult: [
+      { med_id: 999, molecule: 'Nouveau médicament', qty: 100 },
+    ],
     completionMessage: 'DBMS_OUTPUT : Ligne insérée dans STAGING_MEDICAMENT.',
     explanation: 'EXECUTE IMMEDIATE construit et exécute une instruction SQL dont la structure peut varier à l\'exécution. Les variables de liaison (:1, :2, :3) sont fournies par la clause USING, protégeant contre les injections SQL. Le nom de la table est concaténé dynamiquement. La gestion d\'exception capture les erreurs potentielles (table inexistante, contrainte violée) via SQLERRM.',
     hints: [
@@ -1561,8 +1604,6 @@ class SQLExecutor {
             this._log(sampleData.length + ' ligne(s) retournée(s).', 'success');
           } else if (scenario.completionMessage) {
             this._log(scenario.completionMessage, 'success');
-            this._resultWrap.innerHTML = '<div class="result-message">' + scenario.completionMessage.replace(/\n/g, '<br>') + '</div>';
-            this._resultCard.style.display = 'block';
           }
         }
         this._valid = true;
