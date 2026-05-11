@@ -822,15 +822,14 @@ const SCENARIOS = [
   {
     id: 11, title: 'Séquence — Génération d\'ID d\'ordonnance',
     concept: 'SEQUENCE / NEXTVAL',
-    challenge: 'Le système de prescription nécessite un générateur d\'identifiants uniques et séquentiels pour les ordonnances, garantissant l\'absence de collision même en cas d\'accès concurrentiel intensif. Créez une séquence adaptée à un volume de 5000 ordonnances par jour, avec un pas d\'incrémentation de 1, démarrant à 10000. Insérez ensuite une ordonnance en utilisant cette séquence.',
+    challenge: 'Le système de prescription nécessite un générateur d\'identifiants uniques. Créez une séquence `seq_ordonnance` démarrant à 10000 (pour réserver les IDs inférieurs aux données migrées) avec un pas de 1. Une fois la séquence créée, insérez IMMÉDIATEMENT une nouvelle ordonnance pour le patient 1 (med_id 101, qty 60) en utilisant `NEXTVAL` pour générer l\'ID automatiquement.',
     ddl: 'CREATE TABLE ordonnance (\n  ord_id     NUMBER PRIMARY KEY,\n  patient_id NUMBER NOT NULL,\n  med_id     NUMBER NOT NULL,\n  qty        NUMBER(8),\n  date_presc DATE DEFAULT SYSDATE\n);',
-    inserts: "INSERT INTO ordonnance VALUES (SEQ_ORDONNANCE.NEXTVAL, 1, 101, 60, SYSDATE);\nINSERT INTO ordonnance VALUES (SEQ_ORDONNANCE.NEXTVAL, 2, 102, 30, SYSDATE);",
+    inserts: "",
     expected: "-- Création de la séquence\nCREATE SEQUENCE seq_ordonnance\nSTART WITH 10000   -- Première valeur\nINCREMENT BY 1     -- Valeur d'incrément\nNOCACHE            -- Pas de mise en cache (évite les trous dans la numérotation en cas de crash, mais réduit les performances)\nNOCYCLE;           -- Ne recommence pas à zéro si la limite est atteinte\n\n-- Utilisation de la séquence lors d'un insert\nINSERT INTO ordonnance (ord_id, patient_id, med_id, qty)\nVALUES (seq_ordonnance.NEXTVAL, 1, 101, 60); -- NEXTVAL génère le nouvel ID\n",
     mockResult: [
-      { ord_id: 10000, patient_id: 1, med_id: 101, qty: 60, date_presc: '2025-05-11' },
-      { ord_id: 10001, patient_id: 2, med_id: 102, qty: 30, date_presc: '2025-05-11' },
+      { ord_id: 10000, patient_id: 1, med_id: 101, qty: 60, date_presc: '2025-05-11' }
     ],
-    completionMessage: 'Séquence SEQ_ORDONNANCE créée (START WITH 10000).\n2 lignes insérées dans ORDONNANCE.',
+    completionMessage: 'Séquence SEQ_ORDONNANCE créée (START WITH 10000).\n1 ligne insérée dans ORDONNANCE  (ID généré : 10000).',
     explanation: 'Une séquence Oracle garantit la génération atomique de nombres uniques, même sous charge concurrente élevée. NEXTVAL incrémente la séquence et retourne la nouvelle valeur. NOCACHE évite la perte de valeurs en cas de redémarrage de l\'instance. NOCYCLE empêche le recyclage après avoir atteint la valeur maximale, protégeant ainsi l\'intégrité des clés.',
     hints: [
       { pattern: '\\bSELECT\\s+MAX\\(ord_id\\)\\s*\\+\\s*1\\b', msg: 'SELECT MAX + 1 échouera en environnement concurrent (deux sessions obtiendront le même ID). Utilisez une séquence.', level: 'error' },
