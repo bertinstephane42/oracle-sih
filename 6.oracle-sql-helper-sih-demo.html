@@ -1059,11 +1059,11 @@ class SQLValidator {
     }
     const upper = sql.toUpperCase().trim();
     const checks = [
-      { test: !/^SELECT\b|^WITH\b|^DECLARE\b|^CREATE\b|^MERGE\b|^BEGIN\b/.test(upper), msg: 'ORA-00920 : L\'instruction doit commencer par un mot-clé SQL ou PL/SQL valide (SELECT, WITH, DECLARE, CREATE, MERGE, BEGIN...).', level: 'error' },
+      { test: !/^SELECT\b|^WITH\b|^DECLARE\b|^CREATE\b|^MERGE\b|^BEGIN\b/.test(upper.replace(/^--[^\n]*\n*/m, '')), msg: 'ORA-00920 : L\'instruction doit commencer par un mot-clé SQL ou PL/SQL valide (SELECT, WITH, DECLARE, CREATE, MERGE, BEGIN...).', level: 'error' },
       { test: /^SELECT\b/.test(upper) && !/\bFROM\b/.test(upper), msg: 'ORA-00923 : Mot-clé FROM manquant. Une requête SELECT nécessite une clause FROM.', level: 'error' },
       { test: /\bSELECT\b/.test(upper) && /\bWHERE\b/.test(upper) && !/=\s*['"]?/.test(upper) && !/\bIS\b/.test(upper) && !/\bIN\b/.test(upper), msg: 'ORA-00911 : La clause WHERE semble incomplète. Vérifiez la présence d\'une condition.', level: 'warning' },
       { test: (sql.match(/\(/g) || []).length !== (sql.match(/\)/g) || []).length, msg: 'ORA-00907 : Parenthèses déséquilibrées. Vérifiez l\'ouverture et la fermeture des parenthèses.', level: 'error' },
-      { test: !/[;]\s*$/.test(sql.trim()), msg: 'ATTENTION : L\'instruction devrait se terminer par un point-virgule (;). En Oracle, le point-virgule termine une instruction SQL.', level: 'warning' },
+      { test: !/[;]\s*$/.test(sql.replace(/--[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '').trim()), msg: 'ATTENTION : L\'instruction devrait se terminer par un point-virgule (;). En Oracle, le point-virgule termine une instruction SQL.', level: 'warning' },
       { test: (() => { const aggRe = /\b(SUM|AVG|COUNT|MIN|MAX)\s*\(/i; const m = aggRe.exec(upper); if (!m) return false; const before = upper.slice(0, m.index); if (/\(\s*SELECT\b/i.test(before)) return false; return !/\bGROUP\s+BY\b/.test(upper); })(), msg: 'ORA-00937 : Fonction d\'agrégation sans GROUP BY. Si vous utilisez SUM, AVG ou COUNT sans GROUP BY, toutes les colonnes non agrégées du SELECT doivent être dans GROUP BY.', level: 'error' },
       { test: /\bLEFT\s+JOIN\b/.test(upper) && /\bWHERE\b/.test(upper) && /\bIS\s+NULL\b/.test(upper), msg: 'ATTENTION : Un filtre WHERE ... IS NULL sur une colonne de la table jointe annule l\'effet du LEFT JOIN et le transforme en INNER JOIN.', level: 'warning' },
       { test: /\bDELETE\b/.test(upper) && /\bFROM\b/.test(upper) && !/\bWHERE\b/.test(upper), msg: 'ATTENTION : DELETE sans WHERE supprime TOUTES les lignes de la table. Vérifiez l\'intention.', level: 'warning' },
@@ -1357,6 +1357,32 @@ class SQLValidator {
         .replace(/--[^\n]*/g, '')
         .replace(/\/\*[\s\S]*?\*\//g, '')
         .replace(/'[^']*'/g, '');
+      // Strip DBMS_OUTPUT.PUT_LINE(...) calls (display-only, not compared)
+      {
+        let result = '';
+        let i = 0;
+        while (i < cleaned.length) {
+          const rest = cleaned.substring(i);
+          const dblMatch = rest.match(/\bDBMS_OUTPUT\s*\.\s*PUT_LINE\s*\(/i);
+          if (dblMatch) {
+            if (dblMatch.index > 0) result += rest.substring(0, dblMatch.index);
+            let depth = 1;
+            let j = i + dblMatch.index + dblMatch[0].length;
+            while (j < cleaned.length && depth > 0) {
+              if (cleaned[j] === '(') depth++;
+              else if (cleaned[j] === ')') depth--;
+              j++;
+            }
+            // Also skip trailing semicolon and whitespace
+            while (j < cleaned.length && (cleaned[j] === ';' || cleaned[j] === ' ' || cleaned[j] === '\n' || cleaned[j] === '\r' || cleaned[j] === '\t')) j++;
+            i = j;
+          } else {
+            result += rest;
+            break;
+          }
+        }
+        cleaned = result;
+      }
       const aliases = {};
       const aliasRe = /(?:FROM|JOIN|INTO|USING)\s+(\w+)\s+(?:AS\s+)?(\w+)/gi;
       let m;
