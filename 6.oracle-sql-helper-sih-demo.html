@@ -170,6 +170,7 @@ a:hover { text-decoration: underline; }
 .result-table td { padding: var(--sp-2) var(--sp-3); border-bottom: 1px solid rgba(30, 45, 74, 0.3); color: #e2e8f0; }
 .result-table tr:hover td { background: var(--color-bg-hover); }
 .result-table tr:last-child td { border-bottom: none; }
+.result-message { padding: var(--sp-4); color: var(--color-green); font-family: var(--font-mono); font-size: var(--fs-sm); white-space: pre-wrap; }
 
 .schema-box { font-family: var(--font-mono); font-size: var(--fs-xs); line-height: 1.8; color: var(--color-cyan); white-space: pre-wrap; word-break: break-all; background: var(--color-bg-deep); padding: var(--sp-4); border-radius: var(--radius-md); border: 1px solid var(--color-border); max-height: 200px; overflow-y: auto; }
 .data-box { font-family: var(--font-mono); font-size: var(--fs-xs); line-height: 1.8; color: var(--color-green); white-space: pre-wrap; word-break: break-all; background: var(--color-bg-deep); padding: var(--sp-4); border-radius: var(--radius-md); border: 1px solid var(--color-border); max-height: 200px; overflow-y: auto; }
@@ -1057,13 +1058,14 @@ class SQLValidator {
     if (!sql || sql.trim().length === 0) {
       return { valid: false, message: 'ORA-00900 : Instruction SQL vide. Veuillez saisir une requête.', level: 'error' };
     }
-    const upper = sql.toUpperCase().trim();
+    const noComments = sql.replace(/--[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
+    const upper = noComments.toUpperCase().trim();
     const checks = [
-      { test: !/^SELECT\b|^WITH\b|^DECLARE\b|^CREATE\b|^MERGE\b|^BEGIN\b/.test(upper.replace(/^--[^\n]*\n*/m, '')), msg: 'ORA-00920 : L\'instruction doit commencer par un mot-clé SQL ou PL/SQL valide (SELECT, WITH, DECLARE, CREATE, MERGE, BEGIN...).', level: 'error' },
+      { test: !/^SELECT\b|^WITH\b|^DECLARE\b|^CREATE\b|^MERGE\b|^BEGIN\b/.test(upper), msg: 'ORA-00920 : L\'instruction doit commencer par un mot-clé SQL ou PL/SQL valide (SELECT, WITH, DECLARE, CREATE, MERGE, BEGIN...).', level: 'error' },
       { test: /^SELECT\b/.test(upper) && !/\bFROM\b/.test(upper), msg: 'ORA-00923 : Mot-clé FROM manquant. Une requête SELECT nécessite une clause FROM.', level: 'error' },
       { test: /\bSELECT\b/.test(upper) && /\bWHERE\b/.test(upper) && !/=\s*['"]?/.test(upper) && !/\bIS\b/.test(upper) && !/\bIN\b/.test(upper), msg: 'ORA-00911 : La clause WHERE semble incomplète. Vérifiez la présence d\'une condition.', level: 'warning' },
       { test: (sql.match(/\(/g) || []).length !== (sql.match(/\)/g) || []).length, msg: 'ORA-00907 : Parenthèses déséquilibrées. Vérifiez l\'ouverture et la fermeture des parenthèses.', level: 'error' },
-      { test: !/[;]\s*$/.test(sql.replace(/--[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '').trim()), msg: 'ATTENTION : L\'instruction devrait se terminer par un point-virgule (;). En Oracle, le point-virgule termine une instruction SQL.', level: 'warning' },
+      { test: !/[;]\s*$/.test(noComments.trim()), msg: 'ATTENTION : L\'instruction devrait se terminer par un point-virgule (;). En Oracle, le point-virgule termine une instruction SQL.', level: 'warning' },
       { test: (() => { const aggRe = /\b(SUM|AVG|COUNT|MIN|MAX)\s*\(/i; const m = aggRe.exec(upper); if (!m) return false; const before = upper.slice(0, m.index); if (/\(\s*SELECT\b/i.test(before)) return false; return !/\bGROUP\s+BY\b/.test(upper); })(), msg: 'ORA-00937 : Fonction d\'agrégation sans GROUP BY. Si vous utilisez SUM, AVG ou COUNT sans GROUP BY, toutes les colonnes non agrégées du SELECT doivent être dans GROUP BY.', level: 'error' },
       { test: /\bLEFT\s+JOIN\b/.test(upper) && /\bWHERE\b/.test(upper) && /\bIS\s+NULL\b/.test(upper), msg: 'ATTENTION : Un filtre WHERE ... IS NULL sur une colonne de la table jointe annule l\'effet du LEFT JOIN et le transforme en INNER JOIN.', level: 'warning' },
       { test: /\bDELETE\b/.test(upper) && /\bFROM\b/.test(upper) && !/\bWHERE\b/.test(upper), msg: 'ATTENTION : DELETE sans WHERE supprime TOUTES les lignes de la table. Vérifiez l\'intention.', level: 'warning' },
@@ -1089,7 +1091,14 @@ class SQLValidator {
       const idCheck = this._checkIdentifiers(upper, schema, scenario.expected);
       if (idCheck) return idCheck;
     }
-    // Scenario-specific hints
+    // Functional equivalence check (dernière couche)
+    if (scenario && scenario.expected) {
+      const eqCheck = this._checkFunctionalEquivalence(sql, scenario.expected, scenario.ddl);
+      if (eqCheck) return eqCheck;
+      // SQL correct → succès, ne pas intercepter avec des hints informatifs
+      return { valid: true, message: 'Syntaxe vérifiée. Aucune erreur détectée.', level: 'success' };
+    }
+    // Scenario-specific hints (fallback pour scénarios sans expected SQL)
     if (scenario && scenario.hints) {
       for (const hint of scenario.hints) {
         const re = new RegExp(hint.pattern, 'i');
@@ -1097,11 +1106,6 @@ class SQLValidator {
           return { valid: hint.level === 'error' ? false : true, message: hint.msg, level: hint.level };
         }
       }
-    }
-    // Functional equivalence check (dernière couche)
-    if (scenario && scenario.expected) {
-      const eqCheck = this._checkFunctionalEquivalence(sql, scenario.expected, scenario.ddl);
-      if (eqCheck) return eqCheck;
     }
     return { valid: true, message: 'Syntaxe vérifiée. Aucune erreur détectée.', level: 'success' };
   }
@@ -1557,6 +1561,8 @@ class SQLExecutor {
             this._log(sampleData.length + ' ligne(s) retournée(s).', 'success');
           } else if (scenario.completionMessage) {
             this._log(scenario.completionMessage, 'success');
+            this._resultWrap.innerHTML = '<div class="result-message">' + scenario.completionMessage.replace(/\n/g, '<br>') + '</div>';
+            this._resultCard.style.display = 'block';
           }
         }
         this._valid = true;
