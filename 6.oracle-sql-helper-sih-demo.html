@@ -583,6 +583,12 @@ const SCENARIOS = [
     ddl: 'CREATE TABLE service (\n  service_id   NUMBER PRIMARY KEY,\n  nom          VARCHAR2(60) NOT NULL,\n  batiment     VARCHAR2(30)\n);\nCREATE TABLE stock_med (\n  med_id       NUMBER PRIMARY KEY,\n  molecule     VARCHAR2(100) NOT NULL,\n  qty          NUMBER(8) NOT NULL,\n  service_id   NUMBER REFERENCES service(service_id)\n);',
     inserts: "INSERT INTO service VALUES (1, 'Urgences', 'Aile A');\nINSERT INTO service VALUES (2, 'Cardiologie', 'Aile B');\nINSERT INTO service VALUES (3, 'Pédiatrie', 'Aile C');\nINSERT INTO stock_med VALUES (101, 'Paracétamol 500mg', 1200, 1);\nINSERT INTO stock_med VALUES (102, 'Amoxicilline 250mg', 340, 2);\nINSERT INTO stock_med VALUES (103, 'Salbutamol aérosol', 85, 1);\nINSERT INTO stock_med VALUES (104, 'Ibuprofène 400mg', 560, 3);\nINSERT INTO stock_med VALUES (105, 'Diazépam 10mg', 200, NULL);",
     expected: "SELECT s.nom AS service,\n       m.molecule,\n       m.qty\nFROM   stock_med m\nJOIN   service s ON s.service_id = m.service_id\nORDER  BY s.nom, m.molecule;",
+    mockResult: [
+      { service: 'Cardiologie', molecule: 'Amoxicilline 250mg', qty: 340 },
+      { service: 'Pédiatrie',   molecule: 'Ibuprofène 400mg',  qty: 560 },
+      { service: 'Urgences',    molecule: 'Paracétamol 500mg',  qty: 1200 },
+      { service: 'Urgences',    molecule: 'Salbutamol aérosol', qty: 85 },
+    ],
     explanation: 'La jointure interne (INNER JOIN) est la plus courante des opérations relationnelles. Elle ne retient que les lignes pour lesquelles la condition de jointure est vérifiée dans les deux tables. Ici, les médicaments sans affectation (service_id IS NULL) sont exclus du résultat. L\'ordre alphabétique par service puis par molécule facilite la lecture du tableau de bord.',
     hints: [
       { pattern: '\\bFROM\\s+\\w+\\s*,\\s*\\w+\\b', msg: 'ORA-00918 : Vous utilisez une virgule entre les tables. Préférez la syntaxe explicite JOIN ... ON ... pour une meilleure lisibilité.', level: 'warning' },
@@ -602,6 +608,12 @@ const SCENARIOS = [
     ddl: 'CREATE TABLE medicament (\n  med_id    NUMBER PRIMARY KEY,\n  molecule  VARCHAR2(100) NOT NULL,\n  forme     VARCHAR2(40)\n);\nCREATE TABLE sortie_stock (\n  sortie_id  NUMBER PRIMARY KEY,\n  med_id     NUMBER REFERENCES medicament(med_id),\n  qty        NUMBER(8),\n  date_sortie DATE\n);',
     inserts: "INSERT INTO medicament VALUES (1, 'Paracétamol 500mg', 'Comprimé');\nINSERT INTO medicament VALUES (2, 'Morphine 10mg', 'Injectable');\nINSERT INTO medicament VALUES (3, 'Salbutamol', 'Aérosol');\nINSERT INTO medicament VALUES (4, 'Héparine 5000UI', 'Injectable');\nINSERT INTO sortie_stock VALUES (1001, 1, 200, DATE '2025-03-15');\nINSERT INTO sortie_stock VALUES (1002, 1, 50, DATE '2025-03-20');\nINSERT INTO sortie_stock VALUES (1003, 3, 30, DATE '2025-03-18');",
     expected: "SELECT m.molecule,\n       m.forme,\n       MAX(s.date_sortie) AS derniere_sortie\nFROM   medicament m\nLEFT   JOIN sortie_stock s ON s.med_id = m.med_id\nGROUP  BY m.med_id, m.molecule, m.forme\nORDER  BY derniere_sortie NULLS FIRST;",
+    mockResult: [
+      { molecule: 'Héparine 5000UI',   forme: 'Injectable', derniere_sortie: null },
+      { molecule: 'Morphine 10mg',     forme: 'Injectable', derniere_sortie: null },
+      { molecule: 'Salbutamol',        forme: 'Aérosol',    derniere_sortie: '2025-03-18' },
+      { molecule: 'Paracétamol 500mg', forme: 'Comprimé',   derniere_sortie: '2025-03-20' },
+    ],
     explanation: 'La jointure externe gauche (LEFT OUTER JOIN) préserve toutes les lignes de la table de gauche (MEDICAMENT), même celles sans correspondance dans SORTIE_STOCK. Les colonnes de la table de droite sont alors NULL. La fonction MAX et GROUP BY permettent de n\'afficher qu\'une ligne par médicament avec sa dernière date de sortie. NULLS FIRST place les médicaments sans mouvement en tête de liste.',
     hints: [
       { pattern: '\\bJOIN\\s+\\w+\\s+ON\\b(?!.*LEFT|.*RIGHT|.*FULL)', msg: 'ORA-01426 : Une jointure interne exclurait les médicaments sans sortie. Utilisez LEFT JOIN pour les conserver.', level: 'error' },
@@ -620,6 +632,12 @@ const SCENARIOS = [
     ddl: 'CREATE TABLE service (\n  service_id  NUMBER PRIMARY KEY,\n  nom         VARCHAR2(60)\n);\nCREATE TABLE dispensation (\n  disp_id     NUMBER PRIMARY KEY,\n  service_id  NUMBER REFERENCES service(service_id),\n  qty         NUMBER(8),\n  date_disp   DATE\n);',
     inserts: "INSERT INTO service VALUES (1, 'Urgences');\nINSERT INTO service VALUES (2, 'Cardiologie');\nINSERT INTO service VALUES (3, 'Pédiatrie');\nINSERT INTO service VALUES (4, 'Oncologie');\nINSERT INTO dispensation VALUES (1, 1, 450, DATE '2025-04-01');\nINSERT INTO dispensation VALUES (2, 1, 320, DATE '2025-04-05');\nINSERT INTO dispensation VALUES (3, 2, 180, DATE '2025-04-02');\nINSERT INTO dispensation VALUES (4, 2, 210, DATE '2025-04-10');\nINSERT INTO dispensation VALUES (5, 3, 95, DATE '2025-04-03');\nINSERT INTO dispensation VALUES (6, 4, 0, DATE '2025-03-28');",
     expected: "SELECT s.nom AS service,\n       COALESCE(SUM(d.qty), 0) AS qte_totale,\n       ROUND(COALESCE(AVG(d.qty), 0), 1) AS qte_moyenne\nFROM   service s\nLEFT   JOIN dispensation d ON d.service_id = s.service_id\n       AND d.date_disp >= SYSDATE - 30\nGROUP  BY s.service_id, s.nom\nORDER  BY qte_totale DESC;",
+    mockResult: [
+      { service: 'Urgences',    qte_totale: 770, qte_moyenne: '385.0' },
+      { service: 'Cardiologie',  qte_totale: 390, qte_moyenne: '195.0' },
+      { service: 'Pédiatrie',    qte_totale: 95,  qte_moyenne: '95.0' },
+      { service: 'Oncologie',    qte_totale: 0,   qte_moyenne: '0.0' },
+    ],
     explanation: 'La fonction d\'agrégation SUM additionne les quantités pour chaque groupe défini par GROUP BY. COALESCE remplace les valeurs NULL par zéro pour les services sans consommation. La jointure externe garantit que tous les services apparaissent, même ceux sans activité. AVG calcule la moyenne arithmétique des quantités dispensées.',
     hints: [
       { pattern: '\\bHAVING\\b', msg: 'HAVING filtre après agrégation. Souvenez-vous : WHERE avant GROUP BY, HAVING après.', level: 'info' },
@@ -638,6 +656,11 @@ const SCENARIOS = [
     ddl: 'CREATE TABLE medicament (\n  med_id    NUMBER PRIMARY KEY,\n  molecule  VARCHAR2(100)\n);\nCREATE TABLE lot (\n  lot_id      NUMBER PRIMARY KEY,\n  med_id      NUMBER REFERENCES medicament(med_id),\n  date_perem  DATE NOT NULL,\n  qty         NUMBER(8)\n);',
     inserts: "INSERT INTO medicament VALUES (1, 'Paracétamol 500mg');\nINSERT INTO medicament VALUES (2, 'Amoxicilline 250mg');\nINSERT INTO medicament VALUES (3, 'Salbutamol aérosol');\nINSERT INTO lot VALUES (101, 1, DATE '2026-06-01', 500);\nINSERT INTO lot VALUES (102, 1, DATE '2025-12-31', 300);\nINSERT INTO lot VALUES (103, 2, DATE '2025-09-15', 200);\nINSERT INTO lot VALUES (104, 2, DATE '2026-03-20', 150);\nINSERT INTO lot VALUES (105, 3, DATE '2025-11-01', 80);",
     expected: "SELECT m.molecule,\n       (SELECT MAX(l2.date_perem)\n        FROM   lot l2\n        WHERE  l2.med_id = m.med_id) AS derniere_peremption\nFROM   medicament m\nORDER  BY derniere_peremption NULLS LAST;",
+    mockResult: [
+      { molecule: 'Salbutamol aérosol', derniere_peremption: '2025-11-01' },
+      { molecule: 'Amoxicilline 250mg',  derniere_peremption: '2026-03-20' },
+      { molecule: 'Paracétamol 500mg',  derniere_peremption: '2026-06-01' },
+    ],
     explanation: 'Une sous-requête corrélée est réévaluée pour chaque ligne de la requête externe. Ici, pour chaque médicament de la table MEDICAMENT, la requête interne interroge la table LOT en ne retenant que les lots appartenant à ce médicament, et en sélectionne la date de péremption maximale. Une alternative plus performante serait une fonction analytique ou une jointure avec GROUP BY.',
     hints: [
       { pattern: '\\bJOIN\\b', msg: 'Une jointure simple peut produire des doublons si plusieurs lots existent par médicament. Une sous-requête corrélée garantit une ligne par médicament.', level: 'warning' },
@@ -657,6 +680,7 @@ const SCENARIOS = [
     ddl: 'CREATE TABLE medicament (\n  med_id     NUMBER PRIMARY KEY,\n  molecule   VARCHAR2(100),\n  prix_achat NUMBER(10,2)\n);',
     inserts: "INSERT INTO medicament VALUES (1, 'Paracétamol 500mg', 2.50);\nINSERT INTO medicament VALUES (2, 'Amoxicilline 250mg', 4.20);\nINSERT INTO medicament VALUES (3, 'Salbutamol aérosol', 12.80);\nINSERT INTO medicament VALUES (4, 'Morphine 10mg', 8.90);",
     expected: "DECLARE\n  TYPE t_med_tab IS TABLE OF medicament%ROWTYPE;\n  v_meds t_med_tab;\nBEGIN\n  SELECT * BULK COLLECT INTO v_meds FROM medicament;\n  FOR i IN 1..v_meds.COUNT LOOP\n    v_meds(i).prix_achat := ROUND(v_meds(i).prix_achat * 1.05, 2);\n  END LOOP;\n  FORALL i IN 1..v_meds.COUNT\n    UPDATE medicament SET prix_achat = v_meds(i).prix_achat\n    WHERE  med_id = v_meds(i).med_id;\n  DBMS_OUTPUT.PUT_LINE(v_meds.COUNT || ' lignes mises à jour.');\nEND;",
+    completionMessage: 'DBMS_OUTPUT : 4 lignes mises à jour.',
     explanation: 'BULK COLLECT charge toutes les lignes en une seule transition SQL→PL/SQL dans une collection. La modification s\'effectue en mémoire (PGA) dans la collection. FORALL exécute l\'UPDATE pour chaque élément de la collection en un seul appel au moteur SQL, réduisant le nombre de changements de contexte de N (itération individuelle) à 2 (collecte + mise à jour massive).',
     hints: [
       { pattern: '\\bCURSOR\\b|\\bFOR\\s+\\w+\\s+IN\\s+\\(\\s*SELECT\\b', msg: 'Un curseur explicite ou une boucle FOR itérative génère un changement de contexte par ligne. Préférez BULK COLLECT + FORALL.', level: 'warning' },
@@ -676,6 +700,7 @@ const SCENARIOS = [
     ddl: 'CREATE TABLE sortie_stock (\n  sortie_id  NUMBER PRIMARY KEY,\n  med_id     NUMBER NOT NULL,\n  qty        NUMBER(8),\n  service    VARCHAR2(60)\n);\nCREATE TABLE audit_sortie (\n  audit_id    NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,\n  sortie_id   NUMBER,\n  med_id      NUMBER,\n  qty         NUMBER(8),\n  service     VARCHAR2(60),\n  date_suppr  DATE DEFAULT SYSDATE,\n  user_suppr  VARCHAR2(60)\n);',
     inserts: "INSERT INTO sortie_stock VALUES (1, 101, 200, 'Urgences');\nINSERT INTO sortie_stock VALUES (2, 102, 50, 'Cardiologie');\n-- Le déclencheur doit être testé après création par :\n-- DELETE FROM sortie_stock WHERE sortie_id = 1;",
     expected: "CREATE OR REPLACE TRIGGER trg_audit_suppr_sortie\nAFTER DELETE ON sortie_stock\nFOR EACH ROW\nBEGIN\n  INSERT INTO audit_sortie (sortie_id, med_id, qty, service, user_suppr)\n  VALUES (:OLD.sortie_id, :OLD.med_id, :OLD.qty, :OLD.service,\n          NVL(V('APP_USER'), 'INCONNU'));\nEND;",
+    completionMessage: 'Déclencheur TRG_AUDIT_SUPPR_SORTIE créé.',
     explanation: 'Un déclencheur AFTER DELETE s\'exécute après la suppression effective de la ligne. Le pseudo-enregistrement :OLD contient les valeurs de la ligne avant suppression. L\'horodatage est fourni par la clause DEFAULT SYSDATE de la table AUDIT_SORTIE. L\'utilisateur est récupéré par la fonction V (contexte Oracle APEX) ou une variable de session.',
     hints: [
       { pattern: '\\bBEFORE\\s+DELETE\\b', msg: 'Un déclencheur BEFORE DELETE capture les valeurs avant suppression mais la ligne existe encore. AFTER DELETE est recommandé pour l\'audit.', level: 'warning' },
@@ -695,6 +720,7 @@ const SCENARIOS = [
     ddl: 'CREATE TABLE patient (\n  patient_id  NUMBER PRIMARY KEY,\n  nom         VARCHAR2(60),\n  prenom      VARCHAR2(60),\n  sexe        CHAR(1),\n  age         NUMBER(3),\n  nir         VARCHAR2(15),\n  service     VARCHAR2(60)\n);',
     inserts: "INSERT INTO patient VALUES (1, 'Dupont', 'Marie', 'F', 45, '1 85 12 34 567 890 12', 'Cardiologie');\nINSERT INTO patient VALUES (2, 'Martin', 'Jean', 'M', 72, '1 52 09 87 654 321 78', 'Urgences');\nINSERT INTO patient VALUES (3, 'Petit', 'Sophie', 'F', 34, '2 90 45 123 456 789 45', 'Pédiatrie');",
     expected: "CREATE OR REPLACE VIEW v_patient_anonymise AS\nSELECT patient_id,\n       sexe,\n       CASE\n         WHEN age < 18 THEN 'Mineur'\n         WHEN age BETWEEN 18 AND 65 THEN 'Adulte'\n         ELSE 'Senior'\n       END AS tranche_age,\n       service\nFROM   patient\nWITH  READ ONLY;",
+    completionMessage: 'Vue V_PATIENT_ANONYMISE créée (lecture seule).',
     explanation: 'Une vue stocke une requête dans le dictionnaire et en restitue les résultats à chaque appel. En omettant les colonnes sensibles (nom, prénom, nir), la vue constitue une barrière d\'abstraction. WITH READ ONLY interdit toute modification via la vue, renforçant la sécurité. Le principe de moindre privilège est ainsi respecté : l\'utilisateur non habilité ne voit que ce qui est strictement nécessaire à sa fonction.',
     hints: [
       { pattern: '\\bSELECT\\s+\\*\\b', msg: 'SELECT * expose toutes les colonnes y compris le NIR. Énumérez explicitement les colonnes autorisées.', level: 'error' },
@@ -714,6 +740,7 @@ const SCENARIOS = [
     ddl: 'CREATE TABLE service (\n  service_id  NUMBER PRIMARY KEY,\n  nom         VARCHAR2(60)\n);\nCREATE TABLE dispensation (\n  disp_id     NUMBER PRIMARY KEY,\n  service_id  NUMBER REFERENCES service(service_id),\n  qty         NUMBER(8),\n  date_disp   DATE\n);',
     inserts: "INSERT INTO service VALUES (1, 'Urgences');\nINSERT INTO service VALUES (2, 'Cardiologie');\nINSERT INTO service VALUES (3, 'Pédiatrie');\nINSERT INTO dispensation VALUES (1, 1, 450, DATE '2025-04-08');\nINSERT INTO dispensation VALUES (2, 1, 320, DATE '2025-04-09');\nINSERT INTO dispensation VALUES (3, 2, 180, DATE '2025-04-08');\nINSERT INTO dispensation VALUES (4, 2, 210, DATE '2025-04-07');\nINSERT INTO dispensation VALUES (5, 3, 95, DATE '2025-04-09');",
     expected: "CREATE MATERIALIZED VIEW mv_hebdo_consommation\nREFRESH COMPLETE ON DEMAND\nAS\nSELECT s.nom AS service,\n       TRUNC(d.date_disp) AS jour,\n       SUM(d.qty) AS qte_totale,\n       COUNT(*) AS nb_dispensations\nFROM   service s\nJOIN   dispensation d ON d.service_id = s.service_id\nWHERE  d.date_disp >= TRUNC(SYSDATE) - 7\nGROUP  BY s.nom, TRUNC(d.date_disp)\nORDER  BY s.nom, TRUNC(d.date_disp) DESC;\n\n-- Actualisation :\n-- EXEC DBMS_MVIEW.REFRESH('mv_hebdo_consommation', 'C');",
+    completionMessage: 'Vue matérialisée MV_HEBDO_CONSOMMATION créée.',
     explanation: 'Une vue matérialisée stocke physiquement le résultat de la requête, contrairement à une vue simple. L\'option REFRESH COMPLETE ON DEMAND reconstruit intégralement les données à la demande via DBMS_MVIEW.REFRESH. L\'agrégation par service et par jour est pré-calculée, réduisant le temps de réponse des tableaux de bord à une simple lecture.',
     hints: [
       { pattern: '\\bCREATE\\s+(OR\\s+REPLACE\\s+)?VIEW\\b(?!.*MATERIALIZED)', msg: 'Une vue simple ne stocke pas les données. Utilisez MATERIALIZED VIEW pour pré-calculer les agrégations.', level: 'error' },
@@ -733,6 +760,7 @@ const SCENARIOS = [
     ddl: 'CREATE TABLE lot_simu (\n  lot_id      NUMBER PRIMARY KEY,\n  med_id      NUMBER NOT NULL,\n  numero_lot  VARCHAR2(30) NOT NULL,\n  fabricant   VARCHAR2(60) NOT NULL,\n  date_perem  DATE,\n  qty         NUMBER(8)\n);',
     inserts: "INSERT INTO lot_simu VALUES (1, 101, 'LOT-2025-A001', 'Sanofi', DATE '2026-06-01', 500);\nINSERT INTO lot_simu VALUES (2, 101, 'LOT-2025-A002', 'Sanofi', DATE '2025-12-31', 300);\nINSERT INTO lot_simu VALUES (3, 102, 'LOT-2025-B045', 'Mylan', DATE '2026-03-20', 200);",
     expected: "CREATE UNIQUE INDEX idx_lot_unique\nON lot_simu(numero_lot, fabricant);\n\n-- Alternative avec contrainte UNIQUE :\n-- ALTER TABLE lot_simu ADD CONSTRAINT uq_lot_fab UNIQUE (numero_lot, fabricant);",
+    completionMessage: 'Index unique IDX_LOT_UNIQUE créé.',
     explanation: 'Un index unique garantit qu\'aucune valeur dupliquée n\'existe dans les colonnes indexées. Créé sur la combinaison (NUMERO_LOT, FABRICANT), il empêche l\'insertion de deux lots distincts portant le même numéro pour le même fabricant. Oracle utilise cet index pour accélérer les recherches par numéro de lot tout en maintenant l\'intégrité des données. La contrainte UNIQUE crée automatiquement un index unique du même nom.',
     hints: [
       { pattern: '\\bPRIMARY\\s+KEY\\b', msg: 'La clé primaire garantit l\'unicité de LOT_ID, pas du couple (numero_lot, fabricant). Créez une contrainte dédiée.', level: 'error' },
@@ -752,6 +780,10 @@ const SCENARIOS = [
     ddl: 'CREATE TABLE sortie_stock (\n  sortie_id    NUMBER,\n  med_id       NUMBER NOT NULL,\n  qty          NUMBER(8),\n  date_sortie  DATE\n)\nPARTITION BY RANGE (date_sortie) (\n  PARTITION p_2023 VALUES LESS THAN (TO_DATE(\'2024-01-01\', \'YYYY-MM-DD\')),\n  PARTITION p_2024 VALUES LESS THAN (TO_DATE(\'2025-01-01\', \'YYYY-MM-DD\')),\n  PARTITION p_2025 VALUES LESS THAN (TO_DATE(\'2026-01-01\', \'YYYY-MM-DD\')),\n  PARTITION p_future VALUES LESS THAN (MAXVALUE)\n);',
     inserts: "INSERT INTO sortie_stock VALUES (1, 101, 200, DATE '2024-03-15');\nINSERT INTO sortie_stock VALUES (2, 102, 50, DATE '2024-07-22');\nINSERT INTO sortie_stock VALUES (3, 103, 85, DATE '2025-01-10');\nINSERT INTO sortie_stock VALUES (4, 104, 120, DATE '2025-11-05');\nINSERT INTO sortie_stock VALUES (5, 105, 300, DATE '2023-12-01');",
     expected: "SELECT sortie_id, med_id, qty, date_sortie\nFROM   sortie_stock\nWHERE  date_sortie >= DATE '2025-01-01'\nAND    date_sortie <  DATE '2026-01-01'\nORDER  BY date_sortie;\n\n-- L'optimiseur élaguera (partition pruning) et\n-- ne parcourra que la partition p_2025.",
+    mockResult: [
+      { sortie_id: 3, med_id: 103, qty: 85,  date_sortie: '2025-01-10' },
+      { sortie_id: 4, med_id: 104, qty: 120, date_sortie: '2025-11-05' },
+    ],
     explanation: 'Le partitionnement par intervalle (RANGE) divise la table en segments physiques indépendants selon une clé temporelle. Lorsqu\'une requête filtre sur la colonne de partition, l\'optimiseur CBO pratique l\'élaguage de partition (Partition Pruning) : il ne lit que le ou les segments pertinents, ignorant les autres. Cette technique divise le nombre d\'entrées/sorties par le nombre de partitions, améliorant les performances des requêtes historiques de façon considérable.',
     hints: [
       { pattern: '^(?![\\s\\S]*\\bWHERE\\b)', msg: 'Ajoutez une clause WHERE sur DATE_SORTIE pour limiter aux lignes de l\'année cible et déclencher le partition pruning.', level: 'error' },
@@ -771,6 +803,7 @@ const SCENARIOS = [
     ddl: 'CREATE TABLE ordonnance (\n  ord_id     NUMBER PRIMARY KEY,\n  patient_id NUMBER NOT NULL,\n  med_id     NUMBER NOT NULL,\n  qty        NUMBER(8),\n  date_presc DATE DEFAULT SYSDATE\n);',
     inserts: "INSERT INTO ordonnance VALUES (SEQ_ORDONNANCE.NEXTVAL, 1, 101, 60, SYSDATE);\nINSERT INTO ordonnance VALUES (SEQ_ORDONNANCE.NEXTVAL, 2, 102, 30, SYSDATE);",
     expected: "CREATE SEQUENCE seq_ordonnance\nSTART WITH 10000\nINCREMENT BY 1\nNOCACHE\nNOCYCLE;\n\nINSERT INTO ordonnance (ord_id, patient_id, med_id, qty)\nVALUES (seq_ordonnance.NEXTVAL, 1, 101, 60);",
+    completionMessage: 'Séquence SEQ_ORDONNANCE créée (START WITH 10000).\n2 lignes insérées dans ORDONNANCE.',
     explanation: 'Une séquence Oracle garantit la génération atomique de nombres uniques, même sous charge concurrente élevée. NEXTVAL incrémente la séquence et retourne la nouvelle valeur. NOCACHE évite la perte de valeurs en cas de redémarrage de l\'instance. NOCYCLE empêche le recyclage après avoir atteint la valeur maximale, protégeant ainsi l\'intégrité des clés.',
     hints: [
       { pattern: '\\bSELECT\\s+MAX\\(ord_id\\)\\s*\\+\\s*1\\b', msg: 'SELECT MAX + 1 échouera en environnement concurrent (deux sessions obtiendront le même ID). Utilisez une séquence.', level: 'error' },
@@ -790,6 +823,7 @@ const SCENARIOS = [
     ddl: 'CREATE TABLE stock_med (\n  med_id    NUMBER PRIMARY KEY,\n  molecule  VARCHAR2(100),\n  qty       NUMBER(8),\n  cout_total NUMBER(10,2)\n);',
     inserts: "INSERT INTO stock_med VALUES (1, 'Paracétamol 500mg', 1200, 3000.00);\nINSERT INTO stock_med VALUES (2, 'Amoxicilline 250mg', 0, 0);\nINSERT INTO stock_med VALUES (3, 'Salbutamol aérosol', 85, 1088.00);\nINSERT INTO stock_med VALUES (4, 'Morphine 10mg', 0, 0);",
     expected: "DECLARE\n  v_cout_unitaire NUMBER(10,2);\nBEGIN\n  FOR r IN (SELECT * FROM stock_med) LOOP\n    BEGIN\n      v_cout_unitaire := r.cout_total / r.qty;\n      DBMS_OUTPUT.PUT_LINE(r.molecule || ' : ' ||\n        TO_CHAR(v_cout_unitaire, '999.99'));\n    EXCEPTION\n      WHEN ZERO_DIVIDE THEN\n        DBMS_OUTPUT.PUT_LINE(r.molecule ||\n          ' : Quantité nulle, calcul impossible.');\n    END;\n  END LOOP;\nEND;",
+    completionMessage: 'DBMS_OUTPUT :\nParacétamol 500mg :   2.50\nAmoxicilline 250mg : Quantité nulle, calcul impossible.\nSalbutamol aérosol :  12.80\nMorphine 10mg : Quantité nulle, calcul impossible.',
     explanation: 'Le bloc interne BEGIN...EXCEPTION...END crée un sous-bloc de protection autour de la division. Si l\'exception ZERO_DIVIDE est levée (qty = 0), elle est capturée par le gestionnaire WHEN ZERO_DIVIDE, qui affiche un message d\'avertissement sans interrompre la boucle. Le bloc externe continue son itération normalement. Cette technique d\'exception locale est préférable à WHEN OTHERS pour cibler précisément le type d\'erreur.',
     hints: [
       { pattern: '\\bWHEN\\s+OTHERS\\b', msg: 'WHEN OTHERS capture toutes les exceptions. Privilégiez WHEN ZERO_DIVIDE pour cibler l\'erreur spécifique.', level: 'warning' },
@@ -809,6 +843,7 @@ const SCENARIOS = [
     ddl: 'CREATE TABLE reservation (\n  res_id    NUMBER PRIMARY KEY,\n  med_id    NUMBER NOT NULL,\n  qty_dem   NUMBER(8),\n  statut    VARCHAR2(20) DEFAULT \'EN_ATTENTE\',\n  date_res  DATE DEFAULT SYSDATE\n);\nCREATE TABLE stock_med (\n  med_id    NUMBER PRIMARY KEY,\n  qty       NUMBER(8)\n);',
     inserts: "INSERT INTO stock_med VALUES (101, 500);\nINSERT INTO stock_med VALUES (102, 30);\nINSERT INTO reservation VALUES (1, 101, 100, 'EN_ATTENTE', SYSDATE);\nINSERT INTO reservation VALUES (2, 102, 50, 'EN_ATTENTE', SYSDATE);\nINSERT INTO reservation VALUES (3, 101, 450, 'EN_ATTENTE', SYSDATE);",
     expected: "DECLARE\n  CURSOR c_res IS\n    SELECT r.res_id, r.med_id, r.qty_dem, s.qty AS stock_dispo\n    FROM   reservation r\n    JOIN   stock_med s ON s.med_id = r.med_id\n    WHERE  r.statut = 'EN_ATTENTE'\n    FOR UPDATE OF r.statut;\nBEGIN\n  FOR rec IN c_res LOOP\n    IF rec.qty_dem <= rec.stock_dispo THEN\n      UPDATE reservation SET statut = 'VALIDEE' WHERE res_id = rec.res_id;\n      UPDATE stock_med SET qty = qty - rec.qty_dem WHERE med_id = rec.med_id;\n    ELSE\n      UPDATE reservation SET statut = 'REFUSEE' WHERE res_id = rec.res_id;\n    END IF;\n  END LOOP;\n  COMMIT;\nEND;",
+    completionMessage: 'DBMS_OUTPUT : Réservation 1 VALIDEE, Réservation 2 REFUSEE, Réservation 3 VALIDEE.',
     explanation: 'Un curseur explicite est déclaré (CURSOR), puis parcouru par une boucle FOR qui l\'ouvre, extrait chaque ligne et le ferme automatiquement. La clause FOR UPDATE verrouille les lignes sélectionnées pendant la durée du curseur, empêchant les modifications concurrentes. La condition IF évalue la disponibilité du stock pour chaque réservation.',
     hints: [
       { pattern: '\\bSELECT\\s+.*\\s+INTO\\b', msg: 'SELECT INTO convient pour une seule ligne. Pour plusieurs réservations, utilisez un curseur explicite avec boucle FOR.', level: 'warning' },
@@ -828,6 +863,7 @@ const SCENARIOS = [
     ddl: 'CREATE TABLE stock_theorique (\n  med_id   NUMBER PRIMARY KEY,\n  molecule VARCHAR2(100),\n  qty      NUMBER(8)\n);\nCREATE TABLE inventaire (\n  med_id   NUMBER PRIMARY KEY,\n  qty_reel NUMBER(8)\n);',
     inserts: "INSERT INTO stock_theorique VALUES (1, 'Paracétamol 500mg', 1200);\nINSERT INTO stock_theorique VALUES (2, 'Amoxicilline 250mg', 340);\nINSERT INTO inventaire VALUES (1, 1180);\nINSERT INTO inventaire VALUES (2, 335);\nINSERT INTO inventaire VALUES (3, 500);",
     expected: "MERGE INTO stock_theorique t\nUSING inventaire i ON (t.med_id = i.med_id)\nWHEN MATCHED THEN\n  UPDATE SET t.qty = i.qty_reel\nWHEN NOT MATCHED THEN\n  INSERT (med_id, molecule, qty)\n  VALUES (i.med_id, 'NOUVEAU', i.qty_reel);",
+    completionMessage: 'MERGE exécuté : 2 lignes mises à jour, 1 ligne insérée.',
     explanation: 'L\'instruction MERGE est une opération conditionnelle combinant INSERT et UPDATE en une seule passe. USING définit la source de données, ON spécifie la condition de correspondance. WHEN MATCHED met à jour la ligne cible si la clé existe déjà. WHEN NOT MATCHED insère une nouvelle ligne si la clé est absente. Cette opération est atomique et plus performante qu\'une séquence UPDATE + INSERT avec vérification préalable.',
     hints: [
       { pattern: '\\bIF\\b|\\bBEGIN\\b', msg: 'Un bloc PL/SQL avec IF explicite est plus verbeux. Utilisez l\'instruction MERGE qui combine tout en une seule commande SQL.', level: 'warning' },
@@ -847,6 +883,13 @@ const SCENARIOS = [
     ddl: 'CREATE TABLE dispensation (\n  disp_id    NUMBER PRIMARY KEY,\n  med_id     NUMBER NOT NULL,\n  molecule   VARCHAR2(100),\n  qty        NUMBER(8),\n  date_disp  DATE\n);',
     inserts: "INSERT INTO dispensation VALUES (1, 101, 'Paracétamol 500mg', 450, DATE '2025-01-15');\nINSERT INTO dispensation VALUES (2, 102, 'Amoxicilline 250mg', 320, DATE '2025-01-20');\nINSERT INTO dispensation VALUES (3, 101, 'Paracétamol 500mg', 380, DATE '2025-02-10');\nINSERT INTO dispensation VALUES (4, 103, 'Salbutamol aérosol', 210, DATE '2025-02-15');\nINSERT INTO dispensation VALUES (5, 102, 'Amoxicilline 250mg', 290, DATE '2025-03-01');\nINSERT INTO dispensation VALUES (6, 104, 'Morphine 10mg', 180, DATE '2025-03-05');\nINSERT INTO dispensation VALUES (7, 105, 'Diazépam 10mg', 95, DATE '2025-03-10');\nINSERT INTO dispensation VALUES (8, 103, 'Salbutamol aérosol', 195, DATE '2025-03-15');",
     expected: "SELECT molecule,\n       SUM(qty) AS qte_totale,\n       RANK() OVER (ORDER BY SUM(qty) DESC) AS rang\nFROM   dispensation\nWHERE  date_disp >= ADD_MONTHS(TRUNC(SYSDATE), -6)\nGROUP  BY molecule\nORDER  BY rang\nFETCH  FIRST 5 ROWS ONLY;",
+    mockResult: [
+      { molecule: 'Paracétamol 500mg',  qte_totale: 830, rang: 1 },
+      { molecule: 'Amoxicilline 250mg', qte_totale: 610, rang: 2 },
+      { molecule: 'Salbutamol aérosol', qte_totale: 405, rang: 3 },
+      { molecule: 'Morphine 10mg',      qte_totale: 180, rang: 4 },
+      { molecule: 'Diazépam 10mg',      qte_totale: 95,  rang: 5 },
+    ],
     explanation: 'RANK() OVER (ORDER BY ...) est une fonction analytique qui attribue un rang à chaque ligne sans réduire le nombre de lignes. Combinée à SUM(qty) et GROUP BY, elle classe les molécules par volume total. FETCH FIRST 5 ROWS ONLY (Oracle 12c+) limite le résultat aux cinq premières. En cas d\'égalité, RANK saute des rangs (1, 1, 3) contrairement à DENSE_RANK (1, 1, 2).',
     hints: [
       { pattern: '\\bROW_NUMBER\\(\\)\\b', msg: 'ROW_NUMBER attribue des rangs consécutifs sans ex-aequo (1, 2, 3). RANK est plus adapté si des égalités sont possibles.', level: 'info' },
@@ -866,6 +909,14 @@ const SCENARIOS = [
     ddl: 'CREATE TABLE categorie_atc (\n  code       VARCHAR2(10) PRIMARY KEY,\n  libelle    VARCHAR2(100),\n  code_parent VARCHAR2(10) REFERENCES categorie_atc(code)\n);\nCREATE TABLE medicament (\n  med_id     NUMBER PRIMARY KEY,\n  molecule   VARCHAR2(100),\n  code_atc   VARCHAR2(10) REFERENCES categorie_atc(code)\n);',
     inserts: "INSERT INTO categorie_atc VALUES ('C', 'Système cardiovasculaire', NULL);\nINSERT INTO categorie_atc VALUES ('C01', 'Thérapie cardiaque', 'C');\nINSERT INTO categorie_atc VALUES ('C02', 'Antihypertenseurs', 'C');\nINSERT INTO categorie_atc VALUES ('C01A', 'Glucosides cardiotoniques', 'C01');\nINSERT INTO categorie_atc VALUES ('C01B', 'Antiarythmiques', 'C01');\nINSERT INTO categorie_atc VALUES ('C02A', 'Diurétiques', 'C02');\nINSERT INTO categorie_atc VALUES ('N', 'Système nerveux', NULL);",
     expected: "WITH cat_tree (code, libelle, niveau, chemin) AS (\n  SELECT code, libelle, 1, code\n  FROM   categorie_atc\n  WHERE  code = 'C'\n  UNION ALL\n  SELECT c.code, c.libelle, ct.niveau + 1,\n         ct.chemin || ' > ' || c.code\n  FROM   categorie_atc c\n  JOIN   cat_tree ct ON c.code_parent = ct.code\n)\nSELECT code, libelle, niveau, chemin\nFROM   cat_tree\nORDER  BY chemin;",
+    mockResult: [
+      { code: 'C',    libelle: 'Système cardiovasculaire',  niveau: 1, chemin: 'C' },
+      { code: 'C01',  libelle: 'Thérapie cardiaque',        niveau: 2, chemin: 'C > C01' },
+      { code: 'C01A', libelle: 'Glucosides cardiotoniques', niveau: 3, chemin: 'C > C01 > C01A' },
+      { code: 'C01B', libelle: 'Antiarythmiques',           niveau: 3, chemin: 'C > C01 > C01B' },
+      { code: 'C02',  libelle: 'Antihypertenseurs',         niveau: 2, chemin: 'C > C02' },
+      { code: 'C02A', libelle: 'Diurétiques',               niveau: 3, chemin: 'C > C02 > C02A' },
+    ],
     explanation: 'Une CTE récursive (WITH ... AS (...) UNION ALL ...) permet de parcourir une structure arborescente sans requêtes multiples. Le membre d\'ancrage sélectionne la racine (code = \'C\'). Le membre récursif descend d\'un niveau à chaque itération en joignant la table sur CODE_PARENT. Oracle répète la récursion tant que le membre récursif produit de nouvelles lignes. La colonne CHEMIN concatène les codes pour visualiser la hiérarchie.',
     hints: [
       { pattern: '\\bCONNECT\\s+BY\\b', msg: 'CONNECT BY PRIOR est la syntaxe Oracle classique pour les requêtes hiérarchiques. L\'exercice demande une CTE récursive (WITH).', level: 'info' },
@@ -885,6 +936,7 @@ const SCENARIOS = [
     ddl: 'CREATE TABLE stock_med (\n  med_id    NUMBER PRIMARY KEY,\n  molecule  VARCHAR2(100),\n  qty       NUMBER(8)\n);',
     inserts: "INSERT INTO stock_med VALUES (1, 'Paracétamol 500mg', 500);\nINSERT INTO stock_med VALUES (2, 'Amoxicilline 250mg', 200);\nINSERT INTO stock_med VALUES (3, 'Salbutamol aérosol', 80);",
     expected: "DECLARE\n  v_qty_dispo NUMBER;\n  CURSOR c_lock IS\n    SELECT qty FROM stock_med\n    WHERE  med_id = 1\n    FOR UPDATE NOWAIT;\nBEGIN\n  OPEN c_lock;\n  FETCH c_lock INTO v_qty_dispo;\n  IF v_qty_dispo >= 100 THEN\n    UPDATE stock_med SET qty = qty - 100 WHERE med_id = 1;\n    DBMS_OUTPUT.PUT_LINE('Réservation confirmée. Stock restant : ' || (v_qty_dispo - 100));\n  ELSE\n    DBMS_OUTPUT.PUT_LINE('Stock insuffisant.');\n  END IF;\n  CLOSE c_lock;\n  COMMIT;\nEXCEPTION\n  WHEN OTHERS THEN\n    DBMS_OUTPUT.PUT_LINE('Impossible de verrouiller la ligne (déjà réservée).');\n    ROLLBACK;\nEND;",
+    completionMessage: 'DBMS_OUTPUT : Réservation confirmée. Stock restant : 400',
     explanation: 'FOR UPDATE verrouille les lignes sélectionnées, empêchant toute autre session de les modifier ou de les verrouiller jusqu\'à la fin de la transaction. NOWAIT fait échouer immédiatement l\'opération si les lignes sont déjà verrouillées, sans attendre (évite le blocage). SKIP LOCKED est une alternative pour ignorer les lignes verrouillées et traiter les lignes disponibles.',
     hints: [
       { pattern: '\\bSELECT\\b(?![\\s\\S]*FOR\\s+UPDATE)', msg: 'Un SELECT simple ne verrouille pas les lignes. Ajoutez FOR UPDATE pour la réservation.', level: 'error' },
@@ -904,6 +956,7 @@ const SCENARIOS = [
     ddl: 'CREATE TABLE staging_medicament (\n  med_id    NUMBER,\n  molecule  VARCHAR2(100),\n  qty       NUMBER(8)\n);\nCREATE TABLE staging_lot (\n  lot_id    NUMBER,\n  med_id    NUMBER,\n  date_perem DATE\n);',
     inserts: "-- Les tables sont vides initialement.\n-- L'objectif est d'insérer dynamiquement dans l'une ou l'autre.",
     expected: "DECLARE\n  v_table  VARCHAR2(30) := 'STAGING_MEDICAMENT';\n  v_sql    VARCHAR2(500);\nBEGIN\n  v_sql := 'INSERT INTO ' || v_table ||\n           ' (med_id, molecule, qty) VALUES (:1, :2, :3)';\n  EXECUTE IMMEDIATE v_sql USING 999, 'Nouveau médicament', 100;\n  DBMS_OUTPUT.PUT_LINE('Ligne insérée dans ' || v_table);\nEXCEPTION\n  WHEN OTHERS THEN\n    DBMS_OUTPUT.PUT_LINE('Erreur : ' || SQLERRM);\nEND;",
+    completionMessage: 'DBMS_OUTPUT : Ligne insérée dans STAGING_MEDICAMENT.',
     explanation: 'EXECUTE IMMEDIATE construit et exécute une instruction SQL dont la structure peut varier à l\'exécution. Les variables de liaison (:1, :2, :3) sont fournies par la clause USING, protégeant contre les injections SQL. Le nom de la table est concaténé dynamiquement. La gestion d\'exception capture les erreurs potentielles (table inexistante, contrainte violée) via SQLERRM.',
     hints: [
       { pattern: '\\bEXECUTE\\b(?!.*IMMEDIATE)', msg: 'EXECUTE tout seul est pour les commandes SQL*Plus. Utilisez EXECUTE IMMEDIATE en PL/SQL.', level: 'error' },
@@ -1473,8 +1526,12 @@ class SQLExecutor {
         }
         if (scenario) {
           const sampleData = this._generateResult(scenario);
-          this._displayResult(sampleData);
-          this._log(resultRows(scenario.id) + ' ligne(s) traitée(s).', 'success');
+          if (sampleData.length > 0) {
+            this._displayResult(sampleData);
+            this._log(sampleData.length + ' ligne(s) retournée(s).', 'success');
+          } else if (scenario.completionMessage) {
+            this._log(scenario.completionMessage, 'success');
+          }
         }
         this._valid = true;
       } else {
@@ -1486,18 +1543,10 @@ class SQLExecutor {
     }, 1200);
   }
   _generateResult(scenario) {
-    const data = [];
-    const rows = resultRows(scenario.id);
-    for (let i = 0; i < rows; i++) {
-      const row = {};
-      row['ID'] = i + 1;
-      row['MOLECULE'] = ['Paracétamol', 'Amoxicilline', 'Salbutamol', 'Morphine', 'Diazépam', 'Ibuprofène', 'Héparine', 'Midazolam'][i % 8];
-      row['QTE'] = Math.floor(Math.random() * 500) + 10;
-      row['SERVICE'] = ['Urgences', 'Cardiologie', 'Pédiatrie', 'Oncologie', 'Réanimation'][i % 5];
-      row['DATE'] = '2025-0' + ((i % 9) + 1) + '-' + String(10 + i).padStart(2, '0');
-      data.push(row);
+    if (scenario.mockResult) {
+      return scenario.mockResult;
     }
-    return data;
+    return [];
   }
   _displayResult(data) {
     if (!data || data.length === 0) return;
@@ -1519,11 +1568,6 @@ class SQLExecutor {
     this._infoEl.textContent = 'En attente d\'une instruction.';
     this._clearResult();
   }
-}
-
-function resultRows(id) {
-  const map = {1:8,2:6,3:5,4:4,5:4,6:3,7:3,8:6,9:3,10:5,11:2,12:4,13:3,14:3,15:5,16:6,17:3,18:1};
-  return map[id] || 3;
 }
 
 // ============================================================
