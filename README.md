@@ -1,6 +1,6 @@
 ﻿# Oracle SIH (Système d'Information Hospitalier) — Démonstrations Techniques
 
-> Ensemble de 6 applications HTML/CSS/JavaScript autonomes, sans dépendance externe et exécutables hors-ligne, destinées à la démonstration pédagogique de mécanismes Oracle Database et d’architectures SIH (Système d’Information Hospitalier) dans un contexte de conformité HDS/RGPD.
+> Ensemble de 7 applications HTML/CSS/JavaScript autonomes, sans dépendance externe et exécutables hors-ligne, destinées à la démonstration pédagogique de mécanismes Oracle Database et d’architectures SIH (Système d’Information Hospitalier) dans un contexte de conformité HDS/RGPD.
 
 ---
 
@@ -8,17 +8,18 @@
 
 1. [Objectifs et périmètre](#objectifs-et-périmètre)
 2. [Méthodologie et limites](#méthodologie-et-limites)
-3. [Fichier 1 : Architecture Infrastructure](#fichier-1--architecture-infrastructure)
-4. [Fichier 2 : Atelier SQL PUI](#fichier-2--atelier-sql-pui)
-5. [Fichier 3 : Lexique Oracle PUI](#fichier-3--lexique-oracle-pui)
-6. [Fichier 4 : Cycle de vie projet Oracle PUI](#fichier-4--cycle-de-vie-projet-oracle-pui)
-7. [Fichier 5 : Suite Performance Avancée](#fichier-5--suite-performance-avancee)
-8. [Fichier 6 : Assistant SQL PUI](#fichier-6--assistant-sql-pui)
-9. [Thèmes transversaux](#thèmes-transversaux)
-10. [Conformité et sécurité](#conformité-et-sécurité)
-11. [Aide intégrée et lexiques contextuels](#aide-intégrée-et-lexiques-contextuels)
-12. [Prérequis](#prérequis)
-13. [Licence](#licence)
+3. [Fichier 0 : Architecture des Tablespaces et Fichiers de Données](#fichier-0--architecture-des-tablespaces-et-fichiers-de-données)
+4. [Fichier 1 : Architecture Infrastructure](#fichier-1--architecture-infrastructure)
+5. [Fichier 2 : Atelier SQL PUI](#fichier-2--atelier-sql-pui)
+6. [Fichier 3 : Lexique Oracle PUI](#fichier-3--lexique-oracle-pui)
+7. [Fichier 4 : Cycle de vie projet Oracle PUI](#fichier-4--cycle-de-vie-projet-oracle-pui)
+8. [Fichier 5 : Suite Performance Avancée](#fichier-5--suite-performance-avancee)
+9. [Fichier 6 : Assistant SQL PUI](#fichier-6--assistant-sql-pui)
+10. [Thèmes transversaux](#thèmes-transversaux)
+11. [Conformité et sécurité](#conformité-et-sécurité)
+12. [Aide intégrée et lexiques contextuels](#aide-intégrée-et-lexiques-contextuels)
+13. [Prérequis](#prérequis)
+14. [Licence](#licence)
 
 ---
 
@@ -86,6 +87,33 @@ Certains phénomènes réels ne peuvent être reproduits fidèlement dans un env
 * la gestion mémoire de la JVM ;
 * les contentions concurrentes à forte charge ;
 * les coûts réels de brassage de données (shuffle) dans Spark.
+
+---
+
+# Fichier 0 : Architecture des Tablespaces et Fichiers de Données
+
+**Fichier :** `0.oracle-database-structure.html`
+
+Application pédagogique présentant l'architecture de stockage hiérarchique d'Oracle Database, des tablespaces logiques aux fichiers de données physiques.
+
+| Module | Contenu |
+|--------|---------|
+| Vue d'ensemble | Architecture visuelle (cylindres de données), composants principaux (tablespace, data file, segment), types de tablespaces (SYSTEM, SYSAUX, UNDO, TEMP, USERS) |
+| Hiérarchie | Diagramme complet Database → Tablespace → Data File → Segment → Extent → Data Block, détail de chaque niveau, guide de bonnes pratiques avec commandes SQL |
+| Visualisation Interactive | Simulation d'allocation d'extents dans un fichier de données (grille 8×8), segmentation tables/index, fragmentation |
+| Comparaison | Tableau comparatif des 6 composants (nature, taille, relations), règles d'appartenance, commandes SQL de diagnostic (`dba_tablespaces`, `dba_data_files`, `dba_segments`) |
+| Administration | Gestion des utilisateurs (CREATE USER, QUOTA), rôles et profils de sécurité (CREATE ROLE, CREATE PROFILE), maintenance courante (DBMS_STATS, shrink, controlfile) |
+| Quiz | 20 questions avec correction immédiate couvrant l'intégralité des concepts de la page |
+| Glossaire | 9 termes détaillés : Tablespace, Data File, Segment, Extent, Data Block, ASM, ASSM, UNDO, TEMP |
+
+Fonctionnalités :
+
+* navigation par onglets avec sidebar ;
+* aide contextuelle par module (bouton « ? ») ;
+* lexique technique intégré (bouton « L ») ;
+* grille interactive d'allocation d'espace ;
+* quiz auto-correctif avec score ;
+* glossaire dépliable par clic.
 
 ---
 
