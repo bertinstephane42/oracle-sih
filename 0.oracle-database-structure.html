@@ -308,6 +308,7 @@ a:hover { text-decoration: underline; }
       <div class="app-nav__section-title">Pratique</div>
       <button class="app-nav__item" data-module="visualization"><span class="app-nav__item-icon">I</span>Visualisation Interactive</button>
       <button class="app-nav__item" data-module="comparison"><span class="app-nav__item-icon">C</span>Comparaison</button>
+      <button class="app-nav__item" data-module="administration"><span class="app-nav__item-icon">A</span>Administration</button>
     </div>
     <div class="app-nav__section">
       <div class="app-nav__section-title">Évaluation</div>
@@ -761,7 +762,95 @@ a:hover { text-decoration: underline; }
     </section>
 
     <!-- ============================================================
-         SECTION 5: Quiz
+         SECTION 5: Administration
+         ============================================================ -->
+    <section id="mod-administration" class="module-section">
+      <div class="page-header">
+        <div class="page-header__subtitle-row">
+          <div>
+            <div class="page-header__title">
+              Administration post-création
+              <button class="page-header__help-btn" data-help="administration" aria-label="Aide" title="Aide">?</button>
+            </div>
+            <div class="page-header__subtitle">Gestion des utilisateurs, rôles, profils et maintenance courante</div>
+          </div>
+        </div>
+      </div>
+
+      <p style="margin-bottom: var(--sp-6); color: #94a3b8;">Une fois la base de données créée et les tablespaces configurés, l'administrateur doit créer les utilisateurs, leur attribuer les privilèges nécessaires, et mettre en place les procédures de maintenance régulières selon les bonnes pratiques Oracle.</p>
+
+      <div class="card">
+        <div class="card__title"><span class="card__title-icon">&#9670;</span> Gestion des utilisateurs</div>
+        <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Chaque utilisateur doit posséder un tablespace par défaut, un tablespace temporaire, un quota adapté et un profil de sécurité.</p>
+        <div class="code-block">
+          <span class="comment">-- Création d'un utilisateur avec tablespaces dédiés</span><br>
+          <span>CREATE USER app_admin</span><br>
+          <span>&nbsp;&nbsp;IDENTIFIED BY "P@ssw0rd_2025"</span><br>
+          <span>&nbsp;&nbsp;DEFAULT TABLESPACE tbs_data</span><br>
+          <span>&nbsp;&nbsp;TEMPORARY TABLESPACE temp</span><br>
+          <span>&nbsp;&nbsp;QUOTA 500M ON tbs_data</span><br>
+          <span>&nbsp;&nbsp;QUOTA 100M ON tbs_index</span><br>
+          <span>&nbsp;&nbsp;PROFILE app_profile;</span><br><br>
+          <span class="comment">-- Attribution des privilèges minimaux (principe du moindre privilège)</span><br>
+          <span>GRANT CONNECT, RESOURCE TO app_admin;</span><br>
+          <span>GRANT CREATE SESSION, CREATE TABLE, CREATE VIEW TO app_admin;</span><br><br>
+          <span class="comment">-- Vérification des privilèges attribués</span><br>
+          <span>SELECT * FROM dba_sys_privs WHERE grantee = 'APP_ADMIN';</span>
+        </div>
+        <div class="alert alert--warning" style="margin-top: var(--sp-4);">
+          <strong>Principe du moindre privilège :</strong> N'attribuez que les privilèges strictement nécessaires à chaque utilisateur. Évitez <code>GRANT UNLIMITED TABLESPACE</code> ; préférez des quotas précis sur chaque tablespace.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__title"><span class="card__title-icon">&#9670;</span> Rôles et profils de sécurité</div>
+        <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Les rôles simplifient l'administration des privilèges en les regroupant par fonction métier. Les profils imposent les politiques de mot de passe et les limites de ressources.</p>
+        <div class="code-block">
+          <span class="comment">-- Création de rôles fonctionnels</span><br>
+          <span>CREATE ROLE app_readonly;</span><br>
+          <span>CREATE ROLE app_admin_role;</span><br><br>
+          <span class="comment">-- Privilèges sur les rôles</span><br>
+          <span>GRANT SELECT ON hr.employees TO app_readonly;</span><br>
+          <span>GRANT app_readonly TO app_admin_role;</span><br>
+          <span>GRANT app_admin_role TO app_admin;</span><br><br>
+          <span class="comment">-- Politique de mot de passe (profil)</span><br>
+          <span>CREATE PROFILE app_profile LIMIT</span><br>
+          <span>&nbsp;&nbsp;FAILED_LOGIN_ATTEMPTS 5</span><br>
+          <span>&nbsp;&nbsp;PASSWORD_LOCK_TIME 1</span><br>
+          <span>&nbsp;&nbsp;PASSWORD_LIFE_TIME 90</span><br>
+          <span>&nbsp;&nbsp;PASSWORD_GRACE_TIME 7</span><br>
+          <span>&nbsp;&nbsp;SESSIONS_PER_USER 4;</span><br><br>
+          <span class="comment">-- Appliquer le profil à un utilisateur</span><br>
+          <span>ALTER USER app_admin PROFILE app_profile;</span><br><br>
+          <span class="comment">-- Vérification des profils</span><br>
+          <span>SELECT * FROM dba_profiles WHERE profile = 'APP_PROFILE';</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__title"><span class="card__title-icon">&#9670;</span> Maintenance courante</div>
+        <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Les opérations de maintenance régulières garantissent la performance, l'intégrité et la disponibilité de la base de données.</p>
+        <div class="code-block">
+          <span class="comment">-- Collecte des statistiques optimiseur (hebdomadaire recommandé)</span><br>
+          <span>EXEC DBMS_STATS.GATHER_SCHEMA_STATS('APP_ADMIN');</span><br><br>
+          <span class="comment">-- Sauvegarde du controlfile (après chaque changement structurel)</span><br>
+          <span>ALTER DATABASE BACKUP CONTROLFILE TO '/backup/ctrl_prod.ctl';</span><br><br>
+          <span class="comment">-- Shrink d'un segment (libération d'espace)</span><br>
+          <span>ALTER TABLE app_admin.employees ENABLE ROW MOVEMENT;</span><br>
+          <span>ALTER TABLE app_admin.employees SHRINK SPACE CASCADE;</span><br><br>
+          <span class="comment">-- Surveillance de l'espace utilisé</span><br>
+          <span>SELECT tablespace_name, used_space * 100 / tablespace_size AS pct_used</span><br>
+          <span>&nbsp;&nbsp;FROM dba_tablespace_usage_metrics</span><br>
+          <span>&nbsp;&nbsp;WHERE used_space * 100 / tablespace_size > 80;</span>
+        </div>
+        <div class="alert alert--info" style="margin-top: var(--sp-4);">
+          <strong>Bonnes pratiques :</strong> Planifiez la collecte des statistiques via <code>DBMS_SCHEDULER</code> en dehors des heures de pointe. Surveillez les segments dont la taille excède 80 % du quota alloué. Testez les restaurations de sauvegarde au moins une fois par trimestre.
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 6: Quiz
          ============================================================ -->
     <section id="mod-quiz" class="module-section">
       <div class="page-header">
@@ -1260,6 +1349,39 @@ a:hover { text-decoration: underline; }
         <li><strong>Tableau comparatif</strong> : Nature, taille typique, relations et exemples pour chaque composant</li>
         <li><strong>Règles importantes</strong> : Relations d'appartenance entre les composants</li>
         <li><strong>Commandes SQL</strong> : Requêtes utiles pour interroger le dictionnaire de données</li>
+      </ul>
+    </div>
+  </div>
+  <div class="help-modal__footer">
+    <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+  </div>
+</div>
+
+<!-- HELP MODAL: Administration -->
+<div class="help-modal" id="help-administration" role="dialog" aria-modal="true" aria-labelledby="help-administration-title" aria-hidden="true">
+  <div class="help-modal__header">
+    <div class="help-modal__title" id="help-administration-title">Administration post-création</div>
+    <button class="help-modal__close" aria-label="Fermer l'aide" tabindex="0">&times;</button>
+  </div>
+  <div class="help-modal__body">
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--objective">Objectif pédagogique</div>
+      <p class="help-modal__text">Cette section présente les commandes essentielles d'administration post-création : gestion des utilisateurs et de leurs quotas, attribution des rôles et privilèges, profils de sécurité, et opérations de maintenance courante.</p>
+    </div>
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--controls">Contenu</div>
+      <ul class="help-modal__list">
+        <li><strong>Gestion des utilisateurs</strong> : CREATE USER, QUOTA, GRANT de privilèges système</li>
+        <li><strong>Rôles et profils</strong> : CREATE ROLE, hiérarchie de rôles, CREATE PROFILE avec politique de mot de passe</li>
+        <li><strong>Maintenance</strong> : DBMS_STATS, sauvegarde du controlfile, shrink de segments, surveillance des métriques</li>
+      </ul>
+    </div>
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--controls">Bonnes pratiques</div>
+      <ul class="help-modal__list">
+        <li>Appliquer le principe du moindre privilège (POLP)</li>
+        <li>Utiliser des rôles fonctionnels plutôt que des privilèges directs</li>
+        <li>Planifier les statistiques en dehors des heures de production</li>
       </ul>
     </div>
   </div>
