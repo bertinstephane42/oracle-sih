@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Oracle Database Architecture - Tablespaces et Fichiers de Données">
+<title>Architecture Oracle : Tablespaces et Fichiers de Données</title>
+<style>
+/* ============================================================
+   DESIGN SYSTEM
+   ============================================================ */
+:root {
+  --color-bg-deep: #0a0e17;
+  --color-bg-surface: #131a2a;
+  --color-bg-elevated: #1a2340;
+  --color-bg-hover: #243052;
+  --color-border: #1e2d4a;
+  --color-border-active: #3b82f6;
+  --color-blue: #3b82f6;
+  --color-blue-dim: #1e3a6e;
+  --color-red: #ef4444;
+  --color-red-dim: #7f1d1d;
+  --color-green: #22c55e;
+  --color-green-dim: #166534;
+  --color-amber: #f59e0b;
+  --color-amber-dim: #78350f;
+  --color-cyan: #06b6d4;
+  --color-purple: #a855f7;
+  --font-ui: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+  --fs-xs: 0.6875rem;
+  --fs-sm: 0.8125rem;
+  --fs-base: 0.9375rem;
+  --fs-md: 1.0625rem;
+  --fs-lg: 1.25rem;
+  --fs-xl: 1.5rem;
+  --fs-2xl: 2rem;
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-6: 1.5rem;
+  --sp-8: 2rem;
+  --sp-12: 3rem;
+  --nav-width: 260px;
+  --header-height: 56px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --transition-fast: 150ms ease;
+  --transition-normal: 300ms ease;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+body { font-family: var(--font-ui); font-size: var(--fs-base); color: #e2e8f0; background: var(--color-bg-deep); line-height: 1.6; overflow-x: hidden; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input, select, textarea { font-family: inherit; font-size: inherit; }
+pre, code { font-family: var(--font-mono); }
+table { border-collapse: collapse; width: 100%; }
+a { color: var(--color-cyan); text-decoration: none; }
+a:hover { text-decoration: underline; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--color-bg-deep); }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: var(--radius-sm); }
+::-webkit-scrollbar-thumb:hover { background: var(--color-blue); }
+
+.app-layout { display: grid; grid-template-columns: var(--nav-width) 1fr; grid-template-rows: var(--header-height) 1fr; grid-template-areas: "header header" "nav main"; min-height: 100vh; }
+.app-header { grid-area: header; display: flex; align-items: center; justify-content: space-between; padding: 0 var(--sp-6); background: var(--color-bg-surface); border-bottom: 1px solid var(--color-border); z-index: 100; }
+.app-header__brand { display: flex; align-items: center; gap: var(--sp-3); font-family: var(--font-mono); font-size: var(--fs-md); font-weight: 700; letter-spacing: -0.02em; }
+.app-header__brand-icon { width: 28px; height: 28px; background: var(--color-blue); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: var(--fs-sm); font-weight: 900; color: #fff; }
+.app-header__status { display: flex; align-items: center; gap: var(--sp-4); font-size: var(--fs-xs); font-family: var(--font-mono); }
+.status-badge { display: inline-flex; align-items: center; gap: var(--sp-2); padding: var(--sp-1) var(--sp-3); border-radius: var(--radius-sm); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.status-badge--online { background: var(--color-green-dim); color: var(--color-green); }
+.status-badge--rgpd { background: var(--color-blue-dim); color: var(--color-blue); }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: pulse-dot 2s infinite; }
+@keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.app-nav { grid-area: nav; background: var(--color-bg-surface); border-right: 1px solid var(--color-border); padding: var(--sp-6) 0; overflow-y: auto; }
+.app-nav__section { padding: 0 var(--sp-4); margin-bottom: var(--sp-6); }
+.app-nav__section-title { font-size: var(--fs-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-blue); margin-bottom: var(--sp-3); font-family: var(--font-mono); }
+.app-nav__item { display: flex; align-items: center; gap: var(--sp-3); width: 100%; padding: var(--sp-3) var(--sp-4); border-radius: var(--radius-md); font-size: var(--fs-sm); font-weight: 500; color: #94a3b8; transition: all var(--transition-fast); text-align: left; }
+.app-nav__item:hover { background: var(--color-bg-hover); color: #e2e8f0; }
+.app-nav__item--active { background: var(--color-blue-dim); color: var(--color-blue); font-weight: 600; }
+.app-nav__item-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700; border-radius: var(--radius-sm); background: var(--color-bg-elevated); flex-shrink: 0; }
+.app-nav__item--active .app-nav__item-icon { background: var(--color-blue); color: #fff; }
+.app-nav__rgpd-notice { margin: var(--sp-6) var(--sp-4); padding: var(--sp-3); background: var(--color-blue-dim); border: 1px solid var(--color-blue); border-radius: var(--radius-md); font-size: var(--fs-xs); color: var(--color-blue); font-family: var(--font-mono); line-height: 1.5; }
+
+.app-main { grid-area: main; padding: var(--sp-8); overflow-y: auto; background: var(--color-bg-deep); }
+
+.page-header { margin-bottom: var(--sp-8); padding-bottom: var(--sp-4); border-bottom: 1px solid var(--color-border); }
+.page-header__title { font-size: var(--fs-xl); font-weight: 700; letter-spacing: -0.02em; margin-bottom: var(--sp-2); display: flex; align-items: center; gap: var(--sp-3); }
+.page-header__subtitle { font-size: var(--fs-sm); color: #94a3b8; font-family: var(--font-mono); }
+.page-header__subtitle-row { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); }
+.page-header__help-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 1px solid var(--color-border); border-radius: 50%; background: var(--color-bg-elevated); color: #94a3b8; font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700; cursor: pointer; transition: all var(--transition-fast); vertical-align: middle; flex-shrink: 0; }
+.page-header__help-btn:hover { border-color: var(--color-blue); color: var(--color-blue); background: var(--color-blue-dim); }
+
+.card { background: var(--color-bg-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--sp-6); margin-bottom: var(--sp-6); }
+.card__title { font-size: var(--fs-md); font-weight: 700; margin-bottom: var(--sp-4); display: flex; align-items: center; gap: var(--sp-3); font-family: var(--font-mono); }
+.card__title-icon { color: var(--color-blue); }
+
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-6); }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-6); }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-6); }
+@media (max-width: 1200px) { .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+.data-mono { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--color-cyan); background: var(--color-bg-elevated); padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); display: inline-block; }
+.data-label { font-size: var(--fs-xs); color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+.data-value { font-family: var(--font-mono); font-size: var(--fs-base); font-weight: 600; }
+
+.stat-block { background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--sp-4); text-align: center; }
+.stat-block__value { font-family: var(--font-mono); font-size: var(--fs-xl); font-weight: 700; margin-bottom: var(--sp-1); }
+.stat-block__label { font-size: var(--fs-xs); color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+.stat-block--blue .stat-block__value { color: var(--color-blue); }
+.stat-block--green .stat-block__value { color: var(--color-green); }
+.stat-block--red .stat-block__value { color: var(--color-red); }
+.stat-block--amber .stat-block__value { color: var(--color-amber); }
+.stat-block--cyan .stat-block__value { color: var(--color-cyan); }
+
+.progress-bar { width: 100%; height: 8px; background: var(--color-bg-elevated); border-radius: var(--radius-sm); overflow: hidden; margin: var(--sp-2) 0; }
+.progress-bar__fill { height: 100%; border-radius: var(--radius-sm); transition: width var(--transition-normal); }
+.progress-bar__fill--blue { background: var(--color-blue); }
+.progress-bar__fill--green { background: var(--color-green); }
+.progress-bar__fill--red { background: var(--color-red); }
+.progress-bar__fill--amber { background: var(--color-amber); }
+
+.data-table { width: 100%; font-size: var(--fs-sm); margin-bottom: var(--sp-6); }
+.data-table th { text-align: left; padding: var(--sp-3) var(--sp-4); background: var(--color-bg-elevated); font-family: var(--font-mono); font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; font-weight: 600; border-bottom: 1px solid var(--color-border); }
+.data-table td { padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--color-border); font-size: var(--fs-sm); }
+.data-table tr:hover td { background: var(--color-bg-hover); }
+
+.tag { display: inline-flex; align-items: center; padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); font-size: var(--fs-xs); font-weight: 600; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.03em; }
+.tag--blue { background: var(--color-blue-dim); color: var(--color-blue); }
+.tag--green { background: var(--color-green-dim); color: var(--color-green); }
+.tag--red { background: var(--color-red-dim); color: var(--color-red); }
+.tag--amber { background: var(--color-amber-dim); color: var(--color-amber); }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2); padding: var(--sp-3) var(--sp-6); border-radius: var(--radius-md); font-size: var(--fs-sm); font-weight: 600; transition: all var(--transition-fast); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.03em; }
+.btn--primary { background: var(--color-blue); color: #fff; }
+.btn--primary:hover { background: #2563eb; }
+.btn--success { background: var(--color-green); color: #fff; }
+.btn--success:hover { background: #16a34a; }
+.btn--danger { background: var(--color-red); color: #fff; }
+.btn--danger:hover { background: #dc2626; }
+.btn--outline { border: 1px solid var(--color-border); color: #e2e8f0; }
+.btn--outline:hover { border-color: var(--color-blue); color: var(--color-blue); }
+.btn--sm { padding: var(--sp-2) var(--sp-4); font-size: var(--fs-xs); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.alert { padding: var(--sp-4); border-radius: var(--radius-md); border-left: 4px solid; margin-bottom: var(--sp-4); font-size: var(--fs-sm); font-family: var(--font-mono); }
+.alert--info { background: var(--color-blue-dim); border-color: var(--color-blue); color: #93c5fd; }
+.alert--success { background: var(--color-green-dim); border-color: var(--color-green); color: #86efac; }
+.alert--warning { background: var(--color-amber-dim); border-color: var(--color-amber); color: #fcd34d; }
+.alert--error { background: var(--color-red-dim); border-color: var(--color-red); color: #fca5a5; }
+
+.section-divider { border: none; border-top: 1px solid var(--color-border); margin: var(--sp-6) 0; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn var(--transition-normal) ease; }
+
+.module-section { display: none; }
+.module-section--active { display: block; animation: fadeIn var(--transition-normal) ease; }
+
+/* Diagram nodes for hierarchy */
+.diagram-node { background: var(--color-bg-elevated); border: 2px solid var(--color-border); border-radius: var(--radius-md); padding: var(--sp-4) var(--sp-6); text-align: center; transition: all var(--transition-fast); position: relative; cursor: pointer; }
+.diagram-node:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+.diagram-node--root { border-color: var(--color-blue); background: var(--color-blue-dim); }
+.diagram-node--primary { border-color: var(--color-cyan); background: rgba(6,182,212,0.1); }
+.diagram-node--normal { border-color: var(--color-green); background: var(--color-green-dim); }
+.diagram-node--warning { border-color: var(--color-amber); background: var(--color-amber-dim); }
+.diagram-node--critical { border-color: var(--color-red); background: var(--color-red-dim); }
+.diagram-node__title { font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700; margin-bottom: var(--sp-1); }
+.diagram-node__detail { font-size: var(--fs-xs); color: #94a3b8; font-family: var(--font-mono); }
+.diagram-connector { display: flex; align-items: center; justify-content: center; padding: var(--sp-2) 0; color: var(--color-border); font-size: var(--fs-lg); font-family: var(--font-mono); }
+
+/* Cylinder visualization */
+.cylinders-viz { display: flex; justify-content: center; align-items: flex-start; gap: var(--sp-8); flex-wrap: wrap; margin: var(--sp-6) 0; }
+.datafile-cylinder { width: 260px; cursor: pointer; transition: transform var(--transition-normal); }
+.datafile-cylinder:hover { transform: scale(1.03); }
+.cylinder-top { width: 260px; height: 60px; background: linear-gradient(135deg, #1a2340, #243052); border-radius: 50%; border: 2px solid var(--color-border); }
+.cylinder-body { width: 260px; min-height: 240px; background: linear-gradient(90deg, #131a2a, #1a2340, #131a2a); border-left: 2px solid var(--color-border); border-right: 2px solid var(--color-border); border-bottom: 2px solid var(--color-border); border-radius: 0 0 50% 50%; padding: 50px var(--sp-3) var(--sp-3); display: flex; flex-direction: column; gap: var(--sp-2); }
+.segment-block { padding: var(--sp-2) var(--sp-3); border-radius: var(--radius-sm); text-align: center; font-weight: 600; font-size: var(--fs-xs); font-family: var(--font-mono); cursor: pointer; transition: all var(--transition-fast); }
+.segment-block.table { background: var(--color-green-dim); border: 1px solid var(--color-green); color: #86efac; }
+.segment-block.index { background: var(--color-amber-dim); border: 1px solid var(--color-amber); color: #fcd34d; }
+.segment-block:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+.segment-block.highlight { transform: scale(1.08); box-shadow: 0 0 20px rgba(59,130,246,0.5); border-color: var(--color-blue); }
+.cylinder-label { text-align: center; margin-top: var(--sp-3); font-size: var(--fs-sm); color: #94a3b8; font-family: var(--font-mono); line-height: 1.5; }
+
+/* Interactive grid */
+.interactive-demo { background: var(--color-bg-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--sp-6); margin: var(--sp-6) 0; }
+.demo-controls { display: flex; gap: var(--sp-3); margin-bottom: var(--sp-6); flex-wrap: wrap; }
+.demo-visualization { background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--sp-6); }
+.grid-container { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; margin: var(--sp-4) 0; }
+.grid-cell { aspect-ratio: 1; background: #1e2d4a; border: 1px solid #2a3a5a; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: var(--fs-xs); font-family: var(--font-mono); color: #64748b; cursor: pointer; transition: all var(--transition-fast); }
+.grid-cell:hover { transform: scale(1.1); z-index: 10; border-color: var(--color-blue); }
+.grid-cell.allocated { background: var(--color-green-dim); border-color: var(--color-green); color: #86efac; }
+.grid-cell.index-type { background: var(--color-amber-dim); border-color: var(--color-amber); color: #fcd34d; }
+.grid-cell.selected { background: var(--color-blue-dim); border-color: var(--color-blue); color: var(--color-blue); transform: scale(1.15); }
+.legend { display: flex; gap: var(--sp-6); margin: var(--sp-4) 0; flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: var(--sp-2); font-size: var(--fs-sm); color: #94a3b8; }
+.legend-color { width: 16px; height: 16px; border-radius: 3px; border: 1px solid var(--color-border); }
+
+/* Quiz */
+.quiz-container { background: var(--color-bg-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--sp-6); margin-bottom: var(--sp-6); }
+.quiz-question { font-size: var(--fs-md); font-weight: 700; font-family: var(--font-mono); color: #e2e8f0; margin-bottom: var(--sp-4); }
+.quiz-options { display: flex; flex-direction: column; gap: var(--sp-2); }
+.quiz-option { padding: var(--sp-3) var(--sp-4); background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-md); cursor: pointer; transition: all var(--transition-fast); font-size: var(--fs-sm); font-family: var(--font-mono); }
+.quiz-option:hover { background: var(--color-bg-hover); border-color: var(--color-blue); }
+.quiz-option.correct { background: var(--color-green-dim); border-color: var(--color-green); color: #86efac; }
+.quiz-option.incorrect { background: var(--color-red-dim); border-color: var(--color-red); color: #fca5a5; }
+.quiz-feedback { margin-top: var(--sp-3); padding: var(--sp-3); border-radius: var(--radius-md); font-weight: 600; font-size: var(--fs-sm); display: none; }
+.quiz-feedback.correct { background: var(--color-green-dim); color: #86efac; display: block; }
+.quiz-feedback.incorrect { background: var(--color-red-dim); color: #fca5a5; display: block; }
+
+/* Glossary */
+.glossary-term { background: var(--color-bg-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--sp-4); margin-bottom: var(--sp-3); cursor: pointer; transition: all var(--transition-fast); }
+.glossary-term:hover { border-color: var(--color-blue); }
+.glossary-term h4 { font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700; color: var(--color-blue); margin-bottom: var(--sp-1); }
+.glossary-definition { display: none; margin-top: var(--sp-3); padding-top: var(--sp-3); border-top: 1px solid var(--color-border); font-size: var(--fs-sm); color: #cbd5e1; line-height: 1.7; }
+.glossary-definition ul { margin: var(--sp-2) 0 var(--sp-2) var(--sp-6); }
+.glossary-definition li { margin-bottom: var(--sp-1); }
+.glossary-term.expanded .glossary-definition { display: block; }
+.glossary-term.expanded { border-color: var(--color-blue); background: var(--color-blue-dim); }
+
+/* Code block */
+.code-block { background: #0d1117; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--sp-4); font-family: var(--font-mono); font-size: var(--fs-xs); line-height: 1.8; overflow-x: auto; margin: var(--sp-4) 0; }
+.code-block .comment { color: #8b949e; }
+.code-block .keyword { color: #ff7b72; }
+.code-block .string { color: #a5d6ff; }
+
+/* TOC */
+.toc { background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--sp-4); margin: var(--sp-4) 0; }
+.toc h3 { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--color-blue); margin-bottom: var(--sp-3); }
+.toc ul { list-style: none; padding: 0; }
+.toc li { margin: var(--sp-2) 0; }
+.toc a { color: #94a3b8; font-size: var(--fs-sm); transition: color var(--transition-fast); cursor: pointer; }
+.toc a:hover { color: var(--color-blue); text-decoration: none; }
+
+/* Footer */
+.app-footer { margin-top: var(--sp-12); padding-top: var(--sp-6); border-top: 1px solid var(--color-border); font-size: var(--fs-xs); color: #475569; font-family: var(--font-mono); text-align: center; line-height: 1.8; }
+
+/* ============================================================
+   HELP MODAL SYSTEM
+   ============================================================ */
+.help-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 999; animation: fadeIn 0.2s ease; }
+.help-overlay--active { display: block; }
+.help-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%) translateY(16px); width: 90%; max-width: 720px; max-height: 85vh; background: var(--color-bg-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); z-index: 1000; overflow: hidden; animation: fadeSlideUp 0.3s ease forwards; box-shadow: 0 24px 48px rgba(0,0,0,0.4); }
+.help-modal--active { display: flex; flex-direction: column; }
+@keyframes fadeSlideUp { from { opacity:0; transform: translate(-50%,-50%) translateY(16px); } to { opacity:1; transform: translate(-50%,-50%) translateY(0); } }
+.help-modal__header { display: flex; align-items: center; justify-content: space-between; padding: var(--sp-4) var(--sp-6); border-bottom: 1px solid var(--color-border); background: var(--color-bg-elevated); }
+.help-modal__title { font-family: var(--font-mono); font-size: var(--fs-md); font-weight: 700; color: var(--color-blue); }
+.help-modal__close { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-bg-deep); color: #94a3b8; font-size: var(--fs-md); cursor: pointer; transition: all var(--transition-fast); font-weight: 700; }
+.help-modal__close:hover { border-color: var(--color-red); color: var(--color-red); background: var(--color-red-dim); }
+.help-modal__body { padding: var(--sp-6); overflow-y: auto; flex: 1; }
+.help-modal__section { margin-bottom: var(--sp-6); }
+.help-modal__section:last-child { margin-bottom: 0; }
+.help-modal__section-title { font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: var(--sp-3); padding-bottom: var(--sp-2); border-bottom: 1px solid var(--color-border); }
+.help-modal__section-title--objective { color: var(--color-blue); }
+.help-modal__section-title--controls { color: var(--color-cyan); }
+.help-modal__section-title--lexique { color: var(--color-purple); }
+.help-modal__text { font-size: var(--fs-sm); color: #cbd5e1; line-height: 1.7; margin-bottom: var(--sp-3); }
+.help-modal__credit { text-align: center; padding: var(--sp-4) 0; }
+.help-modal__credit-role { font-size: var(--fs-xs); color: #64748b; margin-bottom: var(--sp-4); line-height: 1.7; }
+.help-modal__credit-author { font-size: var(--fs-lg); font-weight: 700; margin-bottom: var(--sp-2); }
+.help-modal__credit-author a { color: var(--color-cyan); text-decoration: none; transition: color var(--transition-normal); }
+.help-modal__credit-author a:hover { color: var(--color-blue); text-decoration: underline; }
+.help-modal__credit-assist { font-size: var(--fs-xs); color: var(--color-amber-dim); margin-bottom: var(--sp-4); line-height: 1.6; }
+.help-modal__credit-year { font-size: var(--fs-xs); color: #475569; }
+.help-modal__text code { font-family: var(--font-mono); font-size: var(--fs-xs); background: var(--color-bg-elevated); padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); color: var(--color-cyan); }
+.help-modal__list { list-style: none; padding: 0; }
+.help-modal__list li { position: relative; padding: var(--sp-2) 0 var(--sp-2) var(--sp-6); font-size: var(--fs-sm); color: #94a3b8; line-height: 1.6; border-left: 2px solid var(--color-border); }
+.help-modal__list li::before { content: ''; position: absolute; left: -1px; top: 50%; width: 8px; height: 2px; background: var(--color-blue); transform: translateY(-50%); }
+.help-modal__footer { padding: var(--sp-4) var(--sp-6); border-top: 1px solid var(--color-border); display: flex; justify-content: flex-end; background: var(--color-bg-elevated); }
+
+@media (max-width: 768px) {
+  .app-layout { grid-template-columns: 1fr; grid-template-rows: var(--header-height) auto 1fr; grid-template-areas: "header" "nav" "main"; }
+  .app-nav { border-right: none; border-bottom: 1px solid var(--color-border); padding: var(--sp-3) 0; }
+  .app-nav__section { margin-bottom: var(--sp-3); }
+  .app-main { padding: var(--sp-4); }
+  .cylinders-viz { flex-direction: column; align-items: center; }
+  .help-modal { width: 95%; max-height: 90vh; }
+}
+</style>
+</head>
+<body>
+
+<div class="app-layout">
+  <header class="app-header">
+    <div class="app-header__brand">
+      <div class="app-header__brand-icon">O</div>
+      <span>ORACLE<span style="color: var(--color-cyan);">_ARCH</span>::DÉMO</span>
+    </div>
+    <div class="app-header__status">
+      <span class="status-badge status-badge--online"><span class="status-dot"></span>DÉMO ACTIVE</span>
+      <span class="status-badge status-badge--rgpd">DONNÉES FICTIVES / PÉDAGOGIQUE</span>
+      <button class="page-header__help-btn" data-help="lexicon" aria-label="Lexique technique" title="Lexique technique">L</button>
+      <button class="page-header__help-btn" data-help="credit" aria-label="Crédits" title="Crédits">C</button>
+    </div>
+  </header>
+
+  <nav class="app-nav">
+    <div class="app-nav__section">
+      <div class="app-nav__section-title">Architecture</div>
+      <button class="app-nav__item app-nav__item--active" data-module="overview"><span class="app-nav__item-icon">V</span>Vue d'ensemble</button>
+      <button class="app-nav__item" data-module="hierarchy"><span class="app-nav__item-icon">H</span>Hiérarchie</button>
+    </div>
+    <div class="app-nav__section">
+      <div class="app-nav__section-title">Pratique</div>
+      <button class="app-nav__item" data-module="visualization"><span class="app-nav__item-icon">I</span>Visualisation Interactive</button>
+      <button class="app-nav__item" data-module="comparison"><span class="app-nav__item-icon">C</span>Comparaison</button>
+    </div>
+    <div class="app-nav__section">
+      <div class="app-nav__section-title">Évaluation</div>
+      <button class="app-nav__item" data-module="quiz"><span class="app-nav__item-icon">Q</span>Quiz</button>
+      <button class="app-nav__item" data-module="glossary"><span class="app-nav__item-icon">G</span>Glossaire</button>
+    </div>
+    <div class="app-nav__rgpd-notice">
+      Aucune donnée de santé réelle. Conforme RGPD Art. 25 (Privacy by Design).
+    </div>
+  </nav>
+
+  <main class="app-main" id="app-main">
+
+    <!-- ============================================================
+         SECTION 1: Vue d'ensemble
+         ============================================================ -->
+    <section id="mod-overview" class="module-section module-section--active">
+      <div class="page-header">
+        <div class="page-header__subtitle-row">
+          <div>
+            <div class="page-header__title">
+              Vue d'ensemble de l'architecture de stockage Oracle
+              <button class="page-header__help-btn" data-help="overview" aria-label="Aide" title="Aide">?</button>
+            </div>
+            <div class="page-header__subtitle">Comprendre les Tablespaces et Fichiers de Données</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert--info">
+        <strong>Concept clé :</strong> Un <strong>tablespace</strong> est une unité logique de stockage qui contient des objets de base de données (tables, index, etc.), tandis qu'un <strong>fichier de données</strong> est le fichier physique qui stocke concrètement les données.
+      </div>
+
+      <div class="card">
+        <div class="card__title"><span class="card__title-icon">&#9670;</span> Architecture visuelle</div>
+        <div class="cylinders-viz">
+          <div class="datafile-cylinder" onclick="App.highlightSegment('t1')">
+            <div class="cylinder-top"></div>
+            <div class="cylinder-body">
+              <div class="segment-block table" id="seg-t1">Table EMPLOYEES</div>
+              <div class="segment-block index" id="seg-t1a">Index PK_EMP</div>
+              <div class="segment-block index" id="seg-t1b">Index IDX_DEPT</div>
+            </div>
+            <div class="cylinder-label">SYSTEM01.DBF</div>
+          </div>
+          <div class="datafile-cylinder" onclick="App.highlightSegment('t2')">
+            <div class="cylinder-top"></div>
+            <div class="cylinder-body">
+              <div class="segment-block table" id="seg-t2">Table DEPARTMENTS</div>
+              <div class="segment-block index" id="seg-t2a">Index PK_DEPT</div>
+              <div class="segment-block index" id="seg-t2b">Index IDX_LOC</div>
+              <div class="segment-block table" id="seg-t2c">Table PROJECTS</div>
+            </div>
+            <div class="cylinder-label">USERS01.DBF</div>
+          </div>
+        </div>
+        <p style="text-align: center; margin-top: var(--sp-4); font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--color-cyan);">
+          &#8593; Un Tablespace (conteneur logique) peut contenir un ou plusieurs fichiers de données
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card__title"><span class="card__title-icon">&#9670;</span> Les composants principaux</div>
+
+        <div class="alert alert--success">
+          <strong>TABLESPACE</strong> &mdash; Unité logique de stockage Oracle. Un tablespace regroupe des structures de stockage logiques. C'est la couche intermédiaire entre la base de données et les fichiers de données.
+        </div>
+
+        <div class="alert alert--info">
+          <strong>FICHIER DE DONNÉES (Data File)</strong> &mdash; Fichier physique sur le disque du système d'exploitation. Chaque fichier de données est associé à un seul tablespace, mais un tablespace peut contenir plusieurs fichiers de données.
+        </div>
+
+        <div class="alert alert--warning">
+          <strong>SEGMENT</strong> &mdash; Ensemble d'extents alloués à un objet de base de données spécifique (table, index, etc.). Un segment appartient à un seul tablespace mais peut s'étendre sur plusieurs fichiers de données.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__title"><span class="card__title-icon">&#9670;</span> Types de tablespaces</div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Description</th>
+              <th>Utilisation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>SYSTEM</strong></td><td>Créé automatiquement lors de la création de la base. Contient le dictionnaire de données.</td><td>Objets système Oracle</td></tr>
+            <tr><td><strong>SYSAUX</strong></td><td>Tablespace auxiliaire du SYSTEM. Réduit la charge sur SYSTEM.</td><td>Composants optionnels Oracle</td></tr>
+            <tr><td><strong>UNDO</strong></td><td>Contient les données d'annulation pour la cohérence des transactions.</td><td>Gestion des transactions et rollback</td></tr>
+            <tr><td><strong>TEMP</strong></td><td>Utilisé pour les opérations de tri temporaires.</td><td>Tris, jointures, opérations temporaires</td></tr>
+            <tr><td><strong>USERS</strong></td><td>Tablespace par défaut pour les objets utilisateur.</td><td>Tables et index des utilisateurs</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="toc">
+        <h3>&#9655; Dans cette section</h3>
+        <ul>
+          <li><a onclick="App.navigateTo('hierarchy'); return false;">Comprendre la hiérarchie de stockage</a></li>
+          <li><a onclick="App.navigateTo('visualization'); return false;">Visualisation interactive des concepts</a></li>
+          <li><a onclick="App.navigateTo('comparison'); return false;">Tableau comparatif des composants</a></li>
+          <li><a onclick="App.navigateTo('quiz'); return false;">Tester vos connaissances</a></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 2: Hiérarchie
+         ============================================================ -->
+    <section id="mod-hierarchy" class="module-section">
+      <div class="page-header">
+        <div class="page-header__subtitle-row">
+          <div>
+            <div class="page-header__title">
+              Hiérarchie de stockage Oracle
+              <button class="page-header__help-btn" data-help="hierarchy" aria-label="Aide" title="Aide">?</button>
+            </div>
+            <div class="page-header__subtitle">Organisation logique et physique du stockage Oracle</div>
+          </div>
+        </div>
+      </div>
+
+      <p style="margin-bottom: var(--sp-6); color: #94a3b8;">Oracle organise le stockage des données en une hiérarchie de structures logiques et physiques. Comprendre cette hiérarchie est essentiel pour optimiser les performances et la gestion de votre base de données.</p>
+
+      <div class="card">
+        <div class="card__title"><span class="card__title-icon">&#9670;</span> Hiérarchie complète</div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: var(--sp-2);">
+          <div class="diagram-node diagram-node--root" style="min-width: 300px;">
+            <div class="diagram-node__title">DATABASE</div>
+            <div class="diagram-node__detail">Base de données complète</div>
+          </div>
+          <div class="diagram-connector">&#9660;</div>
+          <div class="diagram-node diagram-node--primary" style="min-width: 280px;">
+            <div class="diagram-node__title">TABLESPACE</div>
+            <div class="diagram-node__detail">Unité logique de stockage</div>
+          </div>
+          <div class="diagram-connector">&#9660;</div>
+          <div style="display: flex; gap: var(--sp-4); flex-wrap: wrap; justify-content: center;">
+            <div class="diagram-node" style="min-width: 200px;">
+              <div class="diagram-node__title">DATA FILE 1</div>
+              <div class="diagram-node__detail">Fichier physique</div>
+            </div>
+            <div class="diagram-node" style="min-width: 200px;">
+              <div class="diagram-node__title">DATA FILE 2</div>
+              <div class="diagram-node__detail">Fichier physique</div>
+            </div>
+            <div class="diagram-node" style="min-width: 200px;">
+              <div class="diagram-node__title">DATA FILE N</div>
+              <div class="diagram-node__detail">Fichier physique</div>
+            </div>
+          </div>
+          <div class="diagram-connector">&#9660;</div>
+          <div style="display: flex; gap: var(--sp-4); flex-wrap: wrap; justify-content: center;">
+            <div class="diagram-node diagram-node--normal" style="min-width: 180px;">
+              <div class="diagram-node__title">SEGMENT</div>
+              <div class="diagram-node__detail">Table / Index</div>
+            </div>
+            <div class="diagram-node diagram-node--normal" style="min-width: 180px;">
+              <div class="diagram-node__title">SEGMENT</div>
+              <div class="diagram-node__detail">Table / Index</div>
+            </div>
+          </div>
+          <div class="diagram-connector">&#9660;</div>
+          <div style="display: flex; gap: var(--sp-4); flex-wrap: wrap; justify-content: center;">
+            <div class="diagram-node diagram-node--warning" style="min-width: 140px;">
+              <div class="diagram-node__title">EXTENT 1</div>
+            </div>
+            <div class="diagram-node diagram-node--warning" style="min-width: 140px;">
+              <div class="diagram-node__title">EXTENT 2</div>
+            </div>
+            <div class="diagram-node diagram-node--warning" style="min-width: 140px;">
+              <div class="diagram-node__title">EXTENT N</div>
+            </div>
+          </div>
+          <div class="diagram-connector">&#9660;</div>
+          <div style="display: flex; gap: var(--sp-3); flex-wrap: wrap; justify-content: center;">
+            <div class="diagram-node diagram-node--critical" style="min-width: 100px;">
+              <div class="diagram-node__title">BLOCK</div>
+            </div>
+            <div class="diagram-node diagram-node--critical" style="min-width: 100px;">
+              <div class="diagram-node__title">BLOCK</div>
+            </div>
+            <div class="diagram-node diagram-node--critical" style="min-width: 100px;">
+              <div class="diagram-node__title">BLOCK</div>
+            </div>
+            <div class="diagram-node diagram-node--critical" style="min-width: 100px;">
+              <div class="diagram-node__title">BLOCK</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__title"><span class="card__title-icon">&#9670;</span> Détail de chaque niveau</div>
+
+        <div class="glossary-term" onclick="App.toggleGlossary(this)">
+          <h4>&#127962; Database (Base de données)</h4>
+          <p style="font-size: var(--fs-sm); color: #94a3b8;">Ensemble complet des données et structures Oracle. C'est le niveau le plus élevé qui contient tous les tablespaces.</p>
+        </div>
+
+        <div class="glossary-term" onclick="App.toggleGlossary(this)">
+          <h4>&#128230; Tablespace</h4>
+          <div class="glossary-definition">
+            <p>Unité logique de stockage qui regroupe des structures de stockage. Un tablespace :</p>
+            <ul>
+              <li>Contient un ou plusieurs fichiers de données</li>
+              <li>Peut contenir plusieurs segments (tables, index)</li>
+              <li>Est l'unité de sauvegarde et de récupération</li>
+              <li>Peut être en ligne ou hors ligne</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="glossary-term" onclick="App.toggleGlossary(this)">
+          <h4>&#128451; Data File (Fichier de données)</h4>
+          <div class="glossary-definition">
+            <p>Fichier physique sur le disque du système d'exploitation. Caractéristiques :</p>
+            <ul>
+              <li>Appartient à un seul tablespace</li>
+              <li>Contient les données réelles</li>
+              <li>Peut être redimensionné (auto-extensible)</li>
+              <li>Stocké sur le système de fichiers ou ASM</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="glossary-term" onclick="App.toggleGlossary(this)">
+          <h4>&#128451;&#65039; Segment</h4>
+          <div class="glossary-definition">
+            <p>Ensemble d'extents alloués à un objet spécifique. Types de segments :</p>
+            <ul>
+              <li><strong>Table segment</strong> : contient les données d'une table</li>
+              <li><strong>Index segment</strong> : contient les données d'un index</li>
+              <li><strong>Undo segment</strong> : contient les données d'annulation</li>
+              <li><strong>Temporary segment</strong> : pour les opérations temporaires</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="glossary-term" onclick="App.toggleGlossary(this)">
+          <h4>&#128208; Extent</h4>
+          <div class="glossary-definition">
+            <p>Ensemble contigu de blocs de données Oracle. Un extent :</p>
+            <ul>
+              <li>Est alloué à un segment spécifique</li>
+              <li>Contient plusieurs blocs de données</li>
+              <li>Est alloué quand un segment grandit</li>
+              <li>Ne peut pas être partagé entre segments</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="glossary-term" onclick="App.toggleGlossary(this)">
+          <h4>&#128313; Data Block (Bloc de données)</h4>
+          <div class="glossary-definition">
+            <p>Plus petite unité de stockage Oracle. Le bloc :</p>
+            <ul>
+              <li>Est la plus petite unité d'E/S Oracle</li>
+              <li>Taille typique : 8 Ko (configurable)</li>
+              <li>Contient des en-têtes et des données</li>
+              <li>Correspond à une ou plusieurs blocs OS</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__title"><span class="card__title-icon">&#9670;</span> Guide de bonnes pratiques — Création d'une base Oracle</div>
+
+        <div class="alert alert--info">
+          <strong>Principe :</strong> Séparez vos tables et index dans des tablespaces distincts, et répartissez les fichiers de données sur plusieurs disques physiques pour optimiser les E/S concurrentes.
+        </div>
+
+        <ol style="margin: var(--sp-4) 0 var(--sp-4) var(--sp-6); line-height: 2.2; font-size: var(--fs-sm);">
+          <li><strong>Créer les tablespaces cibles</strong> — un pour les données, un pour les index</li>
+        </ol>
+
+        <div class="code-block">
+          <span class="comment">-- Tablespace pour les données (3 data files sur disques distincts)</span><br>
+          <span>CREATE TABLESPACE tbs_data</span><br>
+          <span>&nbsp;&nbsp;DATAFILE </span><br>
+          <span>&nbsp;&nbsp;&nbsp;'/u01/oradata/prod/tbs_data01.dbf' SIZE 10G AUTOEXTEND ON,</span><br>
+          <span>&nbsp;&nbsp;&nbsp;'/u02/oradata/prod/tbs_data02.dbf' SIZE 10G AUTOEXTEND ON,</span><br>
+          <span>&nbsp;&nbsp;&nbsp;'/u03/oradata/prod/tbs_data03.dbf' SIZE 10G AUTOEXTEND ON</span><br>
+          <span>&nbsp;&nbsp;EXTENT MANAGEMENT LOCAL UNIFORM SIZE 1M</span><br>
+          <span>&nbsp;&nbsp;SEGMENT SPACE MANAGEMENT AUTO;</span><br><br>
+          <span class="comment">-- Tablespace pour les index</span><br>
+          <span>CREATE TABLESPACE tbs_index</span><br>
+          <span>&nbsp;&nbsp;DATAFILE '/u04/oradata/prod/tbs_index01.dbf' SIZE 5G AUTOEXTEND ON</span><br>
+          <span>&nbsp;&nbsp;EXTENT MANAGEMENT LOCAL UNIFORM SIZE 128K</span><br>
+          <span>&nbsp;&nbsp;SEGMENT SPACE MANAGEMENT AUTO;</span>
+        </div>
+
+        <ol start="2" style="margin: var(--sp-4) 0 var(--sp-4) var(--sp-6); line-height: 2.2; font-size: var(--fs-sm);">
+          <li><strong>Assigner les objets aux bons tablespaces</strong> à la création</li>
+        </ol>
+
+        <div class="code-block">
+          <span class="comment">-- Table dans tbs_data</span><br>
+          <span>CREATE TABLE hr.employees (</span><br>
+          <span>&nbsp;&nbsp;emp_id&nbsp;&nbsp;NUMBER(6) PRIMARY KEY,</span><br>
+          <span>&nbsp;&nbsp;emp_name VARCHAR2(100)</span><br>
+          <span>) TABLESPACE tbs_data;</span><br><br>
+          <span class="comment">-- Index dans tbs_index (séparation physique)</span><br>
+          <span>CREATE INDEX hr.emp_name_idx ON hr.employees(emp_name)</span><br>
+          <span>&nbsp;&nbsp;TABLESPACE tbs_index;</span>
+        </div>
+
+        <div class="alert alert--success" style="margin-top: var(--sp-4);">
+          <strong>Résultat :</strong> Les lectures/index s'exécutent en parallèle sur des disques distincts, réduisant la contention d'E/S et améliorant les temps de réponse jusqu'à 30–50 % sur les requêtes mixtes (lectures + index).
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 3: Visualisation Interactive
+         ============================================================ -->
+    <section id="mod-visualization" class="module-section">
+      <div class="page-header">
+        <div class="page-header__subtitle-row">
+          <div>
+            <div class="page-header__title">
+              Visualisation Interactive
+              <button class="page-header__help-btn" data-help="visualization" aria-label="Aide" title="Aide">?</button>
+            </div>
+            <div class="page-header__subtitle">Expérimentez avec l'allocation d'espace Oracle</div>
+          </div>
+        </div>
+      </div>
+
+      <p style="margin-bottom: var(--sp-6); color: #94a3b8;">Expérimentez avec cette démonstration interactive pour comprendre comment Oracle alloue l'espace dans les fichiers de données.</p>
+
+      <div class="interactive-demo">
+        <div class="card__title"><span class="card__title-icon">&#9670;</span> Simulation d'allocation d'espace</div>
+        <p style="font-size: var(--fs-sm); color: #94a3b8; margin-bottom: var(--sp-4);">Cliquez sur les boutons pour voir comment les segments sont alloués dans le fichier de données :</p>
+
+        <div class="demo-controls">
+          <button class="btn btn--primary btn--sm" onclick="App.createSegment('table')">Créer Table</button>
+          <button class="btn btn--outline btn--sm" onclick="App.createSegment('index')">Créer Index</button>
+          <button class="btn btn--outline btn--sm" onclick="App.resetGrid()">Réinitialiser</button>
+        </div>
+
+        <div class="demo-visualization">
+          <p style="text-align: center; margin-bottom: var(--sp-4); font-family: var(--font-mono); font-size: var(--fs-sm); color: #94a3b8;">
+            Fichier de données (représentation simplifiée — 64 blocs)
+          </p>
+          <div class="grid-container" id="storageGrid"></div>
+
+          <div class="legend">
+            <div class="legend-item"><div class="legend-color" style="background: #1e2d4a;"></div> Espace libre</div>
+            <div class="legend-item"><div class="legend-color" style="background: var(--color-green-dim);"></div> Segment Table</div>
+            <div class="legend-item"><div class="legend-color" style="background: var(--color-amber-dim);"></div> Segment Index</div>
+          </div>
+
+          <div id="allocationInfo" style="display: none; margin-top: var(--sp-4); padding: var(--sp-3); background: var(--color-bg-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md);">
+            <span style="font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--color-cyan);">Allocation :</span>
+            <span id="allocationText" style="font-family: var(--font-mono); font-size: var(--fs-xs); color: #94a3b8;"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__title"><span class="card__title-icon">&#9670;</span> Comment ça marche ?</div>
+        <div class="alert alert--info">
+          <strong>Processus d'allocation</strong>
+          <ol style="margin: var(--sp-3) 0 var(--sp-3) var(--sp-6); line-height: 2; font-size: var(--fs-sm);">
+            <li>Quand vous créez une table, Oracle alloue un <strong>segment</strong> dans le tablespace</li>
+            <li>Le segment commence avec un <strong>extent initial</strong> (premier ensemble de blocs)</li>
+            <li>Quand l'extent est plein, Oracle alloue un <strong>nouvel extent</strong></li>
+            <li>Les extents peuvent être dans le même fichier ou dans d'autres fichiers du tablespace</li>
+            <li>Chaque extent contient plusieurs <strong>blocs de données</strong> (typiquement 8 Ko chacun)</li>
+          </ol>
+        </div>
+
+        <div class="alert alert--warning">
+          <strong>Fragmentation :</strong> Avec le temps, les suppressions et insertions peuvent créer de la fragmentation. Oracle utilise différents mécanismes (comme ASSM — Automatic Segment Space Management) pour optimiser l'utilisation de l'espace.
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 4: Comparaison
+         ============================================================ -->
+    <section id="mod-comparison" class="module-section">
+      <div class="page-header">
+        <div class="page-header__subtitle-row">
+          <div>
+            <div class="page-header__title">
+              Tableau comparatif des composants
+              <button class="page-header__help-btn" data-help="comparison" aria-label="Aide" title="Aide">?</button>
+            </div>
+            <div class="page-header__subtitle">Différences clés entre les composants de l'architecture de stockage</div>
+          </div>
+        </div>
+      </div>
+
+      <p style="margin-bottom: var(--sp-6); color: #94a3b8;">Ce tableau compare les composants de l'architecture de stockage Oracle.</p>
+
+      <div class="card">
+        <div class="card__title"><span class="card__title-icon">&#9670;</span> Tableau comparatif</div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Composant</th>
+              <th>Nature</th>
+              <th>Taille typique</th>
+              <th>Relation</th>
+              <th>Exemple</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Database</strong></td><td>Logique</td><td>Variable (Go à To)</td><td>Contient tous les tablespaces</td><td>ORCL, PROD, DEV</td></tr>
+            <tr><td><strong>Tablespace</strong></td><td>Logique</td><td>Variable (Mo à To)</td><td>Contient 1+ data files</td><td>USERS, SYSTEM, UNDO</td></tr>
+            <tr><td><strong>Data File</strong></td><td>Physique</td><td>100 Mo — 32 Go</td><td>Appartient à 1 tablespace</td><td>users01.dbf, system01.dbf</td></tr>
+            <tr><td><strong>Segment</strong></td><td>Logique</td><td>Variable</td><td>Contient 1+ extents</td><td>Table EMPLOYEES, Index PK_EMP</td></tr>
+            <tr><td><strong>Extent</strong></td><td>Logique</td><td>64 Ko — plusieurs Mo</td><td>Contient 1+ blocks</td><td>Extent initial de 64 Ko</td></tr>
+            <tr><td><strong>Data Block</strong></td><td>Physique/Logique</td><td>2 Ko — 32 Ko (8 Ko def.)</td><td>Plus petite unité</td><td>Bloc de 8 Ko</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card__title"><span class="card__title-icon">&#9670;</span> Relations entre composants</div>
+        <div class="alert alert--success">
+          <strong>Règles importantes</strong>
+          <ul style="margin: var(--sp-3) 0 var(--sp-3) var(--sp-6); line-height: 2; font-size: var(--fs-sm);">
+            <li>Un <strong>tablespace</strong> peut contenir <strong>un ou plusieurs</strong> fichiers de données</li>
+            <li>Un <strong>fichier de données</strong> appartient à <strong>un seul</strong> tablespace</li>
+            <li>Un <strong>segment</strong> peut s'étendre sur <strong>plusieurs</strong> fichiers de données d'un même tablespace</li>
+            <li>Un <strong>extent</strong> est contenu dans <strong>un seul</strong> fichier de données</li>
+            <li>Un <strong>bloc</strong> est contenu dans <strong>un seul</strong> extent</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__title"><span class="card__title-icon">&#9670;</span> Commandes SQL de diagnostic</div>
+        <div class="code-block">
+          <span class="comment">-- Voir tous les tablespaces</span><br>
+          <span>SELECT tablespace_name, status, contents FROM dba_tablespaces;</span><br><br>
+          <span class="comment">-- Voir les fichiers de données d'un tablespace</span><br>
+          <span>SELECT file_name, bytes/1024/1024 AS size_mb FROM dba_data_files WHERE tablespace_name = 'USERS';</span><br><br>
+          <span class="comment">-- Voir l'utilisation des tablespaces</span><br>
+          <span>SELECT tablespace_name, used_space, tablespace_size FROM dba_tablespace_usage_metrics;</span><br><br>
+          <span class="comment">-- Voir les segments d'un utilisateur</span><br>
+          <span>SELECT segment_name, segment_type, bytes/1024/1024 AS size_mb FROM dba_segments WHERE owner = 'HR';</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 5: Quiz
+         ============================================================ -->
+    <section id="mod-quiz" class="module-section">
+      <div class="page-header">
+        <div class="page-header__subtitle-row">
+          <div>
+            <div class="page-header__title">
+              Testez vos connaissances
+              <button class="page-header__help-btn" data-help="quiz" aria-label="Aide" title="Aide">?</button>
+            </div>
+            <div class="page-header__subtitle">Quiz interactif sur l'architecture Oracle</div>
+          </div>
+        </div>
+      </div>
+
+      <p style="margin-bottom: var(--sp-6); color: #94a3b8;">Répondez à ces questions pour vérifier votre compréhension de l'architecture Oracle.</p>
+
+      <div class="quiz-container">
+        <div class="quiz-question">Question 1 : Quel composant représente la plus petite unité de stockage dans Oracle ?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">A) Extent</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, true)">B) Data Block</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">C) Segment</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">D) Tablespace</div>
+        </div>
+        <div class="quiz-feedback"></div>
+      </div>
+
+      <div class="quiz-container">
+        <div class="quiz-question">Question 2 : A combien de tablespaces un fichier de données peut-il appartenir ?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">A) Plusieurs</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, true)">B) Un seul</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">C) Zéro</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">D) Dépend de la version Oracle</div>
+        </div>
+        <div class="quiz-feedback"></div>
+      </div>
+
+      <div class="quiz-container">
+        <div class="quiz-question">Question 3 : Quel est l'ordre correct de la hiérarchie (du plus grand au plus petit) ?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">A) Database &rarr; Segment &rarr; Tablespace &rarr; Extent &rarr; Block</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">B) Database &rarr; Tablespace &rarr; Extent &rarr; Segment &rarr; Block</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, true)">C) Database &rarr; Tablespace &rarr; Segment &rarr; Extent &rarr; Block</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">D) Tablespace &rarr; Database &rarr; Segment &rarr; Block &rarr; Extent</div>
+        </div>
+        <div class="quiz-feedback"></div>
+      </div>
+
+      <div class="quiz-container">
+        <div class="quiz-question">Question 4 : Que se passe-t-il quand un segment atteint la taille de son extent initial ?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">A) La table est verrouillée</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">B) Oracle crée une nouvelle table</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, true)">C) Oracle alloue un nouvel extent</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">D) La base de données plante</div>
+        </div>
+        <div class="quiz-feedback"></div>
+      </div>
+
+      <div class="quiz-container">
+        <div class="quiz-question">Question 5 : Quelle est la taille par défaut d'un bloc de données Oracle ?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">A) 4 Ko</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, true)">B) 8 Ko</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">C) 16 Ko</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">D) 32 Ko</div>
+        </div>
+        <div class="quiz-feedback"></div>
+      </div>
+
+      <div class="quiz-container">
+        <div class="quiz-question">Question 6 : Quel tablespace stocke les données d'annulation pour la cohérence des transactions ?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">A) SYSTEM</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, true)">B) UNDO</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">C) USERS</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">D) TEMP</div>
+        </div>
+        <div class="quiz-feedback"></div>
+      </div>
+
+      <div class="quiz-container">
+        <div class="quiz-question">Question 7 : À quoi sert principalement le tablespace TEMP ?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">A) Stocker les données des utilisateurs</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">B) Contenir le dictionnaire de données</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, true)">C) Exécuter les opérations de tri temporaires</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">D) Gérer les annulations de transactions</div>
+        </div>
+        <div class="quiz-feedback"></div>
+      </div>
+
+      <div class="quiz-container">
+        <div class="quiz-question">Question 8 : Quel tablespace auxiliaire réduit la charge sur le tablespace SYSTEM ?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">A) USERS</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, true)">B) SYSAUX</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">C) TEMP</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">D) UNDO</div>
+        </div>
+        <div class="quiz-feedback"></div>
+      </div>
+
+      <div class="quiz-container">
+        <div class="quiz-question">Question 9 : Combien de fichiers de données un tablespace peut-il contenir ?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">A) Un seul exactement</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">B) Deux au maximum</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, true)">C) Un ou plusieurs</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">D) Aucun</div>
+        </div>
+        <div class="quiz-feedback"></div>
+      </div>
+
+      <div class="quiz-container">
+        <div class="quiz-question">Question 10 : Que signifie l'acronyme ASM dans l'administration Oracle ?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">A) Automatic Segment Management</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, true)">B) Automatic Storage Management</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">C) Advanced Security Module</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">D) Active Session Monitoring</div>
+        </div>
+        <div class="quiz-feedback"></div>
+      </div>
+
+      <div class="quiz-container">
+        <div class="quiz-question">Question 11 : Quel mécanisme Oracle gère automatiquement l'espace libre dans les segments à l'aide de bitmaps ?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">A) ASM</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, true)">B) ASSM</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">C) AMM</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">D) SPM</div>
+        </div>
+        <div class="quiz-feedback"></div>
+      </div>
+
+      <div class="quiz-container">
+        <div class="quiz-question">Question 12 : Quelle est la nature d'un segment dans la hiérarchie de stockage Oracle ?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">A) Physique</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, true)">B) Logique</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">C) Physique et logique</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">D) Virtuelle</div>
+        </div>
+        <div class="quiz-feedback"></div>
+      </div>
+
+      <div class="quiz-container">
+        <div class="quiz-question">Question 13 : Quelle vue dynamique permet d'interroger la taille des segments d'un utilisateur ?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">A) dba_tablespaces</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">B) dba_data_files</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, true)">C) dba_segments</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">D) dba_tablespace_usage_metrics</div>
+        </div>
+        <div class="quiz-feedback"></div>
+      </div>
+
+      <div class="quiz-container">
+        <div class="quiz-question">Question 14 : Quels sont les deux types de segments les plus courants dans un tablespace utilisateur ?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">A) Redo et Undo</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">B) SYSTEM et SYSAUX</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, true)">C) Table et Index</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">D) TEMP et UNDO</div>
+        </div>
+        <div class="quiz-feedback"></div>
+      </div>
+
+      <div class="quiz-container">
+        <div class="quiz-question">Question 15 : Un extent peut-il s'étendre sur plusieurs fichiers de données ?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">A) Oui, toujours</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, true)">B) Non, il est contenu dans un seul fichier</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">C) Oui, si le tablespace le permet</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">D) Uniquement pour les index</div>
+        </div>
+        <div class="quiz-feedback"></div>
+      </div>
+
+      <div class="quiz-container">
+        <div class="quiz-question">Question 16 : Que permet la clause AUTOEXTEND ON lors de la création d'un fichier de données ?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">A) Chiffrer automatiquement le fichier</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, true)">B) Redimensionner automatiquement le fichier</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">C) Activer la compression intégrée</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">D) Créer une sauvegarde automatique</div>
+        </div>
+        <div class="quiz-feedback"></div>
+      </div>
+
+      <div class="quiz-container">
+        <div class="quiz-question">Question 17 : Que contient un segment de type LOB ?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">A) Les métadonnées des index</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, true)">B) Les objets volumineux (BLOB, CLOB)</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">C) Les informations d'annulation</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">D) Les plans d'exécution SQL</div>
+        </div>
+        <div class="quiz-feedback"></div>
+      </div>
+
+      <div class="quiz-container">
+        <div class="quiz-question">Question 18 : Quelle est la structure interne d'un bloc de données Oracle ?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="App.checkAnswer(this, true)">A) En-tête, Table des lignes, Espace libre, Données</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">B) Segment, Extent, Bloc, Ligne</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">C) Tablespace, Fichier, Extent, Bloc</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">D) Dictionnaire, Cache, Tampon, Journal</div>
+        </div>
+        <div class="quiz-feedback"></div>
+      </div>
+
+      <div class="quiz-container">
+        <div class="quiz-question">Question 19 : Le tablespace USERS est destiné par défaut à :</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">A) Les objets système d'Oracle</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, true)">B) Les objets des utilisateurs non système</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">C) Les opérations de tri temporaires</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">D) Les données d'annulation des transactions</div>
+        </div>
+        <div class="quiz-feedback"></div>
+      </div>
+
+      <div class="quiz-container">
+        <div class="quiz-question">Question 20 : Quelle bonne pratique est recommandée pour optimiser les performances d'E/S ?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">A) Placer tables et index dans le même tablespace</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, true)">B) Séparer tables et index dans des tablespaces distincts</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">C) N'utiliser qu'un seul fichier de données</div>
+          <div class="quiz-option" onclick="App.checkAnswer(this, false)">D) Désactiver l'auto-extension des fichiers</div>
+        </div>
+        <div class="quiz-feedback"></div>
+      </div>
+
+      <div class="alert alert--success" style="margin-top: var(--sp-6);">
+        <strong>Score :</strong> <span id="scoreDisplay">Répondez aux questions pour voir votre score.</span>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 6: Glossaire
+         ============================================================ -->
+    <section id="mod-glossary" class="module-section">
+      <div class="page-header">
+        <div class="page-header__subtitle-row">
+          <div>
+            <div class="page-header__title">
+              Glossaire complet
+              <button class="page-header__help-btn" data-help="lexicon" aria-label="Lexique technique" title="Lexique technique">L</button>
+            </div>
+            <div class="page-header__subtitle">Cliquez sur chaque terme pour afficher sa définition</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="glossary-term" onclick="App.toggleGlossary(this)">
+        <h4>&#128202; Tablespace</h4>
+        <div class="glossary-definition">
+          <p>Unité logique de stockage dans Oracle qui contient des objets de base de données. Un tablespace est composé d'un ou plusieurs fichiers de données physiques.</p>
+          <p><strong>Caractéristiques :</strong></p>
+          <ul>
+            <li>Peut être en ligne (ONLINE) ou hors ligne (OFFLINE)</li>
+            <li>Peut être en lecture seule (READ ONLY) ou lecture-écriture (READ WRITE)</li>
+            <li>Peut être temporaire (TEMPORARY) ou permanent (PERMANENT)</li>
+            <li>Supporte l'auto-extension des fichiers de données</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="glossary-term" onclick="App.toggleGlossary(this)">
+        <h4>&#128451;&#65039; Data File (Fichier de données)</h4>
+        <div class="glossary-definition">
+          <p>Fichier physique sur le disque du système d'exploitation qui stocke les données d'un tablespace Oracle.</p>
+          <p><strong>Caractéristiques :</strong></p>
+          <ul>
+            <li>Appartient exclusivement à un seul tablespace</li>
+            <li>Peut être redimensionné manuellement ou automatiquement</li>
+            <li>Stocké sur système de fichiers ou ASM (Automatic Storage Management)</li>
+            <li>Extension typique : .dbf</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="glossary-term" onclick="App.toggleGlossary(this)">
+        <h4>&#128230; Segment</h4>
+        <div class="glossary-definition">
+          <p>Structure de stockage qui contient les données d'un objet de base de données spécifique (table, index, etc.).</p>
+          <p><strong>Types de segments :</strong></p>
+          <ul>
+            <li><strong>Table segment :</strong> Stocke les lignes d'une table</li>
+            <li><strong>Index segment :</strong> Stocke les entrées d'index</li>
+            <li><strong>Undo segment :</strong> Stocke les informations d'annulation</li>
+            <li><strong>Temporary segment :</strong> Utilisé pour les opérations de tri temporaires</li>
+            <li><strong>LOB segment :</strong> Stocke les objets Large Object (BLOB, CLOB)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="glossary-term" onclick="App.toggleGlossary(this)">
+        <h4>&#128208; Extent</h4>
+        <div class="glossary-definition">
+          <p>Ensemble contigu de blocs de données Oracle alloué à un segment.</p>
+          <p><strong>Caractéristiques :</strong></p>
+          <ul>
+            <li>Unité d'allocation d'espace pour les segments</li>
+            <li>Taille définie lors de la création du segment (INITIAL EXTENT)</li>
+            <li>Peut augmenter selon NEXT EXTENT et les paramètres d'extension</li>
+            <li>Ne peut pas être partagé entre plusieurs segments</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="glossary-term" onclick="App.toggleGlossary(this)">
+        <h4>&#128313; Data Block (Bloc de données)</h4>
+        <div class="glossary-definition">
+          <p>Plus petite unité de stockage et d'E/S dans Oracle.</p>
+          <p><strong>Structure d'un bloc :</strong></p>
+          <ul>
+            <li><strong>En-tête (Header) :</strong> Informations générales sur le bloc</li>
+            <li><strong>Table des lignes (Row Directory) :</strong> Pointeurs vers les lignes</li>
+            <li><strong>Espace libre (Free Space) :</strong> Espace disponible pour nouvelles données</li>
+            <li><strong>Données (Row Data) :</strong> Les données réelles stockées</li>
+          </ul>
+          <p><strong>Taille configurable :</strong> 2K, 4K, 8K (défaut), 16K, 32K</p>
+        </div>
+      </div>
+
+      <div class="glossary-term" onclick="App.toggleGlossary(this)">
+        <h4>&#128260; ASM (Automatic Storage Management)</h4>
+        <div class="glossary-definition">
+          <p>Système de gestion de stockage intégré à Oracle qui simplifie l'administration des fichiers de données.</p>
+          <p><strong>Avantages :</strong></p>
+          <ul>
+            <li>Équilibrage automatique des E/S (striping)</li>
+            <li>Miroir intégré pour la redondance</li>
+            <li>Gestion simplifiée des fichiers de données</li>
+            <li>Redimensionnement dynamique des disques</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="glossary-term" onclick="App.toggleGlossary(this)">
+        <h4>&#9889; ASSM (Automatic Segment Space Management)</h4>
+        <div class="glossary-definition">
+          <p>Mécanisme Oracle pour gérer automatiquement l'espace libre dans les segments.</p>
+          <p><strong>Fonctionnement :</strong></p>
+          <ul>
+            <li>Utilise des bitmaps au lieu des freelists</li>
+            <li>Gère automatiquement l'espace libre</li>
+            <li>Réduit la fragmentation</li>
+            <li>Améliore les performances en environnement concurrentiel</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="glossary-term" onclick="App.toggleGlossary(this)">
+        <h4>&#128221; UNDO Tablespace</h4>
+        <div class="glossary-definition">
+          <p>Tablespace spécialisé qui stocke les données d'annulation pour les transactions.</p>
+          <p><strong>Utilisations :</strong></p>
+          <ul>
+            <li>Rollback des transactions non validées</li>
+            <li>Lecture cohérente (consistent read)</li>
+            <li>Récupération après échec (failure recovery)</li>
+            <li>Flashback Query</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="glossary-term" onclick="App.toggleGlossary(this)">
+        <h4>&#128451;&#65039; TEMP Tablespace</h4>
+        <div class="glossary-definition">
+          <p>Tablespace temporaire utilisé pour les opérations de tri et les tables temporaires.</p>
+          <p><strong>Utilisations typiques :</strong></p>
+          <ul>
+            <li>Opérations ORDER BY et GROUP BY</li>
+            <li>Jointures complexes (hash joins, sort merges)</li>
+            <li>Création d'index</li>
+            <li>Tables temporaires globales (GTT)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="alert alert--info" style="margin-top: var(--sp-6);">
+        <strong>Astuce de mémorisation :</strong> Pour retenir la hiérarchie : <strong>D-T-S-E-B</strong> (Database, Tablespace, Segment, Extent, Block). Pensez à « Des Tables Sur Étagère, Bloc par Bloc » !
+      </div>
+    </section>
+
+    <footer class="app-footer">
+      ORACLE_ARCH::DÉMO — Application de démonstration technique<br>
+      Données : 100% FICTIVES — Conforme RGPD Art. 25 (Privacy by Design) — Aucune donnée de santé réelle<br>
+      Architecture: Vanilla JS — Zéro dépendance — Hors ligne<br>
+      Usage pédagogique et technique uniquement
+    </footer>
+  </main>
+</div>
+
+<!-- ============================================================
+     HELP OVERLAY
+     ============================================================ -->
+<div class="help-overlay" id="help-overlay" aria-hidden="true"></div>
+
+<!-- ============================================================
+     HELP MODAL: Overview
+     ============================================================ -->
+<div class="help-modal" id="help-overview" role="dialog" aria-modal="true" aria-labelledby="help-overview-title" aria-hidden="true">
+  <div class="help-modal__header">
+    <div class="help-modal__title" id="help-overview-title">Vue d'ensemble — Architecture de stockage Oracle</div>
+    <button class="help-modal__close" aria-label="Fermer l'aide" tabindex="0">&times;</button>
+  </div>
+  <div class="help-modal__body">
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--objective">Objectif pédagogique</div>
+      <p class="help-modal__text">Cette section présente l'architecture de stockage hiérarchique d'Oracle Database, des tablespaces logiques aux fichiers de données physiques. Comprendre cette organisation est fondamental pour l'administration, le tuning et la gestion des sauvegardes.</p>
+    </div>
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--controls">Navigation</div>
+      <ul class="help-modal__list">
+        <li>Cliquez sur les <strong>cylindres</strong> de données pour voir la structure des segments</li>
+        <li>Consultez le <strong>tableau des types de tablespaces</strong> pour les différences clés</li>
+        <li>Utilisez le <strong>sommaire</strong> en bas de page pour naviguer vers les autres sections</li>
+      </ul>
+    </div>
+  </div>
+  <div class="help-modal__footer">
+    <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+  </div>
+</div>
+
+<!-- HELP MODAL: Hierarchy -->
+<div class="help-modal" id="help-hierarchy" role="dialog" aria-modal="true" aria-labelledby="help-hierarchy-title" aria-hidden="true">
+  <div class="help-modal__header">
+    <div class="help-modal__title" id="help-hierarchy-title">Hiérarchie de stockage Oracle</div>
+    <button class="help-modal__close" aria-label="Fermer l'aide" tabindex="0">&times;</button>
+  </div>
+  <div class="help-modal__body">
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--objective">Objectif pédagogique</div>
+      <p class="help-modal__text">Ce diagramme illustre la hiérarchie complète du stockage Oracle : Database &rarr; Tablespace &rarr; Data File &rarr; Segment &rarr; Extent &rarr; Data Block. Chaque niveau est détaillé avec des cartes cliquables.</p>
+    </div>
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--controls">Interaction</div>
+      <ul class="help-modal__list">
+        <li>Cliquez sur les <strong>cartes de détail</strong> pour développer la définition de chaque niveau</li>
+        <li>Le diagramme central montre les relations entre les niveaux</li>
+      </ul>
+    </div>
+  </div>
+  <div class="help-modal__footer">
+    <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+  </div>
+</div>
+
+<!-- HELP MODAL: Visualization -->
+<div class="help-modal" id="help-visualization" role="dialog" aria-modal="true" aria-labelledby="help-visualization-title" aria-hidden="true">
+  <div class="help-modal__header">
+    <div class="help-modal__title" id="help-visualization-title">Visualisation Interactive</div>
+    <button class="help-modal__close" aria-label="Fermer l'aide" tabindex="0">&times;</button>
+  </div>
+  <div class="help-modal__body">
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--objective">Objectif pédagogique</div>
+      <p class="help-modal__text">Simulation interactive d'allocation d'espace dans un fichier de données Oracle. Visualisez comment les segments (tables et index) occupent des extents composés de blocs de données.</p>
+    </div>
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--controls">Contrôles</div>
+      <ul class="help-modal__list">
+        <li><strong>Créer Table</strong> : Alloue un extent de 8 blocs verts (segment table)</li>
+        <li><strong>Créer Index</strong> : Alloue un extent de 8 blocs jaunes (segment index)</li>
+        <li><strong>Réinitialiser</strong> : Vide la grille et recommence</li>
+        <li><strong>Cliquer sur une case</strong> : La surligne en bleu (sélection)</li>
+      </ul>
+    </div>
+  </div>
+  <div class="help-modal__footer">
+    <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+  </div>
+</div>
+
+<!-- HELP MODAL: Comparison -->
+<div class="help-modal" id="help-comparison" role="dialog" aria-modal="true" aria-labelledby="help-comparison-title" aria-hidden="true">
+  <div class="help-modal__header">
+    <div class="help-modal__title" id="help-comparison-title">Tableau comparatif</div>
+    <button class="help-modal__close" aria-label="Fermer l'aide" tabindex="0">&times;</button>
+  </div>
+  <div class="help-modal__body">
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--objective">Objectif pédagogique</div>
+      <p class="help-modal__text">Tableau récapitulatif des 6 composants de l'architecture de stockage Oracle (Database, Tablespace, Data File, Segment, Extent, Data Block) avec leurs caractéristiques et exemples.</p>
+    </div>
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--controls">Contenu</div>
+      <ul class="help-modal__list">
+        <li><strong>Tableau comparatif</strong> : Nature, taille typique, relations et exemples pour chaque composant</li>
+        <li><strong>Règles importantes</strong> : Relations d'appartenance entre les composants</li>
+        <li><strong>Commandes SQL</strong> : Requêtes utiles pour interroger le dictionnaire de données</li>
+      </ul>
+    </div>
+  </div>
+  <div class="help-modal__footer">
+    <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+  </div>
+</div>
+
+<!-- HELP MODAL: Quiz -->
+<div class="help-modal" id="help-quiz" role="dialog" aria-modal="true" aria-labelledby="help-quiz-title" aria-hidden="true">
+  <div class="help-modal__header">
+    <div class="help-modal__title" id="help-quiz-title">Quiz — Testez vos connaissances</div>
+    <button class="help-modal__close" aria-label="Fermer l'aide" tabindex="0">&times;</button>
+  </div>
+  <div class="help-modal__body">
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--objective">Objectif pédagogique</div>
+      <p class="help-modal__text">20 questions pour valider votre compréhension de l'architecture de stockage Oracle. Chaque question propose 4 choix avec feedback immédiat.</p>
+    </div>
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--controls">Fonctionnement</div>
+      <ul class="help-modal__list">
+        <li>Cliquez sur la réponse de votre choix</li>
+        <li>Le feedback s'affiche immédiatement (vert = correct, rouge = incorrect)</li>
+        <li>Le score se met à jour automatiquement</li>
+        <li>20/20 = Excellent !</li>
+      </ul>
+    </div>
+  </div>
+  <div class="help-modal__footer">
+    <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+  </div>
+</div>
+
+<!-- HELP MODAL: Lexicon -->
+<div class="help-modal" id="help-lexicon" role="dialog" aria-modal="true" aria-labelledby="help-lexicon-title" aria-hidden="true">
+  <div class="help-modal__header">
+    <div class="help-modal__title" id="help-lexicon-title">Lexique technique — Architecture Oracle</div>
+    <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+  </div>
+  <div class="help-modal__body">
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--lexique">Concepts de stockage</div>
+      <ul class="help-modal__list">
+        <li><strong>Tablespace</strong> — Unité logique de stockage regroupant des structures de base de données (tables, index), composée d'un ou plusieurs fichiers de données physiques.</li>
+        <li><strong>Fichier de données (Data File)</strong> — Fichier physique sur le système d'exploitation stockant les données d'un tablespace. Extension typique : .dbf.</li>
+        <li><strong>Segment</strong> — Ensemble d'extents alloué à un objet spécifique (table, index, undo, temporaire, LOB).</li>
+        <li><strong>Extent</strong> — Ensemble contigu de blocs de données alloué à un segment. Unité d'allocation d'espace.</li>
+        <li><strong>Bloc de données (Data Block)</strong> — Plus petite unité d'E/S Oracle. Taille par défaut : 8 Ko.</li>
+      </ul>
+    </div>
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--lexique">Gestion de l'espace</div>
+      <ul class="help-modal__list">
+        <li><strong>ASM (Automatic Storage Management)</strong> — Système de stockage intégré Oracle offrant striping, miroir et gestion simplifiée des fichiers.</li>
+        <li><strong>ASSM (Automatic Segment Space Management)</strong> — Gestion automatique de l'espace libre via bitmaps, remplaçant les freelists.</li>
+        <li><strong>Tablespace SYSTEM</strong> — Tablespace système contenant le dictionnaire de données Oracle.</li>
+        <li><strong>Tablespace SYSAUX</strong> — Tablespace auxiliaire réduisant la charge sur SYSTEM pour les composants optionnels.</li>
+        <li><strong>Tablespace UNDO</strong> — Stocke les données d'annulation pour rollback, read consistency et flashback query.</li>
+        <li><strong>Tablespace TEMP</strong> — Espace temporaire pour les tris, jointures et tables temporaires globales (GTT).</li>
+        <li><strong>Tablespace USERS</strong> — Tablespace par défaut pour les objets des utilisateurs non système.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="help-modal__footer">
+    <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+  </div>
+</div>
+
+<!-- HELP MODAL: Credit -->
+<div class="help-modal" id="help-credit" role="dialog" aria-modal="true" aria-labelledby="help-credit-title" aria-hidden="true">
+  <div class="help-modal__header">
+    <div class="help-modal__title" id="help-credit-title">Crédit</div>
+    <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+  </div>
+  <div class="help-modal__body">
+    <div class="help-modal__credit">
+      <p class="help-modal__credit-role">Conception fonctionnelle, scénarios, développement et relecture</p>
+      <p class="help-modal__credit-author">
+        <a href="https://github.com/bertinstephane42/oracle-sih" target="_blank" rel="noopener noreferrer">Stéphane Bertin</a>
+      </p>
+      <p class="help-modal__credit-assist">Assisté par <strong>OpenCode</strong>, agent <strong>Big Pickle</strong></p>
+      <p class="help-modal__credit-year">2025</p>
+    </div>
+  </div>
+  <div class="help-modal__footer">
+    <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ============================================================
+   HELP MANAGER — Gestion des modales d'aide contextuelle
+   ============================================================ */
+class HelpManager {
+  constructor() {
+    this._overlay = null;
+    this._activeModal = null;
+    this._previouslyFocused = null;
+    this._initDOM();
+    this._bindEvents();
+  }
+
+  _initDOM() {
+    this._overlay = document.getElementById('help-overlay');
+    this._modals = document.querySelectorAll('.help-modal');
+  }
+
+  _bindEvents() {
+    var self = this;
+
+    document.addEventListener('click', function(e) {
+      var helpBtn = e.target.closest('[data-help]');
+      if (helpBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        self.open(helpBtn.dataset.help);
+        return;
+      }
+      var closeBtn = e.target.closest('.help-modal__close') || e.target.closest('.help-modal__footer-btn');
+      if (closeBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        self.close();
+      }
+    });
+
+    this._overlay.addEventListener('click', function() { self.close(); });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && self._activeModal) {
+        e.preventDefault();
+        self.close();
+      }
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key !== 'Tab' || !self._activeModal) return;
+      var focusable = self._activeModal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      if (focusable.length === 0) { e.preventDefault(); return; }
+      var first = focusable[0];
+      var last = focusable[focusable.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first || !self._activeModal.contains(document.activeElement)) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (document.activeElement === last || !self._activeModal.contains(document.activeElement)) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    });
+  }
+
+  open(moduleId) {
+    var modalId = 'help-' + moduleId;
+    var modal = document.getElementById(modalId);
+    if (!modal) return;
+
+    this._previouslyFocused = document.activeElement;
+    this._activeModal = modal;
+
+    this._overlay.classList.add('help-overlay--active');
+    this._overlay.setAttribute('aria-hidden', 'false');
+    modal.classList.add('help-modal--active');
+    modal.setAttribute('aria-hidden', 'false');
+
+    var closeBtn = modal.querySelector('.help-modal__close');
+    if (closeBtn) {
+      setTimeout(function() { closeBtn.focus(); }, 50);
+    }
+
+    document.body.style.overflow = 'hidden';
+  }
+
+  close() {
+    if (!this._activeModal) return;
+
+    this._overlay.classList.remove('help-overlay--active');
+    this._overlay.setAttribute('aria-hidden', 'true');
+    this._activeModal.classList.remove('help-modal--active');
+    this._activeModal.setAttribute('aria-hidden', 'true');
+    this._activeModal = null;
+
+    document.body.style.overflow = '';
+    if (this._previouslyFocused && typeof this._previouslyFocused.focus === 'function') {
+      this._previouslyFocused.focus();
+    }
+  }
+}
+
+/* ============================================================
+   APPLICATION — Routeur et contrôleur principal
+   ============================================================ */
+var App = {
+  _helpManager: null,
+  gridInitialized: false,
+  allocationCount: 0,
+  score: 0,
+  answeredQuestions: 0,
+  scoreDisplay: null,
+
+  init: function() {
+    this._helpManager = new HelpManager();
+    this._bindNavigation();
+    this.initGrid();
+    this.scoreDisplay = document.getElementById('scoreDisplay');
+  },
+
+  _bindNavigation: function() {
+    var self = this;
+    document.querySelectorAll('.app-nav__item[data-module]').forEach(function(item) {
+      item.addEventListener('click', function() { self.navigateTo(item.dataset.module); });
+    });
+  },
+
+  navigateTo: function(moduleName) {
+    document.querySelectorAll('.app-nav__item').forEach(function(el) {
+      el.classList.remove('app-nav__item--active');
+    });
+    var activeNav = document.querySelector('.app-nav__item[data-module="' + moduleName + '"]');
+    if (activeNav) activeNav.classList.add('app-nav__item--active');
+
+    document.querySelectorAll('.module-section').forEach(function(el) {
+      el.classList.remove('module-section--active');
+    });
+    var target = document.getElementById('mod-' + moduleName);
+    if (target) target.classList.add('module-section--active');
+  },
+
+  /* Glossaire */
+  toggleGlossary: function(element) {
+    element.classList.toggle('expanded');
+  },
+
+  /* Highlight segment */
+  highlightSegment: function(id) {
+    document.querySelectorAll('.segment-block').forEach(function(seg) {
+      seg.classList.remove('highlight');
+    });
+    var targetIds = [];
+    if (id === 't1') targetIds = ['seg-t1', 'seg-t1a', 'seg-t1b'];
+    else if (id === 't2') targetIds = ['seg-t2', 'seg-t2a', 'seg-t2b', 'seg-t2c'];
+    targetIds.forEach(function(sid) {
+      var el = document.getElementById(sid);
+      if (el) el.classList.add('highlight');
+    });
+  },
+
+  /* Grid visualization */
+  initGrid: function() {
+    var grid = document.getElementById('storageGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    for (var i = 0; i < 64; i++) {
+      var cell = document.createElement('div');
+      cell.className = 'grid-cell';
+      cell.id = 'grid-cell-' + i;
+      cell.textContent = i + 1;
+      cell.onclick = function() { this.classList.toggle('selected'); };
+      grid.appendChild(cell);
+    }
+    this.gridInitialized = true;
+  },
+
+  createSegment: function(type) {
+    if (!this.gridInitialized) this.initGrid();
+
+    var freeCells = [];
+    for (var i = 0; i < 64; i++) {
+      var cell = document.getElementById('grid-cell-' + i);
+      if (!cell.classList.contains('allocated') && !cell.classList.contains('index-type')) {
+        freeCells.push(i);
+      }
+    }
+
+    if (freeCells.length < 8) {
+      alert('Espace insuffisant dans le fichier de données ! Cliquez sur Réinitialiser.');
+      return;
+    }
+
+    var startIdx = freeCells[0];
+    var segmentClass = type === 'table' ? 'allocated' : 'index-type';
+    var segmentName = type === 'table' ? 'Table' : 'Index';
+
+    for (var j = 0; j < 8; j++) {
+      var c = document.getElementById('grid-cell-' + (startIdx + j));
+      c.classList.add(segmentClass);
+    }
+
+    this.allocationCount++;
+
+    var infoDiv = document.getElementById('allocationInfo');
+    var infoText = document.getElementById('allocationText');
+    if (infoDiv && infoText) {
+      infoDiv.style.display = 'block';
+      infoText.textContent = segmentName + ' #' + this.allocationCount + ' alloué(e) — Extent de 8 blocs (blocs ' + (startIdx + 1) + '-' + (startIdx + 8) + ')';
+    }
+  },
+
+  resetGrid: function() {
+    if (!this.gridInitialized) this.initGrid();
+    for (var i = 0; i < 64; i++) {
+      var cell = document.getElementById('grid-cell-' + i);
+      if (cell) cell.className = 'grid-cell';
+    }
+    this.allocationCount = 0;
+    var infoDiv = document.getElementById('allocationInfo');
+    if (infoDiv) infoDiv.style.display = 'none';
+  },
+
+  /* Quiz */
+  checkAnswer: function(element, isCorrect) {
+    var parent = element.parentElement;
+    var feedback = parent.nextElementSibling;
+
+    parent.querySelectorAll('.quiz-option').forEach(function(opt) {
+      opt.style.pointerEvents = 'none';
+    });
+
+    if (isCorrect) {
+      element.classList.add('correct');
+      feedback.className = 'quiz-feedback correct';
+      feedback.textContent = 'Correct ! Bien joué.';
+      this.score++;
+    } else {
+      element.classList.add('incorrect');
+      feedback.className = 'quiz-feedback incorrect';
+      feedback.textContent = 'Incorrect. La bonne réponse est surlignée en vert.';
+
+      parent.querySelectorAll('.quiz-option').forEach(function(opt) {
+        if (opt.getAttribute('onclick') && opt.getAttribute('onclick').indexOf('true') > -1) {
+          opt.classList.add('correct');
+        }
+      });
+    }
+
+    this.answeredQuestions++;
+    this.updateScore();
+  },
+
+  updateScore: function() {
+    var display = this.scoreDisplay;
+    if (!display) return;
+    var percentage = Math.round((this.score / this.answeredQuestions) * 100);
+
+    if (this.answeredQuestions === 20) {
+      var msg = 'Score final : ' + this.score + '/20 (' + percentage + '%)';
+      if (percentage >= 80) msg += ' — Excellent travail ! Vous maîtrisez le sujet.';
+      else if (percentage >= 60) msg += ' — Bon travail ! Revoyez quelques concepts.';
+      else msg += ' — Continuez à étudier les concepts présentés.';
+      display.innerHTML = '<strong>' + msg + '</strong>';
+    } else {
+      display.textContent = 'Score actuel : ' + this.score + '/' + this.answeredQuestions;
+    }
+  }
+};
+
+/* ============================================================
+   BOOTSTRAP
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', function() {
+  App.init();
+});
+</script>
+</body>
+</html>
