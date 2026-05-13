@@ -789,9 +789,10 @@ const SCENARIOS = [
     inserts: "INSERT INTO lot_simu VALUES (1, 101, 'LOT-2025-A001', 'Sanofi', DATE '2026-06-01', 500);\nINSERT INTO lot_simu VALUES (2, 101, 'LOT-2025-A002', 'Sanofi', DATE '2025-12-31', 300);\nINSERT INTO lot_simu VALUES (3, 102, 'LOT-2025-B045', 'Mylan', DATE '2026-03-20', 200);",
     expected: "-- =============================================================================\n-- Scenario 9 : Index unique (Intégrité et Performance)\n-- Objectif : Garantir qu'un numéro de lot + fabricant n'existe qu'une seule fois\n-- et accélérer les recherches sur ces colonnes.\n-- =============================================================================\nCREATE UNIQUE INDEX idx_lot_unique\nON lot_simu(numero_lot, fabricant);\n\n-- Alternative avec contrainte UNIQUE (souvent préférée pour l'intégrité métier) :\n-- ALTER TABLE lot_simu ADD CONSTRAINT uq_lot_fab UNIQUE (numero_lot, fabricant);\n",
     mockResult: [
-      { lot_id: 1, med_id: 101, numero_lot: 'LOT-2025-A001', fabricant: 'Sanofi',  date_perem: '2026-06-01', qty: 500 },
-      { lot_id: 2, med_id: 101, numero_lot: 'LOT-2025-A002', fabricant: 'Sanofi',  date_perem: '2025-12-31', qty: 300 },
-      { lot_id: 3, med_id: 102, numero_lot: 'LOT-2025-B045', fabricant: 'Mylan',   date_perem: '2026-03-20', qty: 200 },
+      { operation: 'CREATE UNIQUE INDEX idx_lot_unique ON lot_simu(numero_lot, fabricant)',
+        statut: 'Index IDX_LOT_UNIQUE créé avec succès.' },
+      { operation: 'INSERT INTO lot_simu VALUES (4, 101, \'LOT-2025-A001\', \'Sanofi\', DATE \'2026-12-31\', 100)',
+        statut: 'ORA-00001 : violation de contrainte unique (IDX_LOT_UNIQUE) — doublon sur (LOT-2025-A001, Sanofi)' },
     ],
     completionMessage: 'Index unique IDX_LOT_UNIQUE créé.',
     explanation: 'Un index unique garantit qu\'aucune valeur dupliquée n\'existe dans les colonnes indexées. Créé sur la combinaison (NUMERO_LOT, FABRICANT), il empêche l\'insertion de deux lots distincts portant le même numéro pour le même fabricant. Oracle utilise cet index pour accélérer les recherches par numéro de lot tout en maintenant l\'intégrité des données. La contrainte UNIQUE crée automatiquement un index unique du même nom.',
