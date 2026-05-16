@@ -1,0 +1,1627 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Oracle Best Practices SIH - Tablespace, CBO, Recycle Bin, Indexation, Deadlocks">
+<title>Oracle Best Practices - SIH DBA</title>
+<style>
+:root {
+  --color-bg-deep: #0a0e17;
+  --color-bg-surface: #131a2a;
+  --color-bg-elevated: #1a2340;
+  --color-bg-hover: #243052;
+  --color-border: #1e2d4a;
+  --color-border-active: #3b82f6;
+  --color-blue: #3b82f6;
+  --color-blue-dim: #1e3a6e;
+  --color-red: #ef4444;
+  --color-red-dim: #7f1d1d;
+  --color-green: #22c55e;
+  --color-green-dim: #166534;
+  --color-amber: #f59e0b;
+  --color-amber-dim: #78350f;
+  --color-cyan: #06b6d4;
+  --color-purple: #a855f7;
+  --font-ui: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+  --fs-xs: 0.6875rem;
+  --fs-sm: 0.8125rem;
+  --fs-base: 0.9375rem;
+  --fs-md: 1.0625rem;
+  --fs-lg: 1.25rem;
+  --fs-xl: 1.5rem;
+  --fs-2xl: 2rem;
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-6: 1.5rem;
+  --sp-8: 2rem;
+  --sp-12: 3rem;
+  --nav-width: 260px;
+  --header-height: 56px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --transition-fast: 150ms ease;
+  --transition-normal: 300ms ease;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+body { font-family: var(--font-ui); font-size: var(--fs-base); color: #e2e8f0; background: var(--color-bg-deep); line-height: 1.6; overflow-x: hidden; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input, select, textarea { font-family: inherit; font-size: inherit; }
+pre, code { font-family: var(--font-mono); }
+table { border-collapse: collapse; width: 100%; }
+a { color: var(--color-cyan); text-decoration: none; }
+a:hover { text-decoration: underline; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--color-bg-deep); }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: var(--radius-sm); }
+::-webkit-scrollbar-thumb:hover { background: var(--color-blue); }
+.app-layout { display: grid; grid-template-columns: var(--nav-width) 1fr; grid-template-rows: var(--header-height) 1fr; grid-template-areas: "header header" "nav main"; min-height: 100vh; }
+.app-header { grid-area: header; display: flex; align-items: center; justify-content: space-between; padding: 0 var(--sp-6); background: var(--color-bg-surface); border-bottom: 1px solid var(--color-border); z-index: 100; }
+.app-header__brand { display: flex; align-items: center; gap: var(--sp-3); font-family: var(--font-mono); font-size: var(--fs-md); font-weight: 700; letter-spacing: -0.02em; }
+.app-header__brand-icon { width: 28px; height: 28px; background: var(--color-blue); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: var(--fs-sm); font-weight: 900; color: #fff; }
+.app-header__status { display: flex; align-items: center; gap: var(--sp-4); font-size: var(--fs-xs); font-family: var(--font-mono); }
+.status-badge { display: inline-flex; align-items: center; gap: var(--sp-2); padding: var(--sp-1) var(--sp-3); border-radius: var(--radius-sm); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.status-badge--online { background: var(--color-green-dim); color: var(--color-green); }
+.status-badge--hds { background: var(--color-blue-dim); color: var(--color-blue); }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: pulse-dot 2s infinite; }
+@keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+.app-nav { grid-area: nav; background: var(--color-bg-surface); border-right: 1px solid var(--color-border); padding: var(--sp-6) 0; overflow-y: auto; }
+.app-nav__section { padding: 0 var(--sp-4); margin-bottom: var(--sp-6); }
+.app-nav__section-title { font-size: var(--fs-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-blue); margin-bottom: var(--sp-3); font-family: var(--font-mono); }
+.app-nav__item { display: flex; align-items: center; gap: var(--sp-3); width: 100%; padding: var(--sp-3) var(--sp-4); border-radius: var(--radius-md); font-size: var(--fs-sm); font-weight: 500; color: #94a3b8; transition: all var(--transition-fast); text-align: left; }
+.app-nav__item:hover { background: var(--color-bg-hover); color: #e2e8f0; }
+.app-nav__item--active { background: var(--color-blue-dim); color: var(--color-blue); font-weight: 600; }
+.app-nav__item-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700; border-radius: var(--radius-sm); background: var(--color-bg-elevated); flex-shrink: 0; }
+.app-nav__item--active .app-nav__item-icon { background: var(--color-blue); color: #fff; }
+.app-nav__rgpd-notice { margin: var(--sp-6) var(--sp-4); padding: var(--sp-3); background: var(--color-blue-dim); border: 1px solid var(--color-blue); border-radius: var(--radius-md); font-size: var(--fs-xs); color: var(--color-blue); font-family: var(--font-mono); line-height: 1.5; }
+.app-main { grid-area: main; padding: var(--sp-8); overflow-y: auto; background: var(--color-bg-deep); }
+.page-header { margin-bottom: var(--sp-8); padding-bottom: var(--sp-4); border-bottom: 1px solid var(--color-border); }
+.page-header__title { font-size: var(--fs-xl); font-weight: 700; letter-spacing: -0.02em; margin-bottom: var(--sp-2); }
+.page-header__subtitle { font-size: var(--fs-sm); color: #94a3b8; font-family: var(--font-mono); }
+.page-header__subtitle-row { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); }
+.page-header__help-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 1px solid var(--color-border); border-radius: 50%; background: var(--color-bg-elevated); color: #94a3b8; font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700; cursor: pointer; transition: all var(--transition-fast); flex-shrink: 0; vertical-align: middle; }
+.page-header__help-btn:hover { border-color: var(--color-blue); color: var(--color-blue); background: var(--color-blue-dim); }
+.card { background: var(--color-bg-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--sp-6); margin-bottom: var(--sp-6); }
+.card__title { font-size: var(--fs-md); font-weight: 700; margin-bottom: var(--sp-4); display: flex; align-items: center; gap: var(--sp-3); font-family: var(--font-mono); }
+.card__title-icon { color: var(--color-blue); }
+.card__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--sp-4); flex-wrap: wrap; gap: var(--sp-3); }
+.card__header-title { font-size: var(--fs-md); font-weight: 700; font-family: var(--font-mono); display: flex; align-items: center; gap: var(--sp-3); }
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-6); }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-6); }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-6); }
+@media (max-width: 1200px) { .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+.data-mono { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--color-cyan); background: var(--color-bg-elevated); padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); display: inline-block; }
+.data-label { font-size: var(--fs-xs); color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+.stat-block { background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--sp-4); text-align: center; }
+.stat-block__value { font-family: var(--font-mono); font-size: var(--fs-xl); font-weight: 700; margin-bottom: var(--sp-1); }
+.stat-block__label { font-size: var(--fs-xs); color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+.stat-block--blue .stat-block__value { color: var(--color-blue); }
+.stat-block--green .stat-block__value { color: var(--color-green); }
+.stat-block--red .stat-block__value { color: var(--color-red); }
+.stat-block--amber .stat-block__value { color: var(--color-amber); }
+.stat-block--cyan .stat-block__value { color: var(--color-cyan); }
+.stat-block--purple .stat-block__value { color: var(--color-purple); }
+
+/* Risk-specific stat block variant */
+.stat-block--risk-critique .stat-block__value { color: var(--color-red); }
+.stat-block--risk-critique { border-color: var(--color-red-dim); background: rgba(127,29,29,0.2); }
+.stat-block--risk-eleve .stat-block__value { color: var(--color-amber); }
+.stat-block--risk-eleve { border-color: var(--color-amber-dim); background: rgba(120,53,15,0.2); }
+.stat-block--risk-maitrise .stat-block__value { color: var(--color-green); }
+.stat-block--risk-maitrise { border-color: var(--color-green-dim); background: rgba(22,101,52,0.2); }
+
+.progress-bar { width: 100%; height: 8px; background: var(--color-bg-elevated); border-radius: var(--radius-sm); overflow: hidden; margin: var(--sp-2) 0; }
+.progress-bar__fill { height: 100%; border-radius: var(--radius-sm); transition: width var(--transition-normal); }
+.progress-bar__fill--blue { background: var(--color-blue); }
+.progress-bar__fill--green { background: var(--color-green); }
+.progress-bar__fill--red { background: var(--color-red); }
+.progress-bar__fill--amber { background: var(--color-amber); }
+.progress-bar__fill--cyan { background: var(--color-cyan); }
+.progress-bar--lg { height: 20px; border-radius: var(--radius-md); }
+.progress-bar__fill--risk-critique { background: linear-gradient(90deg, var(--color-red), #dc2626); }
+.progress-bar__fill--risk-eleve { background: linear-gradient(90deg, var(--color-amber), #d97706); }
+.progress-bar__fill--risk-maitrise { background: linear-gradient(90deg, var(--color-green), #16a34a); }
+.tag { display: inline-flex; align-items: center; padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); font-size: var(--fs-xs); font-weight: 600; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.03em; }
+.tag--blue { background: var(--color-blue-dim); color: var(--color-blue); }
+.tag--green { background: var(--color-green-dim); color: var(--color-green); }
+.tag--red { background: var(--color-red-dim); color: var(--color-red); }
+.tag--amber { background: var(--color-amber-dim); color: var(--color-amber); }
+.tag--cyan { background: #164e63; color: var(--color-cyan); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2); padding: var(--sp-3) var(--sp-6); border-radius: var(--radius-md); font-size: var(--fs-sm); font-weight: 600; transition: all var(--transition-fast); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.03em; }
+.btn--primary { background: var(--color-blue); color: #fff; }
+.btn--primary:hover { background: #2563eb; }
+.btn--success { background: var(--color-green); color: #fff; }
+.btn--success:hover { background: #16a34a; }
+.btn--danger { background: var(--color-red); color: #fff; }
+.btn--danger:hover { background: #dc2626; }
+.btn--outline { border: 1px solid var(--color-border); color: #e2e8f0; }
+.btn--outline:hover { border-color: var(--color-blue); color: var(--color-blue); }
+.btn--sm { padding: var(--sp-2) var(--sp-4); font-size: var(--fs-xs); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn--warning { background: var(--color-amber); color: #000; }
+.btn--warning:hover { background: #d97706; }
+.alert { padding: var(--sp-4); border-radius: var(--radius-md); border-left: 4px solid; margin-bottom: var(--sp-4); font-size: var(--fs-sm); font-family: var(--font-mono); }
+.alert--info { background: var(--color-blue-dim); border-color: var(--color-blue); color: #93c5fd; }
+.alert--success { background: var(--color-green-dim); border-color: var(--color-green); color: #86efac; }
+.alert--warning { background: var(--color-amber-dim); border-color: var(--color-amber); color: #fcd34d; }
+.alert--error { background: var(--color-red-dim); border-color: var(--color-red); color: #fca5a5; }
+.log-console { background: #000; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--sp-4); font-family: var(--font-mono); font-size: var(--fs-xs); max-height: 200px; overflow-y: auto; line-height: 1.8; }
+.log-console__entry { color: #94a3b8; }
+.log-console__entry--info { color: var(--color-blue); }
+.log-console__entry--success { color: var(--color-green); }
+.log-console__entry--error { color: var(--color-red); }
+.log-console__entry--warn { color: var(--color-amber); }
+.log-console__timestamp { color: #475569; margin-right: var(--sp-2); }
+.slider-group { display: flex; flex-direction: column; gap: var(--sp-2); }
+.slider-group__header { display: flex; justify-content: space-between; align-items: center; }
+.slider-group__label { font-size: var(--fs-sm); font-weight: 600; font-family: var(--font-mono); }
+.slider-group__value { font-size: var(--fs-sm); font-family: var(--font-mono); color: var(--color-cyan); font-weight: 700; }
+input[type="range"] { -webkit-appearance: none; width: 100%; height: 6px; background: var(--color-bg-elevated); border-radius: var(--radius-sm); outline: none; }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--color-blue); border-radius: 50%; cursor: pointer; border: 2px solid var(--color-bg-surface); }
+.data-table { width: 100%; font-size: var(--fs-sm); }
+.data-table th { text-align: left; padding: var(--sp-3) var(--sp-4); background: var(--color-bg-elevated); font-family: var(--font-mono); font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; font-weight: 600; border-bottom: 1px solid var(--color-border); }
+.data-table td { padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--color-border); font-family: var(--font-mono); font-size: var(--fs-xs); }
+.data-table tr:hover td { background: var(--color-bg-hover); }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn var(--transition-normal) ease; }
+.module-section { display: none; }
+.module-section--active { display: block; animation: fadeIn var(--transition-normal) ease; }
+.app-footer { margin-top: var(--sp-12); padding-top: var(--sp-6); border-top: 1px solid var(--color-border); font-size: var(--fs-xs); color: #475569; font-family: var(--font-mono); text-align: center; line-height: 1.8; }
+
+/* Comparison Bars */
+.comp-card { margin-bottom: var(--sp-4); }
+.comp-bar { display: flex; align-items: center; gap: var(--sp-3); margin-bottom: var(--sp-2); }
+.comp-bar__label { width: 90px; font-family: var(--font-mono); font-size: var(--fs-xs); color: #94a3b8; flex-shrink: 0; }
+.comp-bar__track { flex: 1; height: 28px; background: var(--color-bg-elevated); border-radius: var(--radius-sm); overflow: hidden; position: relative; }
+.comp-bar__fill { height: 100%; border-radius: var(--radius-sm); transition: width 1s ease; }
+.comp-bar__fill--before { background: linear-gradient(90deg, var(--color-red-dim), var(--color-red)); }
+.comp-bar__fill--after { background: linear-gradient(90deg, var(--color-green-dim), var(--color-green)); }
+.comp-bar__value { width: 110px; font-family: var(--font-mono); font-size: var(--fs-xs); text-align: right; flex-shrink: 0; }
+.comp-bar__value--before { color: var(--color-red); }
+.comp-bar__value--after { color: var(--color-green); }
+.comp-legend { display: flex; justify-content: flex-end; gap: var(--sp-6); font-size: var(--fs-xs); font-family: var(--font-mono); color: #64748b; margin-bottom: var(--sp-3); }
+.comp-legend span { display: flex; align-items: center; gap: var(--sp-2); }
+.comp-legend__dot { width: 10px; height: 10px; border-radius: 2px; }
+.comp-legend__dot--before { background: var(--color-red); }
+.comp-legend__dot--after { background: var(--color-green); }
+
+/* Toggle / Radio group */
+.toggle-group { display: flex; gap: var(--sp-2); margin-bottom: var(--sp-4); flex-wrap: wrap; }
+.toggle-group__btn { padding: var(--sp-2) var(--sp-4); border: 1px solid var(--color-border); border-radius: var(--radius-md); font-family: var(--font-mono); font-size: var(--fs-xs); font-weight: 600; color: #94a3b8; background: var(--color-bg-elevated); cursor: pointer; transition: all var(--transition-fast); text-transform: uppercase; letter-spacing: 0.03em; }
+.toggle-group__btn:hover { border-color: var(--color-blue); color: var(--color-blue); }
+.toggle-group__btn--active { background: var(--color-blue-dim); border-color: var(--color-blue); color: var(--color-blue); }
+
+/* Visualization cards for Recycle Bin / Deadlocks */
+.vis-list { display: flex; flex-direction: column; gap: var(--sp-2); margin: var(--sp-4) 0; }
+.vis-item { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4); background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-md); font-family: var(--font-mono); font-size: var(--fs-xs); }
+.vis-item__icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); font-weight: 700; font-size: var(--fs-xs); flex-shrink: 0; }
+.vis-item__icon--bin { background: var(--color-amber-dim); color: var(--color-amber); }
+.vis-item__icon--restored { background: var(--color-green-dim); color: var(--color-green); }
+.vis-item__icon--lock { background: var(--color-red-dim); color: var(--color-red); }
+.vis-item__icon--unlock { background: var(--color-green-dim); color: var(--color-green); }
+
+/* Transaction deadlock schema */
+.dl-schema { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); margin: var(--sp-4) 0; }
+.dl-transaction { padding: var(--sp-4); background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-md); }
+.dl-transaction__title { font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700; margin-bottom: var(--sp-3); }
+.dl-transaction__step { display: flex; align-items: center; gap: var(--sp-2); padding: var(--sp-2); margin-bottom: var(--sp-1); font-family: var(--font-mono); font-size: var(--fs-xs); border-radius: var(--radius-sm); }
+.dl-transaction__step--hold { background: rgba(34,197,94,0.15); color: var(--color-green); }
+.dl-transaction__step--wait { background: rgba(239,68,68,0.15); color: var(--color-red); }
+
+/* Help modals (identical pattern) */
+.help-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 999; animation: fadeIn 0.2s ease; }
+.help-overlay--active { display: block; }
+.help-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%) translateY(16px); width: 90%; max-width: 720px; max-height: 85vh; background: var(--color-bg-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); z-index: 1000; overflow: hidden; animation: fadeSlideUp 0.3s ease forwards; box-shadow: 0 24px 48px rgba(0,0,0,0.4); }
+.help-modal--active { display: flex; flex-direction: column; }
+@keyframes fadeSlideUp { from { opacity:0; transform: translate(-50%,-50%) translateY(16px); } to { opacity:1; transform: translate(-50%,-50%) translateY(0); } }
+.help-modal__header { display: flex; align-items: center; justify-content: space-between; padding: var(--sp-4) var(--sp-6); border-bottom: 1px solid var(--color-border); background: var(--color-bg-elevated); }
+.help-modal__title { font-family: var(--font-mono); font-size: var(--fs-md); font-weight: 700; color: var(--color-blue); }
+.help-modal__close { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-bg-deep); color: #94a3b8; font-size: var(--fs-md); cursor: pointer; transition: all var(--transition-fast); font-weight: 700; }
+.help-modal__close:hover { border-color: var(--color-red); color: var(--color-red); background: var(--color-red-dim); }
+.help-modal__body { padding: var(--sp-6); overflow-y: auto; flex: 1; }
+.help-modal__section { margin-bottom: var(--sp-6); }
+.help-modal__section:last-child { margin-bottom: 0; }
+.help-modal__section-title { font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: var(--sp-3); padding-bottom: var(--sp-2); border-bottom: 1px solid var(--color-border); }
+.help-modal__section-title--objective { color: var(--color-blue); }
+.help-modal__section-title--rule { color: var(--color-amber); }
+.help-modal__section-title--lexique { color: var(--color-purple); }
+.help-modal__text { font-size: var(--fs-sm); color: #cbd5e1; line-height: 1.7; margin-bottom: var(--sp-3); }
+.help-modal__text code { font-family: var(--font-mono); font-size: var(--fs-xs); background: var(--color-bg-elevated); padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); color: var(--color-cyan); }
+.help-modal__list { list-style: none; padding: 0; }
+.help-modal__list li { position: relative; padding: var(--sp-2) 0 var(--sp-2) var(--sp-6); font-size: var(--fs-sm); color: #94a3b8; line-height: 1.6; border-left: 2px solid var(--color-border); }
+.help-modal__list li::before { content: ''; position: absolute; left: -1px; top: 50%; width: 8px; height: 2px; background: var(--color-blue); transform: translateY(-50%); }
+.help-modal__list li:last-child { border-left-color: transparent; }
+.help-modal__footer { padding: var(--sp-4) var(--sp-6); border-top: 1px solid var(--color-border); display: flex; justify-content: flex-end; background: var(--color-bg-elevated); }
+.help-modal__credit { text-align: center; padding: var(--sp-4) 0; }
+.help-modal__credit-role { font-size: var(--fs-xs); color: #64748b; margin-bottom: var(--sp-4); line-height: 1.7; }
+.help-modal__credit-author { font-size: var(--fs-lg); font-weight: 700; margin-bottom: var(--sp-2); }
+.help-modal__credit-author a { color: var(--color-cyan); text-decoration: none; transition: color var(--transition-normal); }
+.help-modal__credit-author a:hover { color: var(--color-blue); text-decoration: underline; }
+.help-modal__credit-assist { font-size: var(--fs-xs); color: var(--color-amber-dim); margin-bottom: var(--sp-4); line-height: 1.6; }
+.help-modal__credit-year { font-size: var(--fs-xs); color: #475569; }
+.selected-display { font-family: var(--font-mono); font-size: var(--fs-sm); padding: var(--sp-2) var(--sp-3); border-radius: var(--radius-sm); background: var(--color-bg-elevated); display: inline-block; margin-bottom: var(--sp-2); }
+</style>
+</head>
+<body>
+
+<div class="app-layout">
+  <header class="app-header">
+    <div class="app-header__brand">
+      <div class="app-header__brand-icon">B</div>
+      <span>ORACLE<span style="color: var(--color-cyan);">_BEST_PRACTICES</span>::DÉMO</span>
+    </div>
+    <div class="app-header__status">
+      <span class="status-badge status-badge--online"><span class="status-dot"></span>DÉMO ACTIVE</span>
+      <span class="status-badge status-badge--hds">HDS / DONNÉES FICTIVES</span>
+      <button class="page-header__help-btn" data-help="lexicon" aria-label="Lexique technique" title="Lexique technique">L</button>
+      <button class="page-header__help-btn" data-help="credit" aria-label="Credits" title="Credits">C</button>
+    </div>
+  </header>
+
+  <nav class="app-nav">
+    <div class="app-nav__section">
+      <div class="app-nav__section-title">Piliers DBA</div>
+      <button class="app-nav__item app-nav__item--active" data-tab="tablespace"><span class="app-nav__item-icon">E</span>1. Espace (Tablespace)</button>
+      <button class="app-nav__item" data-tab="stats"><span class="app-nav__item-icon">S</span>2. Statistiques (CBO)</button>
+      <button class="app-nav__item" data-tab="recyclebin"><span class="app-nav__item-icon">R</span>3. Recycle Bin</button>
+      <button class="app-nav__item" data-tab="indexation"><span class="app-nav__item-icon">I</span>4. Indexation</button>
+      <button class="app-nav__item" data-tab="deadlocks"><span class="app-nav__item-icon">D</span>5. Deadlocks</button>
+    </div>
+    <div class="app-nav__section">
+      <div class="app-nav__section-title">Tableau de bord</div>
+      <button class="app-nav__item" data-tab="dashboard"><span class="app-nav__item-icon">G</span>Niveau de Risque SIH</button>
+    </div>
+    <div class="app-nav__section">
+      <div style="padding: 0 var(--sp-4); font-size: var(--fs-xs); font-family: var(--font-mono); line-height: 2;">
+        <div style="color: #64748b;">USER</div>
+        <div style="color: var(--color-cyan);">DBA_BEST_PRACTICES</div>
+        <div style="color: #64748b; margin-top: var(--sp-2);;">SCORE SIH</div>
+        <div id="nav-score" style="color: var(--color-green);">0 / 100</div>
+      </div>
+    </div>
+    <div class="app-nav__rgpd-notice">
+      DONNÉES 100% FICTIVES<br>
+      PATIENT_SIMU_XXXX / SORTIE_STOCK<br>
+      Contexte PUI — CHU de démonstration<br>
+      Conforme RGPD Art. 25
+    </div>
+  </nav>
+
+  <main class="app-main" id="app-main">
+
+    <!-- ============================================================
+         PILIER 1 : TABLESPACE
+         ============================================================ -->
+    <section class="module-section module-section--active" id="tab-tablespace">
+      <div class="page-header">
+        <h1 class="page-header__title">Espace (Tablespace) — Gestion de l'allocation</h1>
+        <div class="page-header__subtitle-row">
+          <p class="page-header__subtitle">Simulation de remplissage d'un tablespace PHARMA_DATA. Impact du mode d'allocation sur la continuité PUI.</p>
+          <button class="page-header__help-btn" data-help="tablespace" aria-label="Aide Tablespace" title="Rubrique d'aide">?</button>
+        </div>
+      </div>
+
+      <div class="card fade-in">
+        <div class="card__header">
+          <div class="card__header-title"><span class="card__title-icon">&#9632;</span> Simulation d'allocation</div>
+          <div><span class="tag tag--cyan" id="ts-score-tag">SCORE: 0</span></div>
+        </div>
+
+        <!-- Mode toggle -->
+        <div class="card__title" style="font-size:var(--fs-sm);margin-bottom:var(--sp-3);">Mode d'allocation :</div>
+        <div class="toggle-group" id="ts-mode-group">
+          <button class="toggle-group__btn" data-ts-mode="unlimited">AUTOEXTEND UNLIMITED</button>
+          <button class="toggle-group__btn toggle-group__btn--active" data-ts-mode="maxsize">MAXSIZE + ALERTE 80%</button>
+        </div>
+
+        <!-- Slider -->
+        <div class="slider-group" style="max-width:500px;margin-bottom:var(--sp-4);">
+          <div class="slider-group__header">
+            <span class="slider-group__label">Espace utilisé</span>
+            <span class="slider-group__value" id="ts-slider-value">50%</span>
+          </div>
+          <input type="range" id="ts-slider" min="0" max="100" step="5" value="50">
+        </div>
+
+        <!-- Progress bar -->
+        <div style="max-width:500px;margin-bottom:var(--sp-4);">
+          <div class="progress-bar progress-bar--lg">
+            <div class="progress-bar__fill" id="ts-progress-fill" style="width:50%;background:var(--color-green);"></div>
+          </div>
+        </div>
+
+        <!-- Status / Alerts -->
+        <div id="ts-status-area"></div>
+
+        <!-- Datafile button (hidden initially) -->
+        <div id="ts-add-area" style="display:none;margin-bottom:var(--sp-4);">
+          <button class="btn btn--success btn--sm" id="ts-add-datafile">Ajouter un datafile</button>
+        </div>
+
+        <!-- Console -->
+        <div class="log-console" id="ts-console">
+          <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Simulateur tablespace prêt. Mode MAXSIZE + ALERTE actif.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__title">Commande DBA</div>
+        <div class="code-block" style="background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:var(--sp-4);font-family:var(--font-mono);font-size:var(--fs-xs);overflow-x:auto;margin-bottom:var(--sp-3);">
+<pre style="color:var(--color-cyan);">-- Ajouter un datafile avec taille max
+ALTER TABLESPACE pharma_data
+ADD DATAFILE 'pharma02.dbf' SIZE 1G
+AUTOEXTEND ON MAXSIZE 10G;
+
+-- Vérifier l'occupation
+SELECT tablespace_name, SUM(bytes)/1024/1024 AS size_mb
+FROM dba_data_files
+WHERE tablespace_name = 'PHARMA_DATA'
+GROUP BY tablespace_name;
+
+-- Vérifier l'espace libre
+SELECT tablespace_name, SUM(bytes)/1024/1024 AS free_mb
+FROM dba_free_space
+WHERE tablespace_name = 'PHARMA_DATA'
+GROUP BY tablespace_name;
+
+-- Métriques d'usage
+SELECT * FROM dba_tablespace_usage_metrics
+WHERE tablespace_name = 'PHARMA_DATA';</pre>
+        </div>
+        <button class="btn btn--outline btn--sm" onclick="copyCode(this)">Copier</button>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         PILIER 2 : STATISTIQUES CBO
+         ============================================================ -->
+    <section class="module-section" id="tab-stats">
+      <div class="page-header">
+        <h1 class="page-header__title">Statistiques (CBO) — Impact sur les plans d'exécution</h1>
+        <div class="page-header__subtitle-row">
+          <p class="page-header__subtitle">Simulation de l'effet de statistiques obsolètes vs à jour sur le temps de réponse d'une requête critique PUI.</p>
+          <button class="page-header__help-btn" data-help="stats" aria-label="Aide Statistiques" title="Rubrique d'aide">?</button>
+        </div>
+      </div>
+
+      <div class="card fade-in">
+        <div class="card__header">
+          <div class="card__header-title"><span class="card__title-icon">&#9632;</span> Simulation CBO</div>
+          <div><span class="tag tag--cyan" id="stats-score-tag">SCORE: 0</span></div>
+        </div>
+
+        <div class="card__title" style="font-size:var(--fs-sm);margin-bottom:var(--sp-3);">État des statistiques :</div>
+        <div class="toggle-group" id="stats-mode-group">
+          <button class="toggle-group__btn toggle-group__btn--active" data-stats-mode="old">Obsolètes (30 jours)</button>
+          <button class="toggle-group__btn" data-stats-mode="fresh">À jour</button>
+        </div>
+
+        <div style="margin-bottom:var(--sp-4);">
+          <button class="btn btn--primary btn--sm" id="stats-run">Lancer la requête critique</button>
+        </div>
+
+        <!-- Results grid -->
+        <div id="stats-results-area">
+          <div class="comp-card">
+            <div class="comp-legend"><span><span class="comp-legend__dot comp-legend__dot--before"></span>Obsolètes</span><span><span class="comp-legend__dot comp-legend__dot--after"></span>À jour</span></div>
+            <div class="comp-bar"><span class="comp-bar__label">Temps</span><div class="comp-bar__track"><div class="comp-bar__fill comp-bar__fill--before" id="stats-bar-before" style="width:100%"></div></div><span class="comp-bar__value comp-bar__value--before" id="stats-val-before">--</span></div>
+            <div class="comp-bar"><span class="comp-bar__label">Coût</span><div class="comp-bar__track"><div class="comp-bar__fill comp-bar__fill--after" id="stats-bar-after" style="width:0%"></div></div><span class="comp-bar__value comp-bar__value--after" id="stats-val-after">--</span></div>
+          </div>
+          <div class="grid-3" id="stats-metrics">
+            <div class="stat-block stat-block--red"><div class="stat-block__value" id="stats-time">--</div><div class="stat-block__label">Temps exécution</div></div>
+            <div class="stat-block stat-block--amber"><div class="stat-block__value" id="stats-cost">--</div><div class="stat-block__label">Coût optimiseur</div></div>
+            <div class="stat-block stat-block--purple"><div class="stat-block__value" id="stats-rows">--</div><div class="stat-block__label">Lignes estimées</div></div>
+          </div>
+        </div>
+        <div id="stats-result-msg" style="margin-bottom:var(--sp-3);"></div>
+
+        <div class="log-console" id="stats-console">
+          <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Simulateur CBO prêt. Statistiques obsolètes par défaut.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__title">Commande DBA</div>
+        <div class="code-block" style="background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:var(--sp-4);font-family:var(--font-mono);font-size:var(--fs-xs);overflow-x:auto;margin-bottom:var(--sp-3);">
+<pre style="color:var(--color-cyan);">BEGIN
+  DBMS_STATS.GATHER_TABLE_STATS(
+    ownname    => 'PHARMA',
+    tabname    => 'SORTIE_STOCK',
+    cascade    => TRUE,
+    method_opt => 'FOR ALL COLUMNS SIZE AUTO'
+  );
+END;
+
+-- Vérifier la date des dernières statistiques
+SELECT table_name, last_analyzed, num_rows
+FROM dba_tables
+WHERE owner = 'PHARMA' AND table_name = 'SORTIE_STOCK';</pre>
+        </div>
+        <button class="btn btn--outline btn--sm" onclick="copyCode(this)">Copier</button>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         PILIER 3 : RECYCLE BIN
+         ============================================================ -->
+    <section class="module-section" id="tab-recyclebin">
+      <div class="page-header">
+        <h1 class="page-header__title">Recycle Bin — Sauvetage &amp; purge d'objets</h1>
+        <div class="page-header__subtitle-row">
+          <p class="page-header__subtitle">Gestion du Recycle Bin Oracle : DROP, FLASHBACK et PURGE de tables PUI fictives.</p>
+          <button class="page-header__help-btn" data-help="recyclebin" aria-label="Aide Recycle Bin" title="Rubrique d'aide">?</button>
+        </div>
+      </div>
+
+      <div class="card fade-in">
+        <div class="card__header">
+          <div class="card__header-title"><span class="card__title-icon">&#9632;</span> Simulation Recycle Bin</div>
+          <div><span class="tag tag--cyan" id="rb-score-tag">SCORE: 0</span></div>
+        </div>
+
+        <div class="stat-block stat-block--blue" style="margin-bottom:var(--sp-4);">
+          <div class="stat-block__value" id="rb-count">0 objet(s)</div>
+          <div class="stat-block__label">Dans le Recycle Bin</div>
+        </div>
+
+        <div style="display:flex;gap:var(--sp-3);margin-bottom:var(--sp-4);flex-wrap:wrap;">
+          <button class="btn btn--danger btn--sm" id="rb-drop">DROP TABLE stock_med</button>
+          <button class="btn btn--success btn--sm" id="rb-flashback" disabled>FLASHBACK TABLE</button>
+          <button class="btn btn--warning btn--sm" id="rb-purge" disabled>PURGE RECYCLEBIN</button>
+        </div>
+
+        <div id="rb-list-area">
+          <div class="card__title" style="font-size:var(--fs-sm);">Objets dans le Recycle Bin :</div>
+          <div class="vis-list" id="rb-list"></div>
+        </div>
+
+        <div class="log-console" id="rb-console">
+          <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Simulateur Recycle Bin prêt. Aucun objet supprimé.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__title">Commande DBA</div>
+        <div class="code-block" style="background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:var(--sp-4);font-family:var(--font-mono);font-size:var(--fs-xs);overflow-x:auto;margin-bottom:var(--sp-3);">
+<pre style="color:var(--color-cyan);">-- Voir les objets dans le Recycle Bin
+SELECT object_name, original_name, type, droptime
+FROM user_recyclebin;
+
+-- Restaurer une table
+FLASHBACK TABLE stock_med TO BEFORE DROP;
+
+-- Vider le Recycle Bin
+PURGE RECYCLEBIN;
+
+-- DROP sans passer par le Recycle Bin
+DROP TABLE stock_med PURGE;
+
+-- Purge sélective d'une table
+PURGE TABLE stock_med;</pre>
+        </div>
+        <button class="btn btn--outline btn--sm" onclick="copyCode(this)">Copier</button>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         PILIER 4 : INDEXATION
+         ============================================================ -->
+    <section class="module-section" id="tab-indexation">
+      <div class="page-header">
+        <h1 class="page-header__title">Indexation — Compromis lecture / écriture</h1>
+        <div class="page-header__subtitle-row">
+          <p class="page-header__subtitle">Impact du nombre d'index sur les performances en lecture et en écriture dans une base PUI.</p>
+          <button class="page-header__help-btn" data-help="indexation" aria-label="Aide Indexation" title="Rubrique d'aide">?</button>
+        </div>
+      </div>
+
+      <div class="card fade-in">
+        <div class="card__header">
+          <div class="card__header-title"><span class="card__title-icon">&#9632;</span> Simulation d'indexation</div>
+          <div><span class="tag tag--cyan" id="idx-score-tag">SCORE: 0</span></div>
+        </div>
+
+        <div class="slider-group" style="max-width:500px;margin-bottom:var(--sp-4);">
+          <div class="slider-group__header">
+            <span class="slider-group__label">Nombre d'index</span>
+            <span class="slider-group__value" id="idx-slider-value">3</span>
+          </div>
+          <input type="range" id="idx-slider" min="0" max="10" step="1" value="3">
+        </div>
+
+        <div class="comp-card" style="margin-bottom:var(--sp-4);">
+          <div class="comp-legend"><span><span class="comp-legend__dot comp-legend__dot--after" style="background:var(--color-cyan);"></span>Lecture</span><span><span class="comp-legend__dot comp-legend__dot--before"></span>Écriture</span></div>
+          <div class="comp-bar"><span class="comp-bar__label">Lecture</span><div class="comp-bar__track"><div class="comp-bar__fill" id="idx-bar-read" style="background:var(--color-cyan);width:60%"></div></div><span class="comp-bar__value" id="idx-read-value" style="color:var(--color-cyan);">60%</span></div>
+          <div class="comp-bar"><span class="comp-bar__label">Écriture</span><div class="comp-bar__track"><div class="comp-bar__fill comp-bar__fill--before" id="idx-bar-write" style="width:70%"></div></div><span class="comp-bar__value comp-bar__value--before" id="idx-write-value">70%</span></div>
+        </div>
+
+        <div id="idx-status-area">
+          <div class="alert alert--success" id="idx-status-msg">Équilibre optimal — 3-5 index recommandés.</div>
+        </div>
+
+        <div class="log-console" id="idx-console">
+          <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Simulateur d'indexation prêt. 3 index configurés.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__title">Commande DBA</div>
+        <div class="code-block" style="background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:var(--sp-4);font-family:var(--font-mono);font-size:var(--fs-xs);overflow-x:auto;margin-bottom:var(--sp-3);">
+<pre style="color:var(--color-cyan);">-- Créer un index
+CREATE INDEX idx_sortie_date
+ON sortie_stock(date_sortie);
+
+-- Lister les index d'une table
+SELECT index_name, uniqueness, status, visibility
+FROM user_indexes
+WHERE table_name = 'SORTIE_STOCK';
+
+-- Vérifier l'état physique d'un index
+ANALYZE INDEX idx_sortie_date VALIDATE STRUCTURE;
+SELECT name, height, lf_rows, del_lf_rows,
+  ROUND(del_lf_rows / NULLIF(lf_rows, 0) * 100, 1) AS pct_frag
+FROM index_stats;
+
+-- Reconstruire un index fragmenté (&gt; 30% deleted)
+ALTER INDEX idx_sortie_date REBUILD ONLINE;</pre>
+        </div>
+        <button class="btn btn--outline btn--sm" onclick="copyCode(this)">Copier</button>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         PILIER 5 : DEADLOCKS
+         ============================================================ -->
+    <section class="module-section" id="tab-deadlocks">
+      <div class="page-header">
+        <h1 class="page-header__title">Deadlocks (ORA-00060) — Ordre de verrouillage</h1>
+        <div class="page-header__subtitle-row">
+          <p class="page-header__subtitle">Simulation d'interblocage entre deux transactions concurrentes. Choisissez l'ordre de verrouillage pour l'éviter.</p>
+          <button class="page-header__help-btn" data-help="deadlocks" aria-label="Aide Deadlocks" title="Rubrique d'aide">?</button>
+        </div>
+      </div>
+
+      <div class="card fade-in">
+        <div class="card__header">
+          <div class="card__header-title"><span class="card__title-icon">&#9632;</span> Simulation d'interblocage</div>
+          <div><span class="tag tag--cyan" id="dl-score-tag">SCORE: 0</span></div>
+        </div>
+
+        <!-- Transaction schema -->
+        <div class="dl-schema" id="dl-schema">
+          <div class="dl-transaction">
+            <div class="dl-transaction__title" style="color:var(--color-cyan);">Transaction A</div>
+            <div class="dl-transaction__step dl-transaction__step--hold">
+              <span style="font-size:var(--fs-xs);">&#128274;</span> UPDATE stock_med SET qty=100 WHERE med_id = 1
+            </div>
+            <div class="dl-transaction__step dl-transaction__step--wait">
+              <span style="font-size:var(--fs-xs);">&#8987;</span> UPDATE lot SET qty=200 WHERE med_id = 2 <span style="color:#94a3b8;">(attend B)</span>
+            </div>
+          </div>
+          <div class="dl-transaction">
+            <div class="dl-transaction__title" style="color:var(--color-amber);">Transaction B</div>
+            <div class="dl-transaction__step dl-transaction__step--hold">
+              <span style="font-size:var(--fs-xs);">&#128274;</span> UPDATE lot SET qty=200 WHERE med_id = 2
+            </div>
+            <div class="dl-transaction__step dl-transaction__step--wait">
+              <span style="font-size:var(--fs-xs);">&#8987;</span> UPDATE stock_med SET qty=100 WHERE med_id = 1 <span style="color:#94a3b8;">(attend A)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card__title" style="font-size:var(--fs-sm);">Quel ordre de verrouillage choisissez-vous ?</div>
+        <div style="display:flex;flex-direction:column;gap:var(--sp-2);margin-bottom:var(--sp-4);">
+          <button class="btn btn--outline btn--sm" id="dl-choice-1" style="justify-content:flex-start;text-transform:none;letter-spacing:0;font-size:var(--fs-sm);padding:var(--sp-3) var(--sp-4);">
+            Verrouiller par ordre alphabétique (lot puis med_id)
+          </button>
+          <button class="btn btn--outline btn--sm" id="dl-choice-2" style="justify-content:flex-start;text-transform:none;letter-spacing:0;font-size:var(--fs-sm);padding:var(--sp-3) var(--sp-4);">
+            Verrouiller par ordre alphabétique inverse (med_id puis lot)
+          </button>
+          <button class="btn btn--outline btn--sm" id="dl-choice-3" style="justify-content:flex-start;text-transform:none;letter-spacing:0;font-size:var(--fs-sm);padding:var(--sp-3) var(--sp-4);">
+            Ordre différent selon la transaction
+          </button>
+        </div>
+
+        <div id="dl-result-area"></div>
+
+        <div class="log-console" id="dl-console">
+          <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Simulateur de deadlocks prêt. Transactions concurrentes actives.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__title">Commande DBA</div>
+        <div class="code-block" style="background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:var(--sp-4);font-family:var(--font-mono);font-size:var(--fs-xs);overflow-x:auto;margin-bottom:var(--sp-3);">
+<pre style="color:var(--color-cyan);">-- Identifier une session bloquante
+SELECT blocking_session, sid, serial#, event
+FROM v$session
+WHERE blocking_session IS NOT NULL;
+
+-- Bonne pratique : ordre de verrouillage
+-- identique dans TOUTES les transactions
+
+-- Identifier l'objet verrouillé
+SELECT ao.object_name, lo.session_id, lo.oracle_username
+FROM v$locked_object lo
+JOIN dba_objects ao ON lo.object_id = ao.object_id;
+
+-- Débloquer une session bloquante (utiliser les SID et SERIAL# de v$session)
+-- ALTER SYSTEM KILL SESSION 'sid,serial#' IMMEDIATE;</pre>
+        </div>
+        <button class="btn btn--outline btn--sm" onclick="copyCode(this)">Copier</button>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         DASHBOARD — Niveau de Risque SIH
+         ============================================================ -->
+    <section class="module-section" id="tab-dashboard">
+      <div class="page-header">
+        <h1 class="page-header__title">Niveau de Risque SIH — Score agrégé</h1>
+        <div class="page-header__subtitle-row">
+          <p class="page-header__subtitle">Synthèse des 5 piliers. Score sur 100 points. Conformité HDS / ISO 27001 / COFRAC.</p>
+          <button class="page-header__help-btn" data-help="dashboard" aria-label="Aide Dashboard" title="Rubrique d'aide">?</button>
+        </div>
+      </div>
+
+      <div class="card fade-in">
+        <div class="card__header">
+          <div class="card__header-title"><span class="card__title-icon">&#9632;</span> Risque SIH Global</div>
+          <div><span class="tag tag--cyan" id="dash-level-tag">INITIAL</span></div>
+        </div>
+
+        <div style="margin-bottom:var(--sp-6);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--sp-2);">
+            <span class="card__title" style="font-size:var(--fs-xl);margin:0;" id="dash-level-text">NIVEAU : INITIAL</span>
+            <span class="stat-block__value" id="dash-score" style="font-size:var(--fs-2xl);">0 / 100</span>
+          </div>
+          <div class="progress-bar progress-bar--lg">
+            <div class="progress-bar__fill progress-bar__fill--risk-maitrise" id="dash-progress-fill" style="width:0%;"></div>
+          </div>
+        </div>
+
+        <div class="card__title" style="font-size:var(--fs-sm);">Détail par pilier</div>
+        <table class="data-table" id="dash-table">
+          <thead>
+            <tr>
+              <th>Pilier</th>
+              <th>Statut</th>
+              <th>Points</th>
+            </tr>
+          </thead>
+          <tbody id="dash-table-body">
+            <tr><td>1. Espace (Tablespace)</td><td id="dash-status-ts">—</td><td id="dash-pts-ts">0</td></tr>
+            <tr><td>2. Statistiques (CBO)</td><td id="dash-status-st">—</td><td id="dash-pts-st">0</td></tr>
+            <tr><td>3. Recycle Bin</td><td id="dash-status-rb">—</td><td id="dash-pts-rb">0</td></tr>
+            <tr><td>4. Indexation</td><td id="dash-status-id">—</td><td id="dash-pts-id">0</td></tr>
+            <tr><td>5. Deadlocks</td><td id="dash-status-dl">—</td><td id="dash-pts-dl">0</td></tr>
+          </tbody>
+        </table>
+
+        <div style="margin-top:var(--sp-4);">
+          <button class="btn btn--outline btn--sm" id="dash-reset">Réinitialiser tous les scores</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- HELP OVERLAY -->
+    <div class="help-overlay" id="help-overlay" aria-hidden="true"></div>
+
+    <!-- MODAL : Tablespace -->
+    <div class="help-modal" id="help-tablespace" role="dialog" aria-modal="true" aria-labelledby="help-ts-title" aria-hidden="true">
+      <div class="help-modal__header">
+        <div class="help-modal__title" id="help-ts-title">Tablespace — Gestion de l'espace</div>
+        <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+      </div>
+      <div class="help-modal__body">
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--objective">Objectif pédagogique</div>
+          <p class="help-modal__text">Comprendre l'impact du mode d'allocation (<code>AUTOEXTEND UNLIMITED</code> vs <code>MAXSIZE + ALERTE</code>) sur la continuité d'une PUI. Un tablespace saturé bloque toute prescription.</p>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--rule">Règle métier SIH</div>
+          <ul class="help-modal__list">
+            <li><strong>MAXSIZE</strong> : Toujours définir une taille maximale pour éviter la saturation disque.</li>
+            <li><strong>Alerte à 80%</strong> : Mettre en place une supervision remontant une alerte avant saturation.</li>
+            <li><strong>Datafile supplémentaire</strong> : Ajouter un datafile dès 80% d'occupation pour garantir la continuité.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="help-modal__footer">
+        <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+      </div>
+    </div>
+
+    <!-- MODAL : Stats CBO -->
+    <div class="help-modal" id="help-stats" role="dialog" aria-modal="true" aria-labelledby="help-st-title" aria-hidden="true">
+      <div class="help-modal__header">
+        <div class="help-modal__title" id="help-st-title">Statistiques CBO — Optimizer</div>
+        <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+      </div>
+      <div class="help-modal__body">
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--objective">Objectif pédagogique</div>
+          <p class="help-modal__text">Le <strong>Cost-Based Optimizer (CBO)</strong> utilise les statistiques des tables et index pour choisir le plan d'exécution optimal. Des statistiques obsolètes conduisent à des choix sous-optimaux et des temps de réponse dégradés.</p>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--rule">Bonnes pratiques</div>
+          <ul class="help-modal__list">
+            <li><strong>Fréquence</strong> : Lancer <code>DBMS_STATS</code> quotidiennement sur les tables critiques PUI.</li>
+            <li><strong>Cascade</strong> : Utiliser <code>cascade => TRUE</code> pour mettre à jour les index simultanément.</li>
+            <li><strong>Verrouillage</strong> : Ne jamais verrouiller les statistiques sans procédure de mise à jour documentée.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="help-modal__footer">
+        <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+      </div>
+    </div>
+
+    <!-- MODAL : Recycle Bin -->
+    <div class="help-modal" id="help-recyclebin" role="dialog" aria-modal="true" aria-labelledby="help-rb-title" aria-hidden="true">
+      <div class="help-modal__header">
+        <div class="help-modal__title" id="help-rb-title">Recycle Bin — FLASHBACK vs PURGE</div>
+        <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+      </div>
+      <div class="help-modal__body">
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--objective">Objectif pédagogique</div>
+          <p class="help-modal__text">Le Recycle Bin Oracle stocke les objets supprimés (<code>DROP TABLE</code>) et permet leur récupération via <code>FLASHBACK TABLE ... TO BEFORE DROP</code>. La purge définitive (<code>PURGE RECYCLEBIN</code>) libère l'espace mais interdit tout retour en arrière.</p>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--rule">Bonnes pratiques</div>
+          <ul class="help-modal__list">
+            <li><strong>FLASHBACK prioritaire</strong> : Toujours tenter un flashback avant une restauration depuis une sauvegarde.</li>
+            <li><strong>Purge maîtrisée</strong> : Ne purger que lorsque l'espace est critique et que les objets sont validés comme non nécessaires.</li>
+            <li><strong>Script d'audit</strong> : Vérifier régulièrement le contenu du Recycle Bin via <code>USER_RECYCLEBIN</code>.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="help-modal__footer">
+        <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+      </div>
+    </div>
+
+    <!-- MODAL : Indexation -->
+    <div class="help-modal" id="help-indexation" role="dialog" aria-modal="true" aria-labelledby="help-id-title" aria-hidden="true">
+      <div class="help-modal__header">
+        <div class="help-modal__title" id="help-id-title">Indexation — Compromis lecture/écriture</div>
+        <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+      </div>
+      <div class="help-modal__body">
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--objective">Objectif pédagogique</div>
+          <p class="help-modal__text">Les index accélèrent les lectures (<code>SELECT</code>) mais ralentissent les écritures (<code>INSERT/UPDATE/DELETE</code>) car chaque index doit être maintenu. Trouver le bon équilibre est crucial pour une application PUI aux deux types d'accès.</p>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--rule">Règle métier</div>
+          <ul class="help-modal__list">
+            <li><strong>Ratio optimal</strong> : 3-5 index par table OLTP pour un bon équilibre.</li>
+            <li><strong>Index composites</strong> : Préférer un index composite à plusieurs index mono-colonne.</li>
+            <li><strong>Monitoring</strong> : Utiliser <code>INDEX_STATS</code> pour vérifier l'utilisation réelle des index.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="help-modal__footer">
+        <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+      </div>
+    </div>
+
+    <!-- MODAL : Deadlocks -->
+    <div class="help-modal" id="help-deadlocks" role="dialog" aria-modal="true" aria-labelledby="help-dl-title" aria-hidden="true">
+      <div class="help-modal__header">
+        <div class="help-modal__title" id="help-dl-title">Deadlocks — ORA-00060</div>
+        <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+      </div>
+      <div class="help-modal__body">
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--objective">Objectif pédagogique</div>
+          <p class="help-modal__text">Un <strong>deadlock</strong> (interblocage) survient lorsque deux transactions attendent mutuellement un verrou détenu par l'autre. Oracle détecte la situation et rollbacke l'une des transactions avec une erreur <code>ORA-00060</code>.</p>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--rule">Prévention</div>
+          <ul class="help-modal__list">
+            <li><strong>Ordre de verrouillage</strong> : Toutes les transactions doivent verrouiller les ressources dans le même ordre.</li>
+            <li><strong>Transactions courtes</strong> : Limiter la durée des transactions pour réduire la fenêtre de conflit.</li>
+            <li><strong>Trace ORA-00060</strong> : Analyser le fichier de trace généré dans <code>background_dump_dest</code>.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="help-modal__footer">
+        <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+      </div>
+    </div>
+
+    <!-- MODAL : Dashboard -->
+    <div class="help-modal" id="help-dashboard" role="dialog" aria-modal="true" aria-labelledby="help-dash-title" aria-hidden="true">
+      <div class="help-modal__header">
+        <div class="help-modal__title" id="help-dash-title">Dashboard — Niveau de Risque SIH</div>
+        <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+      </div>
+      <div class="help-modal__body">
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--objective">Interprétation</div>
+          <p class="help-modal__text">Le score SIH global (0-100) est la somme des points gagnés ou perdus sur chaque pilier. Un score &lt; 40 est critique, 40-70 est élevé, &gt; 70 est maîtrisé. Chaque action de l'utilisateur impacte le score en temps réel.</p>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--rule">Pondération</div>
+          <ul class="help-modal__list">
+            <li>Tablespace : 20 pts max</li>
+            <li>Statistiques CBO : 20 pts max</li>
+            <li>Recycle Bin : 15 pts max</li>
+            <li>Indexation : 20 pts max</li>
+            <li>Deadlocks : 25 pts max</li>
+          </ul>
+        </div>
+      </div>
+      <div class="help-modal__footer">
+        <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+      </div>
+    </div>
+
+    <!-- MODAL : Lexique -->
+    <div class="help-modal" id="help-lexicon" role="dialog" aria-modal="true" aria-labelledby="help-lexicon-title" aria-hidden="true">
+      <div class="help-modal__header">
+        <div class="help-modal__title" id="help-lexicon-title">Lexique technique — Best Practices SIH</div>
+        <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+      </div>
+      <div class="help-modal__body">
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--lexique">Gestion de l'espace</div>
+          <ul class="help-modal__list">
+            <li><strong>Tablespace</strong> — Conteneur logique de stockage Oracle. Une PUI doit avoir des tablespaces dédiés par type de données.</li>
+            <li><strong>Autoextend</strong> — Extension automatique d'un datafile. Sans MAXSIZE, le disque peut saturer (→ PUI bloquée).</li>
+          </ul>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--lexique">Optimiseur et Statistiques</div>
+          <ul class="help-modal__list">
+            <li><strong>CBO</strong> — Cost-Based Optimizer. Moteur de plan d'exécution Oracle basé sur les statistiques.</li>
+            <li><strong>DBMS_STATS</strong> — Package Oracle de collecte des statistiques. Essentiel pour des plans optimaux.</li>
+          </ul>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--lexique">Recycle Bin et Récupération</div>
+          <ul class="help-modal__list">
+            <li><strong>Recycle Bin</strong> — Espace de stockage des objets supprimés (DROP). Permet le FLASHBACK réversible.</li>
+            <li><strong>Flashback</strong> — Récupération d'une table supprimée via <code>FLASHBACK TABLE ... TO BEFORE DROP</code>.</li>
+          </ul>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--lexique">Verrous et Deadlocks</div>
+          <ul class="help-modal__list">
+            <li><strong>Deadlock</strong> — Interblocage entre 2 transactions. Oracle le détecte et rollbacke l'une d'elles (ORA-00060).</li>
+            <li><strong>ORA-00060</strong> — Code d'erreur Oracle signalant un deadlock. Trace générée dans le fichier de log.</li>
+            <li><strong>Lock</strong> — Verrou placé sur une ligne ou une table pendant une transaction.</li>
+            <li><strong>Row Exclusive</strong> — Mode de verrouillage ligne le plus courant (RX). Permet les lectures concurrentes.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="help-modal__footer">
+        <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+      </div>
+    </div>
+
+    <!-- MODAL : Credit -->
+    <div class="help-modal" id="help-credit" role="dialog" aria-modal="true" aria-labelledby="help-credit-title" aria-hidden="true">
+      <div class="help-modal__header">
+        <div class="help-modal__title" id="help-credit-title">Crédit</div>
+        <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+      </div>
+      <div class="help-modal__body">
+        <div class="help-modal__credit">
+          <p class="help-modal__credit-role">Conception fonctionnelle, scénarios, développement et relecture</p>
+          <p class="help-modal__credit-author">
+            <a href="https://github.com/bertinstephane42/oracle-sih" target="_blank" rel="noopener noreferrer">Stéphane Bertin</a>
+          </p>
+          <p class="help-modal__credit-assist">Assisté par <strong>OpenCode</strong>, agent <strong>Big Pickle</strong></p>
+          <p class="help-modal__credit-year">2025</p>
+        </div>
+      </div>
+      <div class="help-modal__footer">
+        <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+      </div>
+    </div>
+
+    <footer class="app-footer">
+      ORACLE_BEST_PRACTICES::DÉMO — Application de démonstration technique<br>
+      DONNÉES: 100% FICTIVES — Conforme RGPD Art. 25 (Privacy by Design) — HDS / ISO 27001 / COFRAC<br>
+      Architecture: ES6 Classes — Vanilla JS — Zéro dépendance — Hors ligne
+    </footer>
+  </main>
+</div>
+
+<script>
+'use strict';
+
+/* ============================================================
+   CORE INFRASTRUCTURE
+   ============================================================ */
+
+const Logger = (() => {
+  const LEVELS = { DEBUG: 0, INFO: 1, WARN: 2, ERROR: 3 };
+  const COLORS = { DEBUG: '#64748b', INFO: '#3b82f6', WARN: '#f59e0b', ERROR: '#ef4444' };
+  const prefix = '[OracleBestPractices]';
+  function _log(level, ...args) {
+    const ts = new Date().toISOString().slice(11, 19);
+    console.log('%c' + prefix + ' [' + ts + '] [' + level + ']', 'color: ' + (COLORS[level]||'#fff') + '; font-weight: bold;', ...args);
+  }
+  return { debug: (...a) => _log('DEBUG', ...a), info: (...a) => _log('INFO', ...a), warn: (...a) => _log('WARN', ...a), error: (...a) => _log('ERROR', ...a) };
+})();
+
+class EventDispatcher {
+  constructor() { this._listeners = new Map(); }
+  on(event, callback) {
+    if (!this._listeners.has(event)) this._listeners.set(event, []);
+    this._listeners.get(event).push(callback);
+  }
+  emit(event, payload) {
+    const cbs = this._listeners.get(event) || [];
+    cbs.forEach(cb => { try { cb(payload); } catch(e) { Logger.error('Listener error:', e); } });
+  }
+}
+
+/* ============================================================
+   HELP MANAGER
+   ============================================================ */
+
+class HelpManager {
+  constructor() {
+    this._overlay = document.getElementById('help-overlay');
+    this._active = null;
+    this._boundKey = this._onKey.bind(this);
+    this._overlay.addEventListener('click', () => this.close());
+  }
+  open(id) {
+    const modal = document.getElementById('help-' + id);
+    if (!modal) return;
+    this._active = modal;
+    this._overlay.classList.add('help-overlay--active');
+    this._overlay.setAttribute('aria-hidden', 'false');
+    modal.classList.add('help-modal--active');
+    modal.setAttribute('aria-hidden', 'false');
+    document.addEventListener('keydown', this._boundKey);
+    const closeBtn = modal.querySelector('.help-modal__close');
+    if (closeBtn) closeBtn.focus();
+  }
+  close() {
+    if (!this._active) return;
+    this._active.classList.remove('help-modal--active');
+    this._active.setAttribute('aria-hidden', 'true');
+    this._overlay.classList.remove('help-overlay--active');
+    this._overlay.setAttribute('aria-hidden', 'true');
+    document.removeEventListener('keydown', this._boundKey);
+    this._active = null;
+  }
+  _onKey(e) {
+    if (e.key === 'Escape') { this.close(); return; }
+    if (e.key !== 'Tab' || !this._active) return;
+    const focusable = this._active.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    const first = focusable[0], last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
+}
+
+/* ============================================================
+   RISK ENGINE — Score SIH Global
+   ============================================================ */
+
+class RiskEngine {
+  constructor() {
+    this._dispatcher = new EventDispatcher();
+    this._scores = new Map();
+    this._labels = new Map();
+  }
+  on(evt, cb) { this._dispatcher.on(evt, cb); }
+  setScore(pilier, value) {
+    this._scores.set(pilier, value);
+    this._dispatcher.emit('risk-change', { pilier, value });
+  }
+  setLabel(pilier, label) {
+    this._labels.set(pilier, label);
+    this._dispatcher.emit('risk-change', { pilier });
+  }
+  getScore(pilier) { return this._scores.get(pilier) || 0; }
+  getLabel(pilier) { return this._labels.get(pilier) || '—'; }
+  getTotal() {
+    let total = 0;
+    for (const v of this._scores.values()) total += v;
+    return Math.max(0, Math.min(100, total));
+  }
+  getLevel() {
+    const t = this.getTotal();
+    if (t >= 70) return { key: 'maitrise', label: 'MAÎTRISÉ', color: 'var(--color-green)' };
+    if (t >= 40) return { key: 'eleve', label: 'ÉLEVÉ', color: 'var(--color-amber)' };
+    return { key: 'critique', label: 'CRITIQUE', color: 'var(--color-red)' };
+  }
+  reset() {
+    this._scores.clear();
+    this._labels.clear();
+    this._dispatcher.emit('risk-change', {});
+  }
+}
+
+/* ============================================================
+   TABLESPACE MODULE
+   ============================================================ */
+
+class TablespaceModule {
+  constructor(engine) {
+    this._engine = engine;
+    this._mode = 'maxsize'; // 'unlimited' | 'maxsize'
+    this._value = 50;
+    this._datafileAdded = false;
+  }
+  init() {
+    this._bindEvents();
+    this._updateUI();
+  }
+  _bindEvents() {
+    const self = this;
+
+    document.getElementById('ts-slider').addEventListener('input', function() {
+      self._value = parseInt(this.value);
+      document.getElementById('ts-slider-value').textContent = self._value + '%';
+      self._updateUI();
+    });
+
+    document.querySelectorAll('[data-ts-mode]').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('[data-ts-mode]').forEach(b => b.classList.remove('toggle-group__btn--active'));
+        this.classList.add('toggle-group__btn--active');
+        self._mode = this.dataset.tsMode;
+        self._datafileAdded = false;
+        self._updateUI();
+        self._log('Mode changé : ' + (self._mode === 'unlimited' ? 'AUTOEXTEND UNLIMITED' : 'MAXSIZE + ALERTE 80%'), 'info');
+      });
+    });
+
+    document.getElementById('ts-add-datafile').addEventListener('click', function() {
+      self._datafileAdded = true;
+      self._value = 50;
+      document.getElementById('ts-slider').value = 50;
+      document.getElementById('ts-slider-value').textContent = '50%';
+      self._engine.setScore('tablespace', 20);
+      self._engine.setLabel('tablespace', '✅ MAXSIZE');
+      self._updateUI();
+      self._log('Datafile ajouté. Espace repassé à 50%. +20 pts.', 'success');
+    });
+  }
+  _updateUI() {
+    const fill = document.getElementById('ts-progress-fill');
+    const area = document.getElementById('ts-status-area');
+    const addArea = document.getElementById('ts-add-area');
+    const score = this._engine.getScore('tablespace');
+
+    document.getElementById('ts-score-tag').textContent = 'SCORE: ' + score;
+
+    if (this._mode === 'unlimited') {
+      if (this._value >= 100) {
+        fill.style.width = '100%';
+        fill.style.background = 'var(--color-red)';
+        area.innerHTML = '<div class="alert alert--error">&#9888; GAME OVER — Tablespace saturé, PUI bloquée ! La capacité disque est atteinte (AUTOEXTEND UNLIMITED).</div>';
+        addArea.style.display = 'none';
+        this._engine.setScore('tablespace', -30);
+        this._engine.setLabel('tablespace', '❌ SATURÉ');
+      } else {
+        fill.style.width = this._value + '%';
+        const color = this._value >= 80 ? 'var(--color-red)' : this._value >= 60 ? 'var(--color-amber)' : 'var(--color-green)';
+        fill.style.background = color;
+        area.innerHTML = '<div class="alert alert--warning">&#9888; Mode AUTOEXTEND UNLIMITED — Aucune limite de taille. Risque de saturation disque (' + this._value + '% utilisé).</div>';
+        addArea.style.display = 'none';
+        this._engine.setScore('tablespace', -5);
+        this._engine.setLabel('tablespace', '⚠️ AUCUNE LIMITE');
+      }
+    } else {
+      fill.style.width = this._value + '%';
+      const color = this._value >= 80 ? 'var(--color-red)' : this._value >= 70 ? 'var(--color-amber)' : 'var(--color-green)';
+      fill.style.background = color;
+
+      if (this._value >= 80 && !this._datafileAdded) {
+        area.innerHTML = '<div class="alert alert--success">&#9989; Alerte ! Ajoutez un datafile. Seuil des 80% atteint.</div>';
+        addArea.style.display = 'block';
+        this._engine.setScore('tablespace', 0);
+        this._engine.setLabel('tablespace', '⚠️ SEUIL 80%');
+      } else if (this._datafileAdded) {
+        area.innerHTML = '<div class="alert alert--success">&#9989; Datafile ajouté — Espace sous contrôle (' + this._value + '%).</div>';
+        addArea.style.display = 'none';
+      } else if (this._value >= 70) {
+        area.innerHTML = '<div class="alert alert--warning">&#9888; Approche du seuil des 80% — Préparez un datafile.</div>';
+        addArea.style.display = 'none';
+        this._engine.setScore('tablespace', 5);
+        this._engine.setLabel('tablespace', '⚙️ APPROCHE SEUIL');
+      } else {
+        area.innerHTML = '<div class="alert alert--info">Espace utilisateur sous contrôle (' + this._value + '%). Mode MAXSIZE actif.</div>';
+        addArea.style.display = 'none';
+        this._engine.setScore('tablespace', 10);
+        this._engine.setLabel('tablespace', '✅ SOUS CONTRÔLE');
+      }
+    }
+  }
+  _log(msg, level) {
+    const log = document.getElementById('ts-console');
+    const ts = new Date().toISOString().slice(11, 19);
+    log.innerHTML += '<div class="log-console__entry log-console__entry--' + level + '"><span class="log-console__timestamp">[' + ts + ']</span>' + msg + '</div>';
+    log.scrollTop = log.scrollHeight;
+  }
+}
+
+/* ============================================================
+   STATS MODULE
+   ============================================================ */
+
+class StatsModule {
+  constructor(engine) {
+    this._engine = engine;
+    this._mode = 'old';
+    this._hasRun = false;
+  }
+  init() {
+    this._bindEvents();
+  }
+  _bindEvents() {
+    const self = this;
+
+    document.querySelectorAll('[data-stats-mode]').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('[data-stats-mode]').forEach(b => b.classList.remove('toggle-group__btn--active'));
+        this.classList.add('toggle-group__btn--active');
+        self._mode = this.dataset.statsMode;
+      });
+    });
+
+    document.getElementById('stats-run').addEventListener('click', function() {
+      self._hasRun = true;
+      self._runQuery();
+    });
+  }
+  _runQuery() {
+    const isOld = this._mode === 'old';
+    const oldData = { time: 45.2, cost: 12480, rows: '2 000 000' };
+    const freshData = { time: 0.2, cost: 340, rows: '85 430' };
+    const data = isOld ? oldData : freshData;
+    const pctAfter = isOld ? 100 : Math.round((0.2 / 45.2) * 1000) / 10;
+
+    document.getElementById('stats-bar-before').style.width = '100%';
+    document.getElementById('stats-bar-after').style.width = pctAfter + '%';
+    document.getElementById('stats-val-before').textContent = isOld ? '45.2 s' : '45.2 s';
+    document.getElementById('stats-val-after').textContent = isOld ? '45.2 s' : '0.2 s';
+    document.getElementById('stats-time').textContent = data.time + ' s';
+    document.getElementById('stats-cost').textContent = data.cost.toLocaleString();
+    document.getElementById('stats-rows').textContent = data.rows;
+
+    const statusClass = isOld ? 'stat-block--red' : 'stat-block--green';
+    document.getElementById('stats-time').parentElement.className = 'stat-block ' + statusClass;
+
+    const msg = document.getElementById('stats-result-msg');
+    if (isOld) {
+      msg.innerHTML = '<div class="alert alert--error">&#9888; Statistiques obsolètes — Plan d\'exécution sous-optimal. Temps : 45.2 s.</div>';
+      this._engine.setScore('stats', -20);
+      this._engine.setLabel('stats', '❌ OBSOLÈTES');
+    } else {
+      msg.innerHTML = '<div class="alert alert--success">&#9989; Statistiques à jour — Plan d\'exécution optimal. Temps : 0.2 s (-99.6%).</div>';
+      this._engine.setScore('stats', 20);
+      this._engine.setLabel('stats', '✅ À JOUR');
+    }
+
+    document.getElementById('stats-score-tag').textContent = 'SCORE: ' + this._engine.getScore('stats');
+
+    this._log('Requête ' + (isOld ? 'lente (45.2s)' : 'rapide (0.2s)') + ' — Coût optimiseur : ' + data.cost.toLocaleString(), isOld ? 'error' : 'success');
+  }
+  _log(msg, level) {
+    const log = document.getElementById('stats-console');
+    const ts = new Date().toISOString().slice(11, 19);
+    log.innerHTML += '<div class="log-console__entry log-console__entry--' + level + '"><span class="log-console__timestamp">[' + ts + ']</span>' + msg + '</div>';
+    log.scrollTop = log.scrollHeight;
+  }
+}
+
+/* ============================================================
+   RECYCLE BIN MODULE
+   ============================================================ */
+
+class RecycleBinModule {
+  constructor(engine) {
+    this._engine = engine;
+    this._items = [];
+    this._counter = 0;
+  }
+  init() {
+    this._bindEvents();
+    this._render();
+  }
+  _bindEvents() {
+    const self = this;
+
+    document.getElementById('rb-drop').addEventListener('click', function() {
+      self._dropTable();
+    });
+
+    document.getElementById('rb-flashback').addEventListener('click', function() {
+      self._flashback();
+    });
+
+    document.getElementById('rb-purge').addEventListener('click', function() {
+      self._purge();
+    });
+  }
+  _dropTable() {
+    const tableNames = ['STOCK_MED', 'LOT', 'SORTIE_STOCK', 'PRESCRIPTION'];
+    const name = tableNames[this._counter % tableNames.length];
+    this._counter++;
+    const binName = 'BIN$' + Math.random().toString(36).substring(2, 10) + '$0';
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('fr-FR');
+    this._items.push({ original: name, binName: binName, date: dateStr });
+    this._render();
+    this._log('DROP TABLE ' + name + ' → ' + binName, 'warn');
+  }
+  _flashback() {
+    if (this._items.length === 0) return;
+    const item = this._items.pop();
+    this._engine.setScore('recyclebin', Math.min(15, this._engine.getScore('recyclebin') + 15));
+    this._engine.setLabel('recyclebin', '✅ FLASHBACK OK');
+    this._render();
+    this._log('FLASHBACK TABLE ' + item.original + ' TO BEFORE DROP — Table récupérée. +15 pts.', 'success');
+  }
+  _purge() {
+    const count = this._items.length;
+    if (count === 0) return;
+    this._items = [];
+    const penalty = Math.max(-15, -(Math.min(count * 2, 15)));
+    this._engine.setScore('recyclebin', Math.max(-15, this._engine.getScore('recyclebin') + penalty));
+    this._engine.setLabel('recyclebin', '⚠️ PURGÉ');
+    this._render();
+    this._log('PURGE RECYCLEBIN — ' + count + ' objet(s) définitivement supprimé(s). ' + penalty + ' pts.', 'error');
+  }
+  _render() {
+    document.getElementById('rb-count').textContent = this._items.length + ' objet(s)';
+    const s = Math.min(15, Math.max(-15, this._engine.getScore('recyclebin')));
+    document.getElementById('rb-score-tag').textContent = 'SCORE: ' + s + ' / 15';
+
+    const fbBtn = document.getElementById('rb-flashback');
+    const purgeBtn = document.getElementById('rb-purge');
+    fbBtn.disabled = this._items.length === 0;
+    purgeBtn.disabled = this._items.length === 0;
+
+    const list = document.getElementById('rb-list');
+    if (this._items.length === 0) {
+      list.innerHTML = '<div style="color:#64748b;font-family:var(--font-mono);font-size:var(--fs-xs);padding:var(--sp-3);">Aucun objet dans le Recycle Bin.</div>';
+    } else {
+      list.innerHTML = this._items.map(item =>
+        '<div class="vis-item"><span class="vis-item__icon vis-item__icon--bin">B</span><span style="color:var(--color-amber);">' + item.binName + '</span><span style="color:#94a3b8;">' + item.original + '</span><span style="color:#64748b;margin-left:auto;">' + item.date + '</span></div>'
+      ).join('');
+    }
+  }
+  _log(msg, level) {
+    const log = document.getElementById('rb-console');
+    const ts = new Date().toISOString().slice(11, 19);
+    log.innerHTML += '<div class="log-console__entry log-console__entry--' + level + '"><span class="log-console__timestamp">[' + ts + ']</span>' + msg + '</div>';
+    log.scrollTop = log.scrollHeight;
+  }
+}
+
+/* ============================================================
+   INDEXATION MODULE
+   ============================================================ */
+
+class IndexationModule {
+  constructor(engine) {
+    this._engine = engine;
+    this._value = 3;
+  }
+  init() {
+    this._bindEvents();
+    this._updateUI();
+  }
+  _bindEvents() {
+    const self = this;
+    document.getElementById('idx-slider').addEventListener('input', function() {
+      self._value = parseInt(this.value);
+      document.getElementById('idx-slider-value').textContent = self._value;
+      self._updateUI();
+    });
+  }
+  _updateUI() {
+    const v = this._value;
+    const readPct = Math.min(95, 25 + v * 7);
+    const writePct = Math.max(25, 95 - v * 3.5);
+
+    document.getElementById('idx-bar-read').style.width = readPct + '%';
+    document.getElementById('idx-read-value').textContent = Math.round(readPct) + '%';
+    document.getElementById('idx-bar-write').style.width = writePct + '%';
+    document.getElementById('idx-write-value').textContent = Math.round(writePct) + '%';
+
+    const msg = document.getElementById('idx-status-msg');
+    let score = 0;
+    let label = '';
+    let msgClass = 'alert--info';
+    let msgText = '';
+
+    if (v >= 3 && v <= 5) {
+      score = 20;
+      label = '✅ OPTIMAL';
+      msgClass = 'alert--success';
+      msgText = 'Équilibre optimal — ' + v + ' index. Bon compromis lecture/écriture. +20 pts.';
+    } else if (v >= 6 && v <= 8) {
+      score = -10;
+      label = '⚠️ TROP D\'INDEX';
+      msgClass = 'alert--warning';
+      msgText = 'Trop d\'index (' + v + ') — Écritures ralenties. -10 pts.';
+    } else if (v >= 9) {
+      score = -20;
+      label = '❌ SURCHARGE';
+      msgClass = 'alert--error';
+      msgText = 'Surcharge d\'index (' + v + ') — DMLs fortement impactées. -20 pts.';
+    } else {
+      score = -15;
+      label = '⚠️ TROP PEU D\'INDEX';
+      msgClass = 'alert--warning';
+      msgText = 'Trop peu d\'index (' + v + ') — Lectures lentes. -15 pts.';
+    }
+
+    msg.className = 'alert ' + msgClass;
+    msg.innerHTML = msgText;
+    this._engine.setScore('indexation', score);
+    this._engine.setLabel('indexation', label);
+    document.getElementById('idx-score-tag').textContent = 'SCORE: ' + score;
+
+    this._log('Index : ' + v + ' — Lecture: ' + Math.round(readPct) + '% / Écriture: ' + Math.round(writePct) + '%', score >= 0 ? 'info' : 'warn');
+  }
+  _log(msg, level) {
+    const log = document.getElementById('idx-console');
+    const ts = new Date().toISOString().slice(11, 19);
+    log.innerHTML += '<div class="log-console__entry log-console__entry--' + level + '"><span class="log-console__timestamp">[' + ts + ']</span>' + msg + '</div>';
+    log.scrollTop = log.scrollHeight;
+  }
+}
+
+/* ============================================================
+   DEADLOCK MODULE
+   ============================================================ */
+
+class DeadlockModule {
+  constructor(engine) {
+    this._engine = engine;
+    this._hasAnswered = false;
+  }
+  init() {
+    this._bindEvents();
+  }
+  _bindEvents() {
+    const self = this;
+
+    document.getElementById('dl-choice-1').addEventListener('click', function() { self._choose(1); });
+    document.getElementById('dl-choice-2').addEventListener('click', function() { self._choose(2); });
+    document.getElementById('dl-choice-3').addEventListener('click', function() { self._choose(3); });
+  }
+  _choose(choice) {
+    if (this._hasAnswered) return;
+    this._hasAnswered = true;
+
+    const area = document.getElementById('dl-result-area');
+    const schema = document.getElementById('dl-schema');
+    const score = this._engine.getScore('deadlocks');
+
+    if (choice === 1 || choice === 2) {
+      area.innerHTML = '<div class="alert alert--success">&#9989; Deadlock évité ! Ordre de verrouillage cohérent entre les transactions. +25 pts.</div>';
+      this._engine.setScore('deadlocks', 25);
+      this._engine.setLabel('deadlocks', '✅ BON ORDRE');
+      this._log('Ordre de verrouillage correct — Deadlock évité. +25 pts.', 'success');
+      schema.querySelectorAll('.dl-transaction__step--wait').forEach(el => {
+        el.classList.remove('dl-transaction__step--wait');
+        el.classList.add('dl-transaction__step--hold');
+      });
+    } else {
+      area.innerHTML = '<div class="alert alert--error">&#9888; ORA-00060 : Deadlock détecté ! Transaction B rollbackée par Oracle. -25 pts.</div>';
+      this._engine.setScore('deadlocks', -25);
+      this._engine.setLabel('deadlocks', '❌ DEADLOCK');
+      this._log('ORA-00060 — Deadlock détecté. Transaction B annulée. -25 pts.', 'error');
+    }
+
+    document.getElementById('dl-score-tag').textContent = 'SCORE: ' + this._engine.getScore('deadlocks');
+  }
+  _log(msg, level) {
+    const log = document.getElementById('dl-console');
+    const ts = new Date().toISOString().slice(11, 19);
+    log.innerHTML += '<div class="log-console__entry log-console__entry--' + level + '"><span class="log-console__timestamp">[' + ts + ']</span>' + msg + '</div>';
+    log.scrollTop = log.scrollHeight;
+  }
+}
+
+/* ============================================================
+   DASHBOARD MODULE
+   ============================================================ */
+
+class DashboardModule {
+  constructor(engine) {
+    this._engine = engine;
+    this._pilierMap = {
+      tablespace: { id: 'ts', name: '1. Espace (Tablespace)' },
+      stats: { id: 'st', name: '2. Statistiques (CBO)' },
+      recyclebin: { id: 'rb', name: '3. Recycle Bin' },
+      indexation: { id: 'id', name: '4. Indexation' },
+      deadlocks: { id: 'dl', name: '5. Deadlocks' }
+    };
+  }
+  init() {
+    this._engine.on('risk-change', () => this._updateUI());
+    this._updateUI();
+  }
+  _updateUI() {
+    const level = this._engine.getLevel();
+    const total = this._engine.getTotal();
+
+    document.getElementById('dash-score').textContent = total + ' / 100';
+    document.getElementById('dash-level-text').textContent = 'NIVEAU : ' + level.label;
+    document.getElementById('dash-level-text').style.color = level.color;
+    document.getElementById('dash-level-tag').textContent = level.label;
+    document.getElementById('dash-level-tag').className = 'tag tag--' + (level.key === 'maitrise' ? 'green' : level.key === 'eleve' ? 'amber' : 'red');
+
+    const fill = document.getElementById('dash-progress-fill');
+    fill.style.width = total + '%';
+    fill.className = 'progress-bar__fill progress-bar__fill--risk-' + level.key;
+
+    // Update per-pilier
+    for (const [pilier, map] of Object.entries(this._pilierMap)) {
+      const labelEl = document.getElementById('dash-status-' + map.id);
+      const ptsEl = document.getElementById('dash-pts-' + map.id);
+      const score = this._engine.getScore(pilier);
+      const label = this._engine.getLabel(pilier);
+      labelEl.textContent = label || '—';
+      ptsEl.textContent = score;
+      // Color the status
+      if (label.startsWith('✅')) {
+        labelEl.style.color = 'var(--color-green)';
+      } else if (label.startsWith('❌') || label.startsWith('⚠️')) {
+        labelEl.style.color = 'var(--color-red)';
+      } else {
+        labelEl.style.color = '#94a3b8';
+      }
+    }
+
+    // Update nav score
+    const navScore = document.getElementById('nav-score');
+    if (navScore) navScore.textContent = total + ' / 100';
+  }
+}
+
+/* ============================================================
+   COPY CODE HELPER
+   ============================================================ */
+
+function copyCode(btn) {
+  const codeBlock = btn.previousElementSibling;
+  if (!codeBlock) return;
+  const text = codeBlock.textContent.trim();
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      const orig = btn.textContent;
+      btn.textContent = 'Copié !';
+      btn.style.borderColor = 'var(--color-green)';
+      btn.style.color = 'var(--color-green)';
+      setTimeout(() => { btn.textContent = orig; btn.style.borderColor = ''; btn.style.color = ''; }, 2000);
+    });
+  }
+}
+
+/* ============================================================
+   APPLICATION — Router & Bootstrapper
+   ============================================================ */
+
+class Application {
+  constructor() {
+    this._riskEngine = new RiskEngine();
+    this._modules = {};
+    this._currentTab = 'tablespace';
+  }
+
+  init() {
+    Logger.info('=== Oracle Best Practices SIH - Initialisation ===');
+
+    this._modules.tablespace = new TablespaceModule(this._riskEngine);
+    this._modules.stats = new StatsModule(this._riskEngine);
+    this._modules.recyclebin = new RecycleBinModule(this._riskEngine);
+    this._modules.indexation = new IndexationModule(this._riskEngine);
+    this._modules.deadlocks = new DeadlockModule(this._riskEngine);
+    this._modules.dashboard = new DashboardModule(this._riskEngine);
+
+    Object.values(this._modules).forEach(m => m.init());
+
+    this._bindNav();
+    window._helpMgr = new HelpManager();
+    this._bindHelp();
+
+    Logger.info('=== Oracle Best Practices SIH - Ready ===');
+  }
+
+  _bindNav() {
+    document.querySelectorAll('.app-nav__item[data-tab]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+        document.querySelectorAll('.app-nav__item').forEach(b => b.classList.remove('app-nav__item--active'));
+        btn.classList.add('app-nav__item--active');
+        document.querySelectorAll('.module-section').forEach(s => s.classList.remove('module-section--active'));
+        document.getElementById('tab-' + tab).classList.add('module-section--active');
+        this._currentTab = tab;
+      });
+    });
+  }
+
+  _bindHelp() {
+    document.querySelectorAll('[data-help]').forEach(btn => {
+      btn.addEventListener('click', () => window._helpMgr.open(btn.dataset.help));
+    });
+    document.querySelectorAll('.help-modal__close').forEach(btn => {
+      btn.addEventListener('click', () => window._helpMgr.close());
+    });
+    document.querySelectorAll('.help-modal__footer-btn').forEach(btn => {
+      btn.addEventListener('click', () => window._helpMgr.close());
+    });
+    document.getElementById('dash-reset').addEventListener('click', () => {
+      this._riskEngine.reset();
+      // Reset all module visual states
+      this._modules.tablespace._datafileAdded = false;
+      document.getElementById('ts-slider').value = 50;
+      document.getElementById('ts-slider-value').textContent = '50%';
+      document.getElementById('ts-add-area').style.display = 'none';
+      document.getElementById('ts-status-area').innerHTML = '';
+      this._modules.tablespace._updateUI();
+
+      document.getElementById('stats-result-msg').innerHTML = '';
+      document.getElementById('stats-time').textContent = '--';
+      document.getElementById('stats-cost').textContent = '--';
+      document.getElementById('stats-rows').textContent = '--';
+      document.getElementById('stats-val-before').textContent = '--';
+      document.getElementById('stats-val-after').textContent = '--';
+      document.getElementById('stats-score-tag').textContent = 'SCORE: 0';
+
+      this._modules.recyclebin._items = [];
+      this._modules.recyclebin._counter = 0;
+      this._modules.recyclebin._render();
+
+      document.getElementById('idx-slider').value = 3;
+      document.getElementById('idx-slider-value').textContent = '3';
+      this._modules.indexation._value = 3;
+      this._modules.indexation._updateUI();
+
+      this._modules.deadlocks._hasAnswered = false;
+      document.getElementById('dl-result-area').innerHTML = '';
+      document.getElementById('dl-score-tag').textContent = 'SCORE: 0';
+      // Reset schema to initial deadlock state: step1=hold, step2=wait
+      const schema = document.getElementById('dl-schema');
+      const steps = schema.querySelectorAll('.dl-transaction__step');
+      steps.forEach((el, i) => {
+        el.classList.remove('dl-transaction__step--wait');
+        el.classList.add('dl-transaction__step--hold');
+        // Steps at index 1 (TxA lot) and 3 (TxB stock_med) should be wait
+        if (i === 1 || i === 3) {
+          el.classList.remove('dl-transaction__step--hold');
+          el.classList.add('dl-transaction__step--wait');
+        }
+      });
+    });
+  }
+}
+
+/* ============================================================
+   BOOTSTRAP
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', function() {
+  try {
+    const app = new Application();
+    app.init();
+  } catch (e) {
+    Logger.error('Application bootstrap error:', e);
+  }
+});
+</script>
+</body>
+</html>
