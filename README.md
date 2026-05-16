@@ -1,6 +1,6 @@
 ﻿# Oracle SIH (Système d'Information Hospitalier) — Démonstrations Techniques
 
-> Ensemble de 7 applications HTML/CSS/JavaScript autonomes, sans dépendance externe et exécutables hors-ligne, destinées à la démonstration pédagogique de mécanismes Oracle Database et d’architectures SIH (Système d’Information Hospitalier) dans un contexte de conformité HDS/RGPD.
+> Ensemble de 8 applications HTML/CSS/JavaScript autonomes, sans dépendance externe et exécutables hors-ligne, destinées à la démonstration pédagogique de mécanismes Oracle Database et d’architectures SIH (Système d’Information Hospitalier) dans un contexte de conformité HDS/RGPD.
 
 ---
 
@@ -15,11 +15,12 @@
 7. [Fichier 4 : Cycle de vie projet Oracle PUI](#fichier-4--cycle-de-vie-projet-oracle-pui)
 8. [Fichier 5 : Suite Performance Avancée](#fichier-5--suite-performance-avancee)
 9. [Fichier 6 : Assistant SQL PUI](#fichier-6--assistant-sql-pui)
-10. [Thèmes transversaux](#thèmes-transversaux)
-11. [Conformité et sécurité](#conformité-et-sécurité)
-12. [Aide intégrée et lexiques contextuels](#aide-intégrée-et-lexiques-contextuels)
-13. [Prérequis](#prérequis)
-14. [Licence](#licence)
+10. [Fichier 7 : Bonnes Pratiques DBA SIH](#fichier-7--bonnes-pratiques-dba-sih)
+11. [Thèmes transversaux](#thèmes-transversaux)
+12. [Conformité et sécurité](#conformité-et-sécurité)
+13. [Aide intégrée et lexiques contextuels](#aide-intégrée-et-lexiques-contextuels)
+14. [Prérequis](#prérequis)
+15. [Licence](#licence)
 
 ---
 
@@ -265,6 +266,33 @@ Fonctionnalités :
 * console de sortie et tableau de bord de progression.
 
 Données 100 % fictives, contexte PUI, conformes à la charte graphique des modules 1 à 5.
+
+---
+
+# Fichier 7 : Bonnes Pratiques DBA SIH
+
+**Fichier :** `7-oracle-best-practices-sih-demo.html`
+
+Simulateur interactif des 5 bonnes pratiques DBA Oracle appliquées à une Pharmacie à Usage Intérieur (PUI). Score de risque SIH agrégé sur 100 points.
+
+| Pilier | Contenu |
+|--------|---------|
+| Espace (Tablespace) | Simulation de remplissage d'un tablespace PHARMA_DATA. Choix AUTOEXTEND UNLIMITED vs MAXSIZE + ALERTE 80%. Ajout de datafile. Alerte visuelle à saturation PUI. |
+| Statistiques (CBO) | Comparaison statistiques obsolètes (30 jours) vs à jour. Lancement de requête critique avec temps d'exécution, coût optimiseur et lignes estimées. |
+| Recycle Bin | Gestion des objets supprimés : DROP, FLASHBACK TABLE TO BEFORE DROP, PURGE RECYCLEBIN. Liste visuelle des objets BIN$. |
+| Indexation | Compromis lecture/écriture avec slider 0-10 index. Courbes de performance recalibrées selon l'impact réel des index B-tree. |
+| Deadlocks | Mini-jeu d'évitement d'interblocage (ORA-00060) entre deux transactions concurrentes sur stock_med et lot. Schéma visuel des verrous. |
+
+Fonctionnalités :
+
+* RiskEngine avec score pondéré (0-100) et niveau de risque (CRITIQUE / ÉLEVÉ / MAÎTRISÉ) ;
+* dashboard agrégé avec jauge globale et détail par pilier ;
+* commandes DBA intégrées (ALTER TABLESPACE, DBMS_STATS, FLASHBACK, CREATE INDEX, V$SESSION) ;
+* requêtes de diagnostic enrichies (DBA_TABLESPACE_USAGE_METRICS, V$LOCKED_OBJECT, INDEX_STATS) ;
+* réinitialisation complète des scores ;
+* console de log avec horodatage.
+
+Données 100 % fictives, contexte PUI, conforme RGPD Art. 25. Charte graphique identique aux modules 1 à 6.
 
 ---
 
