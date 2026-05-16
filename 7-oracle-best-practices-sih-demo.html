@@ -384,7 +384,7 @@ ALTER TABLESPACE pharma_data
 ADD DATAFILE 'pharma02.dbf' SIZE 1G
 AUTOEXTEND ON MAXSIZE 10G;
 
--- Vérifier l'occupation
+-- Vérifier la taille allouée
 SELECT tablespace_name, SUM(bytes)/1024/1024 AS size_mb
 FROM dba_data_files
 WHERE tablespace_name = 'PHARMA_DATA'
@@ -397,7 +397,8 @@ WHERE tablespace_name = 'PHARMA_DATA'
 GROUP BY tablespace_name;
 
 -- Métriques d'usage
-SELECT tablespace_name, used_space, tablespace_size, used_percent
+SELECT tablespace_name, used_space, tablespace_size, used_percent,
+       CASE WHEN used_percent >= 80 THEN '⚠ ALERTE' ELSE 'OK' END AS seuil_hds
 FROM dba_tablespace_usage_metrics
 WHERE tablespace_name = 'PHARMA_DATA';
 
@@ -649,14 +650,17 @@ FLASHBACK TABLE stock_med TO BEFORE DROP;
 -- Restaurer avec un nouveau nom (si l'original existe encore)
 FLASHBACK TABLE stock_med TO BEFORE DROP RENAME TO stock_med_recovered;
 
+-- Purge sélective d'une table
+PURGE TABLE stock_med;
+
 -- Vider le Recycle Bin
 PURGE RECYCLEBIN;
 
--- DROP sans passer par le Recycle Bin
-DROP TABLE stock_med PURGE;
+-- Suppression simple (passe par le Recycle Bin — recommandé)
+DROP TABLE stock_med;
 
--- Purge sélective d'une table
-PURGE TABLE stock_med;</pre>
+-- DROP sans passer par le Recycle Bin
+DROP TABLE stock_med PURGE;</pre>
         </div>
         <button class="btn btn--outline btn--sm" onclick="copyCode(this)">Copier</button>
       </div>
@@ -743,11 +747,6 @@ ALTER INDEX idx_sortie_date MONITORING USAGE;
 SELECT index_name, table_name, monitoring, used, start_monitoring, end_monitoring
 FROM v$object_usage WHERE index_name = 'IDX_SORTIE_DATE';
 
--- Vérifier que l'index n'est plus utilisé avant suppression
-SELECT index_name, used, start_monitoring, end_monitoring
-FROM v$object_usage
-WHERE index_name = 'IDX_SORTIE_DATE';
-
 -- Vérifier l'état physique d'un index
 ANALYZE INDEX idx_sortie_date VALIDATE STRUCTURE;
 SELECT name, height, lf_rows, del_lf_rows,
@@ -759,6 +758,11 @@ ALTER INDEX idx_sortie_date REBUILD ONLINE;
 
 -- Rendre invisible avant suppression (safety net SIH)
 ALTER INDEX idx_sortie_date INVISIBLE;
+
+-- Vérifier que l'index n'est plus utilisé avant suppression
+SELECT index_name, used, start_monitoring, end_monitoring
+FROM v$object_usage
+WHERE index_name = 'IDX_SORTIE_DATE';
 
 -- Supprimer un index inutilisé (vérifier v$object_usage au préalable)
 DROP INDEX idx_sortie_date;</pre>
@@ -875,10 +879,10 @@ FROM v$lock
 WHERE type IN ('TM', 'TX') AND lmode > 0;
 
 -- Chaîne de blocage hiérarchique
-SELECT session_id, blocking_session, LEVEL AS niveau
+SELECT sid, blocking_session, LEVEL AS niveau
 FROM v$session
 WHERE blocking_session IS NOT NULL
-CONNECT BY PRIOR session_id = blocking_session
+CONNECT BY PRIOR sid = blocking_session
 START WITH blocking_session IS NULL;
 
 -- Localiser le fichier de trace ORA-00060 (interblocage)
