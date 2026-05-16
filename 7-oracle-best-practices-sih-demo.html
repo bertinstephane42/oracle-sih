@@ -627,8 +627,8 @@ WHERE table_owner = 'PHARMA' AND table_name = 'SORTIE_STOCK';</pre>
 -- Étapes du script :
 --   1. AUDIT : Visualisation des objets supprimés (USER_RECYCLEBIN / DBA).
 --   2. RÉCUPÉRATION : FLASHBACK TABLE, avec ou sans renommage.
---   3. PURGE : Libération d'espace maîtrisée et sélective.
---   4. DÉFINITIF : DROP TABLE ... PURGE (contournement du Recycle Bin).
+--   3. DÉFINITIF : DROP TABLE (avec ou sans PURGE), contournement du Recycle Bin possible.
+--   4. PURGE : Libération d'espace maîtrisée et sélective.
 --
 -- Bonne pratique HDS : Toute PURGE définitive supprime la traçabilité —
 -- préférer DROP TABLE simple + purge différée après audit. La vue
@@ -650,17 +650,17 @@ FLASHBACK TABLE stock_med TO BEFORE DROP;
 -- Restaurer avec un nouveau nom (si l'original existe encore)
 FLASHBACK TABLE stock_med TO BEFORE DROP RENAME TO stock_med_recovered;
 
--- Purge sélective d'une table
-PURGE TABLE stock_med;
-
--- Vider le Recycle Bin
-PURGE RECYCLEBIN;
-
 -- Suppression simple (passe par le Recycle Bin — recommandé)
 DROP TABLE stock_med;
 
 -- DROP sans passer par le Recycle Bin
-DROP TABLE stock_med PURGE;</pre>
+DROP TABLE stock_med PURGE;
+
+-- Purge sélective d'une table
+PURGE TABLE archive_stock;
+
+-- Vider le Recycle Bin
+PURGE RECYCLEBIN;</pre>
         </div>
         <button class="btn btn--outline btn--sm" onclick="copyCode(this)">Copier</button>
       </div>
@@ -881,7 +881,6 @@ WHERE type IN ('TM', 'TX') AND lmode > 0;
 -- Chaîne de blocage hiérarchique
 SELECT sid, blocking_session, LEVEL AS niveau
 FROM v$session
-WHERE blocking_session IS NOT NULL
 CONNECT BY PRIOR sid = blocking_session
 START WITH blocking_session IS NULL;
 
