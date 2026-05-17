@@ -273,7 +273,7 @@ Données 100 % fictives, contexte PUI, conformes à la charte graphique des modu
 
 **Fichier :** `7-oracle-best-practices-sih-demo.html`
 
-Simulateur interactif des 5 bonnes pratiques DBA Oracle appliquées à une Pharmacie à Usage Intérieur (PUI). Score de risque SIH agrégé sur 100 points.
+Simulateur interactif des 9 bonnes pratiques DBA Oracle appliquées à une Pharmacie à Usage Intérieur (PUI). Score de risque SIH agrégé sur 200 points.
 
 | Pilier | Contenu |
 |--------|---------|
@@ -282,13 +282,18 @@ Simulateur interactif des 5 bonnes pratiques DBA Oracle appliquées à une Pharm
 | Recycle Bin | Gestion des objets supprimés : DROP, FLASHBACK TABLE TO BEFORE DROP, PURGE RECYCLEBIN. Liste visuelle des objets BIN$. |
 | Indexation | Compromis lecture/écriture avec slider 0-10 index. Courbes de performance recalibrées selon l'impact réel des index B-tree. |
 | Deadlocks | Mini-jeu d'évitement d'interblocage (ORA-00060) entre deux transactions concurrentes sur stock_med et lot. Schéma visuel des verrous. |
+| Volumétrie (ILM) | Gestion de la croissance des données HISTORIQUE_ACTES (20+ ans). Partitionnement RANGE, archivage à froid (ARCHIVE_TS), purge légale à 10 ans. Curseur année 2022-2035. |
+| Haute Disponibilité (Data Guard) | Scénario PRA avec Switchover planifié et Failover d'urgence. Sélecteur de mode de protection (Max Protection / Availability / Performance) avec impact RPO et lag de redo. |
+| Cluster RAC | Diagramme 3 nœuds avec Cache Fusion. Simulation de transfert de blocs entre instances et panne d'un nœud avec bascule automatique des services TNS. |
+| Performance (AWR) | Génération de rapport AWR simulé (Avant / Pendant incident). Top 5 Wait Events cliquables avec diagnostic SQL associé et correction appliquée. |
 
 Fonctionnalités :
 
-* RiskEngine avec score pondéré (0-100) et niveau de risque (CRITIQUE / ÉLEVÉ / MAÎTRISÉ) ;
-* dashboard agrégé avec jauge globale et détail par pilier ;
-* commandes DBA intégrées (ALTER TABLESPACE, DBMS_STATS, FLASHBACK, CREATE INDEX, V$SESSION) ;
-* requêtes de diagnostic enrichies (DBA_TABLESPACE_USAGE_METRICS, V$LOCKED_OBJECT, INDEX_STATS) ;
+* RiskEngine avec score pondéré (0-200) et niveau de risque (CRITIQUE <80 / ÉLEVÉ 80-139 / MAÎTRISÉ ≥140) ;
+* dashboard agrégé avec jauge globale et détail par pilier (9 piliers) ;
+* commandes DBA intégrées (ALTER TABLESPACE, DBMS_STATS, FLASHBACK, CREATE INDEX, ALTER TABLE MOVE PARTITION, ALTER DATABASE COMMIT TO SWITCHOVER, DBMS_WORKLOAD_REPOSITORY) ;
+* requêtes de diagnostic enrichies (DBA_TABLESPACE_USAGE_METRICS, V$LOCKED_OBJECT, INDEX_STATS, V$DATAGUARD_STATS, GV$CACHE_TRANSFER, DBA_HIST_SQLSTAT) ;
+* 9 modales d'aide contextuelle + lexique technique avec 24 termes classés en 9 sections ;
 * réinitialisation complète des scores ;
 * console de log avec horodatage.
 

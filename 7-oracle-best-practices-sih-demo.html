@@ -272,6 +272,10 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
       <button class="app-nav__item" data-tab="recyclebin"><span class="app-nav__item-icon">R</span>3. Recycle Bin</button>
       <button class="app-nav__item" data-tab="indexation"><span class="app-nav__item-icon">I</span>4. Indexation</button>
       <button class="app-nav__item" data-tab="deadlocks"><span class="app-nav__item-icon">D</span>5. Deadlocks</button>
+      <button class="app-nav__item" data-tab="ilm"><span class="app-nav__item-icon">V</span>6. Volumétrie (ILM)</button>
+      <button class="app-nav__item" data-tab="dataguard"><span class="app-nav__item-icon">H</span>7. Haute Disponibilité</button>
+      <button class="app-nav__item" data-tab="rac"><span class="app-nav__item-icon">C</span>8. Cluster RAC</button>
+      <button class="app-nav__item" data-tab="awr"><span class="app-nav__item-icon">P</span>9. Performance AWR</button>
     </div>
     <div class="app-nav__section">
       <div class="app-nav__section-title">Tableau de bord</div>
@@ -282,7 +286,7 @@ input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18p
         <div style="color: #64748b;">USER</div>
         <div style="color: var(--color-cyan);">DBA_BEST_PRACTICES</div>
         <div style="color: #64748b; margin-top: var(--sp-2);;">SCORE SIH</div>
-        <div id="nav-score" style="color: var(--color-green);">0 / 100</div>
+        <div id="nav-score" style="color: var(--color-green);">0 / 200</div>
       </div>
     </div>
     <div class="app-nav__rgpd-notice">
@@ -905,6 +909,422 @@ WHERE blocking_session IS NOT NULL;</pre>
     </section>
 
     <!-- ============================================================
+         PILIER 6 : VOLUMÉTRIE (ILM)
+         ============================================================ -->
+    <section class="module-section" id="tab-ilm">
+      <div class="page-header">
+        <h1 class="page-header__title">Volumétrie &amp; Archiving (ILM) — Cycle de vie des données</h1>
+        <div class="page-header__subtitle-row">
+          <p class="page-header__subtitle">Gestion de la croissance des données de santé — Politique ILM (Information Lifecycle Management) sur HISTORIQUE_ACTES, partitionnée par année.</p>
+          <button class="page-header__help-btn" data-help="ilm" aria-label="Aide ILM" title="Rubrique d'aide">?</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__header">
+          <div class="card__header-title"><span class="card__title-icon">&#9632;</span> Occupation par partition</div>
+          <div><span class="tag tag--blue" id="ilm-score-tag">SCORE: 0</span></div>
+        </div>
+        <div style="margin-bottom:var(--sp-4);">
+          <div class="slider-group">
+            <div class="slider-group__header">
+              <span class="slider-group__label">Année courante</span>
+              <span class="slider-group__value" id="ilm-year-value">2026</span>
+            </div>
+            <input type="range" id="ilm-year-slider" min="2022" max="2035" value="2026" step="1">
+          </div>
+        </div>
+        <div id="ilm-partition-area" style="margin-bottom:var(--sp-4);"></div>
+        <div class="toggle-group">
+          <button class="btn btn--success btn--sm" id="ilm-apply">Appliquer politique ILM</button>
+          <button class="btn btn--danger btn--sm" id="ilm-purge">Simuler purge légale (N-10 ans)</button>
+        </div>
+        <div id="ilm-result-area" style="margin-bottom:var(--sp-3);"></div>
+        <div class="log-console" id="ilm-console">
+          <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Simulateur ILM prêt. Aucune politique appliquée.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__title">Commande DBA</div>
+        <div class="code-block" style="background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:var(--sp-4);font-family:var(--font-mono);font-size:var(--fs-xs);overflow-x:auto;margin-bottom:var(--sp-3);">
+<pre style="color:var(--color-cyan);">-- =============================================================================
+-- GESTION DU CYCLE DE VIE DES DONNÉES - HISTORIQUE_ACTES (ILM - PUI)
+-- =============================================================================
+-- Objectif : Maîtriser la croissance des données de santé (historique patient
+-- sur 20+ ans) en appliquant une politique de cycle de vie (ILM) combinant
+-- partitionnement, archivage à froid et purge légale.
+--
+-- Contexte : La table HISTORIQUE_ACTES enregistre l'intégralité des actes
+-- pharmaceutiques depuis 2010. Sans politique ILM, le volume dépasse 200 Go
+-- et dégrade les performances des requêtes de dispensation courante.
+--
+-- Étapes du script :
+--   1. AUDIT : Inventaire des partitions (DBA_TAB_PARTITIONS) et mesure de
+--      l'espace alloué par segment (DBA_SEGMENTS).
+--   2. ARCHIVAGE : Déplacement des partitions de plus de 3 ans vers le
+--      tablespace ARCHIVE_TS (stockage froid, compression avancée).
+--   3. PURGE LÉGALE : Suppression des partitions au-delà de la durée
+--      légale de conservation (10 ans en France pour les données de soins).
+--   4. VÉRIFICATION : Reconsolidation de l'espace libéré et des index
+--      locaux (DBA_INDEXES, DBA_IND_PARTITIONS).
+--
+-- Bonne pratique HDS : Durée de conservation des données de santé = 10 ans
+-- minimum, puis purge sécurisée (DROP PARTITION). Les index locaux sont
+-- automatiquement maintenus lors du MOVE PARTITION.
+-- =============================================================================
+--
+-- 1. Inventaire des partitions
+SELECT tp.table_name, tp.partition_name, tp.tablespace_name,
+       tp.num_rows, ROUND(s.bytes/1024/1024) AS size_mb
+FROM dba_tab_partitions tp
+LEFT JOIN dba_segments s
+  ON s.segment_name = tp.table_name
+ AND s.partition_name = tp.partition_name
+WHERE tp.table_name = 'HISTORIQUE_ACTES'
+ORDER BY tp.partition_name;
+
+-- 2. Espace alloué par segment
+SELECT segment_name, partition_name, segment_type,
+       ROUND(bytes/1024/1024) AS size_mb
+FROM dba_segments
+WHERE segment_name LIKE 'HISTORIQUE_ACTES%'
+ORDER BY segment_name, partition_name;
+
+-- 3. Déplacer une partition vers l'archivage à froid
+ALTER TABLE historique_actes
+MOVE PARTITION p_2020
+TABLESPACE archive_ts
+COMPRESS FOR ARCHIVE HIGH;
+
+-- 4. Reconstruire les index locaux après déplacement
+ALTER INDEX idx_ha_date
+REBUILD PARTITION p_2020;
+
+-- 5. Purger une partition au-delà de la durée légale (10 ans)
+ALTER TABLE historique_actes
+DROP PARTITION p_2015;
+
+-- 6. Vérifier l'espace libéré dans le tablespace principal
+SELECT tablespace_name,
+       ROUND(SUM(bytes)/1024/1024) AS size_mb
+FROM dba_segments
+WHERE tablespace_name = 'PHARMA_DATA'
+GROUP BY tablespace_name;</pre>
+        </div>
+        <button class="btn btn--outline btn--sm" onclick="copyCode(this)">Copier</button>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         PILIER 7 : HAUTE DISPONIBILITÉ (DATA GUARD)
+         ============================================================ -->
+    <section class="module-section" id="tab-dataguard">
+      <div class="page-header">
+        <h1 class="page-header__title">Haute Disponibilité &amp; PRA — Data Guard</h1>
+        <div class="page-header__subtitle-row">
+          <p class="page-header__subtitle">Résilience face à une panne du site principal — Switchover planifié vs Failover d'urgence. Scénario PRA hospitalier.</p>
+          <button class="page-header__help-btn" data-help="dataguard" aria-label="Aide Data Guard" title="Rubrique d'aide">?</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__header">
+          <div class="card__header-title"><span class="card__title-icon">&#9632;</span> Configuration et statut</div>
+          <div><span class="tag tag--blue" id="dg-score-tag">SCORE: 0</span></div>
+        </div>
+        <div style="margin-bottom:var(--sp-4);">
+          <div class="card__title" style="font-size:var(--fs-sm);margin-bottom:var(--sp-3);">Mode de protection</div>
+          <div class="toggle-group" id="dg-mode-group">
+            <button class="toggle-group__btn toggle-group__btn--active" data-dg-mode="maxprot">MAX PROTECTION</button>
+            <button class="toggle-group__btn" data-dg-mode="maxavail">MAX AVAILABILITY</button>
+            <button class="toggle-group__btn" data-dg-mode="maxperf">MAX PERFORMANCE</button>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-3);margin-bottom:var(--sp-4);">
+          <div class="stat-block stat-block--green"><div class="stat-block__value" id="dg-rpo-value">0</div><div class="stat-block__label">RPO (secondes)</div></div>
+          <div class="stat-block stat-block--green"><div class="stat-block__value" id="dg-rto-value">0</div><div class="stat-block__label">RTO estimé (minutes)</div></div>
+        </div>
+        <div style="margin-bottom:var(--sp-4);">
+          <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:var(--fs-xs);margin-bottom:var(--sp-1);">
+            <span style="color:#94a3b8;">Redo Apply Lag</span>
+            <span id="dg-lag-value" style="color:var(--color-cyan);">0 s</span>
+          </div>
+          <div class="progress-bar"><div class="progress-bar__fill progress-bar__fill--green" id="dg-lag-bar" style="width:0%;"></div></div>
+        </div>
+        <div id="dg-status-area" style="margin-bottom:var(--sp-3);">
+          <div class="alert alert--success">&#9989; Site primaire actif. Base de données de standby synchronisée.</div>
+        </div>
+        <div class="toggle-group">
+          <button class="btn btn--primary btn--sm" id="dg-switchover">Switchover (planifié)</button>
+          <button class="btn btn--danger btn--sm" id="dg-failover">Failover (urgence)</button>
+          <button class="btn btn--outline btn--sm" id="dg-reset-scenario">Réinitialiser</button>
+        </div>
+        <div class="log-console" id="dg-console">
+          <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Data Guard prêt. Mode : Maximum Protection. Site primaire : CHU-PRIMARY.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__title">Commande DBA</div>
+        <div class="code-block" style="background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:var(--sp-4);font-family:var(--font-mono);font-size:var(--fs-xs);overflow-x:auto;margin-bottom:var(--sp-3);">
+<pre style="color:var(--color-cyan);">-- =============================================================================
+-- GESTION DE LA RÉSILIENCE - DATA GUARD PRA (CHU HOSPITALIER)
+-- =============================================================================
+-- Objectif : Assurer la continuité de service en cas de panne du site primaire
+-- (sinistre, cyberattaque, maintenance) en basculant sur un site de standby
+-- situé dans un second datacenter.
+--
+-- Contexte : Le CHU exploite deux salles informatiques distantes de 15 km.
+-- La perte du site primaire ne doit pas interrompre la dispensation de
+-- médicaments au-delà de 15 minutes (RTO) avec une perte de données maximale
+-- de 5 secondes (RPO).
+--
+-- Étapes du script :
+--   1. AUDIT : Vérification de l'état de la réplication (V$DATAGUARD_STATUS).
+--   2. BASCULE PLANIFIÉE : Switchover (ALTER DATABASE COMMIT TO SWITCHOVER).
+--   3. BASCULE URGENCE : Failover avec perte de données potentielle.
+--   4. DIAGNOSTIC : Analyse du lag (V$ARCHIVE_DEST_STATUS) et des alertes.
+--
+-- Bonne pratique HDS : Le mode Maximum Availability est recommandé en
+-- production hospitalière (équilibre RPO zéro vs impact performance).
+-- Tester le switchover en dehors des heures de soins au moins 1x/mois.
+-- =============================================================================
+--
+-- 1. Vérifier l'état de la réplication
+SELECT database_role, protection_mode, open_mode, switchover_status
+FROM v$database;
+
+-- 2. Statut des destinations d'archives (lag, erreurs)
+SELECT name, value, unit
+FROM v$dataguard_stats
+WHERE name IN ('apply lag', 'transport lag');
+
+-- 3. Bascule planifiée (Switchover) — site primaire
+ALTER DATABASE COMMIT TO SWITCHOVER TO STANDBY WITH SESSION SHUTDOWN;
+
+-- 4. Bascule planifiée (Switchover) — nouvel site primaire
+ALTER DATABASE COMMIT TO SWITCHOVER TO PRIMARY;
+
+-- 5. Bascule d'urgence (Failover) — site de standby uniquement
+ALTER DATABASE RECOVER MANAGED STANDBY DATABASE FINISH FORCE;
+ALTER DATABASE COMMIT TO FAILOVER TO PRIMARY;
+
+-- 6. Activer le mode de protection Maximum Availability
+ALTER DATABASE SET STANDBY DATABASE TO MAXIMIZE AVAILABILITY;
+
+-- 7. Historique des événements Data Guard
+SELECT severity, message, timestamp
+FROM v$dataguard_status
+ORDER BY timestamp DESC;</pre>
+        </div>
+        <button class="btn btn--outline btn--sm" onclick="copyCode(this)">Copier</button>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         PILIER 8 : CLUSTER RAC
+         ============================================================ -->
+    <section class="module-section" id="tab-rac">
+      <div class="page-header">
+        <h1 class="page-header__title">Cluster RAC — Cache Fusion &amp; Résilience</h1>
+        <div class="page-header__subtitle-row">
+          <p class="page-header__subtitle">Fonctionnement d'Oracle RAC (Real Application Clusters) dans un grand CHU — Nœuds, Cache Fusion et bascule de services.</p>
+          <button class="page-header__help-btn" data-help="rac" aria-label="Aide RAC" title="Rubrique d'aide">?</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__header">
+          <div class="card__header-title"><span class="card__title-icon">&#9632;</span> Topologie du cluster</div>
+          <div><span class="tag tag--blue" id="rac-score-tag">SCORE: 0</span></div>
+        </div>
+        <div id="rac-node-area" style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-3);margin-bottom:var(--sp-4);"></div>
+        <div class="toggle-group">
+          <button class="btn btn--primary btn--sm" id="rac-cache-sim">Simuler Cache Fusion</button>
+          <button class="btn btn--danger btn--sm" id="rac-node-fail">Panne nœud 2</button>
+          <button class="btn btn--outline btn--sm" id="rac-node-restore">Rétablir nœud 2</button>
+        </div>
+        <div id="rac-result-area" style="margin-bottom:var(--sp-3);"></div>
+        <div class="log-console" id="rac-console">
+          <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Cluster RAC prêt. 3 nœuds actifs. Services répartis.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__title">Commande DBA</div>
+        <div class="code-block" style="background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:var(--sp-4);font-family:var(--font-mono);font-size:var(--fs-xs);overflow-x:auto;margin-bottom:var(--sp-3);">
+<pre style="color:var(--color-cyan);">-- =============================================================================
+-- ADMINISTRATION DU CLUSTER RAC - CACHE FUSION (CHU)
+-- =============================================================================
+-- Objectif : Garantir la continuité de service en cas de perte d'un nœud de
+-- calcul, et visualiser le mécanisme de Cache Fusion qui évite les accès
+-- disques redondants entre les instances du cluster.
+--
+-- Contexte : Le CHU dispose d'un cluster RAC 3 nœuds pour la base de
+-- production PHARMA_DATA. Chaque nœud sert une partie des services de
+-- dispensation ; un nœud perdu = 0 coupure pour l'utilisateur grâce au
+-- basculement automatique des services TNS.
+--
+-- Étapes du script :
+--   1. AUDIT : Inventaire des instances (GV$INSTANCE) et services (GV$SERVICES).
+--   2. CACHE FUSION : Analyse des transferts de blocs entre instances
+--      (GV$CACHE_TRANSFER) et détection des blocs "busy".
+--   3. PANNE : Simulation de la perte d'un nœud et bascule des services.
+--   4. VÉRIFICATION : Sessions actives et répartition de charge.
+--
+-- Bonne pratique HDS : Un cluster RAC avec au moins 2 nœuds et un quorum
+-- disque (Voting Disk) sur 3 disques distincts évite le split-brain.
+-- Les services doivent être configurés en ACTIVE avec bascule automatique.
+-- =============================================================================
+--
+-- 1. Lister les instances du cluster
+SELECT inst_id, instance_name, instance_role, host_name, version, status
+FROM gv$instance
+ORDER BY inst_id;
+
+-- 2. Services configurés et instances associées
+SELECT name, pdb, network_name, goal, clb_goal
+FROM dba_services
+ORDER BY name;
+
+-- 3. Transferts de blocs entre instances (Cache Fusion)
+SELECT file#, block#, class, COUNT(*) AS transfer_count
+FROM gv$cache_transfer
+GROUP BY file#, block#, class
+ORDER BY transfer_count DESC;
+
+-- 4. Temps d'attente global par instance
+SELECT inst_id, event, total_waits, time_waited_micro/1000000 AS attente_secondes
+FROM gv$system_event
+WHERE event LIKE '%cache%' OR event LIKE '%gc%'
+ORDER BY inst_id, total_waits DESC;
+
+-- 5. Vérifier les sessions actives par service
+SELECT inst_id, service_name, COUNT(*) AS sessions_actives
+FROM gv$session
+WHERE status = 'ACTIVE'
+GROUP BY inst_id, service_name
+ORDER BY inst_id;
+
+-- 6. Bascule de service vers une autre instance (planifié)
+-- (à exécuter sur le nœud survivant)
+-- ALTER SYSTEM RELOCATE SERVICE 'pharma_dispensation' TO INSTANCE 3;</pre>
+        </div>
+        <button class="btn btn--outline btn--sm" onclick="copyCode(this)">Copier</button>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         PILIER 9 : PERFORMANCE (AWR)
+         ============================================================ -->
+    <section class="module-section" id="tab-awr">
+      <div class="page-header">
+        <h1 class="page-header__title">Analyse Performance — AWR &amp; Tuning</h1>
+        <div class="page-header__subtitle-row">
+          <p class="page-header__subtitle">Lecture d'un rapport AWR (Automatic Workload Repository) — Identification des goulots d'étranglement et recommandations correctives.</p>
+          <button class="page-header__help-btn" data-help="awr" aria-label="Aide AWR" title="Rubrique d'aide">?</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__header">
+          <div class="card__header-title"><span class="card__title-icon">&#9632;</span> Rapport AWR — Synthèse</div>
+          <div><span class="tag tag--blue" id="awr-score-tag">SCORE: 0</span></div>
+        </div>
+        <div class="toggle-group" id="awr-period-group">
+          <button class="toggle-group__btn toggle-group__btn--active" data-awr-period="normal">Avant incident</button>
+          <button class="toggle-group__btn" data-awr-period="incident">Pendant incident</button>
+        </div>
+        <div id="awr-summary-area" style="margin-bottom:var(--sp-3);"></div>
+        <div class="card__title" style="font-size:var(--fs-sm);margin-bottom:var(--sp-3);">Top 5 Wait Events</div>
+        <table class="data-table" id="awr-wait-table" style="margin-bottom:var(--sp-4);">
+          <thead><tr><th>#</th><th>Wait Event</th><th>Total Waits</th><th>Temps (s)</th><th>% DB Time</th><th>Action</th></tr></thead>
+          <tbody id="awr-wait-body"></tbody>
+        </table>
+        <div id="awr-diagnostic-area" style="margin-bottom:var(--sp-3);"></div>
+        <div id="awr-reco-area" style="margin-bottom:var(--sp-3);"></div>
+        <div class="log-console" id="awr-console">
+          <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Analyseur AWR prêt. Générez un rapport pour commencer.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__title">Commande DBA</div>
+        <div class="code-block" style="background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:var(--sp-4);font-family:var(--font-mono);font-size:var(--fs-xs);overflow-x:auto;margin-bottom:var(--sp-3);">
+<pre style="color:var(--color-cyan);">-- =============================================================================
+-- ANALYSE DE PERFORMANCE - RAPPORT AWR/ASH (PUI)
+-- =============================================================================
+-- Objectif : Identifier les goulots d'étranglement dans la base PUI en
+-- analysant les données historiques de performance (AWR) et les sessions
+-- actives (ASH) afin de prioriser les actions correctives.
+--
+-- Contexte : La Pharmacie à Usage Intérieur a connu un ralentissement
+-- général entre 09h00 et 10h00 (pic de dispensation). Le rapport AWR
+-- permet de déterminer si la cause est un attendre d'E/S, une contention
+-- de verrou, ou un plan d'exécution dégradé.
+--
+-- Étapes du script :
+--   1. GÉNÉRATION : Création du rapport AWR via DBMS_WORKLOAD_REPOSITORY.
+--   2. ANALYSE : Interrogation de DBA_HIST_SYSSTAT pour le DB Time et
+--      DBA_HIST_SYSTEM_EVENT pour les temps d'attente.
+--   3. DIAGNOSTIC : Identification du Top SQL via DBA_HIST_SQLSTAT.
+--   4. CORRECTION : Proposition de correctif (collecte statistiques,
+--      création d'index, optimisation de requête).
+--
+-- Bonne pratique HDS : Un rapport AWR doit être généré et analysé
+-- systématiquement après chaque incident de performance. Conserver les
+-- snapshots 31 jours glissants pour l'analyse des tendances.
+-- =============================================================================
+--
+-- 1. Générer un rapport AWR (intervalle personnalisé)
+-- SELECT * FROM TABLE(DBMS_WORKLOAD_REPOSITORY.AWR_REPORT_HTML(
+--   l_dbid       => (SELECT dbid FROM v$database),
+--   l_inst_num   => 1,
+--   l_bid        => 120,  -- snapshot début
+--   l_eid        => 125   -- snapshot fin
+-- ));
+
+-- 2. DB Time total sur un intervalle (delta)
+SELECT ROUND((e.value - b.value)/1000000) AS db_time_secondes
+FROM dba_hist_sysstat b
+JOIN dba_hist_sysstat e ON e.snap_id = b.snap_id + 4 AND e.stat_name = b.stat_name
+WHERE b.stat_name = 'DB time' AND b.snap_id = 120;
+
+-- 3. Top 5 wait events (delta entre deux snapshots)
+SELECT e.event_name,
+       e.total_waits - b.total_waits AS delta_waits,
+       ROUND((e.time_waited_micro - b.time_waited_micro)/1000000) AS delta_temps_secondes
+FROM dba_hist_system_event b
+JOIN dba_hist_system_event e ON e.snap_id = b.snap_id + 4 AND e.event_name = b.event_name
+WHERE b.snap_id = 120
+  AND e.event_name NOT IN ('SQL*Net message from client', 'Streams AQ: waiting for messages')
+  AND e.wait_class != 'Idle'
+ORDER BY delta_temps_secondes DESC;
+
+-- 4. Top SQL par temps d'exécution (DBA_HIST_SQLSTAT)
+SELECT s.sql_id, s.plan_hash_value,
+       ROUND(SUM(s.elapsed_time_delta)/1000000) AS temps_total_secondes,
+       ROUND(SUM(s.cpu_time_delta)/1000000) AS cpu_secondes,
+       COUNT(DISTINCT s.snap_id) AS nb_snapshots
+FROM dba_hist_sqlstat s
+WHERE s.snap_id BETWEEN 120 AND 125
+GROUP BY s.sql_id, s.plan_hash_value
+ORDER BY temps_total_secondes DESC;
+
+-- 5. Sessions actives par échantillon ASH
+SELECT sql_id, session_state, COUNT(*) AS echantillons
+FROM dba_hist_active_sess_history
+WHERE snap_id BETWEEN 120 AND 125
+  AND session_state = 'WAITING'
+GROUP BY sql_id, session_state
+ORDER BY echantillons DESC;</pre>
+        </div>
+        <button class="btn btn--outline btn--sm" onclick="copyCode(this)">Copier</button>
+      </div>
+    </section>
+
+    <!-- ============================================================
          DASHBOARD — Niveau de Risque SIH
          ============================================================ -->
     <section class="module-section" id="tab-dashboard">
@@ -925,7 +1345,7 @@ WHERE blocking_session IS NOT NULL;</pre>
         <div style="margin-bottom:var(--sp-6);">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--sp-2);">
             <span class="card__title" style="font-size:var(--fs-xl);margin:0;" id="dash-level-text">NIVEAU : INITIAL</span>
-            <span class="stat-block__value" id="dash-score" style="font-size:var(--fs-2xl);">0 / 100</span>
+            <span class="stat-block__value" id="dash-score" style="font-size:var(--fs-2xl);">0 / 200</span>
           </div>
           <div class="progress-bar progress-bar--lg">
             <div class="progress-bar__fill progress-bar__fill--risk-maitrise" id="dash-progress-fill" style="width:0%;"></div>
@@ -947,6 +1367,10 @@ WHERE blocking_session IS NOT NULL;</pre>
             <tr><td>3. Recycle Bin</td><td id="dash-status-rb">—</td><td id="dash-pts-rb">0</td></tr>
             <tr><td>4. Indexation</td><td id="dash-status-id">—</td><td id="dash-pts-id">0</td></tr>
             <tr><td>5. Deadlocks</td><td id="dash-status-dl">—</td><td id="dash-pts-dl">0</td></tr>
+            <tr><td>6. Volumétrie (ILM)</td><td id="dash-status-il">—</td><td id="dash-pts-il">0</td></tr>
+            <tr><td>7. Haute Disponibilité</td><td id="dash-status-dg">—</td><td id="dash-pts-dg">0</td></tr>
+            <tr><td>8. Cluster RAC</td><td id="dash-status-rc">—</td><td id="dash-pts-rc">0</td></tr>
+            <tr><td>9. Performance AWR</td><td id="dash-status-aw">—</td><td id="dash-pts-aw">0</td></tr>
           </tbody>
         </table>
 
@@ -1085,6 +1509,110 @@ WHERE blocking_session IS NOT NULL;</pre>
       </div>
     </div>
 
+    <!-- MODAL : ILM -->
+    <div class="help-modal" id="help-ilm" role="dialog" aria-modal="true" aria-labelledby="help-ilm-title" aria-hidden="true">
+      <div class="help-modal__header">
+        <div class="help-modal__title" id="help-ilm-title">Volumétrie &amp; ILM — Cycle de vie</div>
+        <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+      </div>
+      <div class="help-modal__body">
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--objective">Objectif pédagogique</div>
+          <p class="help-modal__text">L'<strong>ILM (Information Lifecycle Management)</strong> définit des règles de gestion des données selon leur âge et leur valeur métier. Les données récentes (3 ans) restent en ligne ; les données anciennes sont déplacées vers un stockage à froid compressé ; les données au-delà de la durée légale (10 ans) sont purgées.</p>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--rule">Bonnes pratiques</div>
+          <ul class="help-modal__list">
+            <li><strong>Partitionnement RANGE</strong> : Toujours partitionner par date pour faciliter le movement et la purge.</li>
+            <li><strong>Archivage à froid</strong> : Utiliser <code>COMPRESS FOR ARCHIVE HIGH</code> pour les partitions anciennes.</li>
+            <li><strong>Durée légale</strong> : 10 ans minimum pour les données de soins en France. Purger ensuite via <code>DROP PARTITION</code>.</li>
+            <li><strong>Index locaux</strong> : Reconstruire les index locaux après chaque déplacement de partition.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="help-modal__footer">
+        <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+      </div>
+    </div>
+
+    <!-- MODAL : Data Guard -->
+    <div class="help-modal" id="help-dataguard" role="dialog" aria-modal="true" aria-labelledby="help-dg-title" aria-hidden="true">
+      <div class="help-modal__header">
+        <div class="help-modal__title" id="help-dg-title">Haute Disponibilité — Data Guard</div>
+        <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+      </div>
+      <div class="help-modal__body">
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--objective">Objectif pédagogique</div>
+          <p class="help-modal__text"><strong>Data Guard</strong> assure la réplication synchrone ou asynchrone des redo logs vers une base de standby. En cas de panne du site primaire, le DBA peut basculer sur le standby avec un RPO et RTO maîtrisés. Le switchover est planifié (zéro perte), le failover est une bascule d'urgence.</p>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--rule">Modes de protection</div>
+          <ul class="help-modal__list">
+            <li><strong>Maximum Protection</strong> — RPO = 0, mais impact sur les performances (sync commit).</li>
+            <li><strong>Maximum Availability</strong> — RPO quasi nul, pas d'impact sur le primaire si standby indisponible.</li>
+            <li><strong>Maximum Performance</strong> — RPO = quelques secondes, impact minimal (async).</li>
+            <li><strong>PRA</strong> : Tester le switchover 1x/mois. Le failover nécessite <code>FINISH FORCE</code>.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="help-modal__footer">
+        <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+      </div>
+    </div>
+
+    <!-- MODAL : RAC -->
+    <div class="help-modal" id="help-rac" role="dialog" aria-modal="true" aria-labelledby="help-rac-title" aria-hidden="true">
+      <div class="help-modal__header">
+        <div class="help-modal__title" id="help-rac-title">Cluster RAC — Cache Fusion</div>
+        <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+      </div>
+      <div class="help-modal__body">
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--objective">Objectif pédagogique</div>
+          <p class="help-modal__text"><strong>Oracle RAC</strong> permet à plusieurs instances (nœuds) d'accéder simultanément à la même base de données via un stockage partagé (ASM). Le mécanisme de <strong>Cache Fusion</strong> transfère les blocs entre les caches des instances via l'interconnect, sans accès disque.</p>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--rule">Bonnes pratiques</div>
+          <ul class="help-modal__list">
+            <li><strong>Quorum</strong> : 3 Voting Disks minimum pour éviter le split-brain.</li>
+            <li><strong>Interconnect</strong> : Liaison réseau dédiée (10 GbE minimum) entre nœuds pour le Cache Fusion.</li>
+            <li><strong>Services</strong> : Configurer les services TNS avec bascule automatique (<code>FAILOVER</code>).</li>
+            <li><strong>Disponibilité</strong> : RAC seul ne protège pas contre les pannes de stockage — associer à Data Guard.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="help-modal__footer">
+        <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+      </div>
+    </div>
+
+    <!-- MODAL : AWR -->
+    <div class="help-modal" id="help-awr" role="dialog" aria-modal="true" aria-labelledby="help-awr-title" aria-hidden="true">
+      <div class="help-modal__header">
+        <div class="help-modal__title" id="help-awr-title">AWR — Analyse de Performance</div>
+        <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+      </div>
+      <div class="help-modal__body">
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--objective">Objectif pédagogique</div>
+          <p class="help-modal__text">L'<strong>AWR (Automatic Workload Repository)</strong> stocke les statistiques de performance de la base sur 31 jours glissants. Le rapport AWR identifie les wait events dominants, le Top SQL, et les tendances de charge — outil n°1 du DBA pour le tuning.</p>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--rule">Bonnes pratiques</div>
+          <ul class="help-modal__list">
+            <li><strong>Snapshots</strong> : Intervalle par défaut 60 minutes. Réduire à 30 min pour les bases critiques.</li>
+            <li><strong>Analyse post-incident</strong> : Toujours générer un rapport AWR entre le snapshot avant et après l'incident.</li>
+            <li><strong>ASH</strong> : Active Session History complète l'AWR pour l'analyse temps réel des sessions bloquantes.</li>
+            <li><strong>Seuil d'alerte</strong> : DB Time &gt; 2x le temps élastique = surcharge détectée.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="help-modal__footer">
+        <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+      </div>
+    </div>
+
     <!-- MODAL : Dashboard -->
     <div class="help-modal" id="help-dashboard" role="dialog" aria-modal="true" aria-labelledby="help-dash-title" aria-hidden="true">
       <div class="help-modal__header">
@@ -1104,6 +1632,11 @@ WHERE blocking_session IS NOT NULL;</pre>
             <li>Recycle Bin : 15 pts max</li>
             <li>Indexation : 20 pts max</li>
             <li>Deadlocks : 25 pts max</li>
+            <li>Volumétrie (ILM) : 10 pts max</li>
+            <li>Haute Disponibilité : 15 pts max</li>
+            <li>Cluster RAC : 10 pts max</li>
+            <li>Performance AWR : 15 pts max</li>
+            <li>Total général : 200 pts max. Score &lt; 80 critique, 80-139 élevé, &ge; 140 maîtrisé.</li>
           </ul>
         </div>
       </div>
@@ -1138,6 +1671,42 @@ WHERE blocking_session IS NOT NULL;</pre>
           <ul class="help-modal__list">
             <li><strong>Recycle Bin</strong> — Espace de stockage des objets supprimés (DROP). Permet le FLASHBACK réversible.</li>
             <li><strong>Flashback</strong> — Récupération d'une table supprimée via <code>FLASHBACK TABLE ... TO BEFORE DROP</code>.</li>
+          </ul>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--lexique">ILM et Partitionnement</div>
+          <ul class="help-modal__list">
+            <li><strong>ILM</strong> — Information Lifecycle Management. Politique de gestion des données selon leur cycle de vie (en ligne, archive, purge).</li>
+            <li><strong>Partition Pruning</strong> — Élimination automatique des partitions inutiles par l'optimiseur lors d'une requête avec filtre sur la clé de partition.</li>
+            <li><strong>Archive TS</strong> — Tablespace de stockage à froid (compression avancée) destiné aux données historiques rarement accédées.</li>
+          </ul>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--lexique">Haute Disponibilité et PRA</div>
+          <ul class="help-modal__list">
+            <li><strong>Data Guard</strong> — Solution Oracle de réplication de base vers un site de standby pour la reprise après sinistre.</li>
+            <li><strong>Redo Apply</strong> — Application des redo logs expédiés sur la base standby pour maintenir la synchronisation.</li>
+            <li><strong>Switchover</strong> — Bascule planifiée entre site primaire et standby (zéro perte de données).</li>
+            <li><strong>Failover</strong> — Bascule d'urgence sur le standby avec perte de données potentielle.</li>
+            <li><strong>RPO/RTO</strong> — Recovery Point Objective (perte max admise) / Recovery Time Objective (durée max d'interruption).</li>
+          </ul>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--lexique">Cluster RAC</div>
+          <ul class="help-modal__list">
+            <li><strong>RAC</strong> — Real Application Clusters. Plusieurs instances Oracle partageant le même stockage (ASM).</li>
+            <li><strong>Cache Fusion</strong> — Mécanisme de transfert de blocs entre caches d'instances via interconnect, sans accès disque.</li>
+            <li><strong>Global Cache</strong> — Espace de cache partagé logiquement entre toutes les instances du cluster.</li>
+            <li><strong>Split-brain</strong> — Situation où deux instances pensent être les seules maîtres. Évité par les Voting Disks.</li>
+          </ul>
+        </div>
+        <div class="help-modal__section">
+          <div class="help-modal__section-title help-modal__section-title--lexique">Performance et Tuning</div>
+          <ul class="help-modal__list">
+            <li><strong>AWR</strong> — Automatic Workload Repository. Référentiel de performance avec snapshots à 60 min d'intervalle.</li>
+            <li><strong>ASH</strong> — Active Session History. Échantillonnage des sessions actives toutes les 10 secondes pour l'analyse temps réel.</li>
+            <li><strong>Wait Event</strong> — Événement d'attente Oracle indiquant qu'une session attend une ressource (E/S, verrou, latch).</li>
+            <li><strong>DB Time</strong> — Temps total passé par toutes les sessions dans la base. Métrique clé du rapport AWR.</li>
           </ul>
         </div>
         <div class="help-modal__section">
@@ -1280,12 +1849,12 @@ class RiskEngine {
   getTotal() {
     let total = 0;
     for (const v of this._scores.values()) total += v;
-    return Math.max(0, Math.min(100, total));
+    return Math.max(0, Math.min(200, total));
   }
   getLevel() {
     const t = this.getTotal();
-    if (t >= 70) return { key: 'maitrise', label: 'MAÎTRISÉ', color: 'var(--color-green)' };
-    if (t >= 40) return { key: 'eleve', label: 'ÉLEVÉ', color: 'var(--color-amber)' };
+    if (t >= 140) return { key: 'maitrise', label: 'MAÎTRISÉ', color: 'var(--color-green)' };
+    if (t >= 80) return { key: 'eleve', label: 'ÉLEVÉ', color: 'var(--color-amber)' };
     return { key: 'critique', label: 'CRITIQUE', color: 'var(--color-red)' };
   }
   reset() {
@@ -1684,6 +2253,347 @@ class DeadlockModule {
 }
 
 /* ============================================================
+   ILM MODULE (Volumétrie & Archiving)
+   ============================================================ */
+
+class IlmModule {
+  constructor(engine) {
+    this._engine = engine;
+    this._year = 2026;
+    this._partitions = [];
+  }
+  init() {
+    this._generatePartitions();
+    this._bindEvents();
+    this._render();
+  }
+  _generatePartitions() {
+    const names = ['P_2020','P_2021','P_2022','P_2023','P_2024','P_2025','P_2026','P_2027','P_2028','P_2029','P_2030'];
+    const sizes = [2048, 1980, 2150, 1850, 2100, 1950, 1780, 0, 0, 0, 0];
+    this._partitions = names.map((n, i) => ({
+      name: n, year: 2020 + i, sizeMB: sizes[i], archived: false, purged: false
+    }));
+  }
+  _bindEvents() {
+    const self = this;
+    document.getElementById('ilm-year-slider').addEventListener('input', function() {
+      self._year = parseInt(this.value);
+      document.getElementById('ilm-year-value').textContent = self._year;
+      self._render();
+    });
+    document.getElementById('ilm-apply').addEventListener('click', function() { self._applyIlm(); });
+    document.getElementById('ilm-purge').addEventListener('click', function() { self._simulatePurge(); });
+  }
+  _applyIlm() {
+    const cutoffYear = this._year - 3;
+    let moved = 0;
+    this._partitions.forEach(p => {
+      if (p.year <= cutoffYear && !p.archived && !p.purged) { p.archived = true; moved++; }
+    });
+    if (moved > 0) {
+      this._engine.setScore('ilm', 10);
+      this._engine.setLabel('ilm', '✅ ILM APPLIQUÉ');
+      this._log(moved + ' partition(s) archivée(s) vers ARCHIVE_TS (COMPRESS FOR ARCHIVE HIGH). +10 pts.', 'success');
+    } else {
+      this._log('Aucune partition éligible à l\'archivage.', 'info');
+    }
+    this._render();
+    document.getElementById('ilm-score-tag').textContent = 'SCORE: ' + this._engine.getScore('ilm');
+  }
+  _simulatePurge() {
+    const cutoffYear = this._year - 10;
+    let purged = 0;
+    this._partitions.forEach(p => {
+      if (p.year <= cutoffYear && !p.purged) { p.purged = true; p.archived = false; purged++; }
+    });
+    if (purged > 0) {
+      this._log(purged + ' partition(s) purgée(s) au-delà de la durée légale de conservation (10 ans).', 'warn');
+    } else {
+      this._log('Aucune partition à purger (durée légale non atteinte).', 'info');
+    }
+    this._render();
+  }
+  _render() {
+    const area = document.getElementById('ilm-partition-area');
+    const active = this._partitions.filter(p => !p.purged);
+    let html = '<table class="data-table"><thead><tr><th>Partition</th><th>Taille (Mo)</th><th>Statut</th><th>Stockage</th></tr></thead><tbody>';
+    active.forEach(p => {
+      const size = p.year <= this._year ? p.sizeMB : '—';
+      const status = p.archived ? 'Archivée' : 'Active';
+      const storage = p.archived ? 'ARCHIVE_TS' : 'PHARMA_DATA';
+      const color = p.archived ? 'var(--color-amber)' : 'var(--color-green)';
+      html += '<tr><td style="color:' + color + ';">' + p.name + '</td><td>' + size + '</td><td>' + status + '</td><td>' + storage + '</td></tr>';
+    });
+    const totalSize = active.reduce((s, p) => s + (p.year <= this._year && !p.purged ? p.sizeMB : 0), 0);
+    const archivedSize = active.reduce((s, p) => s + (p.archived ? p.sizeMB : 0), 0);
+    html += '</tbody></table>';
+    html += '<div style="font-family:var(--font-mono);font-size:var(--fs-xs);color:#94a3b8;margin-top:var(--sp-3);">Total : ' + totalSize + ' Mo | Archivé : ' + archivedSize + ' Mo | Ratio : ' + (totalSize > 0 ? Math.round(archivedSize/totalSize*100) : 0) + '%</div>';
+    area.innerHTML = html;
+  }
+  _log(msg, level) {
+    const log = document.getElementById('ilm-console');
+    const ts = new Date().toISOString().slice(11, 19);
+    log.innerHTML += '<div class="log-console__entry log-console__entry--' + level + '"><span class="log-console__timestamp">[' + ts + ']</span>' + msg + '</div>';
+    log.scrollTop = log.scrollHeight;
+  }
+}
+
+/* ============================================================
+   DATA GUARD MODULE (Haute Disponibilité)
+   ============================================================ */
+
+class DataGuardModule {
+  constructor(engine) {
+    this._engine = engine;
+    this._mode = 'maxprot';
+    this._scenarioActive = false;
+  }
+  init() {
+    this._bindEvents();
+    this._updateUI();
+  }
+  _bindEvents() {
+    const self = this;
+    document.querySelectorAll('[data-dg-mode]').forEach(btn => {
+      btn.addEventListener('click', function() {
+        if (self._scenarioActive) return;
+        document.querySelectorAll('[data-dg-mode]').forEach(b => b.classList.remove('toggle-group__btn--active'));
+        this.classList.add('toggle-group__btn--active');
+        self._mode = this.dataset.dgMode;
+        self._updateUI();
+        self._log('Mode de protection changé : ' + self._mode, 'info');
+      });
+    });
+    document.getElementById('dg-switchover').addEventListener('click', function() { self._switchover(); });
+    document.getElementById('dg-failover').addEventListener('click', function() { self._failover(); });
+    document.getElementById('dg-reset-scenario').addEventListener('click', function() { self._resetScenario(); });
+  }
+  _switchover() {
+    if (this._scenarioActive) return;
+    this._scenarioActive = true;
+    document.getElementById('dg-status-area').innerHTML = '<div class="alert alert--success">&#9989; ALTER DATABASE COMMIT TO SWITCHOVER TO STANDBY — Réussi. Site de standby promu primaire. RPO = 0. Aucune perte.</div>';
+    this._engine.setScore('dataguard', 15);
+    this._engine.setLabel('dataguard', '✅ SWITCHOVER OK');
+    this._log('Switchover planifié exécuté. Bascule sans perte de données. +15 pts.', 'success');
+    document.getElementById('dg-score-tag').textContent = 'SCORE: ' + this._engine.getScore('dataguard');
+  }
+  _failover() {
+    if (this._scenarioActive) return;
+    this._scenarioActive = true;
+    const lag = this._mode === 'maxprot' ? 0 : this._mode === 'maxavail' ? 5 : 30;
+    document.getElementById('dg-status-area').innerHTML = '<div class="alert alert--error">&#9888; ALTER DATABASE RECOVER MANAGED STANDBY DATABASE FINISH FORCE — Failover exécuté. Perte estimée : ' + lag + ' s. RPO non garanti.</div>';
+    this._engine.setScore('dataguard', -15);
+    this._engine.setLabel('dataguard', '❌ FAILOVER');
+    this._log('Failover d\'urgence exécuté. Perte : ' + lag + ' s. -15 pts.', 'error');
+    document.getElementById('dg-score-tag').textContent = 'SCORE: ' + this._engine.getScore('dataguard');
+  }
+  _resetScenario() {
+    this._scenarioActive = false;
+    this._updateUI();
+    document.getElementById('dg-status-area').innerHTML = '<div class="alert alert--success">&#9989; Site primaire actif. Base de données de standby synchronisée.</div>';
+    this._log('Scénario Data Guard réinitialisé.', 'info');
+  }
+  _updateUI() {
+    const lagMap = { maxprot: 0, maxavail: 2, maxperf: 10 };
+    const rpoMap = { maxprot: 0, maxavail: 5, maxperf: 30 };
+    const rtoMap = { maxprot: 10, maxavail: 8, maxperf: 5 };
+    const lag = lagMap[this._mode];
+    document.getElementById('dg-rpo-value').textContent = rpoMap[this._mode];
+    document.getElementById('dg-rto-value').textContent = rtoMap[this._mode];
+    document.getElementById('dg-lag-value').textContent = lag + ' s';
+    document.getElementById('dg-lag-bar').style.width = (lag / 30 * 100) + '%';
+    document.getElementById('dg-lag-bar').style.background = lag === 0 ? 'var(--color-green)' : lag <= 5 ? 'var(--color-amber)' : 'var(--color-red)';
+  }
+  _log(msg, level) {
+    const log = document.getElementById('dg-console');
+    const ts = new Date().toISOString().slice(11, 19);
+    log.innerHTML += '<div class="log-console__entry log-console__entry--' + level + '"><span class="log-console__timestamp">[' + ts + ']</span>' + msg + '</div>';
+    log.scrollTop = log.scrollHeight;
+  }
+}
+
+/* ============================================================
+   RAC MODULE (Cluster)
+   ============================================================ */
+
+class RacModule {
+  constructor(engine) {
+    this._engine = engine;
+    this._node2Failed = false;
+    this._nodes = [
+      { id: 1, name: 'Instance 1', host: 'rac1.chu.local', status: 'ACTIVE', services: ['Dispensation', 'Stock'], sessions: 45 },
+      { id: 2, name: 'Instance 2', host: 'rac2.chu.local', status: 'ACTIVE', services: ['Prescription', 'Facturation'], sessions: 38 },
+      { id: 3, name: 'Instance 3', host: 'rac3.chu.local', status: 'ACTIVE', services: ['Archive', 'Reporting'], sessions: 22 }
+    ];
+  }
+  init() {
+    this._bindEvents();
+    this._renderNodes();
+  }
+  _bindEvents() {
+    const self = this;
+    document.getElementById('rac-cache-sim').addEventListener('click', function() { self._simulateCacheFusion(); });
+    document.getElementById('rac-node-fail').addEventListener('click', function() { self._failNode2(); });
+    document.getElementById('rac-node-restore').addEventListener('click', function() { self._restoreNode2(); });
+  }
+  _renderNodes() {
+    const area = document.getElementById('rac-node-area');
+    area.innerHTML = this._nodes.map(n => {
+      const isDown = n.id === 2 && this._node2Failed;
+      const bc = isDown ? 'var(--color-red)' : 'var(--color-green-dim)';
+      const bg = isDown ? 'rgba(239,68,68,0.1)' : 'var(--color-bg-elevated)';
+      const st = isDown ? 'HORS LIGNE' : n.status;
+      const sc = isDown ? 'var(--color-red)' : 'var(--color-green)';
+      return '<div style="background:' + bg + ';border:1px solid ' + bc + ';border-radius:var(--radius-md);padding:var(--sp-4);text-align:center;">' +
+        '<div style="font-family:var(--font-mono);font-size:var(--fs-sm);font-weight:700;color:var(--color-cyan);margin-bottom:var(--sp-2);">' + n.name + '</div>' +
+        '<div style="font-family:var(--font-mono);font-size:var(--fs-xs);color:#94a3b8;margin-bottom:var(--sp-2);">' + n.host + '</div>' +
+        '<div style="font-family:var(--font-mono);font-size:var(--fs-xs);color:' + sc + ';margin-bottom:var(--sp-2);">' + st + '</div>' +
+        '<div style="font-family:var(--font-mono);font-size:var(--fs-xs);color:#64748b;">Services : ' + n.services.join(', ') + '</div>' +
+        '<div style="font-family:var(--font-mono);font-size:var(--fs-xs);color:#64748b;">Sessions : ' + n.sessions + '</div></div>';
+    }).join('');
+  }
+  _simulateCacheFusion() {
+    document.getElementById('rac-result-area').innerHTML = '<div class="alert alert--info">&#9889; Cache Fusion : Bloc #34567 (SORTIE_STOCK) transféré Instance 1 → Instance 2 via interconnect dédié. Temps : 0.02 ms. Aucun accès disque ASM.</div>';
+    this._log('Cache Fusion simulé : transfert de bloc entre noeuds 1 et 2.', 'info');
+    this._engine.setScore('rac', 5);
+    this._engine.setLabel('rac', '✅ CACHE FUSION OK');
+    document.getElementById('rac-score-tag').textContent = 'SCORE: ' + this._engine.getScore('rac');
+  }
+  _failNode2() {
+    if (this._node2Failed) return;
+    this._node2Failed = true;
+    this._nodes[1].status = 'DOWN';
+    this._nodes[1].sessions = 0;
+    this._nodes[0].sessions += 22;
+    this._nodes[2].sessions += 16;
+    this._renderNodes();
+    document.getElementById('rac-result-area').innerHTML = '<div class="alert alert--warning">&#9888; Nœud 2 hors ligne. Services Prescription et Facturation basculés sur nœuds 1 et 3 via service TNS. Aucune interruption.</div>';
+    this._engine.setScore('rac', 10);
+    this._engine.setLabel('rac', '✅ BASCULE OK');
+    this._log('Panne nœud 2 — Services basculés automatiquement. +10 pts.', 'success');
+    document.getElementById('rac-score-tag').textContent = 'SCORE: ' + this._engine.getScore('rac');
+  }
+  _restoreNode2() {
+    if (!this._node2Failed) return;
+    this._node2Failed = false;
+    this._nodes[1] = { id: 2, name: 'Instance 2', host: 'rac2.chu.local', status: 'ACTIVE', services: ['Prescription', 'Facturation'], sessions: 38 };
+    this._nodes[0].sessions = 45;
+    this._nodes[2].sessions = 22;
+    this._renderNodes();
+    document.getElementById('rac-result-area').innerHTML = '<div class="alert alert--success">&#9989; Nœud 2 rétabli. Services répartis. Cluster à pleine capacité.</div>';
+    this._log('Nœud 2 rétabli. Cluster normal.', 'info');
+  }
+  _log(msg, level) {
+    const log = document.getElementById('rac-console');
+    const ts = new Date().toISOString().slice(11, 19);
+    log.innerHTML += '<div class="log-console__entry log-console__entry--' + level + '"><span class="log-console__timestamp">[' + ts + ']</span>' + msg + '</div>';
+    log.scrollTop = log.scrollHeight;
+  }
+}
+
+/* ============================================================
+   AWR MODULE (Performance & Tuning)
+   ============================================================ */
+
+class AwrModule {
+  constructor(engine) {
+    this._engine = engine;
+    this._period = 'normal';
+    this._resolvedEvents = new Set();
+    this._waitEvents = [];
+  }
+  init() {
+    this._bindEvents();
+    this._generateReport();
+  }
+  _bindEvents() {
+    const self = this;
+    document.querySelectorAll('[data-awr-period]').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('[data-awr-period]').forEach(b => b.classList.remove('toggle-group__btn--active'));
+        this.classList.add('toggle-group__btn--active');
+        self._period = this.dataset.awrPeriod;
+        self._generateReport();
+      });
+    });
+  }
+  _generateReport() {
+    this._waitEvents = this._period === 'normal'
+      ? [
+        { name: 'db file scattered read', waits: 12450, time: 180, pct: 35, sql: 'SELECT /*+ FULL(s) */ * FROM sortie_stock s WHERE date_sortie BETWEEN :a AND :b', reco: 'Créer un index composite sur SORTIE_STOCK(date_sortie, medicament_id)' },
+        { name: 'log file sync', waits: 8900, time: 95, pct: 18, sql: 'COMMIT', reco: 'Regrouper les COMMIT en transactions batch' },
+        { name: 'enq: TX - row lock contention', waits: 3200, time: 72, pct: 14, sql: 'UPDATE stock_med SET qty = qty - :1 WHERE med_id = :2', reco: 'Vérifier l\'ordre de verrouillage et la durée des transactions' },
+        { name: 'read by other session', waits: 4100, time: 45, pct: 9, sql: 'SELECT * FROM lot WHERE date_peremption < SYSDATE', reco: 'Augmenter le buffer cache' },
+        { name: 'CPU time', waits: 0, time: 124, pct: 24, sql: '—', reco: 'Aucune action — charge normale' }
+      ]
+      : [
+        { name: 'db file scattered read', waits: 45200, time: 890, pct: 42, sql: 'SELECT /*+ FULL(s) */ * FROM sortie_stock s WHERE date_sortie BETWEEN :a AND :b', reco: 'Créer un index composite sur SORTIE_STOCK(date_sortie, medicament_id)' },
+        { name: 'enq: TX - row lock contention', waits: 18400, time: 520, pct: 25, sql: 'UPDATE stock_med SET qty = qty - :1 WHERE med_id = :2', reco: 'Vérifier l\'ordre de verrouillage et la durée des transactions' },
+        { name: 'log file sync', waits: 15000, time: 280, pct: 13, sql: 'COMMIT', reco: 'Regrouper les COMMIT en transactions batch' },
+        { name: 'read by other session', waits: 12000, time: 210, pct: 10, sql: 'SELECT * FROM lot WHERE date_peremption < SYSDATE', reco: 'Augmenter le buffer cache' },
+        { name: 'buffer busy waits', waits: 6700, time: 210, pct: 10, sql: 'INSERT INTO historique_actes VALUES (:1, :2, :3)', reco: 'Augmenter les freelists ou passer à ASSM' }
+      ];
+    this._renderSummary();
+    this._renderWaitEvents();
+    this._log('Rapport AWR généré — Période : ' + (this._period === 'normal' ? 'Avant incident' : 'Pendant incident'), 'info');
+  }
+  _renderSummary() {
+    const isInc = this._period === 'incident';
+    const dbTime = isInc ? 8500 : 1200;
+    const cpuTime = isInc ? 1800 : 420;
+    const waitTime = isInc ? 6700 : 780;
+    document.getElementById('awr-summary-area').innerHTML = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-3);">' +
+      '<div class="stat-block ' + (isInc ? 'stat-block--red' : 'stat-block--green') + '"><div class="stat-block__value">' + dbTime + ' s</div><div class="stat-block__label">DB Time</div></div>' +
+      '<div class="stat-block ' + (isInc ? 'stat-block--amber' : 'stat-block--green') + '"><div class="stat-block__value">' + cpuTime + ' s</div><div class="stat-block__label">CPU Time</div></div>' +
+      '<div class="stat-block ' + (isInc ? 'stat-block--red' : 'stat-block--green') + '"><div class="stat-block__value">' + waitTime + ' s</div><div class="stat-block__label">Temps attente</div></div></div>';
+  }
+  _renderWaitEvents() {
+    const body = document.getElementById('awr-wait-body');
+    const self = this;
+    body.innerHTML = this._waitEvents.map((e, i) => {
+      const resolved = this._resolvedEvents.has(i);
+      return '<tr><td>' + (i + 1) + '</td>' +
+        '<td style="color:var(--color-cyan);cursor:pointer;" data-awr-idx="' + i + '" data-awr-action="diagnostic">' + e.name + '</td>' +
+        '<td>' + e.waits.toLocaleString() + '</td><td>' + e.time + '</td><td>' + e.pct + '%</td>' +
+        '<td>' + (resolved ? '<span style="color:var(--color-green);">&#9989; Résolu</span>' : '<button class="btn btn--outline btn--sm" data-awr-idx="' + i + '" data-awr-action="reco">Corriger</button>') + '</td></tr>';
+    }).join('');
+    body.querySelectorAll('[data-awr-action]').forEach(el => {
+      el.addEventListener('click', function() {
+        const idx = parseInt(this.dataset.awrIdx);
+        if (this.dataset.awrAction === 'diagnostic') self._showDiagnostic(idx);
+        else self._applyReco(idx);
+      });
+    });
+  }
+  _showDiagnostic(idx) {
+    const event = this._waitEvents[idx];
+    const diagArea = document.getElementById('awr-diagnostic-area');
+    diagArea.innerHTML = '<div class="alert alert--info"><strong>SQL associé :</strong><br><code style="display:block;margin-top:var(--sp-2);padding:var(--sp-2);background:var(--color-bg-deep);border-radius:var(--radius-sm);">' + event.sql + '</code></div>';
+    this._log('Diagnostic affiché pour : ' + event.name, 'info');
+  }
+  _applyReco(idx) {
+    if (this._resolvedEvents.has(idx)) return;
+    this._resolvedEvents.add(idx);
+    const event = this._waitEvents[idx];
+    document.getElementById('awr-reco-area').innerHTML = '<div class="alert alert--success">&#9989; ' + event.reco + '</div>';
+    const total = this._waitEvents.length;
+    const done = this._resolvedEvents.size;
+    const score = Math.round((done / total) * 15);
+    this._engine.setScore('awr', score);
+    this._engine.setLabel('awr', done === total ? '✅ TOUT RÉSOLU' : '✅ ' + done + '/' + total);
+    this._renderWaitEvents();
+    document.getElementById('awr-score-tag').textContent = 'SCORE: ' + score;
+    this._log('Correction : ' + event.name + ' → ' + event.reco, 'success');
+  }
+  _log(msg, level) {
+    const log = document.getElementById('awr-console');
+    const ts = new Date().toISOString().slice(11, 19);
+    log.innerHTML += '<div class="log-console__entry log-console__entry--' + level + '"><span class="log-console__timestamp">[' + ts + ']</span>' + msg + '</div>';
+    log.scrollTop = log.scrollHeight;
+  }
+}
+
+/* ============================================================
    DASHBOARD MODULE
    ============================================================ */
 
@@ -1695,7 +2605,11 @@ class DashboardModule {
       stats: { id: 'st', name: '2. Statistiques (CBO)' },
       recyclebin: { id: 'rb', name: '3. Recycle Bin' },
       indexation: { id: 'id', name: '4. Indexation' },
-      deadlocks: { id: 'dl', name: '5. Deadlocks' }
+      deadlocks: { id: 'dl', name: '5. Deadlocks' },
+      ilm: { id: 'il', name: '6. Volumétrie (ILM)' },
+      dataguard: { id: 'dg', name: '7. Haute Disponibilité' },
+      rac: { id: 'rc', name: '8. Cluster RAC' },
+      awr: { id: 'aw', name: '9. Performance AWR' }
     };
   }
   init() {
@@ -1706,7 +2620,7 @@ class DashboardModule {
     const level = this._engine.getLevel();
     const total = this._engine.getTotal();
 
-    document.getElementById('dash-score').textContent = total + ' / 100';
+    document.getElementById('dash-score').textContent = total + ' / 200';
     document.getElementById('dash-level-text').textContent = 'NIVEAU : ' + level.label;
     document.getElementById('dash-level-text').style.color = level.color;
     document.getElementById('dash-level-tag').textContent = level.label;
@@ -1736,7 +2650,7 @@ class DashboardModule {
 
     // Update nav score
     const navScore = document.getElementById('nav-score');
-    if (navScore) navScore.textContent = total + ' / 100';
+    if (navScore) navScore.textContent = total + ' / 200';
   }
 }
 
@@ -1778,6 +2692,10 @@ class Application {
     this._modules.recyclebin = new RecycleBinModule(this._riskEngine);
     this._modules.indexation = new IndexationModule(this._riskEngine);
     this._modules.deadlocks = new DeadlockModule(this._riskEngine);
+    this._modules.ilm = new IlmModule(this._riskEngine);
+    this._modules.dataguard = new DataGuardModule(this._riskEngine);
+    this._modules.rac = new RacModule(this._riskEngine);
+    this._modules.awr = new AwrModule(this._riskEngine);
     this._modules.dashboard = new DashboardModule(this._riskEngine);
 
     Object.values(this._modules).forEach(m => m.init());
@@ -1842,18 +2760,62 @@ class Application {
       this._modules.deadlocks._hasAnswered = false;
       document.getElementById('dl-result-area').innerHTML = '';
       document.getElementById('dl-score-tag').textContent = 'SCORE: 0';
-      // Reset schema to initial deadlock state: step1=hold, step2=wait
       const schema = document.getElementById('dl-schema');
       const steps = schema.querySelectorAll('.dl-transaction__step');
       steps.forEach((el, i) => {
         el.classList.remove('dl-transaction__step--wait');
         el.classList.add('dl-transaction__step--hold');
-        // Steps at index 1 (TxA lot) and 3 (TxB stock_med) should be wait
         if (i === 1 || i === 3) {
           el.classList.remove('dl-transaction__step--hold');
           el.classList.add('dl-transaction__step--wait');
         }
       });
+
+      // Reset ILM
+      if (this._modules.ilm) {
+        this._modules.ilm._partitions = [];
+        this._modules.ilm._generatePartitions();
+        this._modules.ilm._year = 2026;
+        document.getElementById('ilm-year-slider').value = 2026;
+        document.getElementById('ilm-year-value').textContent = '2026';
+        this._modules.ilm._render();
+        document.getElementById('ilm-score-tag').textContent = 'SCORE: 0';
+      }
+
+      // Reset Data Guard
+      if (this._modules.dataguard) {
+        this._modules.dataguard._scenarioActive = false;
+        this._modules.dataguard._mode = 'maxprot';
+        document.querySelectorAll('[data-dg-mode]').forEach(b => b.classList.remove('toggle-group__btn--active'));
+        document.querySelector('[data-dg-mode="maxprot"]').classList.add('toggle-group__btn--active');
+        this._modules.dataguard._updateUI();
+        document.getElementById('dg-status-area').innerHTML = '<div class="alert alert--success">&#9989; Site primaire actif. Base de données de standby synchronisée.</div>';
+        document.getElementById('dg-score-tag').textContent = 'SCORE: 0';
+      }
+
+      // Reset RAC
+      if (this._modules.rac) {
+        this._modules.rac._node2Failed = false;
+        this._modules.rac._nodes = [
+          { id: 1, name: 'Instance 1', host: 'rac1.chu.local', status: 'ACTIVE', services: ['Dispensation', 'Stock'], sessions: 45 },
+          { id: 2, name: 'Instance 2', host: 'rac2.chu.local', status: 'ACTIVE', services: ['Prescription', 'Facturation'], sessions: 38 },
+          { id: 3, name: 'Instance 3', host: 'rac3.chu.local', status: 'ACTIVE', services: ['Archive', 'Reporting'], sessions: 22 }
+        ];
+        this._modules.rac._renderNodes();
+        document.getElementById('rac-result-area').innerHTML = '';
+        document.getElementById('rac-score-tag').textContent = 'SCORE: 0';
+      }
+
+      // Reset AWR
+      if (this._modules.awr) {
+        this._modules.awr._period = 'normal';
+        this._modules.awr._resolvedEvents = new Set();
+        document.querySelectorAll('[data-awr-period]').forEach(b => b.classList.remove('toggle-group__btn--active'));
+        document.querySelector('[data-awr-period="normal"]').classList.add('toggle-group__btn--active');
+        document.getElementById('awr-diagnostic-area').innerHTML = '';
+        document.getElementById('awr-reco-area').innerHTML = '';
+        this._modules.awr._generateReport();
+      }
     });
   }
 }
