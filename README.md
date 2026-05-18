@@ -1,6 +1,6 @@
 ﻿# Oracle SIH (Système d'Information Hospitalier) — Démonstrations Techniques
 
-> Ensemble de 8 applications HTML/CSS/JavaScript autonomes, sans dépendance externe et exécutables hors-ligne, destinées à la démonstration pédagogique de mécanismes Oracle Database et d’architectures SIH (Système d’Information Hospitalier) dans un contexte de conformité HDS/RGPD.
+> Ensemble de 9 applications HTML/CSS/JavaScript autonomes, sans dépendance externe et exécutables hors-ligne, destinées à la démonstration pédagogique de mécanismes Oracle Database et d’architectures SIH (Système d’Information Hospitalier) dans un contexte de conformité HDS/RGPD.
 
 ---
 
@@ -16,11 +16,12 @@
 8. [Fichier 5 : Suite Performance Avancée](#fichier-5--suite-performance-avancee)
 9. [Fichier 6 : Assistant SQL PUI](#fichier-6--assistant-sql-pui)
 10. [Fichier 7 : Bonnes Pratiques DBA SIH](#fichier-7--bonnes-pratiques-dba-sih)
-11. [Thèmes transversaux](#thèmes-transversaux)
-12. [Conformité et sécurité](#conformité-et-sécurité)
-13. [Aide intégrée et lexiques contextuels](#aide-intégrée-et-lexiques-contextuels)
-14. [Prérequis](#prérequis)
-15. [Licence](#licence)
+11. [Fichier 8 : Manuel de Survie de l'Expert Oracle](#fichier-8--manuel-de-survie-de-lexpert-oracle)
+12. [Thèmes transversaux](#thèmes-transversaux)
+13. [Conformité et sécurité](#conformité-et-sécurité)
+14. [Aide intégrée et lexiques contextuels](#aide-intégrée-et-lexiques-contextuels)
+15. [Prérequis](#prérequis)
+16. [Licence](#licence)
 
 ---
 
@@ -298,6 +299,36 @@ Fonctionnalités :
 * console de log avec horodatage.
 
 Données 100 % fictives, contexte PUI, conforme RGPD Art. 25. Charte graphique identique aux modules 1 à 6.
+
+---
+
+# Fichier 8 : Manuel de Survie de l'Expert Oracle
+
+**Fichier :** `8-oracle-expert-sih-demo.html`
+
+Guide de survie interactif du DBA senior orienté diagnostic immédiat en environnement SIH/PUI. 6 onglets couvrant les réflexes essentiels.
+
+| Onglet | Contenu |
+|--------|---------|
+| Interdits Absolus | Tableau des 8 erreurs fatales (CHECK non-déterministe, COMMIT dans trigger, objets dans SYS, SELECT * dans vue, DROP sans PURGE, UPDATE sans WHERE, CHAR vs VARCHAR2, FK sans index) avec conséquence, solution et contexte détaillé. Blocs de code à ne JAMAIS écrire. |
+| Architecture & Conception | 4 pratiques fondamentales : indexer les FK, séparer DATA/INDEX avec disclaimer ASM/SSD, préférer IDENTITY aux séquences, toujours VARCHAR2. Simulateur interactif d'impact FK sans index (verrou TM). |
+| Performance & SQL | Set-Based Mindset avec comparateur curseur PL/SQL vs UPDATE massif (slider 1 000 – 100 000 lignes). Piège du calcul sur colonne indexée. Bloc BULK COLLECT / FORALL avec explication du context switch. Statistiques CBO (DBMS_STATS). |
+| Concurrence & Monitoring | Générateur de requête V$SESSION avec cases à cocher (15 colonnes). Carte ORA-00054 et verrou DDL/DML. Tableau des Wait Events (ON CPU, db file scattered read, TX lock, log file sync). Requête "couteau suisse" V$SESSION complète. |
+| Mindset & Méthodologie | Philosophie du DBA senior : apprentissage Just-in-Time, dictionnaire DICT/DICT_COLUMNS comme bible, principe du moindre privilège, RMAN avec test de restauration. |
+| Ressources & Outils | Moteur de recherche de vues Oracle (filtrage en temps réel). Boîte à outils : Oracle-Base, AskTOM, Documentation Officielle, SQL Developer, DICT & DICT_COLUMNS. |
+
+Fonctionnalités :
+
+* navigation par onglets avec sidebar et thème cyan/euro ;
+* aide contextuelle par onglet (bouton « ? ») avec 6 rubriques détaillées ;
+* lexique technique intégré (bouton « L ») avec 24 termes classés en 9 sections ;
+* crédits et notes de version (bouton « C ») ;
+* générateur SQL V$SESSION interactif avec sélection de colonnes et copie (clipboard) ;
+* simulateur de verrouillage FK avec deux scénarios (avec/sans index) et animation DOM ;
+* curseur de performance SQL vs PL/SQL (mise à jour temps réel des barres de comparaison) ;
+* console de log avec horodatage et 3 niveaux (info, success, error) ;
+* moteur de recherche de vues Oracle avec filtre insensible à la casse ;
+* design responsive, palette cyan/euro, charte graphique différenciée des modules 1 à 7.
 
 ---
 

@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Oracle Expert SIH - Manuel de Survie de l'Expert Oracle">
+<title>Oracle Expert SIH — Manuel de Survie</title>
+<style>
+:root {
+  --color-bg-deep: #0a0e17;
+  --color-bg-surface: #131a2a;
+  --color-bg-elevated: #1a2340;
+  --color-bg-hover: #243052;
+  --color-border: #1e2d4a;
+  --color-border-active: #3b82f6;
+  --color-blue: #3b82f6;
+  --color-blue-dim: #1e3a6e;
+  --color-red: #ef4444;
+  --color-red-dim: #7f1d1d;
+  --color-green: #22c55e;
+  --color-green-dim: #166534;
+  --color-amber: #f59e0b;
+  --color-amber-dim: #78350f;
+  --color-cyan: #06b6d4;
+  --color-purple: #a855f7;
+  --font-ui: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+  --fs-xs: 0.6875rem;
+  --fs-sm: 0.8125rem;
+  --fs-base: 0.9375rem;
+  --fs-md: 1.0625rem;
+  --fs-lg: 1.25rem;
+  --fs-xl: 1.5rem;
+  --fs-2xl: 2rem;
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-6: 1.5rem;
+  --sp-8: 2rem;
+  --sp-12: 3rem;
+  --nav-width: 260px;
+  --header-height: 56px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --transition-fast: 150ms ease;
+  --transition-normal: 300ms ease;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+body { font-family: var(--font-ui); font-size: var(--fs-base); color: #e2e8f0; background: var(--color-bg-deep); line-height: 1.6; overflow-x: hidden; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input, select, textarea { font-family: inherit; font-size: inherit; }
+pre, code { font-family: var(--font-mono); }
+table { border-collapse: collapse; width: 100%; }
+a { color: var(--color-cyan); text-decoration: none; }
+a:hover { text-decoration: underline; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--color-bg-deep); }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: var(--radius-sm); }
+::-webkit-scrollbar-thumb:hover { background: var(--color-blue); }
+.app-layout { display: grid; grid-template-columns: var(--nav-width) 1fr; grid-template-rows: var(--header-height) 1fr; grid-template-areas: "header header" "nav main"; min-height: 100vh; }
+.app-header { grid-area: header; display: flex; align-items: center; justify-content: space-between; padding: 0 var(--sp-6); background: var(--color-bg-surface); border-bottom: 1px solid var(--color-border); z-index: 100; }
+.app-header__brand { display: flex; align-items: center; gap: var(--sp-3); font-family: var(--font-mono); font-size: var(--fs-md); font-weight: 700; letter-spacing: -0.02em; }
+.app-header__brand-icon { width: 28px; height: 28px; background: var(--color-blue); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: var(--fs-sm); font-weight: 900; color: #fff; }
+.app-header__status { display: flex; align-items: center; gap: var(--sp-4); font-size: var(--fs-xs); font-family: var(--font-mono); }
+.status-badge { display: inline-flex; align-items: center; gap: var(--sp-2); padding: var(--sp-1) var(--sp-3); border-radius: var(--radius-sm); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.status-badge--online { background: var(--color-green-dim); color: var(--color-green); }
+.status-badge--hds { background: var(--color-blue-dim); color: var(--color-blue); }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: pulse-dot 2s infinite; }
+@keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+.app-nav { grid-area: nav; background: var(--color-bg-surface); border-right: 1px solid var(--color-border); padding: var(--sp-6) 0; overflow-y: auto; }
+.app-nav__section { padding: 0 var(--sp-4); margin-bottom: var(--sp-6); }
+.app-nav__section-title { font-size: var(--fs-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-blue); margin-bottom: var(--sp-3); font-family: var(--font-mono); }
+.app-nav__item { display: flex; align-items: center; gap: var(--sp-3); width: 100%; padding: var(--sp-3) var(--sp-4); border-radius: var(--radius-md); font-size: var(--fs-sm); font-weight: 500; color: #94a3b8; transition: all var(--transition-fast); text-align: left; }
+.app-nav__item:hover { background: var(--color-bg-hover); color: #e2e8f0; }
+.app-nav__item--active { background: var(--color-blue-dim); color: var(--color-blue); font-weight: 600; }
+.app-nav__item-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700; border-radius: var(--radius-sm); background: var(--color-bg-elevated); flex-shrink: 0; }
+.app-nav__item--active .app-nav__item-icon { background: var(--color-blue); color: #fff; }
+.app-nav__rgpd-notice { margin: var(--sp-6) var(--sp-4); padding: var(--sp-3); background: var(--color-blue-dim); border: 1px solid var(--color-blue); border-radius: var(--radius-md); font-size: var(--fs-xs); color: var(--color-blue); font-family: var(--font-mono); line-height: 1.5; }
+.app-main { grid-area: main; padding: var(--sp-8); overflow-y: auto; background: var(--color-bg-deep); }
+.page-header { margin-bottom: var(--sp-8); padding-bottom: var(--sp-4); border-bottom: 1px solid var(--color-border); }
+.page-header__title { font-size: var(--fs-xl); font-weight: 700; letter-spacing: -0.02em; margin-bottom: var(--sp-2); display: flex; align-items: center; gap: var(--sp-3); }
+.page-header__subtitle { font-size: var(--fs-sm); color: #94a3b8; font-family: var(--font-mono); }
+.page-header__subtitle-row { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); }
+.page-header__help-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 1px solid var(--color-border); border-radius: 50%; background: var(--color-bg-elevated); color: #94a3b8; font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700; cursor: pointer; transition: all var(--transition-fast); flex-shrink: 0; vertical-align: middle; }
+.page-header__help-btn:hover { border-color: var(--color-blue); color: var(--color-blue); background: var(--color-blue-dim); }
+.card { background: var(--color-bg-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--sp-6); margin-bottom: var(--sp-6); }
+.card__title { font-size: var(--fs-md); font-weight: 700; margin-bottom: var(--sp-4); display: flex; align-items: center; gap: var(--sp-3); font-family: var(--font-mono); }
+.card__title-icon { color: var(--color-blue); }
+.card__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--sp-4); flex-wrap: wrap; gap: var(--sp-3); }
+.card__header-title { font-size: var(--fs-md); font-weight: 700; font-family: var(--font-mono); display: flex; align-items: center; gap: var(--sp-3); }
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-6); }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-6); }
+@media (max-width: 1200px) { .grid-3 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+.data-mono { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--color-cyan); background: var(--color-bg-elevated); padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); display: inline-block; }
+.data-label { font-size: var(--fs-xs); color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+.data-value { font-family: var(--font-mono); font-size: var(--fs-base); font-weight: 600; }
+.stat-block { background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--sp-4); text-align: center; }
+.stat-block__value { font-family: var(--font-mono); font-size: var(--fs-xl); font-weight: 700; margin-bottom: var(--sp-1); }
+.stat-block__label { font-size: var(--fs-xs); color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+.stat-block--blue .stat-block__value { color: var(--color-blue); }
+.stat-block--green .stat-block__value { color: var(--color-green); }
+.stat-block--red .stat-block__value { color: var(--color-red); }
+.stat-block--amber .stat-block__value { color: var(--color-amber); }
+.stat-block--cyan .stat-block__value { color: var(--color-cyan); }
+.stat-block--purple .stat-block__value { color: var(--color-purple); }
+.progress-bar { width: 100%; height: 8px; background: var(--color-bg-elevated); border-radius: var(--radius-sm); overflow: hidden; margin: var(--sp-2) 0; }
+.progress-bar__fill { height: 100%; border-radius: var(--radius-sm); transition: width var(--transition-normal); }
+.progress-bar__fill--blue { background: var(--color-blue); }
+.progress-bar__fill--green { background: var(--color-green); }
+.progress-bar__fill--red { background: var(--color-red); }
+.progress-bar__fill--amber { background: var(--color-amber); }
+.progress-bar__fill--cyan { background: var(--color-cyan); }
+.progress-bar--lg { height: 20px; border-radius: var(--radius-md); }
+.tag { display: inline-flex; align-items: center; padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); font-size: var(--fs-xs); font-weight: 600; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.03em; }
+.tag--blue { background: var(--color-blue-dim); color: var(--color-blue); }
+.tag--green { background: var(--color-green-dim); color: var(--color-green); }
+.tag--red { background: var(--color-red-dim); color: var(--color-red); }
+.tag--amber { background: var(--color-amber-dim); color: var(--color-amber); }
+.tag--cyan { background: #164e63; color: var(--color-cyan); }
+.tag--purple { background: #4c1d95; color: var(--color-purple); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2); padding: var(--sp-3) var(--sp-6); border-radius: var(--radius-md); font-size: var(--fs-sm); font-weight: 600; transition: all var(--transition-fast); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.03em; }
+.btn--primary { background: var(--color-blue); color: #fff; }
+.btn--primary:hover { background: #2563eb; }
+.btn--success { background: var(--color-green); color: #fff; }
+.btn--success:hover { background: #16a34a; }
+.btn--danger { background: var(--color-red); color: #fff; }
+.btn--danger:hover { background: #dc2626; }
+.btn--outline { border: 1px solid var(--color-border); color: #e2e8f0; }
+.btn--outline:hover { border-color: var(--color-blue); color: var(--color-blue); }
+.btn--sm { padding: var(--sp-2) var(--sp-4); font-size: var(--fs-xs); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn--warning { background: var(--color-amber); color: #000; }
+.btn--warning:hover { background: #d97706; }
+.alert { padding: var(--sp-4); border-radius: var(--radius-md); border-left: 4px solid; margin-bottom: var(--sp-4); font-size: var(--fs-sm); font-family: var(--font-mono); }
+.alert--info { background: var(--color-blue-dim); border-color: var(--color-blue); color: #93c5fd; }
+.alert--success { background: var(--color-green-dim); border-color: var(--color-green); color: #86efac; }
+.alert--warning { background: var(--color-amber-dim); border-color: var(--color-amber); color: #fcd34d; }
+.alert--error { background: var(--color-red-dim); border-color: var(--color-red); color: #fca5a5; }
+.log-console { background: #000; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--sp-4); font-family: var(--font-mono); font-size: var(--fs-xs); max-height: 200px; overflow-y: auto; line-height: 1.8; }
+.log-console__entry { color: #94a3b8; }
+.log-console__entry--info { color: var(--color-blue); }
+.log-console__entry--success { color: var(--color-green); }
+.log-console__entry--error { color: var(--color-red); }
+.log-console__entry--warn { color: var(--color-amber); }
+.log-console__timestamp { color: #475569; margin-right: var(--sp-2); }
+.slider-group { display: flex; flex-direction: column; gap: var(--sp-2); }
+.slider-group__header { display: flex; justify-content: space-between; align-items: center; }
+.slider-group__label { font-size: var(--fs-sm); font-weight: 600; font-family: var(--font-mono); }
+.slider-group__value { font-size: var(--fs-sm); font-family: var(--font-mono); color: var(--color-cyan); font-weight: 700; }
+input[type="range"] { -webkit-appearance: none; width: 100%; height: 6px; background: var(--color-bg-elevated); border-radius: var(--radius-sm); outline: none; }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--color-blue); border-radius: 50%; cursor: pointer; border: 2px solid var(--color-bg-surface); }
+.data-table { width: 100%; font-size: var(--fs-sm); }
+.data-table th { text-align: left; padding: var(--sp-3) var(--sp-4); background: var(--color-bg-elevated); font-family: var(--font-mono); font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; font-weight: 600; border-bottom: 1px solid var(--color-border); }
+.data-table td { padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--color-border); font-family: var(--font-mono); font-size: var(--fs-xs); }
+.data-table tr:hover td { background: var(--color-bg-hover); }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn var(--transition-normal) ease; }
+.module-section { display: none; }
+.module-section--active { display: block; animation: fadeIn var(--transition-normal) ease; }
+.app-footer { margin-top: var(--sp-12); padding-top: var(--sp-6); border-top: 1px solid var(--color-border); font-size: var(--fs-xs); color: #475569; font-family: var(--font-mono); text-align: center; line-height: 1.8; }
+
+.comp-bar { display: flex; align-items: center; gap: var(--sp-3); margin-bottom: var(--sp-2); }
+.comp-bar__label { width: 90px; font-family: var(--font-mono); font-size: var(--fs-xs); color: #94a3b8; flex-shrink: 0; }
+.comp-bar__track { flex: 1; height: 28px; background: var(--color-bg-elevated); border-radius: var(--radius-sm); overflow: hidden; position: relative; }
+.comp-bar__fill { height: 100%; border-radius: var(--radius-sm); transition: width 1s ease; }
+.comp-bar__fill--before { background: linear-gradient(90deg, var(--color-red-dim), var(--color-red)); }
+.comp-bar__fill--after { background: linear-gradient(90deg, var(--color-green-dim), var(--color-green)); }
+.comp-bar__value { width: 110px; font-family: var(--font-mono); font-size: var(--fs-xs); text-align: right; flex-shrink: 0; }
+.comp-bar__value--before { color: var(--color-red); }
+.comp-bar__value--after { color: var(--color-green); }
+.comp-legend { display: flex; justify-content: flex-end; gap: var(--sp-6); font-size: var(--fs-xs); font-family: var(--font-mono); color: #64748b; margin-bottom: var(--sp-3); }
+.comp-legend span { display: flex; align-items: center; gap: var(--sp-2); }
+.comp-legend__dot { width: 10px; height: 10px; border-radius: 2px; }
+.comp-legend__dot--before { background: var(--color-red); }
+.comp-legend__dot--after { background: var(--color-green); }
+
+.toggle-group { display: flex; gap: var(--sp-2); margin-bottom: var(--sp-4); flex-wrap: wrap; }
+.toggle-group__btn { padding: var(--sp-2) var(--sp-4); border: 1px solid var(--color-border); border-radius: var(--radius-md); font-family: var(--font-mono); font-size: var(--fs-xs); font-weight: 600; color: #94a3b8; background: var(--color-bg-elevated); cursor: pointer; transition: all var(--transition-fast); text-transform: uppercase; letter-spacing: 0.03em; }
+.toggle-group__btn:hover { border-color: var(--color-blue); color: var(--color-blue); }
+.toggle-group__btn--active { background: var(--color-blue-dim); border-color: var(--color-blue); color: var(--color-blue); }
+
+.sql-block { background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--sp-4); font-family: var(--font-mono); font-size: var(--fs-xs); line-height: 1.7; overflow-x: auto; margin-bottom: var(--sp-4); color: #cbd5e1; white-space: pre; tab-size: 2; }
+
+.help-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%) translateY(16px); width: 90%; max-width: 720px; max-height: 85vh; background: var(--color-bg-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); z-index: 1000; overflow: hidden; animation: fadeSlideUp 0.3s ease forwards; box-shadow: 0 24px 48px rgba(0,0,0,0.4); }
+.help-modal--active { display: flex; flex-direction: column; }
+@keyframes fadeSlideUp { from { opacity: 0; transform: translate(-50%,-50%) translateY(16px); } to { opacity: 1; transform: translate(-50%,-50%) translateY(0); } }
+.help-modal__header { display: flex; align-items: center; justify-content: space-between; padding: var(--sp-4) var(--sp-6); border-bottom: 1px solid var(--color-border); background: var(--color-bg-elevated); }
+.help-modal__title { font-family: var(--font-mono); font-size: var(--fs-md); font-weight: 700; color: var(--color-blue); }
+.help-modal__close { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-bg-deep); color: #94a3b8; font-size: var(--fs-md); cursor: pointer; transition: all var(--transition-fast); font-weight: 700; }
+.help-modal__close:hover { border-color: var(--color-red); color: var(--color-red); background: var(--color-red-dim); }
+.help-modal__body { padding: var(--sp-6); overflow-y: auto; flex: 1; }
+.help-modal__section { margin-bottom: var(--sp-6); }
+.help-modal__section:last-child { margin-bottom: 0; }
+.help-modal__section-title { font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: var(--sp-3); padding-bottom: var(--sp-2); border-bottom: 1px solid var(--color-border); }
+.help-modal__section-title--objective { color: var(--color-blue); }
+.help-modal__section-title--principle { color: var(--color-purple); }
+.help-modal__section-title--lexique { color: var(--color-purple); }
+.help-modal__text { font-size: var(--fs-sm); color: #cbd5e1; line-height: 1.7; margin-bottom: var(--sp-3); }
+.help-modal__text code { font-family: var(--font-mono); font-size: var(--fs-xs); background: var(--color-bg-elevated); padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); color: var(--color-cyan); }
+.help-modal__list { list-style: none; padding: 0; }
+.help-modal__list li { position: relative; padding: var(--sp-2) 0 var(--sp-2) var(--sp-6); font-size: var(--fs-sm); color: #94a3b8; line-height: 1.6; border-left: 2px solid var(--color-border); }
+.help-modal__list li::before { content: ''; position: absolute; left: -1px; top: 50%; width: 8px; height: 2px; background: var(--color-blue); transform: translateY(-50%); }
+.help-modal__list li:last-child { border-left-color: transparent; }
+.help-modal__footer { padding: var(--sp-4) var(--sp-6); border-top: 1px solid var(--color-border); display: flex; justify-content: flex-end; background: var(--color-bg-elevated); }
+
+.help-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 999; }
+.help-overlay--active { display: block; }
+
+.help-modal__credit { text-align: center; padding: var(--sp-4) 0; }
+.help-modal__credit-role { font-size: var(--fs-xs); color: #64748b; margin-bottom: var(--sp-4); line-height: 1.7; }
+.help-modal__credit-author { font-size: var(--fs-lg); font-weight: 700; margin-bottom: var(--sp-2); }
+.help-modal__credit-author a { color: var(--color-cyan); text-decoration: none; transition: color var(--transition-normal); }
+.help-modal__credit-author a:hover { color: var(--color-blue); text-decoration: underline; }
+.help-modal__credit-assist { font-size: var(--fs-xs); color: var(--color-amber-dim); margin-bottom: var(--sp-4); line-height: 1.6; }
+.help-modal__credit-year { font-size: var(--fs-xs); color: #475569; }
+
+.checkbox-group { display: flex; flex-direction: column; gap: var(--sp-2); }
+.checkbox-group label { display: flex; align-items: center; gap: var(--sp-3); font-family: var(--font-mono); font-size: var(--fs-xs); color: #94a3b8; cursor: pointer; padding: var(--sp-2) var(--sp-3); border-radius: var(--radius-sm); transition: background var(--transition-fast); }
+.checkbox-group label:hover { background: var(--color-bg-hover); color: #e2e8f0; }
+.checkbox-group input[type="checkbox"] { -webkit-appearance: none; width: 16px; height: 16px; border: 1px solid var(--color-border); border-radius: 3px; background: var(--color-bg-elevated); cursor: pointer; flex-shrink: 0; transition: all var(--transition-fast); }
+.checkbox-group input[type="checkbox"]:checked { background: var(--color-blue); border-color: var(--color-blue); position: relative; }
+.checkbox-group input[type="checkbox"]:checked::after { content: '✓'; color: #fff; font-size: 12px; display: flex; align-items: center; justify-content: center; line-height: 1; }
+
+.search-field { display: flex; gap: var(--sp-3); margin-bottom: var(--sp-4); }
+.search-field input { flex: 1; padding: var(--sp-3) var(--sp-4); background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-md); color: #e2e8f0; font-family: var(--font-mono); font-size: var(--fs-sm); outline: none; transition: border-color var(--transition-fast); }
+.search-field input:focus { border-color: var(--color-blue); }
+.search-field input::placeholder { color: #475569; }
+
+.fk-sim-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-6); margin-bottom: var(--sp-4); }
+@media (max-width: 768px) { .fk-sim-grid { grid-template-columns: 1fr; } }
+.fk-table { background: var(--color-bg-elevated); border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; }
+.fk-table__header { padding: var(--sp-3) var(--sp-4); background: var(--color-blue-dim); font-family: var(--font-mono); font-size: var(--fs-xs); font-weight: 600; color: var(--color-blue); text-transform: uppercase; letter-spacing: 0.05em; }
+.fk-table__row { padding: var(--sp-2) var(--sp-4); font-family: var(--font-mono); font-size: var(--fs-xs); border-top: 1px solid var(--color-border); color: #94a3b8; display: flex; justify-content: space-between; }
+.fk-sim-result { padding: var(--sp-4); border-radius: var(--radius-md); margin-top: var(--sp-3); font-family: var(--font-mono); font-size: var(--fs-xs); }
+.fk-sim-result--lock { background: var(--color-red-dim); border: 1px solid var(--color-red); color: #fca5a5; }
+.fk-sim-result--ok { background: var(--color-green-dim); border: 1px solid var(--color-green); color: #86efac; }
+
+.resource-card { display: flex; align-items: flex-start; gap: var(--sp-4); padding: var(--sp-4); background: var(--color-bg-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); margin-bottom: var(--sp-3); transition: border-color var(--transition-fast); }
+.resource-card:hover { border-color: var(--color-blue); }
+.resource-card__icon { width: 40px; height: 40px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: var(--fs-lg); flex-shrink: 0; background: var(--color-bg-elevated); }
+.resource-card__body { flex: 1; }
+.resource-card__title { font-family: var(--font-mono); font-size: var(--fs-sm); font-weight: 700; color: #e2e8f0; margin-bottom: var(--sp-1); }
+.resource-card__desc { font-size: var(--fs-xs); color: #94a3b8; line-height: 1.6; }
+.resource-card .tag { margin-right: var(--sp-2); margin-top: var(--sp-2); }
+</style>
+</head>
+<body>
+
+<div class="app-layout">
+  <header class="app-header">
+    <div class="app-header__brand">
+      <div class="app-header__brand-icon">S</div>
+      <span>ORACLE<span style="color: var(--color-cyan);">_SURVIE</span>::DÉMO</span>
+    </div>
+    <div class="app-header__status">
+      <span class="status-badge status-badge--online"><span class="status-dot"></span>DÉMO ACTIVE</span>
+      <span class="status-badge status-badge--hds">MANUEL DE SURVIE</span>
+      <button class="page-header__help-btn" data-help="lexicon" aria-label="Lexique technique" title="Lexique technique">L</button>
+      <button class="page-header__help-btn" data-help="credit" aria-label="Credits" title="Credits">C</button>
+    </div>
+  </header>
+
+  <nav class="app-nav">
+    <div class="app-nav__section">
+      <div class="app-nav__section-title">Manuel de Survie</div>
+      <button class="app-nav__item app-nav__item--active" data-tab="interdits"><span class="app-nav__item-icon">X</span>1. Interdits Absolus</button>
+      <button class="app-nav__item" data-tab="architecture"><span class="app-nav__item-icon">A</span>2. Architecture &amp; Modélisation</button>
+      <button class="app-nav__item" data-tab="performance"><span class="app-nav__item-icon">P</span>3. Performance &amp; SQL</button>
+      <button class="app-nav__item" data-tab="concurrence"><span class="app-nav__item-icon">M</span>4. Concurrence &amp; Monitoring</button>
+      <button class="app-nav__item" data-tab="mindset"><span class="app-nav__item-icon">S</span>5. Mindset &amp; Méthodologie</button>
+      <button class="app-nav__item" data-tab="ressources"><span class="app-nav__item-icon">O</span>6. Ressources &amp; Outils</button>
+    </div>
+    <div class="app-nav__rgpd-notice">
+      Aucune donnée de santé réelle. Conforme RGPD Art. 25 (Privacy by Design).
+    </div>
+  </nav>
+
+  <main class="app-main">
+    <div class="page-header">
+      <div class="page-header__title">Manuel de Survie de l'Expert Oracle</div>
+      <div class="page-header__subtitle-row">
+        <div class="page-header__subtitle">Les réflexes du DBA senior pour un diagnostic immédiat — Contexte SIH / PUI</div>
+        <button class="page-header__help-btn" data-help="overview" aria-label="Aide" title="Aide">?</button>
+      </div>
+    </div>
+
+    <!-- ====== ONGLET 1 : Interdits Absolus ====== -->
+    <section class="module-section module-section--active" id="tab-interdits">
+      <div class="card">
+        <div class="card__title"><span class="card__title-icon">🚫</span> 5 Erreurs Fatales Qui Plantent ou Corrompent une Base<button class="page-header__help-btn" data-help="interdits" aria-label="Aide" title="Aide" style="margin-left:auto;">?</button></div>
+        <p class="help-modal__text" style="margin-bottom:var(--sp-4);color:#94a3b8;">Ces pièges classiques sont la première cause d'incidents évitables en production. Chaque entrée décrit l'erreur, la conséquence et la solution experte.</p>
+        <table class="data-table">
+          <thead><tr><th>Domaine</th><th>Erreur Débutant</th><th>Conséquence</th><th>Solution Expert</th><th>Contexte</th></tr></thead>
+          <tbody>
+            <tr><td><span class="tag tag--red">CHECK</span></td><td><code>CHECK(SYSDATE &gt; date_creation)</code></td><td>ORA-xxxx — fonction non-déterministe interdite</td><td><code>BEFORE INSERT TRIGGER</code></td><td>Les contraintes CHECK doivent être déterministes (même résultat à chaque appel). SYSDATE change à chaque milliseconde → Oracle le rejette.</td></tr>
+            <tr><td><span class="tag tag--red">Trigger</span></td><td><code>COMMIT</code> dans un trigger</td><td>Violation transactionnelle — ORA-04092</td><td>Lever une exception applicative</td><td>Un trigger fait partie de la transaction appelante. COMMIT dedans briserait l'atomicité → ORA-04092.</td></tr>
+            <tr><td><span class="tag tag--red">SYS</span></td><td>Créer des objets métier dans <code>SYS</code></td><td>Corruption du dictionnaire de données</td><td>Schéma métier dédié (<code>PHARMA</code>)</td><td>Le schéma SYS contient le dictionnaire. Tout objet tiers risque corruption lors des upgrades Oracle.</td></tr>
+            <tr><td><span class="tag tag--red">Vue</span></td><td><code>CREATE VIEW ... AS SELECT * FROM ...</code></td><td>Perf dégradée, colonnes inconnues</td><td>Énumérer les colonnes explicitement</td><td>SELECT * fige l'ordre et le nombre de colonnes de la table source. Un ALTER TABLE modifiant la structure changera silencieusement la vue.</td></tr>
+            <tr><td><span class="tag tag--red">DROP</span></td><td><code>DROP TABLE</code> sans <code>PURGE</code></td><td>Occupation du tablespace SYSTEM, contention sur le dictionnaire, ralentissement général des opérations DDL</td><td><code>DROP TABLE ... PURGE</code></td><td>L'objet part dans le Recycle Bin (table BIN$). À force de DROP, le tablespace SYSTEM s'engorge et le dictionnaire ralentit.</td></tr>
+            <tr><td><span class="tag tag--red">UPDATE</span></td><td><code>UPDATE prescriptions SET ...</code> sans <code>WHERE</code></td><td>Mise à jour catastrophique de toutes les lignes</td><td><code>SAVEPOINT</code> + vérification préalable</td><td>Sans clause WHERE, toutes les lignes de la table sont modifiées. Aucune confirmation Oracle ne vous protège.</td></tr>
+            <tr><td><span class="tag tag--red">CHAR</span></td><td><code>CHAR(20)</code> pour un code de 8 car.</td><td>Espace alloué inutilement : (taille déclarée − taille réelle) × nombre de lignes</td><td><code>VARCHAR2(20)</code></td><td>CHAR alloue toujours la taille déclarée (padding d'espaces). VARCHAR2 n'alloue que la taille réelle des données.</td></tr>
+            <tr><td><span class="tag tag--red">Index</span></td><td>FK sans index</td><td>Verrou TM (TABLE LOCK) sur la table enfant lors d'une suppression dans la table parent</td><td><code>CREATE INDEX ... ON ... (fk_col)</code></td><td>Sans index, Oracle verrouille toute la table enfant (TM Lock) pour garantir l'intégrité référentielle pendant un DELETE parent.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card__title"><span class="card__title-icon">💣</span> Code à ne JAMAIS écrire</div>
+        <div class="grid-2">
+          <div>
+            <div class="alert alert--error" style="margin-bottom:var(--sp-2);">Interdit — CHECK non-déterministe</div>
+            <pre class="sql-block">CREATE TABLE prescriptions (
+  date_creation DATE,
+  CONSTRAINT ck_date CHECK(SYSDATE >= date_creation)  -- ERREUR
+);</pre>
+          </div>
+          <div>
+            <div class="alert alert--success" style="margin-bottom:var(--sp-2);">Solution — Trigger BEFORE</div>
+            <pre class="sql-block">CREATE OR REPLACE TRIGGER trg_prescriptions_before
+BEFORE INSERT OR UPDATE ON prescriptions
+FOR EACH ROW
+BEGIN
+  IF :NEW.date_creation > SYSDATE THEN
+    RAISE_APPLICATION_ERROR(-20001,
+      'La date de création ne peut pas être future.');
+  END IF;
+END;</pre>
+          </div>
+          <div>
+            <div class="alert alert--error" style="margin-bottom:var(--sp-2);">Interdit — COMMIT dans trigger</div>
+            <pre class="sql-block">CREATE OR REPLACE TRIGGER trg_after_insert
+AFTER INSERT ON prescriptions
+BEGIN
+  COMMIT;  -- ORA-04092
+END;</pre>
+          </div>
+          <div>
+            <div class="alert alert--success" style="margin-bottom:var(--sp-2);">Solution — Lever une exception</div>
+            <pre class="sql-block">CREATE OR REPLACE TRIGGER trg_after_insert
+AFTER INSERT ON prescriptions
+BEGIN
+  RAISE_APPLICATION_ERROR(-20002,
+    'Insertion refusée : règle métier non respectée.');
+END;</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== ONGLET 2 : Architecture & Modélisation ====== -->
+    <section class="module-section" id="tab-architecture">
+      <div class="card">
+        <div class="card__title"><span class="card__title-icon">🏗️</span> 4 Règles d'Or de la Conception<button class="page-header__help-btn" data-help="architecture" aria-label="Aide" title="Aide" style="margin-left:auto;">?</button></div>
+        <div class="grid-2">
+          <div>
+            <div class="card" style="margin-bottom:0;">
+              <div class="card__title" style="font-size:var(--fs-sm);">1. Indexer les Clés Étrangères</div>
+              <p style="font-size:var(--fs-xs);color:#94a3b8;margin-bottom:var(--sp-3);">Sans index sur une FK, toute suppression dans la table parent verrouille la table enfant entièrement (TM Lock).</p>
+              <pre class="sql-block" style="margin:0;">-- À faire sur TOUTE FK :
+CREATE INDEX idx_lots_med_id
+  ON lots(med_id) TABLESPACE pharma_index;</pre>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:0;">
+              <div class="card__title" style="font-size:var(--fs-sm);">2. Séparer DATA et INDEX</div>
+              <p style="font-size:var(--fs-xs);color:#94a3b8;margin-bottom:var(--sp-3);">Tablespace distincts pour les données et les index = meilleure gestion I/O et maintenance.</p>
+              <pre class="sql-block" style="margin:0;">CREATE TABLESPACE pharma_data
+  DATAFILE '/u01/oradata/pharma_data.dbf'
+  SIZE 10G AUTOEXTEND ON;
+
+CREATE TABLESPACE pharma_index
+  DATAFILE '/u01/oradata/pharma_index.dbf'
+  SIZE 2G AUTOEXTEND ON;</pre>
+              <div class="alert alert--info" style="margin-top:var(--sp-2);font-size:var(--fs-xs);">Bonne pratique historique essentielle sur fichiers systèmes traditionnels. Sous ASM ou stockage SSD/NVMe, l'impact est moindre mais la séparation facilite toujours la maintenance (rebuild d'index sans contention I/O sur les données).</div>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:0;">
+              <div class="card__title" style="font-size:var(--fs-sm);">3. Préférer IDENTITY aux Séquences</div>
+              <p style="font-size:var(--fs-xs);color:#94a3b8;margin-bottom:var(--sp-3);">Les colonnes IDENTITY (12c+) évitent la gestion manuelle des séquences et garantissent l'intégrité.</p>
+              <pre class="sql-block" style="margin:0;">CREATE TABLE prescriptions (
+  id NUMBER
+    GENERATED BY DEFAULT AS IDENTITY,
+  ...
+);</pre>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:0;">
+              <div class="card__title" style="font-size:var(--fs-sm);">4. Toujours VARCHAR2, Jamais CHAR</div>
+              <p style="font-size:var(--fs-xs);color:#94a3b8;margin-bottom:var(--sp-3);">CHAR(10) alloue toujours 10 caractères, même pour un code de 3 lettres. VARCHAR2 n'alloue que le nécessaire.</p>
+              <pre class="sql-block" style="margin:0;">-- MAUVAIS : CHAR(10) → 10 octets fixes
+code_lot CHAR(10);
+
+-- BON : VARCHAR2(10) → taille réelle
+code_lot VARCHAR2(10);</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__header">
+          <div class="card__header-title"><span class="card__title-icon">🔒</span> Simulateur : Impact FK sans Index</div>
+          <div class="toggle-group" id="fk-toggle-group">
+            <button class="toggle-group__btn toggle-group__btn--active" data-fk-mode="noindex">Sans Index</button>
+            <button class="toggle-group__btn" data-fk-mode="indexed">Avec Index</button>
+          </div>
+        </div>
+        <p style="font-size:var(--fs-xs);color:#94a3b8;margin-bottom:var(--sp-4);">Cliquez sur "Supprimer LOT-001" pour visualiser la différence de verrouillage entre les deux scénarios (avec et sans index sur la FK).</p>
+        <div class="fk-sim-grid">
+          <div class="fk-table" id="fk-table-parent">
+            <div class="fk-table__header">LOTS (table parent)</div>
+            <div class="fk-table__row"><span>LOT-001</span><span>Médicament A</span></div>
+            <div class="fk-table__row"><span>LOT-002</span><span>Médicament B</span></div>
+            <div class="fk-table__row"><span>LOT-003</span><span>Médicament C</span></div>
+          </div>
+          <div class="fk-table" id="fk-table-child">
+            <div class="fk-table__header">PRESCRIPTIONS (table enfant — FK sur lot_id)</div>
+            <div class="fk-table__row"><span>PRE-001 → LOT-001</span><span>Patient X</span></div>
+            <div class="fk-table__row"><span>PRE-002 → LOT-001</span><span>Patient Y</span></div>
+            <div class="fk-table__row"><span>PRE-003 → LOT-002</span><span>Patient Z</span></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:var(--sp-4);align-items:center;margin-bottom:var(--sp-3);">
+          <button class="btn btn--danger btn--sm" id="fk-sim-btn">Supprimer LOT-001</button>
+          <button class="btn btn--outline btn--sm" id="fk-reset-btn">Réinitialiser</button>
+        </div>
+        <div id="fk-sim-result-area"></div>
+      </div>
+    </section>
+
+    <!-- ====== ONGLET 3 : Performance & SQL ====== -->
+    <section class="module-section" id="tab-performance">
+      <div class="card">
+        <div class="card__title"><span class="card__title-icon">⚡</span> Set-Based Mindset : Le Réflexe Qui Sauve<button class="page-header__help-btn" data-help="performance" aria-label="Aide" title="Aide" style="margin-left:auto;">?</button></div>
+        <p style="color:#94a3b8;font-size:var(--fs-sm);margin-bottom:var(--sp-4);">
+          <em>"Si c'est faisable en SQL pur, ne fais jamais de PL/SQL bouclant."</em> — Chaque itération de boucle PL/SQL coûte un <strong>context switch</strong> (SQL ↔ PL/SQL) d'environ 5 μs. Multipliez par des millions de lignes, et le temps d'exécution explose.
+        </p>
+        <div class="comp-legend">
+          <span><span class="comp-legend__dot comp-legend__dot--before"></span> Boucle curseur PL/SQL</span>
+          <span><span class="comp-legend__dot comp-legend__dot--after"></span> UPDATE massif SQL</span>
+        </div>
+        <div class="comp-bar" id="perf-bar-cursor">
+          <span class="comp-bar__label">Curseur</span>
+          <div class="comp-bar__track"><div class="comp-bar__fill comp-bar__fill--before" id="perf-fill-cursor" style="width:100%"></div></div>
+          <span class="comp-bar__value comp-bar__value--before" id="perf-val-cursor">45.2 s</span>
+        </div>
+        <div class="comp-bar" id="perf-bar-sql">
+          <span class="comp-bar__label">UPDATE SQL</span>
+          <div class="comp-bar__track"><div class="comp-bar__fill comp-bar__fill--after" id="perf-fill-sql" style="width:1.8%"></div></div>
+          <span class="comp-bar__value comp-bar__value--after" id="perf-val-sql">0.8 s</span>
+        </div>
+        <div class="slider-group" style="margin-top:var(--sp-4);">
+          <div class="slider-group__header">
+            <span class="slider-group__label">Nombre de lignes</span>
+            <span class="slider-group__value" id="perf-slider-value">10 000</span>
+          </div>
+          <input type="range" id="perf-slider" min="1000" max="100000" value="10000" step="1000">
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card__title" style="font-size:var(--fs-sm);"><span class="card__title-icon">🔥</span> Piège Fatal : Calcul sur Colonne Indexée</div>
+          <div class="alert alert--error" style="margin-bottom:var(--sp-3);"><code>WHERE TO_CHAR(date_creation, 'YYYY-MM-DD') = '2026-01-15'</code> ignore l'index !</div>
+          <pre class="sql-block" style="margin:0;">-- MAUVAIS : fonction sur la colonne = FULL SCAN
+SELECT * FROM prescriptions
+WHERE TO_CHAR(date_creation, 'YYYY-MM-DD')
+  = '2026-01-15';
+
+-- BON : prédicat de plage = INDEX RANGE SCAN
+SELECT * FROM prescriptions
+WHERE date_creation >= DATE '2026-01-15'
+  AND date_creation <  DATE '2026-01-16';</pre>
+        </div>
+        <div class="card">
+          <div class="card__title" style="font-size:var(--fs-sm);"><span class="card__title-icon">📦</span> BULK COLLECT / FORALL</div>
+          <p style="font-size:var(--fs-xs);color:#94a3b8;margin-bottom:var(--sp-3);">Une boucle FETCH ligne à ligne provoque N context switches (SQL ↔ PL/SQL, ≈ 5 μs chacun). <strong>BULK COLLECT</strong> réduit à 1 aller-retour pour récupérer toutes les lignes, et <strong>FORALL</strong> à 1 aller-retour pour les mettre à jour. Sur 100 000 lignes, le gain est de plusieurs ordres de grandeur.</p>
+          <pre class="sql-block" style="margin:0;">DECLARE
+  TYPE t_ids IS TABLE OF prescriptions.id%TYPE;
+  v_ids t_ids;
+BEGIN
+  -- Récupération massive en mémoire
+  SELECT id BULK COLLECT INTO v_ids
+  FROM prescriptions
+  WHERE statut = 'EN_ATTENTE'
+  FOR UPDATE;
+
+  -- Mise à jour par lots (pas ligne à ligne)
+  FORALL i IN 1..v_ids.COUNT
+    UPDATE prescriptions
+    SET statut = 'TRAITEE'
+    WHERE id = v_ids(i);
+
+  COMMIT;
+END;</pre>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card__title" style="font-size:var(--fs-sm);"><span class="card__title-icon">📊</span> Statistiques CBO : Toujours à Jour</div>
+        <p style="font-size:var(--fs-xs);color:#94a3b8;margin-bottom:var(--sp-3);">L'Optimiseur Coût-Based (CBO) prend ses décisions sur la base des statistiques. Des stats obsolètes = un mauvais plan d'exécution.</p>
+        <pre class="sql-block" style="margin:0;">BEGIN
+  DBMS_STATS.GATHER_TABLE_STATS(
+    ownname          => 'PHARMA',
+    tabname          => 'PRESCRIPTIONS',
+    estimate_percent => DBMS_STATS.AUTO_SAMPLE_SIZE,
+    method_opt       => 'FOR ALL COLUMNS SIZE AUTO',
+    degree           => DBMS_STATS.AUTO_DEGREE,
+    cascade          => TRUE
+  );
+END;</pre>
+      </div>
+    </section>
+
+    <!-- ====== ONGLET 4 : Concurrence & Monitoring ====== -->
+    <section class="module-section" id="tab-concurrence">
+      <div class="card">
+        <div class="card__title"><span class="card__title-icon">🔍</span> Générateur de Requête V$SESSION<button class="page-header__help-btn" data-help="concurrence" aria-label="Aide" title="Aide" style="margin-left:auto;">?</button></div>
+        <p style="color:#94a3b8;font-size:var(--fs-xs);margin-bottom:var(--sp-3);">
+          Cochez les colonnes que vous voulez surveiller. Le SQL de diagnostic est généré en temps réel. <code>V$SESSION</code> a 300+ colonnes ; un filtre expert n'en utilise que 15.
+        </p>
+        <div class="grid-2">
+          <div>
+            <div class="checkbox-group" id="vss-checkboxes">
+              <label><input type="checkbox" value="s.sid" checked> SID</label>
+              <label><input type="checkbox" value="s.serial#" checked> SERIAL#</label>
+              <label><input type="checkbox" value="s.username" checked> USERNAME</label>
+              <label><input type="checkbox" value="s.status" checked> STATUS</label>
+              <label><input type="checkbox" value="s.event" checked> EVENT</label>
+              <label><input type="checkbox" value="s.seconds_in_wait" checked> SECONDS_IN_WAIT</label>
+              <label><input type="checkbox" value="s.sql_id"> SQL_ID</label>
+              <label><input type="checkbox" value="s.blocking_session"> BLOCKING_SESSION</label>
+              <label><input type="checkbox" value="s.machine"> MACHINE</label>
+              <label><input type="checkbox" value="s.program"> PROGRAM</label>
+              <label><input type="checkbox" value="p.spid"> SPID (PID OS)</label>
+              <label><input type="checkbox" value="q.sql_text"> SQL_TEXT</label>
+            </div>
+          </div>
+          <div>
+            <div class="card__header-title" style="font-size:var(--fs-sm);margin-bottom:var(--sp-3);">Requête générée :</div>
+            <pre class="sql-block" id="vss-query-output" style="min-height:260px;white-space:pre-wrap;">SELECT s.sid,
+       s.serial#,
+       s.username,
+       s.status,
+       s.event,
+       s.seconds_in_wait
+FROM   v$session s
+WHERE  s.type != 'BACKGROUND'
+ORDER  BY s.seconds_in_wait DESC NULLS LAST;</pre>
+            <button class="btn btn--primary btn--sm" id="vss-copy-btn">Copier le SQL</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card__title" style="font-size:var(--fs-sm);"><span class="card__title-icon">🚨</span> ORA-00054 : Resource Busy</div>
+          <p style="font-size:var(--fs-xs);color:#94a3b8;margin-bottom:var(--sp-3);">Se produit quand une commande DDL (DROP, TRUNCATE, ALTER) tente d'acquérir un verrou exclusif sur un objet qu'une transaction DML concurrente utilise déjà. Solution :</p>
+          <pre class="sql-block" style="margin:0;">-- Trouver le bloqueur
+SELECT sid, serial#, username, machine
+FROM   v$session
+WHERE  sid IN (
+  SELECT blocking_session
+  FROM   v$session
+  WHERE  blocking_session IS NOT NULL
+);
+
+-- Kill (en dernier recours)
+ALTER SYSTEM KILL SESSION '123,456';
+
+-- Kill niveau OS (si SQL*Plus injoignable)
+-- kill -9 &lt;SPID&gt;</pre>
+        </div>
+        <div class="card">
+          <div class="card__title" style="font-size:var(--fs-sm);"><span class="card__title-icon">⏳</span> Interprétation des Wait Events</div>
+          <table class="data-table">
+            <thead><tr><th>Wait Event</th><th>Type</th><th>Seuil Critique</th><th>Diagnostic</th></tr></thead>
+            <tbody>
+              <tr><td><code>ON CPU</code></td><td><span class="tag tag--green">CPU</span></td><td>—</td><td>Normal, la session travaille</td></tr>
+              <tr><td><code>db file scattered read</code></td><td><span class="tag tag--amber">I/O</span></td><td>&gt; 500ms</td><td>Full Table Scan — index manquant ?</td></tr>
+              <tr><td><code>enq: TX - row lock contention</code></td><td><span class="tag tag--red">Lock</span></td><td>&gt; 300s</td><td>Blocage critique — kill requis</td></tr>
+              <tr><td><code>log file sync</code></td><td><span class="tag tag--amber">I/O</span></td><td>&gt; 200ms</td><td>Commit trop fréquent ou I/O redo lent</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card__title" style="font-size:var(--fs-sm);"><span class="card__title-icon">💡</span> La Requête "Couteau Suisse" Complète</div>
+        <pre class="sql-block" id="vss-ultimate-query" style="margin:0;">SELECT s.sid,
+       s.serial#,
+       s.username,
+       s.status,
+       s.event,
+       s.seconds_in_wait,
+       s.sql_id,
+       s.blocking_session,
+       s.machine,
+       s.program,
+       p.spid                         AS pid_os,
+       q.sql_text
+FROM   v$session s
+       LEFT JOIN v$process p
+         ON p.addr = s.paddr
+       LEFT JOIN v$sql q
+         ON q.sql_id = s.sql_id
+        AND q.child_number = s.sql_child_number
+WHERE  s.type != 'BACKGROUND'
+AND    (   s.status = 'ACTIVE'
+        OR s.seconds_in_wait > 0)
+ORDER  BY s.seconds_in_wait DESC NULLS LAST;</pre>
+      </div>
+    </section>
+
+    <!-- ====== ONGLET 5 : Mindset & Méthodologie ====== -->
+    <section class="module-section" id="tab-mindset">
+      <div class="card">
+        <div class="card__title"><span class="card__title-icon">🧠</span> La Philosophie du DBA Senior<button class="page-header__help-btn" data-help="mindset" aria-label="Aide" title="Aide" style="margin-left:auto;">?</button></div>
+        <div class="grid-2">
+          <div>
+            <div class="card" style="margin-bottom:0;">
+              <div class="card__title" style="font-size:var(--fs-sm);">🎯 Apprentissage Just-in-Time</div>
+              <p style="font-size:var(--fs-xs);color:#94a3b8;line-height:1.7;">
+                Ne lisez pas le manuel Oracle en entier. Lancez-vous sur un cas concret, et cherchez la solution <em>au moment où vous en avez besoin</em>. 
+                La théorie sans pratique s'oublie en 48h. La pratique ciblée avec documentation ponctuelle s'ancre durablement.
+              </p>
+              <div class="alert alert--info" style="margin-top:var(--sp-3);font-size:var(--fs-xs);">
+                "Je ne connais pas la syntaxe de MERGE. Je la cherche dans 5 minutes quand j'en aurai besoin."
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:0;">
+              <div class="card__title" style="font-size:var(--fs-sm);">📖 Le Dictionnaire de Données est ta Bible</div>
+              <p style="font-size:var(--fs-xs);color:#94a3b8;line-height:1.7;">
+                Avant Google, tapez <code>DICT</code> et <code>DICT_COLUMNS</code>. Ces vues contiennent la liste de TOUTES les vues du dictionnaire et leurs colonnes. Une compétence qui différencie immédiatement un DBA senior d'un débutant.
+              </p>
+              <pre class="sql-block" style="margin:var(--sp-3) 0 0 0;">-- Trouver la vue qui contient 'TABLESPACE'
+SELECT table_name, comments
+FROM   dict
+WHERE  table_name LIKE '%TABLESPACE%'
+ORDER  BY table_name;</pre>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:0;">
+              <div class="card__title" style="font-size:var(--fs-sm);">🔐 Principe du Moindre Privilège</div>
+              <p style="font-size:var(--fs-xs);color:#94a3b8;line-height:1.7;">
+                Jamais de <code>GRANT DBA</code> à un utilisateur métier. Créez des rôles spécifiques avec les privilèges strictement nécessaires. C'est la règle #1 de la sécurité.
+              </p>
+              <pre class="sql-block" style="margin:var(--sp-3) 0 0 0;">CREATE USER med_pharma
+  IDENTIFIED BY "Str0ng!Pass"
+  DEFAULT TABLESPACE pharma_data
+  QUOTA UNLIMITED ON pharma_data;
+
+CREATE ROLE role_prescri;
+GRANT SELECT, INSERT, UPDATE
+  ON prescriptions TO role_prescri;
+GRANT role_prescri TO med_pharma;</pre>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:0;">
+              <div class="card__title" style="font-size:var(--fs-sm);">💾 RMAN : Tester ses Restaurations</div>
+              <div class="alert alert--warning" style="margin-bottom:var(--sp-3);font-size:var(--fs-xs);">
+                "Un backup qui n'a jamais été restauré n'est pas un backup, c'est un espoir."
+              </div>
+              <p style="font-size:var(--fs-xs);color:#94a3b8;line-height:1.7;">
+                Versionnez vos scripts de backup <strong>et de restauration</strong> (Git). Planifiez des tests de restauration trimestriels avec votre équipe. Le jour J, ce n'est pas le moment d'apprendre.
+              </p>
+              <pre class="sql-block" style="margin:var(--sp-3) 0 0 0;">RMAN> RESTORE DATABASE;
+RMAN> RECOVER DATABASE;
+RMAN> ALTER DATABASE OPEN RESETLOGS;</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== ONGLET 6 : Ressources & Outils ====== -->
+    <section class="module-section" id="tab-ressources">
+      <div class="card">
+        <div class="card__title"><span class="card__title-icon">🔎</span> Moteur de Recherche de Vues Oracle<button class="page-header__help-btn" data-help="ressources" aria-label="Aide" title="Aide" style="margin-left:auto;">?</button></div>
+        <p style="font-size:var(--fs-xs);color:#94a3b8;margin-bottom:var(--sp-3);">Cherchez une vue par nom ou une colonne. Le résultat s'affiche en temps réel.</p>
+        <div class="search-field">
+          <input type="text" id="ora-search-input" placeholder="Ex: SESSION, TABLESPACE, SPID, USER..." aria-label="Rechercher une vue Oracle">
+          <button class="btn btn--primary btn--sm" id="ora-search-btn">Chercher</button>
+        </div>
+        <div id="ora-search-results"></div>
+      </div>
+
+      <div class="card">
+        <div class="card__title"><span class="card__title-icon">🧰</span> La Boîte à Outils de l'Expert Oracle</div>
+        <div id="resource-list">
+          <div class="resource-card" data-category="tutoriel">
+            <div class="resource-card__icon" style="background:var(--color-green-dim);color:var(--color-green);">T</div>
+            <div class="resource-card__body">
+              <div class="resource-card__title">Oracle-Base — Tim Hall</div>
+              <div class="resource-card__desc">La référence absolue pour les tutoriels pratiques Oracle. Exemples concrets, scripts prêts à l'emploi, couvre 100% des sujets quotidiens DBA.</div>
+              <span class="tag tag--green">tutoriel</span>
+            </div>
+          </div>
+          <div class="resource-card" data-category="communaute">
+            <div class="resource-card__icon" style="background:var(--color-purple);color:#fff;">A</div>
+            <div class="resource-card__body">
+              <div class="resource-card__title">AskTOM</div>
+              <div class="resource-card__desc">La communauté Oracle officielle. Posez une question et recevez une réponse argumentée, souvent par Tom Kyte lui-même (archives). Logique de résolution de problèmes réels.</div>
+              <span class="tag tag--purple">communauté</span>
+            </div>
+          </div>
+          <div class="resource-card" data-category="officiel">
+            <div class="resource-card__icon" style="background:var(--color-blue-dim);color:var(--color-blue);">D</div>
+            <div class="resource-card__body">
+              <div class="resource-card__title">Documentation Officielle Oracle</div>
+              <div class="resource-card__desc">La source de vérité. Naviguez par guide (Concepts, Admin, Performance Tuning, SQL Reference). Utilisez la recherche interne par mots-clés Oracle.</div>
+              <span class="tag tag--blue">officiel</span>
+            </div>
+          </div>
+          <div class="resource-card" data-category="outil">
+            <div class="resource-card__icon" style="background:var(--color-amber-dim);color:var(--color-amber);">S</div>
+            <div class="resource-card__body">
+              <div class="resource-card__title">SQL Developer</div>
+              <div class="resource-card__desc">IDE gratuit Oracle. Debugging PL/SQL intégré, plan d'exécution visuel, export de données, gestion des connexions multiples.</div>
+              <span class="tag tag--amber">outil</span>
+            </div>
+          </div>
+          <div class="resource-card" data-category="magique">
+            <div class="resource-card__icon" style="background:var(--color-cyan);color:#000;">V</div>
+            <div class="resource-card__body">
+              <div class="resource-card__title">DICT &amp; DICT_COLUMNS</div>
+              <div class="resource-card__desc">Les vues "magiques" qui listent toutes les vues du dictionnaire Oracle. <code>SELECT * FROM DICT WHERE table_name LIKE '%TABLESPACE%'</code> vous donne instantanément toutes les vues disponibles sur les tablespaces.</div>
+              <span class="tag tag--cyan">magique</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Log Console -->
+    <div class="log-console" id="app-log">
+      <div class="log-console__entry log-console__entry--info"><span class="log-console__timestamp">[00:00:00]</span>Manuel de Survie initialisé. Sélectionnez un onglet.</div>
+    </div>
+
+    <div class="app-footer">
+      Manuel de Survie de l'Expert Oracle — Contexte SIH / PUI — Stéphane Bertin — 2025
+    </div>
+  </main>
+</div>
+
+<!-- HELP OVERLAY -->
+<div class="help-overlay" id="help-overlay" aria-hidden="true"></div>
+
+<!-- HELP: Overview -->
+<div class="help-modal" id="help-overview" role="dialog" aria-modal="true" aria-labelledby="help-overview-title" aria-hidden="true">
+  <div class="help-modal__header">
+    <div class="help-modal__title" id="help-overview-title">Manuel de Survie — Principes</div>
+    <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+  </div>
+  <div class="help-modal__body">
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--objective">Objectif pédagogique</div>
+      <p class="help-modal__text">Ce module n'est pas un cours théorique. C'est un condensé de règles d'or, de pièges classiques et de méthodologies éprouvées pour adopter immédiatement les réflexes d'un DBA senior. Il est conçu comme une référence rapide et actionable en situation de diagnostic.</p>
+    </div>
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--principle">Navigation</div>
+      <ul class="help-modal__list">
+        <li>6 onglets dans la sidebar : Interdits, Architecture, Performance, Monitoring, Mindset, Ressources</li>
+        <li>Cliquez <strong>?</strong> dans chaque en-tête de section pour l'aide contextuelle</li>
+        <li>Cliquez <strong>L</strong> dans la barre d'en-tête pour le lexique technique</li>
+        <li>La console de logs en bas de page trace toutes vos actions</li>
+      </ul>
+    </div>
+  </div>
+  <div class="help-modal__footer">
+    <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+  </div>
+</div>
+
+<!-- HELP: Interdits -->
+<div class="help-modal" id="help-interdits" role="dialog" aria-modal="true" aria-labelledby="help-interdits-title" aria-hidden="true">
+  <div class="help-modal__header">
+    <div class="help-modal__title" id="help-interdits-title">Pourquoi ces interdits ?</div>
+    <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+  </div>
+  <div class="help-modal__body">
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--objective">Principe fondamental</div>
+      <p class="help-modal__text">Oracle impose des contraintes de <strong>déterministe</strong> pour les contraintes CHECK : une fonction appelée dans un CHECK doit retourner la même valeur pour les mêmes données d'entrée, peu importe quand elle est exécutée. <code>SYSDATE</code> viole cette règle — sa valeur change à chaque milliseconde.</p>
+      <p class="help-modal__text">De même, les triggers font partie de la transaction appelante. Un <code>COMMIT</code> dans un trigger briserait l'atomicité de la transaction, d'où l'interdiction formelle (ORA-04092).</p>
+    </div>
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--principle">Pourquoi éviter SYS ?</div>
+      <p class="help-modal__text">Le schéma <code>SYS</code> contient le dictionnaire de données. Créer des objets métier dedans expose au risque de corruption lors des opérations de maintenance Oracle (upgrade, patch). Oracle ne supporte pas les objets utilisateur dans SYS.</p>
+    </div>
+  </div>
+  <div class="help-modal__footer">
+    <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+  </div>
+</div>
+
+<!-- HELP: Architecture -->
+<div class="help-modal" id="help-architecture" role="dialog" aria-modal="true" aria-labelledby="help-architecture-title" aria-hidden="true">
+  <div class="help-modal__header">
+    <div class="help-modal__title" id="help-architecture-title">Architecture — Les Fondations</div>
+    <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+  </div>
+  <div class="help-modal__body">
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--objective">Pourquoi indexer les FK ?</div>
+      <p class="help-modal__text">Quand vous supprimez une ligne dans une table parent, Oracle doit vérifier qu'aucune ligne enfant ne référence la ligne supprimée. <strong>Sans index</strong> sur la FK, cette vérification verrouille toute la table enfant (TM Lock). <strong>Avec index</strong>, seule la ligne concernée est verrouillée (Row Lock). Sur une table de millions de lignes, la différence est vitale.</p>
+    </div>
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--principle">Séparation DATA / INDEX</div>
+      <p class="help-modal__text">En plaçant les données et les index dans des tablespaces distincts (sur des disques différents si possible), vous réduisez la contention I/O et facilitez la maintenance (ex: rebuild d'index sans impact sur les données).</p>
+    </div>
+  </div>
+  <div class="help-modal__footer">
+    <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+  </div>
+</div>
+
+<!-- HELP: Performance -->
+<div class="help-modal" id="help-performance" role="dialog" aria-modal="true" aria-labelledby="help-performance-title" aria-hidden="true">
+  <div class="help-modal__header">
+    <div class="help-modal__title" id="help-performance-title">Set-Based Mindset</div>
+    <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+  </div>
+  <div class="help-modal__body">
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--objective">Context Switching</div>
+      <p class="help-modal__text">Chaque passage du moteur SQL au moteur PL/SQL coûte environ 5 microsecondes (context switch). Dans une boucle traitant 100 000 lignes, ce coût atteint 0,5 seconde uniquement en changements de contexte — sans compter le traitement lui-même. Un <code>UPDATE</code> massif SQL traite toutes les lignes en une seule opération sans context switch : le gain est exponentiel.</p>
+    </div>
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--principle">Fonction sur colonne indexée</div>
+      <p class="help-modal__text">Quand vous appliquez une fonction à une colonne indexée dans le WHERE (comme <code>TO_CHAR(date)</code>), l'optimiseur ne peut pas utiliser l'index car la valeur indexée brute ne correspond plus à la valeur recherchée après transformation. Utilisez toujours un prédicat de plage sur la colonne native.</p>
+    </div>
+  </div>
+  <div class="help-modal__footer">
+    <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+  </div>
+</div>
+
+<!-- HELP: Concurrence -->
+<div class="help-modal" id="help-concurrence" role="dialog" aria-modal="true" aria-labelledby="help-concurrence-title" aria-hidden="true">
+  <div class="help-modal__header">
+    <div class="help-modal__title" id="help-concurrence-title">Monitoring V$SESSION</div>
+    <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+  </div>
+  <div class="help-modal__body">
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--objective">Pourquoi ne pas tout sélectionner ?</div>
+      <p class="help-modal__text"><code>V$SESSION</code> contient plus de 300 colonnes. Les charger toutes alourdit inutilement le diagnostic. Les 15 colonnes vitales (SID, USERNAME, STATUS, EVENT, SECONDS_IN_WAIT, SQL_ID, BLOCKING_SESSION, etc.) suffisent dans 95% des cas pour identifier un problème. L'art du DBA est de savoir ce qu'il faut ignorer.</p>
+    </div>
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--principle">SECONDS_IN_WAIT &gt; 300s</div>
+      <p class="help-modal__text">Une session qui attend plus de 300 secondes (5 minutes) sur un événement de type lock ou I/O est un signal d'alarme critique. Dans un SIH, cela peut signifier qu'une prescription est bloquée, avec un impact patient potentiel.</p>
+    </div>
+  </div>
+  <div class="help-modal__footer">
+    <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+  </div>
+</div>
+
+<!-- HELP: Mindset -->
+<div class="help-modal" id="help-mindset" role="dialog" aria-modal="true" aria-labelledby="help-mindset-title" aria-hidden="true">
+  <div class="help-modal__header">
+    <div class="help-modal__title" id="help-mindset-title">Mindset & Méthodologie</div>
+    <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+  </div>
+  <div class="help-modal__body">
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--objective">Apprentissage Just-in-Time</div>
+      <p class="help-modal__text">La méthode traditionnelle (lire un manuel de 1000 pages avant de pratiquer) est inefficace pour la mémoire de travail. L'approche Just-in-Time : face à un problème concret (ex: "comment partitionner cette table ?"), cherchez la solution immédiatement, appliquez-la, et les connaissances s'ancrent par l'action. Vous construisez votre expertise par accumulation de cas résolus.</p>
+    </div>
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--principle">Pourquoi DICT est magique</div>
+      <p class="help-modal__text">La vue <code>DICT</code> (et sa version colonnes <code>DICT_COLUMNS</code>) est le moteur de recherche interne d'Oracle. Au lieu de googler "Oracle view tablespace usage", tapez <code>SELECT * FROM DICT WHERE table_name LIKE '%TABLESPACE%'</code>. Vous obtenez instantanément toutes les vues disponibles, sans connexion internet, sans attente, sans bruit.</p>
+    </div>
+  </div>
+  <div class="help-modal__footer">
+    <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+  </div>
+</div>
+
+<!-- HELP: Ressources -->
+<div class="help-modal" id="help-ressources" role="dialog" aria-modal="true" aria-labelledby="help-ressources-title" aria-hidden="true">
+  <div class="help-modal__header">
+    <div class="help-modal__title" id="help-ressources-title">Ressources & Outils</div>
+    <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+  </div>
+  <div class="help-modal__body">
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--objective">Comment chercher efficacement ?</div>
+      <p class="help-modal__text">Étape 1 : <code>DICT</code> / <code>DICT_COLUMNS</code> dans votre base. Étape 2 : Oracle-Base (Tim Hall) pour les tutoriels pratiques. Étape 3 : AskTOM pour les cas réels avec solutions argumentées. Étape 4 : Documentation officielle Oracle pour la vérification. Cette hiérarchie vous fait gagner des heures.</p>
+    </div>
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--principle">Les vues "magiques"</div>
+      <p class="help-modal__text"><code>DICT</code> : liste toutes les vues du dictionnaire. <code>DICT_COLUMNS</code> : liste les colonnes de ces vues. Les préfixes : <code>USER_</code> (vos objets), <code>ALL_</code> (objets accessibles), <code>DBA_</code> (tous les objets), <code>V$_</code> (vues dynamiques de performance). Maîtrisez ces préfixes et vous naviguez le dictionnaire comme personne.</p>
+    </div>
+  </div>
+  <div class="help-modal__footer">
+    <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+  </div>
+</div>
+
+<!-- HELP: Lexicon (bouton L) -->
+<div class="help-modal" id="help-lexicon" role="dialog" aria-modal="true" aria-labelledby="help-lexicon-title" aria-hidden="true">
+  <div class="help-modal__header">
+    <div class="help-modal__title" id="help-lexicon-title">Lexique technique — Manuel de Survie</div>
+    <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+  </div>
+  <div class="help-modal__body">
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--lexique">Concepts Fondamentaux</div>
+      <ul class="help-modal__list">
+        <li><strong>Déterministe</strong> — Se dit d'une fonction qui retourne toujours la même valeur pour les mêmes arguments. Les contraintes CHECK exigent des fonctions déterministes. SYSDATE, USER, RANDOM sont non-déterministes.</li>
+        <li><strong>Set-Based</strong> — Approche de programmation SQL qui traite les données par ensembles (sets) plutôt que ligne à ligne. Opposé à la pensée procédurale (boucle). "Parle en ensembles, pas en lignes."</li>
+        <li><strong>Context Switching</strong> — Changement de contexte entre le moteur SQL et le moteur PL/SQL. Chaque switch coûte ~5μs. Une boucle PL/SQL sur 100k lignes paie 500ms uniquement en changements de contexte.</li>
+        <li><strong>CBO (Cost-Based Optimizer)</strong> — Moteur d'optimisation d'Oracle qui choisit le plan d'exécution le moins coûteux pour une requête SQL, en se basant sur les statistiques des objets (DBMS_STATS).</li>
+        <li><strong>IDENTITY (Colonne)</strong> — Colonne générée automatiquement (Oracle 12c+) similaire à AUTO_INCREMENT. <code>GENERATED BY DEFAULT AS IDENTITY</code> permet l'insertion manuelle si nécessaire.</li>
+      </ul>
+    </div>
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--lexique">Verrous et Concurrence</div>
+      <ul class="help-modal__list">
+        <li><strong>Row Lock</strong> — Verrouillage au niveau de la ligne (TX Lock). Permet à plusieurs transactions de modifier différentes lignes simultanément. C'est le verrouillage par défaut d'Oracle.</li>
+        <li><strong>TM Lock (DML Lock)</strong> — Verrou de table (Table Management Lock). Protège la structure de la table contre les DDL concurrents. Un DELETE sur un parent sans index FK peut escalader en TM Lock.</li>
+        <li><strong>BLOCKING_SESSION</strong> — Colonne de V$SESSION qui indique le SID de la session bloquante. NULL si la session n'est pas bloquée. Permet de remonter la chaîne de blocage.</li>
+        <li><strong>ORA-00054</strong> — Erreur "resource busy and acquire with NOWAIT specified". Se produit quand un DDL rencontre un verrou DML concurrent.</li>
+        <li><strong>ORA-04092</strong> — Erreur "cannot COMMIT in a trigger". Oracle interdit les COMMIT/ROLLBACK dans les triggers car ils brisent l'atomicité de la transaction.</li>
+      </ul>
+    </div>
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--lexique">Performance et Monitoring</div>
+      <ul class="help-modal__list">
+        <li><strong>Wait Event</strong> — Événement pour lequel une session Oracle attend. Classes : CPU (ON CPU), I/O (db file scattered read), Lock (enq: TX). La colonne SECONDS_IN_WAIT donne la durée.</li>
+        <li><strong>SPID (System PID)</strong> — Identifiant de processus OS correspondant à une session Oracle. Jointure V$SESSION → V$PROCESS (colonne SPID). Utile pour kill -9 en dernier recours.</li>
+        <li><strong>BULK COLLECT</strong> — Instruction PL/SQL qui récupère toutes les lignes d'une requête en une seule opération, évitant les context switches répétés.</li>
+        <li><strong>FORALL</strong> — Instruction PL/SQL qui exécute un DML pour chaque élément d'une collection en un seul context switch. Complémentaire de BULK COLLECT.</li>
+        <li><strong>DBMS_STATS</strong> — Package de collecte des statistiques pour le CBO. Des statistiques fraîches sont essentielles pour des plans d'exécution optimaux.</li>
+      </ul>
+    </div>
+    <div class="help-modal__section">
+      <div class="help-modal__section-title help-modal__section-title--lexique">Dictionnaire et Outils</div>
+      <ul class="help-modal__list">
+        <li><strong>DICT / DICT_COLUMNS</strong> — Vues du dictionnaire listant toutes les vues et colonnes du dictionnaire Oracle. L'outil de recherche interne le plus puissant avant même Google.</li>
+        <li><strong>RMAN (Recovery Manager)</strong> — Outil de sauvegarde et restauration intégré à Oracle. Seul outil supporté pour les backups cohérents. Permet les restaurations point-in-time.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="help-modal__footer">
+    <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+  </div>
+</div>
+
+<!-- HELP: Credit -->
+<div class="help-modal" id="help-credit" role="dialog" aria-modal="true" aria-labelledby="help-credit-title" aria-hidden="true">
+  <div class="help-modal__header">
+    <div class="help-modal__title" id="help-credit-title">Crédit</div>
+    <button class="help-modal__close" aria-label="Fermer" tabindex="0">&times;</button>
+  </div>
+  <div class="help-modal__body">
+    <div class="help-modal__credit">
+      <p class="help-modal__credit-role">Conception fonctionnelle, scénarios, développement et relecture</p>
+      <p class="help-modal__credit-author">
+        <a href="https://github.com/bertinstephane42/oracle-sih" target="_blank" rel="noopener noreferrer">Stéphane Bertin</a>
+      </p>
+      <p class="help-modal__credit-assist">Assisté par <strong>OpenCode</strong>, agent <strong>Big Pickle</strong></p>
+      <p class="help-modal__credit-year">2025</p>
+    </div>
+  </div>
+  <div class="help-modal__footer">
+    <button class="btn btn--outline btn--sm help-modal__footer-btn" tabindex="0">Fermer</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ============================================================
+   HELP MANAGER
+   ============================================================ */
+class HelpManager {
+  constructor() {
+    this._overlay = null;
+    this._activeModal = null;
+    this._previouslyFocused = null;
+    this._initDOM();
+    this._bindEvents();
+  }
+
+  _initDOM() {
+    this._overlay = document.getElementById('help-overlay');
+    this._modals = document.querySelectorAll('.help-modal');
+  }
+
+  _bindEvents() {
+    var self = this;
+    document.addEventListener('click', function(e) {
+      var helpBtn = e.target.closest('[data-help]');
+      if (helpBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        self.open(helpBtn.dataset.help);
+        return;
+      }
+      var closeBtn = e.target.closest('.help-modal__close') || e.target.closest('.help-modal__footer-btn');
+      if (closeBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        self.close();
+      }
+    });
+    this._overlay.addEventListener('click', function() { self.close(); });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && self._activeModal) {
+        e.preventDefault();
+        self.close();
+      }
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key !== 'Tab' || !self._activeModal) return;
+      var focusable = self._activeModal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      if (focusable.length === 0) { e.preventDefault(); return; }
+      var first = focusable[0];
+      var last = focusable[focusable.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first || !self._activeModal.contains(document.activeElement)) {
+          e.preventDefault(); last.focus();
+        }
+      } else {
+        if (document.activeElement === last || !self._activeModal.contains(document.activeElement)) {
+          e.preventDefault(); first.focus();
+        }
+      }
+    });
+  }
+
+  open(moduleId) {
+    var modal = document.getElementById('help-' + moduleId);
+    if (!modal) return;
+    this._previouslyFocused = document.activeElement;
+    this._activeModal = modal;
+    this._overlay.classList.add('help-overlay--active');
+    this._overlay.setAttribute('aria-hidden', 'false');
+    modal.classList.add('help-modal--active');
+    modal.setAttribute('aria-hidden', 'false');
+    var closeBtn = modal.querySelector('.help-modal__close');
+    if (closeBtn) { setTimeout(function() { closeBtn.focus(); }, 50); }
+    document.body.style.overflow = 'hidden';
+  }
+
+  close() {
+    if (!this._activeModal) return;
+    this._overlay.classList.remove('help-overlay--active');
+    this._overlay.setAttribute('aria-hidden', 'true');
+    this._activeModal.classList.remove('help-modal--active');
+    this._activeModal.setAttribute('aria-hidden', 'true');
+    this._activeModal = null;
+    document.body.style.overflow = '';
+    if (this._previouslyFocused && typeof this._previouslyFocused.focus === 'function') {
+      this._previouslyFocused.focus();
+    }
+  }
+}
+
+/* ============================================================
+   LOGGER
+   ============================================================ */
+var Logger = {
+  _logEl: null,
+  init: function() {
+    this._logEl = document.getElementById('app-log');
+  },
+  log: function(msg, level) {
+    level = level || 'info';
+    var ts = new Date().toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    if (this._logEl) {
+      this._logEl.innerHTML += '<div class="log-console__entry log-console__entry--' + level + '"><span class="log-console__timestamp">[' + ts + ']</span>' + msg + '</div>';
+      this._logEl.scrollTop = this._logEl.scrollHeight;
+    }
+  },
+  info: function(msg) { this.log(msg, 'info'); },
+  success: function(msg) { this.log(msg, 'success'); },
+  warn: function(msg) { this.log(msg, 'warn'); },
+  error: function(msg) { this.log(msg, 'error'); }
+};
+
+/* ============================================================
+   APPLICATION
+   ============================================================ */
+var App = {
+  _helpManager: null,
+  _currentTab: 'interdits',
+
+  init: function() {
+    this._helpManager = new HelpManager();
+    window._helpMgr = this._helpManager;
+    Logger.init();
+    this._bindNav();
+    this._initInterdits();
+    this._initArchitecture();
+    this._initPerformance();
+    this._initConcurrence();
+    this._initRessources();
+    Logger.info('Manuel de Survie initialisé. 6 modules prêts.');
+  },
+
+  _bindNav: function() {
+    var self = this;
+    document.querySelectorAll('.app-nav__item[data-tab]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var tab = btn.dataset.tab;
+        document.querySelectorAll('.app-nav__item').forEach(function(b) { b.classList.remove('app-nav__item--active'); });
+        btn.classList.add('app-nav__item--active');
+        document.querySelectorAll('.module-section').forEach(function(s) { s.classList.remove('module-section--active'); });
+        document.getElementById('tab-' + tab).classList.add('module-section--active');
+        self._currentTab = tab;
+        Logger.info('Navigation vers : ' + tab);
+      });
+    });
+  },
+
+  toggleGlossary: function(element) {
+    element.classList.toggle('expanded');
+  },
+
+  /* ---- Interdits ---- */
+  _initInterdits: function() {
+  },
+
+  /* ---- Architecture / FK Simulator ---- */
+  _initArchitecture: function() {
+    var self = this;
+    var mode = 'noindex';
+    var simBtn = document.getElementById('fk-sim-btn');
+    var resetBtn = document.getElementById('fk-reset-btn');
+    var resultArea = document.getElementById('fk-sim-result-area');
+
+    document.querySelectorAll('[data-fk-mode]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('[data-fk-mode]').forEach(function(b) { b.classList.remove('toggle-group__btn--active'); });
+        btn.classList.add('toggle-group__btn--active');
+        mode = btn.dataset.fkMode;
+        resultArea.innerHTML = '';
+        Logger.info('FK sim mode: ' + mode);
+      });
+    });
+
+    if (simBtn) {
+      simBtn.addEventListener('click', function() {
+        if (mode === 'noindex') {
+          resultArea.innerHTML = '<div class="fk-sim-result fk-sim-result--lock">🔴 VERROU TM (TABLE LOCK) — Toute la table PRESCRIPTIONS est bloquée. Aucune insertion/mise à jour possible tant que la transaction n\'est pas terminée.</div>';
+          Logger.warn('FK sim: TM Lock activé (pas d\'index)');
+        } else {
+          resultArea.innerHTML = '<div class="fk-sim-result fk-sim-result--ok">🟢 ROW LOCK — Seulement la ligne concernée est verrouillée. Les autres lignes restent accessibles.</div>';
+          Logger.success('FK sim: Row Lock uniquement (index présent)');
+        }
+      });
+    }
+
+    if (resetBtn) {
+      resetBtn.addEventListener('click', function() {
+        resultArea.innerHTML = '';
+        Logger.info('FK sim réinitialisé');
+      });
+    }
+  },
+
+  /* ---- Performance ---- */
+  _initPerformance: function() {
+    var self = this;
+    var slider = document.getElementById('perf-slider');
+    var sliderVal = document.getElementById('perf-slider-value');
+    var fillCursor = document.getElementById('perf-fill-cursor');
+    var fillSql = document.getElementById('perf-fill-sql');
+    var valCursor = document.getElementById('perf-val-cursor');
+    var valSql = document.getElementById('perf-val-sql');
+
+    function updatePerf(n) {
+      var rows = parseInt(n, 10);
+      sliderVal.textContent = rows.toLocaleString('fr-FR');
+      var cursorTime = (rows * 0.0045 + 0.2).toFixed(1);
+      var sqlTime = (rows * 0.00008 + 0.02).toFixed(2);
+      var maxTime = rows * 0.0045 + 0.2;
+      var cursorPct = Math.min(100, (cursorTime / maxTime) * 100);
+      var sqlPct = Math.min(100, (sqlTime / maxTime) * 100);
+      fillCursor.style.width = cursorPct + '%';
+      fillSql.style.width = sqlPct + '%';
+      valCursor.textContent = cursorTime.replace('.', ',') + ' s';
+      valSql.textContent = sqlTime.replace('.', ',') + ' s';
+    }
+
+    if (slider) {
+      slider.addEventListener('input', function() {
+        updatePerf(slider.value);
+        Logger.info('Perf sim: ' + parseInt(slider.value, 10).toLocaleString('fr-FR') + ' lignes');
+      });
+      updatePerf(slider.value);
+    }
+  },
+
+  /* ---- Concurrence ---- */
+  _initConcurrence: function() {
+    var self = this;
+    var checkboxes = document.querySelectorAll('#vss-checkboxes input[type="checkbox"]');
+    var output = document.getElementById('vss-query-output');
+    var copyBtn = document.getElementById('vss-copy-btn');
+
+    function generateQuery() {
+      var selected = [];
+      document.querySelectorAll('#vss-checkboxes input[type="checkbox"]:checked').forEach(function(cb) {
+        selected.push(cb.value);
+      });
+      if (selected.length === 0) {
+        output.textContent = '-- Sélectionnez au moins une colonne';
+        return;
+      }
+      var cols = selected.join(',\n       ');
+      var sql = 'SELECT ' + cols + '\nFROM   v$session s\n';
+      if (selected.indexOf('p.spid') !== -1 || selected.indexOf('p.addr') !== -1) {
+        sql += '       LEFT JOIN v$process p\n         ON p.addr = s.paddr\n';
+      }
+      if (selected.indexOf('q.sql_text') !== -1) {
+        sql += '       LEFT JOIN v$sql q\n         ON q.sql_id = s.sql_id\n        AND q.child_number = s.sql_child_number\n';
+      }
+      sql += 'WHERE  s.type != \'BACKGROUND\'\n';
+      if (selected.indexOf('s.seconds_in_wait') !== -1) {
+        sql += 'AND    s.seconds_in_wait > 0\n';
+      }
+      if (selected.indexOf('s.event') !== -1) {
+        sql += 'ORDER  BY s.seconds_in_wait DESC NULLS LAST;';
+      } else {
+        sql += 'ORDER  BY s.sid;';
+      }
+      output.textContent = sql;
+    }
+
+    checkboxes.forEach(function(cb) {
+      cb.addEventListener('change', function() {
+        generateQuery();
+        Logger.info('Générateur V$SESSION : colonne ' + (cb.checked ? 'ajoutée' : 'retirée'));
+      });
+    });
+
+    if (copyBtn) {
+      copyBtn.addEventListener('click', function() {
+        var text = output.textContent;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function() {
+            Logger.success('SQL copié dans le presse-papier');
+          }).catch(function() {
+            Logger.error('Échec de la copie');
+          });
+        } else {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+          Logger.success('SQL copié (fallback)');
+        }
+      });
+    }
+
+    generateQuery();
+  },
+
+  /* ---- Ressources ---- */
+  _initRessources: function() {
+    var self = this;
+    var searchInput = document.getElementById('ora-search-input');
+    var searchBtn = document.getElementById('ora-search-btn');
+    var resultsDiv = document.getElementById('ora-search-results');
+
+    var views = [
+      { name: 'V$SESSION', cols: ['SID','SERIAL#','USERNAME','STATUS','EVENT','SECONDS_IN_WAIT','SQL_ID','BLOCKING_SESSION','MACHINE','PROGRAM'], desc: 'Sessions Oracle actives et inactives avec leurs événements d\'attente.' },
+      { name: 'V$PROCESS', cols: ['ADDR','SPID','PID','PROGRAM'], desc: 'Processus Oracle côté OS (background et serveur). Jointure avec V$SESSION via PADDR.' },
+      { name: 'V$SQL', cols: ['SQL_ID','SQL_TEXT','CHILD_NUMBER','PARSING_USER_ID'], desc: 'Texte des requêtes SQL en cache dans la SGA.' },
+      { name: 'V$LOCK', cols: ['SID','TYPE','ID1','ID2','LMODE','REQUEST'], desc: 'Verrous actuellement détenus ou demandés.' },
+      { name: 'V$SESSION_WAIT', cols: ['SID','EVENT','WAIT_TIME','SECONDS_IN_WAIT'], desc: 'Détail de l\'attente courante de chaque session.' },
+      { name: 'V$EVENT_NAME', cols: ['EVENT#','NAME','WAIT_CLASS'], desc: 'Liste de tous les événements d\'attente Oracle avec leur classe.' },
+      { name: 'DBA_TABLESPACES', cols: ['TABLESPACE_NAME','STATUS','CONTENTS','EXTENT_MANAGEMENT'], desc: 'Informations sur tous les tablespaces de la base.' },
+      { name: 'DBA_DATA_FILES', cols: ['FILE_ID','TABLESPACE_NAME','BYTES','STATUS'], desc: 'Fichiers de données physiques associés aux tablespaces.' },
+      { name: 'DBA_SEGMENTS', cols: ['OWNER','SEGMENT_NAME','SEGMENT_TYPE','TABLESPACE_NAME','BYTES'], desc: 'Segments (tables, index, etc.) avec leur taille.' },
+      { name: 'DBA_USERS', cols: ['USERNAME','CREATED','DEFAULT_TABLESPACE','ACCOUNT_STATUS'], desc: 'Tous les utilisateurs de la base avec leur statut de compte.' },
+      { name: 'DBA_INDEXES', cols: ['OWNER','INDEX_NAME','TABLE_NAME','UNIQUENESS'], desc: 'Index de la base avec leur type et statut.' },
+      { name: 'ALL_TAB_COLUMNS', cols: ['OWNER','TABLE_NAME','COLUMN_NAME','DATA_TYPE'], desc: 'Colonnes de toutes les tables accessibles.' },
+      { name: 'USER_TABLES', cols: ['TABLE_NAME','TABLESPACE_NAME','NUM_ROWS','LAST_ANALYZED'], desc: 'Tables de l\'utilisateur courant avec statistiques.' },
+      { name: 'DBA_HIST_SQLSTAT', cols: ['SNAP_ID','SQL_ID','CPU_TIME','ELAPSED_TIME'], desc: 'Historique AWR des statistiques d\'exécution SQL.' },
+      { name: 'DICT', cols: ['TABLE_NAME','COMMENTS'], desc: 'Liste de toutes les vues du dictionnaire de données. La vue "magique".' },
+      { name: 'DICT_COLUMNS', cols: ['TABLE_NAME','COLUMN_NAME','COMMENTS'], desc: 'Liste de toutes les colonnes des vues du dictionnaire.' }
+    ];
+
+    function renderResults(filtered) {
+      resultsDiv.innerHTML = '';
+      if (filtered.length === 0) {
+        resultsDiv.innerHTML = '<div class="alert alert--info">Aucune vue trouvée pour cette recherche.</div>';
+        return;
+      }
+      filtered.forEach(function(v) {
+        var card = document.createElement('div');
+        card.className = 'resource-card';
+        card.innerHTML = '<div class="resource-card__icon" style="background:var(--color-cyan);color:#000;">V</div>' +
+          '<div class="resource-card__body">' +
+          '<div class="resource-card__title">' + v.name + '</div>' +
+          '<div class="resource-card__desc">' + v.desc + '</div>' +
+          '<div style="margin-top:var(--sp-2);">' +
+          '<span class="tag tag--cyan">' + v.cols.length + ' colonnes</span> ' +
+          '<span class="tag tag--blue">' + v.cols.slice(0, 4).join(', ') + (v.cols.length > 4 ? '...' : '') + '</span>' +
+          '</div></div>';
+        resultsDiv.appendChild(card);
+      });
+    }
+
+    function searchViews(query) {
+      var q = query.toUpperCase().trim();
+      if (!q) {
+        renderResults([]);
+        return;
+      }
+      var filtered = views.filter(function(v) {
+        if (v.name.toUpperCase().indexOf(q) !== -1) return true;
+        for (var i = 0; i < v.cols.length; i++) {
+          if (v.cols[i].toUpperCase().indexOf(q) !== -1) return true;
+        }
+        return false;
+      });
+      renderResults(filtered);
+      Logger.info('Recherche : "' + query + '" → ' + filtered.length + ' résultat(s)');
+    }
+
+    if (searchBtn && searchInput) {
+      searchBtn.addEventListener('click', function() { searchViews(searchInput.value); });
+      searchInput.addEventListener('keyup', function(e) {
+        if (e.key === 'Enter') { searchViews(searchInput.value); }
+      });
+    }
+  }
+};
+
+/* ============================================================
+   BOOTSTRAP
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', function() {
+  try {
+    App.init();
+    window._helpMgr = App._helpManager;
+  } catch (e) {
+    console.error('Application bootstrap error:', e);
+  }
+});
+</script>
+</body>
+</html>
